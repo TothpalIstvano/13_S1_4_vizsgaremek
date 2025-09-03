@@ -4,3 +4,8 @@ https://mybird.com/
 
 https://uk.theinkeylist.com/
 
+
+
+Mobil app talán:
+https://nativescript-vue.org/docs/getting-started/introduction
+https://ionicframework.com/
