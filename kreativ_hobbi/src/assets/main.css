@@ -1,1 +1,23 @@
 @import './base.css';
+
+/* Oladl stílusok */
+.page-content {
+      max-width: 1200px;
+      margin: 30px auto;
+      padding: 20px;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+      min-height: 400px;
+}
+h2 {
+  color: #7a402d;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #ff8a65;
+}
+p {
+  line-height: 1.6;
+  margin-bottom: 15px;
+}
+
