@@ -1,15 +1,10 @@
 <template>
-  <div class="about">
-    <h1>Ez a Rólunk oldal</h1>
-  </div>
+  <main >
+    <h1>Ez a rólunk oldal</h1>
+    
+  </main>
 </template>
 
 <style>
-@media (min-width: 1024px) {
-  .about {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-  }
-}
+
 </style>

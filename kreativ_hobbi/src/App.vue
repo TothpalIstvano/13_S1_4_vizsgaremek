@@ -14,12 +14,12 @@ import { RouterLink, RouterView } from 'vue-router'
         height="50"
       />
       <h1 id="nev">Hobbitár</h1>
-      <RouterLink :class="{ 'active-link': $route.path === '/' }"  to="/">Főoldal</RouterLink>
-      <RouterLink :class="{ 'active-link': $route.path === '/aruhaz' }" to="/aruhaz">Áruház</RouterLink>
-      <RouterLink :class="{ 'active-link': $route.path === '/blog' }"  to="/blog">Blog</RouterLink>
-      <RouterLink :class="{ 'active-link': $route.path === '/mintakeszito' }" to="/mintakeszito">Mintakeszítő</RouterLink>  
-      <RouterLink :class="{ 'active-link': $route.path === '/rolunk' }" to="/rolunk">Rólunk</RouterLink>
-      <RouterLink :class="{ 'active-link': $route.path === '/kosar' }" style="float: right;" to="/kosar" class="vonal"
+      <RouterLink class="menu_link"  to="/">Főoldal</RouterLink>
+      <RouterLink class="menu_link" to="/aruhaz">Áruház</RouterLink>
+      <RouterLink class="menu_link"  to="/blog">Blog</RouterLink>
+      <RouterLink class="menu_link" to="/mintakeszito">Mintakeszítő</RouterLink>  
+      <RouterLink class="menu_link" to="/rolunk">Rólunk</RouterLink>
+      <RouterLink class="vonal" id="kocsi" style="float: right;" to="/kosar"
         ><img
           alt="Kosár"
           class="kosarLogo"
@@ -27,11 +27,12 @@ import { RouterLink, RouterView } from 'vue-router'
           width="30"
           height="30"
       /></RouterLink>
-      <RouterLink :class="{ 'active-link': $route.path === '/belepes' }" to="/belepes">Belépés</RouterLink>
+      <RouterLink class="menu_link" to="/belepes">Belépés</RouterLink>
     </nav>
   </header>
-
-  <RouterView />
+  <main>
+    <RouterView />
+  </main>
 </template>
 
 <style scoped>
@@ -45,7 +46,7 @@ import { RouterLink, RouterView } from 'vue-router'
 #nev {
   float: left;
   color: #ff8a65;
-  margin-right: 57%;
+  margin-right: 55%;
 }
 
 /* Naviágációs menű stílusa */
@@ -60,22 +61,54 @@ import { RouterLink, RouterView } from 'vue-router'
   padding: 10px;
   
 }
-.navbar a {
-  color: #c68b59;
-  text-decoration: none;
-  margin: 0 10px;
-}
-.navbar a:hover {
-
-}
 .vonal{
   border-left: #ff8a65 2px solid;
-  padding-left: 10px;
   margin-left: 10px;
+  padding-left: 10px;
+  margin-right: 15px;
 }
-.active-link {
+#kocsi{
+  
+}
+.menu_link {
   position: relative;
   padding-bottom: 4px;
-  font-weight: bold;
+  text-decoration: none;
+  color: #c68b59;
+  margin: 0 10px;
 }
+.menu_link::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background-color: #ff8a65;
+  transition: all 0.3s ease-in-out;
+}
+.menu_link.router-link-exact-active::after {
+  width: 100%;
+  left: 0;
+}
+.menu_link.router-link-exact-active {
+  color: #ff8a65;
+  font-weight: 600;
+}
+
+/* Reszponzív nav bar */
+@media (max-width: 900px) {
+  .navbar {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  #nev {
+    margin-right: 0;
+    width: 100%;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+}
+
 </style>
