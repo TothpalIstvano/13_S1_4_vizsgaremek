@@ -8,6 +8,15 @@ https://uk.theinkeylist.com/
 https://duyn491kcolsw.cloudfront.net/files/1i/1i2/1i217j.svg
 
 
+Ek diagram:
+adatbázis webshop:
+https://www.geeksforgeeks.org/dbms/how-to-design-er-diagrams-for-e-commerce-website/
+
+blog:
+https://www.edrawmax.com/templates/1002460/
+https://www.geeksforgeeks.org/sql/how-to-design-er-diagrams-for-social-media-networks/
+https://www.slideshare.net/slideshow/entity-relationship-diagram-for-blogging-platform/205809340
+
 
 Mobil app talán:
 https://nativescript-vue.org/docs/getting-started/introduction
