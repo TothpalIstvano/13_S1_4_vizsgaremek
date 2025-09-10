@@ -1,32 +1,84 @@
 <script setup>
-import { RouterLink, RouterView } from 'vue-router'
-import Kosar from './views/Kosar.vue';
+import { RouterLink, RouterView, useRouter } from 'vue-router'
+import hamburger from '@/components/icons/hamburger_menu.png'
+import logo from '@/components/icons/logo.png'
+import { ref, onMounted, onUnmounted } from 'vue';
+
+const router = useRouter();
+const latszik = ref(false);
+const nyitva = hamburger
+const zart = logo
+function open() {
+  if (window.innerWidth > 1200) {
+      router.push('/');
+  }
+  else{ 
+    latszik.value = !latszik.value;
+  }
+}
+function handleResize() {
+  if (window.innerWidth > 1200 && latszik.value) {
+    latszik.value = false;
+  }
+}
+onMounted(() => {
+  window.addEventListener('resize', handleResize);
+});
+onUnmounted(() => {
+  window.removeEventListener('resize', handleResize);
+});
+
 </script>
 
 <template>
   <div>
     <header>
       <nav class="navbar">
-        <RouterLink to="/" id="logo">
-        <embed
+        <img
           alt="Placeholder"
           type="image/svg+xml"
-          src="https://duyn491kcolsw.cloudfront.net/files/1i/1i2/1i217j.svg?border=ffa184&outline=ff6433&color=ff8a65"
+          :src="latszik ? nyitva : zart"
           width="50"
           height="50"
-          style="pointer-events:all;"
+          id="logo"
+          style="cursor: pointer;"
+          @click=open();
         />
-        </RouterLink>
         <RouterLink to="/" id="nev">
         <h1>Hobbitár</h1>
         </RouterLink>
 
-        <RouterLink class="menu_link" id="balraTolas" to="/">Főoldal</RouterLink>
-        <RouterLink class="menu_link" to="/aruhaz">Áruház</RouterLink>
-        <RouterLink class="menu_link"  to="/blog">Blog</RouterLink>
-        <RouterLink class="menu_link" to="/mintakeszito">Mintakeszítő</RouterLink>  
-        <RouterLink class="menu_link" to="/rolunk">Rólunk</RouterLink>
-        <RouterLink class="vonal"  style="float: right;" to="/kosar"
+        <RouterLink 
+          class="menu_link" 
+          id="balraTolas" 
+          to="/"
+          :class="{ hamburgerElem: latszik }"
+        >Főoldal</RouterLink>
+        <RouterLink 
+          class="menu_link" 
+          to="/aruhaz"
+          :class="{ hamburgerElem: latszik }"
+        >Áruház</RouterLink>
+        <RouterLink 
+          class="menu_link"  
+          to="/blog"
+          :class="{ hamburgerElem: latszik }"
+        >Blog</RouterLink>
+        <RouterLink 
+          class="menu_link" 
+          to="/mintakeszito"
+          :class="{ hamburgerElem: latszik }"
+        >Mintakeszítő</RouterLink>  
+        <RouterLink 
+          class="menu_link" 
+          to="/rolunk"
+          :class="{ hamburgerElem: latszik }"
+        >Rólunk</RouterLink>
+        <RouterLink 
+          class="vonal"  
+          style="float: right;" 
+          to="/kosar"
+          :class="{ hamburgerElem: latszik }"
           ><img
             alt="Kosár"
             class="kosarLogo"
@@ -34,7 +86,11 @@ import Kosar from './views/Kosar.vue';
             width="50"
             height="50"
         /></RouterLink>
-        <RouterLink class="menu_link" to="/belepes">Belépés</RouterLink>
+        <RouterLink 
+          class="menu_link" 
+          to="/belepes"
+          :class="{ hamburgerElem: latszik }"
+        >Belépés</RouterLink>
 
       </nav>
     </header>
@@ -51,14 +107,23 @@ import Kosar from './views/Kosar.vue';
   float: left;
   margin-left: 10rem;
   text-decoration: none;
-
+  transition: transform 0.7s;
 }
+.logo-fade-enter-active, .logo-fade-leave-active {
+  transition: opacity 0.4s;
+}
+.logo-fade-enter-from, .logo-fade-leave-to {
+  opacity: 0;
+}
+.logo-fade-enter-to, .logo-fade-leave-from {
+  opacity: 1;
+}
+
 #nev {
   float: left;
   color: #ff8a65;
   text-decoration: none;
 }
-
 /* Naviágációs menű stílusa */
 .navbar {
   display: flex;
@@ -89,6 +154,7 @@ import Kosar from './views/Kosar.vue';
   color: #c68b59;
   margin: 0 10px;
 }
+
 .menu_link::after {
   content: '';
   position: absolute;
@@ -108,7 +174,7 @@ import Kosar from './views/Kosar.vue';
   font-weight: 600;
 }
 
-/* Reszponzív nav bar */
+/* Reszponzív nav bar + hamburger menü */
 @media (max-width: 1200px) {
   .navbar {
     flex-direction: column;
@@ -122,8 +188,8 @@ import Kosar from './views/Kosar.vue';
     float: none;
     margin-left: 0;
     margin-bottom: 10px;
-    justify-content: center;
     display: flex;
+    transform: rotate(90deg);
   }
   #nev {
     margin-right: 0;
@@ -132,13 +198,14 @@ import Kosar from './views/Kosar.vue';
     margin-bottom: 10px;
     float: none;
   }
-  .menu_link, .vonal, #kocsi {
+  .menu_link.hamburgerElem, .vonal {
     float: none !important;
     margin: 0 0 10px 0;
     padding: 0;
     width: 100%;
     text-align: center;
-    display: block;
+    display: none;
+
   }
   .vonal {
     display: none !important;
