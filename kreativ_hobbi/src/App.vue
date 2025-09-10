@@ -1,5 +1,6 @@
 <script setup>
 import { RouterLink, RouterView } from 'vue-router'
+import Kosar from './views/Kosar.vue';
 </script>
 
 <template>
@@ -19,13 +20,13 @@ import { RouterLink, RouterView } from 'vue-router'
       <RouterLink class="menu_link"  to="/blog">Blog</RouterLink>
       <RouterLink class="menu_link" to="/mintakeszito">Mintakeszítő</RouterLink>  
       <RouterLink class="menu_link" to="/rolunk">Rólunk</RouterLink>
-      <RouterLink class="vonal" id="kocsi" style="float: right;" to="/kosar"
+      <RouterLink class="vonal" id="kocsi" style="float: right;" to="/kosar" onclick="changePic()"
         ><img
           alt="Kosár"
           class="kosarLogo"
-          src="@/components/icons/kosar.svg"
-          width="30"
-          height="30"
+          src="@/components/icons/cart.svg"
+          width="50"
+          height="50"
       /></RouterLink>
       <RouterLink class="menu_link" to="/belepes">Belépés</RouterLink>
     </nav>
