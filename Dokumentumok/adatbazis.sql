@@ -18,8 +18,7 @@ CREATE TABLE termek{
     mennyiseg INT,
     kepek VARCHAR(255),
     megjelenito_kep VARCHAR(255),
-    merominta VARCHAR(50),
-    FOREIGN KEY (cimkek) REFERENCES cimkek(nev)
+    merominta VARCHAR(50)
 }
 
 CREATE TABLE termek_szinek{
@@ -96,6 +95,7 @@ CREATE TABLE ertekeles{
     felhasznalo_id INT,
     termek_id INT,
     ertekeles INT CHECK (ertekeles BETWEEN 1 AND 5),
+    datum TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (felhasznalo_id) REFERENCES felhasznalo(id),
     FOREIGN KEY (termek_id) REFERENCES termek(id),
     UNIQUE KEY unique_rating (felhasznalo_id, termek_id) -- Egy felhasználó csak egyszer értékelhet egy terméket
