@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Fooldal from '../views/Fooldal.vue'
 import Aruhaz from '../views/Aruhaz.vue'
 import Belepes from '../views/Belepes.vue'
 import Blog from '../views/Blog.vue'
@@ -9,14 +8,15 @@ import Mintakeszito from '../views/Mintakeszito.vue'
 import Profil from '../views/Profil.vue'
 import Regisztracio from '../views/Regisztracio.vue'
 import Rolunk from '../views/Rolunk.vue'
+import Index from '@/views/index.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/',
-      name: 'fooldal',
-      component: Fooldal,
+      name: 'index',
+      component: Index,
     },
     {
       path: '/aruhaz',
