@@ -9,8 +9,9 @@ CREATE TABLE felhasznalo{
     letrehozas_datuma TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 }
 
-CREATE TABLE termek{
+/*CREATE TABLE termekek{
     id INT PRIMARY KEY AUTO_INCREMENT,
+    cimke_id VARCHAR(3),
     nev VARCHAR(100) NOT NULL,
     leiras TEXT,
     ar DECIMAL(10, 2) NOT NULL,
@@ -19,13 +20,13 @@ CREATE TABLE termek{
     kepek VARCHAR(255),
     megjelenito_kep VARCHAR(255),
     merominta VARCHAR(50)
-}
+}*/
 
-CREATE TABLE termek_szinek{
+CREATE TABLE termekek_szinek{
     id INT PRIMARY KEY AUTO_INCREMENT,
     termek_id INT,
     szin VARCHAR(50),
-    FOREIGN KEY (termek_id) REFERENCES termek(id)
+    FOREIGN KEY (termek_id) REFERENCES termekek(id)
 }
 
 CREATE TABLE blog{
@@ -55,11 +56,11 @@ CREATE TABLE cimkek{
     nev VARCHAR(100) NOT NULL UNIQUE,
 }
 
-CREATE TABLE termek_cimkek{
+CREATE TABLE termekek_cimkek{
     id INT PRIMARY KEY AUTO_INCREMENT,
-    termek_id INT,
+    termekek_id INT,
     cimke_id INT,
-    FOREIGN KEY (termek_id) REFERENCES termek(id),
+    FOREIGN KEY (termekek_id) REFERENCES termekek(cimke_id),
     FOREIGN KEY (cimke_id) REFERENCES cimkek(id)
 }
 
@@ -86,7 +87,7 @@ CREATE TABLE kedvencek{
     felhasznalo_id INT,
     termek_id INT,
     FOREIGN KEY (felhasznalo_id) REFERENCES felhasznalo(id),
-    FOREIGN KEY (termek_id) REFERENCES termek(id),
+    FOREIGN KEY (termek_id) REFERENCES termekek(id),
     UNIQUE KEY unique_favorite (felhasznalo_id, termek_id) -- Egy felhasználó csak egyszer jelölheti meg kedvencként ugyanazt a terméket
 }
 
@@ -97,6 +98,6 @@ CREATE TABLE ertekeles{
     ertekeles INT CHECK (ertekeles BETWEEN 1 AND 5),
     datum TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (felhasznalo_id) REFERENCES felhasznalo(id),
-    FOREIGN KEY (termek_id) REFERENCES termek(id),
+    FOREIGN KEY (termek_id) REFERENCES termekek(id),
     UNIQUE KEY unique_rating (felhasznalo_id, termek_id) -- Egy felhasználó csak egyszer értékelhet egy terméket
 }
