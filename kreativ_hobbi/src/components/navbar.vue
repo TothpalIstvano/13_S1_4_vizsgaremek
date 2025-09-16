@@ -1,13 +1,13 @@
 <script setup>
 import { RouterLink, RouterView, useRouter } from 'vue-router'
-import hamburger from '@/components/icons/hamburger_menu.png'
-import logo from '@/components/icons/logo.png'
+import Logo3 from '@/components/icons/logo3.png'
+import Logo2 from '@/components/icons/logo2.png'
 import { ref, onMounted, onUnmounted } from 'vue';
 
 const router = useRouter();
 const latszik = ref(false);
-const nyitva = hamburger
-const zart = logo
+const logo3 = Logo3
+const logo2 = Logo2
 function open() {
   if (window.innerWidth > 1200) {
       router.push('/');
@@ -34,19 +34,37 @@ onUnmounted(() => {
   <div>
     <header>
       <nav class="navbar">
-        <img
-          alt="Placeholder"
-          type="image/svg+xml"
-          :src="latszik ? nyitva : zart"
-          width="50"
-          height="50"
-          id="logo"
-          style="cursor: pointer;"
-          @click=open();
-        />
-        <RouterLink to="/" id="nev">
-        <h1>Hobbitár</h1>
-        </RouterLink>
+        <div id="logoDiv">
+          <img
+            alt="Placeholder"
+            type="image/svg+xml"
+            :src="logo2"
+            width="12"
+            height="50"
+            class="logo"
+            id="logo2"
+            :style="!latszik ? 'transform: rotate(45deg); left: 10px;' : ''"
+            style="cursor: pointer;"
+            @click=open();
+          />
+          <img  
+            alt="Placeholder"
+            type="image/png"
+            :src="logo3"
+            width="20"
+            height="50"
+            class="logo"
+            id="logo3"
+            :style="!latszik ? 'transform: rotate(-45deg); left: -10px; ' : ''"
+            style="cursor: pointer;"
+            @click=open();
+          />
+        </div>
+        <div id="nevDiv">
+          <RouterLink to="/" id="nev">
+            <h1>Hobbitár</h1>
+          </RouterLink>
+        </div>
 
         <RouterLink 
           class="menu_link" 
@@ -54,26 +72,31 @@ onUnmounted(() => {
           to="/"
           :class="{ hamburgerElem: latszik }"
         >Főoldal</RouterLink>
+
         <RouterLink 
           class="menu_link" 
           to="/aruhaz"
           :class="{ hamburgerElem: latszik }"
         >Áruház</RouterLink>
+
         <RouterLink 
           class="menu_link"  
           to="/blog"
           :class="{ hamburgerElem: latszik }"
         >Blog</RouterLink>
+
         <RouterLink 
           class="menu_link" 
           to="/mintakeszito"
           :class="{ hamburgerElem: latszik }"
-        >Mintakeszítő</RouterLink>  
+        >Mintakeszítő</RouterLink> 
+
         <RouterLink 
           class="menu_link" 
           to="/rolunk"
           :class="{ hamburgerElem: latszik }"
         >Rólunk</RouterLink>
+
         <RouterLink 
           class="vonal"  
           style="float: right;" 
@@ -86,6 +109,7 @@ onUnmounted(() => {
             width="50"
             height="50"
         /></RouterLink>
+
         <RouterLink 
           class="menu_link" 
           to="/belepes"
@@ -99,21 +123,37 @@ onUnmounted(() => {
 
 <style scoped>
 /* logo stílusa */
-#logo {
+#logoDiv{
+  display: flex;
+  align-items: center;
+  margin-left: 10rem;
+  flex-direction: row;
+  gap: 5px;
+  transition: transform 0.7s;
+}
+.logo {
   /*color: #ff8a65;*/
   float: left;
-  margin-left: 10rem;
   text-decoration: none;
   transition: transform 0.7s;
 }
-.logo-fade-enter-active, .logo-fade-leave-active {
-  transition: opacity 0.4s;
+
+#logo2{
+  z-index: 2;
+  position: relative; 
+  left: 0px;
 }
-.logo-fade-enter-from, .logo-fade-leave-to {
-  opacity: 0;
+#logo3{
+  z-index: 1;
+  position: relative;
+  left: 0px;
+
 }
-.logo-fade-enter-to, .logo-fade-leave-from {
-  opacity: 1;
+
+#nevDiv{
+  display: flex;
+  align-items: center;
+  margin-left: 1rem;
 }
 
 #nev {
@@ -172,6 +212,7 @@ onUnmounted(() => {
 }
 
 /* Reszponzív nav bar + hamburger menü */
+
 @media (max-width: 1200px) {
   .navbar {
     flex-direction: column;
@@ -181,13 +222,25 @@ onUnmounted(() => {
     gap: 10px;
     padding: 10px 0;
   }
-  #logo {
-    float: none;
+  #logoDiv {
     margin-left: 0;
     margin-bottom: 10px;
-    display: flex;
+    align-items: center;
     transform: rotate(90deg);
   }
+  .logo {
+    float: none;
+    margin-left: 0;
+    display: flex;
+  }
+  .logo1{
+
+    transition: left 0.7s ease-in-out;
+  }
+  .logo2{ 
+    transition: left 0.7s ease-in-out;
+  }
+
   #nev {
     margin-right: 0;
     width: 100%;
@@ -208,7 +261,7 @@ onUnmounted(() => {
     display: none !important;
   }
   #balraTolas{
-    margin-left: 0;
+    margin-left: 1.8%;
   }
 }
 </style>
