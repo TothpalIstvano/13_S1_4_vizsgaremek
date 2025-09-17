@@ -25,6 +25,7 @@ https://ionicframework.com/
 
 Hosting:
 https://www.nethely.hu/
+https://www.w3schools.com/spaces/index.php
 https://render.com/pricing
 https://firebase.google.com/pricing
 https://vercel.com/pricing
