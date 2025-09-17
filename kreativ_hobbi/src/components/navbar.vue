@@ -1,24 +1,27 @@
 <script setup>
 import { RouterLink, RouterView, useRouter } from 'vue-router'
-import Logo3 from '@/components/icons/logo3.png'
-import Logo2 from '@/components/icons/logo2.png'
+import logo_kalapacs from '@/components/icons/logo_kalapacs.png'
+import logo_reszelo from '@/components/icons/logo_reszelo.png'
 import { ref, onMounted, onUnmounted } from 'vue';
 
 const router = useRouter();
 const latszik = ref(false);
-const logo3 = Logo3
-const logo2 = Logo2
+const logoKalapacs = logo_kalapacs
+const logoReszelo = logo_reszelo
+const xbeValtas = false
 function open() {
   if (window.innerWidth > 1200) {
       router.push('/');
   }
   else{ 
     latszik.value = !latszik.value;
+    xbeValtas.value = !xbeValtas.value;
   }
 }
 function handleResize() {
   if (window.innerWidth > 1200 && latszik.value) {
     latszik.value = false;
+    xbeValtas.value = false;
   }
 }
 onMounted(() => {
@@ -32,30 +35,31 @@ onUnmounted(() => {
 
 <template>
   <div>
+    <div style="margin-bottom:88px;"></div>
     <header>
       <nav class="navbar">
         <div id="logoDiv">
           <img
             alt="Placeholder"
             type="image/svg+xml"
-            :src="logo2"
+            :src="logoReszelo"
             width="12"
             height="50"
             class="logo"
-            id="logo2"
-            :style="!latszik ? 'transform: rotate(45deg); left: 10px;' : ''"
+            id="reszelo"
+            :style="latszik ? 'transform: rotate(45deg); left: 10px; right: 5px;' : ''"
             style="cursor: pointer;"
             @click=open();
           />
           <img  
             alt="Placeholder"
             type="image/png"
-            :src="logo3"
+            :src="logoKalapacs"
             width="20"
             height="50"
             class="logo"
-            id="logo3"
-            :style="!latszik ? 'transform: rotate(-45deg); left: -10px; ' : ''"
+            id="kalapacs"
+            :style="latszik ? 'transform: rotate(-45deg); left: -10px; rigth: 5px; ' : ''"
             style="cursor: pointer;"
             @click=open();
           />
@@ -70,42 +74,42 @@ onUnmounted(() => {
           class="menu_link" 
           id="balraTolas" 
           to="/"
-          :class="{ hamburgerElem: latszik }"
+          :class="{ hamburgerElem: !latszik }"
         >Főoldal</RouterLink>
 
         <RouterLink 
           class="menu_link" 
           to="/aruhaz"
-          :class="{ hamburgerElem: latszik }"
+          :class="{ hamburgerElem: !latszik }"
         >Áruház</RouterLink>
 
         <RouterLink 
           class="menu_link"  
           to="/blog"
-          :class="{ hamburgerElem: latszik }"
+          :class="{ hamburgerElem: !latszik }"
         >Blog</RouterLink>
 
         <RouterLink 
           class="menu_link" 
           to="/mintakeszito"
-          :class="{ hamburgerElem: latszik }"
+          :class="{ hamburgerElem: !latszik }"
         >Mintakeszítő</RouterLink> 
 
         <RouterLink 
           class="menu_link" 
           to="/rolunk"
-          :class="{ hamburgerElem: latszik }"
+          :class="{ hamburgerElem: !latszik }"
         >Rólunk</RouterLink>
 
         <RouterLink 
           class="vonal"  
           style="float: right;" 
           to="/kosar"
-          :class="{ hamburgerElem: latszik }"
+          :class="{ hamburgerElem: !latszik }"
           ><img
             alt="Kosár"
             class="kosarLogo"
-            src="@/components/icons/cart.svg"
+            src="@/components/icons/Cart.png"
             width="50"
             height="50"
         /></RouterLink>
@@ -113,7 +117,7 @@ onUnmounted(() => {
         <RouterLink 
           class="menu_link" 
           to="/belepes"
-          :class="{ hamburgerElem: latszik }"
+          :class="{ hamburgerElem: !latszik }"
         >Belépés</RouterLink>
 
       </nav>
@@ -136,18 +140,21 @@ onUnmounted(() => {
   float: left;
   text-decoration: none;
   transition: transform 0.7s;
+  cursor: pointer;
 }
 
-#logo2{
+#reszelo{
   z-index: 2;
   position: relative; 
   left: 0px;
+  right: 0px;
+  
 }
-#logo3{
+#kalapacs{
   z-index: 1;
   position: relative;
   left: 0px;
-
+  right: 0px;
 }
 
 #nevDiv{
@@ -171,7 +178,6 @@ onUnmounted(() => {
   left: 0;
   width: 100%;
   padding: 10px;
-    
 }
 
 #balraTolas{
@@ -227,17 +233,17 @@ onUnmounted(() => {
     margin-bottom: 10px;
     align-items: center;
     transform: rotate(90deg);
+    float: left;
   }
   .logo {
     float: none;
     margin-left: 0;
     display: flex;
   }
-  .logo1{
-
+  .reszelo{
     transition: left 0.7s ease-in-out;
   }
-  .logo2{ 
+  .kalapacs{ 
     transition: left 0.7s ease-in-out;
   }
 
