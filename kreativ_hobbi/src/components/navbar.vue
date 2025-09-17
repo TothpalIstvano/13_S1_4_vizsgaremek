@@ -35,7 +35,7 @@ onUnmounted(() => {
 
 <template>
   <div>
-    <div style="margin-bottom:88px;"></div>
+    <div id="felsoGap"></div>
     <header>
       <nav class="navbar">
         <div id="logoDiv">
@@ -180,6 +180,7 @@ onUnmounted(() => {
   left: 0;
   width: 100%;
   padding: 10px;
+  z-index: 1;
 }
 
 #balraTolas{
@@ -217,6 +218,9 @@ onUnmounted(() => {
 .menu_link.router-link-exact-active {
   color: #ff8a65;
   font-weight: 600;
+}
+#felsoGap{
+  height: 88px;
 }
 
 /* Reszponzív nav bar + hamburger menü */
@@ -270,6 +274,9 @@ onUnmounted(() => {
   }
   #balraTolas{
     margin-left: 1.8%;
+  }
+  #felsoGap{
+    height: 160px;
   }
 }
 </style>

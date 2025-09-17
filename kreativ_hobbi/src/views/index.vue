@@ -4,8 +4,6 @@ import Carousel from '@/components/carousel.vue';
 
 <template>
   <main>
-    <h1>Index Page</h1>
-    <p>Welcome to the index page!</p>
     <carousel />
   </main>
 </template>
