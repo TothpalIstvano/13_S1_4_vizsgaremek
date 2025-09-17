@@ -92,8 +92,10 @@ onUnmounted(() => {
         <RouterLink 
           class="menu_link" 
           to="/mintakeszito"
+
           :class="{ hamburgerElem: !latszik }"
-        >Mintakeszítő</RouterLink> 
+        >Mintakészítő</RouterLink> 
+
 
         <RouterLink 
           class="menu_link" 
