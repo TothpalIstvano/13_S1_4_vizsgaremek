@@ -59,7 +59,7 @@ CREATE TABLE kommentek(
 
 CREATE TABLE cimkek(
     id INT PRIMARY KEY AUTO_INCREMENT,
-    nev VARCHAR(100) NOT NULL UNIQUE,
+    nev VARCHAR(100) NOT NULL UNIQUE, --külön legyen a,b,c,d,e fonalcsoport hogy a mintakészítőben tudjunk vele számolni
 )
 
 CREATE TABLE termekek_cimkek(
