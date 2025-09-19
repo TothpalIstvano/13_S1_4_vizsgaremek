@@ -179,8 +179,11 @@ onUnmounted(() => {
   top: 0;
   left: 0;
   width: 100%;
+  height: 70px;
   padding: 10px;
   z-index: 1;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-bottom:2px solid #ff8a65;
 }
 
 #balraTolas{
@@ -220,7 +223,7 @@ onUnmounted(() => {
   font-weight: 600;
 }
 #felsoGap{
-  height: 88px;
+  height: 90px;
 }
 
 /* Reszponzív nav bar + hamburger menü */
