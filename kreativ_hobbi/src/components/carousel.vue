@@ -26,10 +26,9 @@ setInterval(nextImage, 10000);
 
 <template>
     <div>
-        <div>
-            <div>
+        <div >
+            <div id="carouselContainer" :style="{ backgroundImage: `url(${kepek[currentIndex].src})`}">
                 <button @click="prevImage" type="button" id="balGomb"> 	&#129104;</button>
-                <img :src="kepek[currentIndex].src" :alt="kepek[currentIndex].alt" id="carouselImage"/>
                 <button @click="nextImage" type="button" id="jobbGomb">&#129106;</button>
             </div>
             <div style="display: flex; justify-content: center; gap: 10px; margin-top: 10px;">
@@ -42,18 +41,22 @@ setInterval(nextImage, 10000);
 </template>
 
 <style scoped>
+#carouselContainer {
+    position: relative;
+    overflow: hidden;
+}
 #carouselImage {
     width: 100%;
     height: auto;
     max-height: 600px;
-    border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     transition: opacity 0.5s ease-in-out;
     z-index: -1;
 }
 #balGomb {
     width: 40px;
-    height: 600px;
+    height: 40px;
+    border-radius: 50%;
     position: absolute;
     left: 10px;
     top: 43.5%;
@@ -66,7 +69,8 @@ setInterval(nextImage, 10000);
 }
 #jobbGomb {
     width: 40px;
-    height: 600px;
+    height: 40px;
+    border-radius: 50%;
     position: absolute;
     right: 10px;
     top: 43.5%;
@@ -83,26 +87,7 @@ setInterval(nextImage, 10000);
     transition: all 1.5s ease-in-out;
 }
 #balGomb:hover::after, #jobbGomb:hover::after {
-   background-color: rgba(0, 0, 0, 0.5);
-   transition: all 1.5s ease-in-out;
+    background-color: rgba(0, 0, 0, 0.5);
+    transition: all 1.5s ease-in-out;
 }
-
-/*
-                <div class="box1 box">
-                    <div class="bg"></div>
-                    <div class="details">
-                        <h1>I'm the first Box</h1>
-                        <p>
-                            Lorem ipsum dolor sit amet, consectetur adipiscing 
-                            elit. Integer lacinia dui lectus. Donec scelerisque ipsum
-                            diam, ac mattis orci pellentesque eget. 
-                        </p>
-                        <button>Check Now</button>
-                    </div>
-
-                    <div class="illustration"><div class="inner"></div></div>
-                </div>
-                                
-*/
 </style>
- 

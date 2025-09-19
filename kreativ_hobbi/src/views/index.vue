@@ -4,7 +4,7 @@ import Carousel from '@/components/carousel.vue';
 
 <template>
   <main>
-    <carousel />
+    <carousel></carousel>
   </main>
 </template>
 
