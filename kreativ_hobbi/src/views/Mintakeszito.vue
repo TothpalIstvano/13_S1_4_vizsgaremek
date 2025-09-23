@@ -34,17 +34,17 @@ function kepfeltoltes(event) {
   const selectedFile = event.target.files[0]
   if (selectedFile) {
     file.value = selectedFile
-    // Create object URL for the image
     imageUrl.value = URL.createObjectURL(selectedFile)
   }
 }
 
-function toMintavaltoztato() {  //ehhez kapcsolódik ami nem mükszik
-  if (file.value && imageUrl.value) {
+function toMintavaltoztato() {
+ if (file.value) {
+    const url = URL.createObjectURL(file.value)
     router.push({
       path: '/mintavaltoztato',
       query: { 
-        imageUrl: imageUrl.value,
+        imageUrl: url,
         fileName: file.value.name
       }
     })
@@ -169,7 +169,6 @@ export default {
         />
         <br>
 
-        <!--nem mükszik-->
         <button
             :disabled="!file"
             @click="toMintavaltoztato" 
