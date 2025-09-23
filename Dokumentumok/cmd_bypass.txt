@@ -1,1 +1,3 @@
 set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+
+npx @vue/cli create - ha nem lehet vue create
