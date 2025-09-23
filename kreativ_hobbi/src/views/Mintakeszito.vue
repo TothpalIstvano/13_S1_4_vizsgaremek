@@ -31,14 +31,33 @@ function modositas(target) {
 }
 
 function kepfeltoltes(event) {
-  file.value = event.target.files[0]
-  if (file.value) {
-    // do your upload logic here (API call, etc.)
-    // then redirect
-    router.push("/thank-you") // change path as needed
+  const selectedFile = event.target.files[0]
+  if (selectedFile) {
+    file.value = selectedFile
+    // Create object URL for the image
+    imageUrl.value = URL.createObjectURL(selectedFile)
   }
 }
+
+function toMintavaltoztato() {  //ehhez kapcsolódik ami nem mükszik
+  if (file.value && imageUrl.value) {
+    router.push({
+      path: '/mintavaltoztato',
+      query: { 
+        imageUrl: imageUrl.value,
+        fileName: file.value.name
+      }
+    })
+  }
+}
+
 </script>
+<script>
+export default {
+  name: "Mintakeszito",
+};
+</script>
+
 
 <template>
   <main>
@@ -73,59 +92,6 @@ function kepfeltoltes(event) {
         </div>
     </div>
 
-    <!--
-    <div class="ket_oszlop">
-      <div class="adatok">
-        <p>Milyen projektet szeretne készíteni?</p>
-        <div id="tipusok">
-          <input type="radio" name="tipus" id="1">
-          <label for="tipus">Horgolás</label><br>
-          <input type="radio" name="tipus" id="2">
-          <label for="tipus">Kötés</label><br>
-          <input type="radio" name="tipus" id="3">
-          <label for="tipus">Hímzés</label><br>
-        </div>
-
-        <p>Milyen vastag fonalból készülne?</p> //hímzésnél nyilván ne lehessen választani, disabled lesz
-        <div id="fonalCsoportok">
-          <input type="radio" name="fonal" id="1">
-          <label for="fonal">'A' fonal csoport</label><br>
-          <input type="radio" name="fonal" id="2">
-          <label for="fonal">'B' fonal csoport</label><br>
-          <input type="radio" name="fonal" id="3">
-          <label for="fonal">'C' fonal csoport</label><br>
-          <input type="radio" name="fonal" id="4">
-          <label for="fonal">'D' fonal csoport</label><br>
-          <input type="radio" name="fonal" id="5">
-          <label for="fonal">'E' fonal csoport</label><br>
-        </div>
-      </div>
-
-      <div class="adatok" id="vmiSzar">
-        <p>Válassza ki a fájlt:</p>
-        <input type="file" name="kepFeltoltes" id="" accept="image/*">
-
-        <p>Állítsa be a méretet:</p>
-        <form action="">
-          <input type="range" name="meret" id="" min="20" max="200" resz="1" value="100" oninput="this.form.mennyi.value=this.value">
-          //https://www.w3schools.com/howto/tryit.asp?filename=tryhow_css_js_rangeslider_round
-          <input type="number" name="mennyi" min="20" max="200" value="100" oninput="this.form.meret.value=this.value" />
-        </form>
-      
-        <p id="meretKiiras"></p>
-
-      </div>
-
-      <div class="adatok">
-
-      </div>
-
-      <div class="adatok">
-
-      </div>
-
-    </div>
-  -->
 
     <div id="adatok">
       <!-- 1. rész -->
@@ -202,13 +168,15 @@ function kepfeltoltes(event) {
           @change="kepfeltoltes"
         />
         <br>
+
+        <!--nem mükszik-->
         <button
-          :disabled="!masodikLepes"
-          @click="kovetkezoResz"
-          class="tovabbGomb"
-        >
+            :disabled="!file"
+            @click="toMintavaltoztato" 
+            class="tovabbGomb">
           Minta készítése >>
         </button>
+
       </div>
     </div>
     
@@ -278,10 +246,6 @@ function kepfeltoltes(event) {
     margin-bottom: 30px;
   }
 
-  .radioStilus {
-    
-  }
-
   .tovabbGomb {
   max-width: 200px;
   height: 40px;
@@ -338,4 +302,34 @@ function kepfeltoltes(event) {
     width:100%;
     transition:800ms ease all;
   }
+
+  .tovabbGomb:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.tovabbGomb:disabled:hover {
+  background: linear-gradient(0deg, rgb(248, 121, 107) 0%, rgb(236, 182, 158) 100%);
+  color: rgb(24, 23, 23);
+  box-shadow: inset 2px 2px 2px 0px rgba(255,255,255,.5),
+              7px 7px 20px 0px rgba(0,0,0,.1),
+              4px 4px 5px 0px rgba(0,0,0,.1);
+}
+
+.image-preview {
+  margin: 20px 0;
+  text-align: center;
+}
+
+.image-preview img {
+  max-width: 300px;
+  max-height: 300px;
+  border: 2px solid #ddd;
+  border-radius: 5px;
+}
+
+.tovabbGomb:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
 </style>
