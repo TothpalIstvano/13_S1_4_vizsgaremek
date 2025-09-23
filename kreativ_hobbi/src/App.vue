@@ -5,14 +5,14 @@ import Footer from '@/components/footer.vue';
 
 <template>
   <div>
-    <Navbar />
+    <Navbar></Navbar>
     <main>
-      <RouterView />
+      <RouterView></RouterView>
     </main>
-    <Footer />
+    <Footer></Footer>
   </div>
 </template>
 
-<style>
+<style scoped>
 
 </style>
