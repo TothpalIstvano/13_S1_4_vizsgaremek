@@ -13,8 +13,8 @@
           <label>Pixel Méret: {{ pixelMeret }}px</label>
           <input 
             type="range" 
-            min="2" 
-            max="50" 
+            min="5" 
+            max="40" 
             v-model="pixelMeret" 
             class="csuszka"
             @input="kepFrissites"
@@ -63,9 +63,7 @@
         </div>
       </div>
 
-      <div class="vaszon-container">
-        <canvas ref="canvas"></canvas>
-      </div>
+      <canvas ref="canvas"></canvas>
 
       <div class="gombok">
         <button @click="ujrakedzes" class="gombok">Eredeti kép</button>
@@ -85,7 +83,7 @@ export default {
       eredetiKep: null,
       pixelMeret: 10,
       szinezes: "eredeti",
-      szinekSzama: 8,
+      szinekSzama: 20,
       szinPaletta: [],
       valasztottSzin: null,
       ctx: null,
@@ -105,7 +103,7 @@ export default {
         this.vaszonLetrehozasa();
         this.kepFrissites();
       };
-      this.eredetiKep.crossOrigin = "anonymous";
+      this.eredetiKep.crossOrigin = "anonymous";  //más domain-ről is be tud tölteni a kép
       this.eredetiKep.src = this.imageUrl;
     },
     vaszonLetrehozasa() {
@@ -118,7 +116,7 @@ export default {
       if (!this.eredetiKep) return;
       
       this.vaszonFeldolgozas(this.eredetiKep);
-      this.extractszinPaletta();
+      this.kinyertSzinPaletta();
     },
     vaszonFeldolgozas(img) {
       const pixelMeret = parseInt(this.pixelMeret);
@@ -215,7 +213,7 @@ export default {
         a: a / count / 255
       };
     },
-    extractszinPaletta() {
+    kinyertSzinPaletta() {
       if (!this.jelenlegiKep) return;
       
       const { data, width, height } = this.jelenlegiKep;
@@ -230,7 +228,7 @@ export default {
         szinek.add(color);
       }
       
-      this.szinPaletta = Array.from(szinek).slice(0, 20); // 20 szín a limit
+      this.szinPaletta = Array.from(szinek).slice(0, this.szinekSzama); // 20 szín a limit
     },
     szinValaszto(color) {
       this.valasztottSzin = color;
@@ -339,11 +337,6 @@ export default {
   width: 100%;
   height: 100%;
   cursor: pointer;
-}
-
-.vaszon-container {
-  text-align: center;
-  margin: 2rem 0;
 }
 
 canvas {
