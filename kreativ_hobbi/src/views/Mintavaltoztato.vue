@@ -1,79 +1,76 @@
 <template>
-  <div class="pixelator-container">
+  <div class="pixelesContainer">
     <h1>Minta Változtató</h1>
     
-    <div v-if="!imageUrl" class="upload-section">
+    <div v-if="!imageUrl" class="feltoltes">
       <p>Nincs kép betöltve. Kérjük, menj vissza és tölts fel egy képet.</p>
-      <button @click="$router.back()" class="back-button">Vissza a feltöltéshez</button>
+      <button @click="$router.back()" class="visszaGomb">Vissza a feltöltéshez</button>
     </div>
 
-    <div v-else class="editor-container">
-      <!-- Controls -->
-      <div class="controls">
-        <div class="control-group">
-          <label>Pixel Méret: {{ pixelSize }}px</label>
+    <div v-else class="modositoContainer">
+      <div class="modositas">
+        <div class="valtoztatok">
+          <label>Pixel Méret: {{ pixelMeret }}px</label>
           <input 
             type="range" 
             min="2" 
             max="50" 
-            v-model="pixelSize" 
-            class="slider"
+            v-model="pixelMeret" 
+            class="csuszka"
+            @input="kepFrissites"
           />
         </div>
 
-        <div class="control-group">
+        <div class="valtoztatok">
           <label>Szín Mód:</label>
-          <select v-model="colorMode" class="select-box">
-            <option value="original">Eredeti színek</option>
-            <option value="grayscale">Szürkeárnyalatos</option>
-            <option value="limited">Korlátozott színpaletta</option>
+          <select v-model="szinezes" class="lenyiloBox" @change="kepFrissites">
+            <option value="eredeti">Eredeti színek</option>
+            <option value="kevesebbSzin">Korlátozott színpaletta</option>
           </select>
         </div>
 
-        <div class="control-group" v-if="colorMode === 'limited'">
-          <label>Színek száma: {{ colorCount }}</label>
+        <div class="valtoztatok" v-if="szinezes === 'kevesebbSzin'">
+          <label>Színek száma: {{ szinekSzama }}</label>
           <input 
             type="range" 
             min="2" 
             max="20" 
-            v-model="colorCount" 
-            class="slider"
+            v-model="szinekSzama" 
+            class="csuszka"
+            @input="kepFrissites"
           />
         </div>
       </div>
 
-      <!-- Color Palette -->
-      <div v-if="colorPalette.length > 0" class="color-palette">
+      <div v-if="szinPaletta.length > 0" class="szin-paletta">
         <h3>Színpaletta</h3>
-        <div class="colors">
+        <div class="szinek">
           <div 
-            v-for="(color, index) in colorPalette" 
+            v-for="(color, index) in szinPaletta" 
             :key="index" 
-            class="color-item"
+            class="szinek-class"
             :style="{ backgroundColor: color }"
-            @click="selectColor(color)"
-            :class="{ selected: selectedColor === color }"
+            @click="szinValaszto(color)"
+            :class="{ selected: valasztottSzin === color }"
           >
             <input 
               type="color" 
               :value="color" 
-              @input="updateColor(index, $event.target.value)"
+              @input="frissítettSzin(index, $event.target.value)"
               @click.stop
             />
           </div>
         </div>
       </div>
 
-      <!-- Canvas -->
-      <div class="canvas-container">
+      <div class="vaszon-container">
         <canvas ref="canvas"></canvas>
       </div>
 
-      <!-- Actions -->
-      <div class="actions">
-        <button @click="resetImage" class="action-button">Eredeti kép</button>
-        <button @click="downloadImage" class="action-button download">Letöltés</button>
-        <button @click="$router.back()" class="action-button">Új kép</button>
+      <div class="gombok">
+        <button @click="ujrakedzes" class="gombok">Eredeti kép</button>
+        <button @click="kepletoltes" class="gombok letolt">Letöltés</button>
+        <button @click="$router.back()" class="gombok">Új kép</button>
       </div>
     </div>
   </div>
@@ -85,194 +82,170 @@ export default {
   data() {
     return {
       imageUrl: null,
-      originalImage: null,
-      pixelSize: 10,
-      colorMode: "original",
-      colorCount: 8,
-      colorPalette: [],
-      selectedColor: null,
-      ctx: null
+      eredetiKep: null,
+      pixelMeret: 10,
+      szinezes: "eredeti",
+      szinekSzama: 8,
+      szinPaletta: [],
+      valasztottSzin: null,
+      ctx: null,
+      jelenlegiKep: null
     };
   },
   mounted() {
-    // Get image URL from route query
-    this.imageUrl = this.$route.query.imageUrl;
+    this.imageUrl = this.$route.query.imageUrl; //url a route-ból mert másik oldalról jön
     if (this.imageUrl) {
-      this.loadImage();
-    }
-  },
-  watch: {
-    pixelSize() {
-      this.pixelate();
-    },
-    colorMode() {
-      this.pixelate();
-    },
-    colorCount() {
-      if (this.colorMode === 'limited') {
-        this.pixelate();
-      }
+      this.kepBetolt();
     }
   },
   methods: {
-    loadImage() {
-      this.originalImage = new Image();
-      this.originalImage.onload = () => {
-        this.setupCanvas();
-        this.pixelate();
+    kepBetolt() {
+      this.eredetiKep = new Image();
+      this.eredetiKep.onload = () => {
+        this.vaszonLetrehozasa();
+        this.kepFrissites();
       };
-      this.originalImage.src = this.imageUrl;
+      this.eredetiKep.crossOrigin = "anonymous";
+      this.eredetiKep.src = this.imageUrl;
     },
-    setupCanvas() {
+    vaszonLetrehozasa() {
       const canvas = this.$refs.canvas;
       this.ctx = canvas.getContext("2d");
-      canvas.width = this.originalImage.width;
-      canvas.height = this.originalImage.height;
+      canvas.width = this.eredetiKep.width;
+      canvas.height = this.eredetiKep.height;
     },
-    pixelate() {
-      if (!this.originalImage) return;
-
+    kepFrissites() {
+      if (!this.eredetiKep) return;
+      
+      this.vaszonFeldolgozas(this.eredetiKep);
+      this.extractszinPaletta();
+    },
+    vaszonFeldolgozas(img) {
+      const pixelMeret = parseInt(this.pixelMeret);
       const canvas = this.$refs.canvas;
       const ctx = this.ctx;
-      const { width, height } = this.originalImage;
+      
+      const szelesseg = img.width;
+      const magassag = img.height;
+      
+      canvas.width = szelesseg;
+      canvas.height = magassag;
 
-      // Draw original image
-      ctx.drawImage(this.originalImage, 0, 0, width, height);
+      ctx.drawImage(img, 0, 0, szelesseg, magassag);
 
-      if (this.colorMode === 'original') {
-        this.applyPixelation();
-      } else if (this.colorMode === 'grayscale') {
-        this.applyGrayscalePixelation();
-      } else if (this.colorMode === 'limited') {
-        this.applyLimitedColorPixelation();
-      }
-
-      this.extractColorPalette();
-    },
-    applyPixelation() {
-      const ctx = this.ctx;
-      const width = this.originalImage.width;
-      const height = this.originalImage.height;
-      const size = this.pixelSize;
-
-      for (let y = 0; y < height; y += size) {
-        for (let x = 0; x < width; x += size) {
-          const imageData = ctx.getImageData(x, y, size, size);
-          const data = imageData.data;
-          
-          let r = 0, g = 0, b = 0, count = 0;
-
-          for (let i = 0; i < data.length; i += 4) {
-            r += data[i];
-            g += data[i + 1];
-            b += data[i + 2];
-            count++;
-          }
-
-          const avgR = Math.round(r / count);
-          const avgG = Math.round(g / count);
-          const avgB = Math.round(b / count);
-
-          ctx.fillStyle = `rgb(${avgR}, ${avgG}, ${avgB})`;
-          ctx.fillRect(x, y, size, size);
-        }
-      }
-    },
-    applyGrayscalePixelation() {
-      const ctx = this.ctx;
-      const width = this.originalImage.width;
-      const height = this.originalImage.height;
-      const size = this.pixelSize;
-
-      for (let y = 0; y < height; y += size) {
-        for (let x = 0; x < width; x += size) {
-          const imageData = ctx.getImageData(x, y, size, size);
-          const data = imageData.data;
-          
-          let total = 0, count = 0;
-
-          for (let i = 0; i < data.length; i += 4) {
-            const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
-            total += avg;
-            count++;
-          }
-
-          const grayValue = Math.round(total / count);
-          ctx.fillStyle = `rgb(${grayValue}, ${grayValue}, ${grayValue})`;
-          ctx.fillRect(x, y, size, size);
-        }
-      }
-    },
-    applyLimitedColorPixelation() {
-      // This is a simplified version - you might want to use more advanced color quantization
-      const ctx = this.ctx;
-      const width = this.originalImage.width;
-      const height = this.originalImage.height;
-      const size = this.pixelSize;
-
-      for (let y = 0; y < height; y += size) {
-        for (let x = 0; x < width; x += size) {
-          const imageData = ctx.getImageData(x, y, size, size);
-          const data = imageData.data;
-          
-          let r = 0, g = 0, b = 0, count = 0;
-
-          for (let i = 0; i < data.length; i += 4) {
-            r += data[i];
-            g += data[i + 1];
-            b += data[i + 2];
-            count++;
-          }
-
-          const avgR = Math.round(r / count);
-          const avgG = Math.round(g / count);
-          const avgB = Math.round(b / count);
-
-          // Reduce color precision based on colorCount
-          const precision = Math.round(255 / this.colorCount);
-          const limitedR = Math.round(avgR / precision) * precision;
-          const limitedG = Math.round(avgG / precision) * precision;
-          const limitedB = Math.round(avgB / precision) * precision;
-
-          ctx.fillStyle = `rgb(${limitedR}, ${limitedG}, ${limitedB})`;
-          ctx.fillRect(x, y, size, size);
-        }
-      }
-    },
-    extractColorPalette() {
-      // Extract unique colors from the pixelated image
-      const canvas = this.$refs.canvas;
-      const ctx = canvas.getContext("2d");
-      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const imageData = ctx.getImageData(0, 0, szelesseg, magassag);
       const data = imageData.data;
       
-      const colors = new Set();
+      this.jelenlegiKep = { data, width: szelesseg, height: magassag };
+
+      if (this.szinezes === 'eredeti') {
+        this.kepElkeszites(data, szelesseg, magassag, pixelMeret);
+      }
+      else if (this.szinezes === 'kevesebbSzin') {
+        this.kepElkeszitesKevesebbSzin(data, szelesseg, magassag, pixelMeret);
+      }
+
+      ctx.putImageData(imageData, 0, 0);
+    },
+    kepElkeszites(data, width, height, pixelMeret) {
+      const cols = Math.ceil(width / pixelMeret);
+      const rows = Math.ceil(height / pixelMeret);
+
+      for (let y = 0; y < rows; y++) {
+        for (let x = 0; x < cols; x++) {
+          const avg = this.szinekKinyeres(data, width, x * pixelMeret, y * pixelMeret, pixelMeret);
+          
+          for (let Ytengely = y * pixelMeret; Ytengely < (y + 1) * pixelMeret && Ytengely < height; Ytengely++) {
+            for (let Xtengely = x * pixelMeret; Xtengely < (x + 1) * pixelMeret && Xtengely < width; Xtengely++) {
+              const i = (Ytengely * width + Xtengely) * 4;
+              data[i] = avg.r;
+              data[i + 1] = avg.g;
+              data[i + 2] = avg.b;
+            }
+          }
+        }
+      }
+    },
+    kepElkeszitesKevesebbSzin(data, width, height, pixelMeret) {
+      const cols = Math.ceil(width / pixelMeret);
+      const rows = Math.ceil(height / pixelMeret);
+
+      for (let y = 0; y < rows; y++) {
+        for (let x = 0; x < cols; x++) {
+          const avg = this.szinekKinyeres(data, width, x * pixelMeret, y * pixelMeret, pixelMeret);
+          
+          //
+          const precision = Math.round(255 / this.szinekSzama);
+          const limitedR = Math.round(avg.r / precision) * precision;
+          const limitedG = Math.round(avg.g / precision) * precision;
+          const limitedB = Math.round(avg.b / precision) * precision;
+          
+          // szinek cseréje hoyg kevesebbet használjon
+          for (let Ytengely = y * pixelMeret; Ytengely < (y + 1) * pixelMeret && Ytengely < height; Ytengely++) {
+            for (let Xtengely = x * pixelMeret; Xtengely < (x + 1) * pixelMeret && Xtengely < width; Xtengely++) {
+              const i = (Ytengely * width + Xtengely) * 4;
+              data[i] = limitedR;
+              data[i + 1] = limitedG;
+              data[i + 2] = limitedB;
+            }
+          }
+        }
+      }
+    },
+    szinekKinyeres(data, width, startX, startY, blockSize) {
+      let r = 0, g = 0, b = 0, a = 0, count = 0;
+
+      for (let y = startY; y < startY + blockSize && y < width; y++) {
+        for (let x = startX; x < startX + blockSize && x < width; x++) {
+          const i = (y * width + x) * 4;
+          if (i >= data.length - 3) continue;
+
+          r += data[i];
+          g += data[i + 1];
+          b += data[i + 2];
+          a += data[i + 3];
+          count++;
+        }
+      }
+
+      return {
+        r: Math.round(r / count),
+        g: Math.round(g / count),
+        b: Math.round(b / count),
+        a: a / count / 255
+      };
+    },
+    extractszinPaletta() {
+      if (!this.jelenlegiKep) return;
       
-      for (let i = 0; i < data.length; i += 4) {
+      const { data, width, height } = this.jelenlegiKep;
+      const szinek = new Set();
+      
+      // Színek kinyerése (eddig borzasztó, változtatni kell)
+      for (let i = 0; i < data.length; i += 80) {
         const r = data[i];
         const g = data[i + 1];
         const b = data[i + 2];
         const color = `rgb(${r}, ${g}, ${b})`;
-        colors.add(color);
+        szinek.add(color);
       }
       
-      this.colorPalette = Array.from(colors).slice(0, 20); // Limit to 20 colors
+      this.szinPaletta = Array.from(szinek).slice(0, 20); // 20 szín a limit
     },
-    selectColor(color) {
-      this.selectedColor = color;
+    szinValaszto(color) {
+      this.valasztottSzin = color;
     },
-    updateColor(index, newColor) {
-      this.colorPalette[index] = newColor;
-      // Here you would need to redraw the image with the updated colors
-      // This is a complex operation that would require tracking which pixels use which colors
+    frissítettSzin(index, newColor) {
+      this.szinPaletta[index] = newColor;
+      // színcserélő (a képen frissüljön a szín)
     },
-    resetImage() {
-      this.pixelate();
+    ujrakedzes() {
+      this.kepFrissites();
     },
-    downloadImage() {
+    kepletoltes() {
       const canvas = this.$refs.canvas;
       const link = document.createElement('a');
-      link.download = 'pixelated-image.png';
+      link.letolt = 'pixelated-image.png';
       link.href = canvas.toDataURL();
       link.click();
     }
@@ -281,7 +254,7 @@ export default {
 </script>
 
 <style scoped>
-.pixelator-container {
+.pixelesContainer {
   padding: 2rem;
   max-width: 1200px;
   margin: 0 auto;
@@ -289,12 +262,12 @@ export default {
   min-height: 100vh;
 }
 
-.upload-section {
+.feltoltes {
   text-align: center;
   padding: 2rem;
 }
 
-.back-button {
+.visszaGomb {
   padding: 10px 20px;
   background-color: #4CAF50;
   color: white;
@@ -303,7 +276,7 @@ export default {
   cursor: pointer;
 }
 
-.controls {
+.modositas {
   display: flex;
   flex-wrap: wrap;
   gap: 2rem;
@@ -314,37 +287,37 @@ export default {
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-.control-group {
+.valtoztatok {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
 }
 
-.slider {
+.csuszka {
   width: 200px;
 }
 
-.select-box {
+.lenyiloBox {
   padding: 5px;
   border-radius: 4px;
   border: 1px solid #ddd;
 }
 
-.color-palette {
+.szin-paletta {
   margin: 2rem 0;
   padding: 1rem;
   background: white;
   border-radius: 8px;
 }
 
-.colors {
+.szinek {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
   margin-top: 1rem;
 }
 
-.color-item {
+.szinek-class {
   position: relative;
   width: 50px;
   height: 50px;
@@ -356,11 +329,11 @@ export default {
   justify-content: center;
 }
 
-.color-item.selected {
+.szinek-class.selected {
   border-color: #007bff;
 }
 
-.color-item input[type="color"] {
+.szinek-class input[type="color"] {
   opacity: 0;
   position: absolute;
   width: 100%;
@@ -368,7 +341,7 @@ export default {
   cursor: pointer;
 }
 
-.canvas-container {
+.vaszon-container {
   text-align: center;
   margin: 2rem 0;
 }
@@ -380,14 +353,14 @@ canvas {
   box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
-.actions {
+.gombok {
   display: flex;
   justify-content: center;
   gap: 1rem;
   margin-top: 2rem;
 }
 
-.action-button {
+.gombok {
   padding: 10px 20px;
   border: none;
   border-radius: 5px;
@@ -395,7 +368,7 @@ canvas {
   font-weight: bold;
 }
 
-.action-button.download {
+.gombok.letolt {
   background-color: #4CAF50;
   color: white;
 }
