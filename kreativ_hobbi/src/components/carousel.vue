@@ -1,11 +1,11 @@
 <script setup>
-import { ref } from 'vue';
+import { callWithAsyncErrorHandling, ref } from 'vue';
 const kepek = [
-    { src: 'https://picsum.photos/id/1015/800/500', alt: 'A beautiful sunset' },
-    { src: 'https://picsum.photos/id/1016/800/500', alt: 'A stunning mountain landscape' },
-    { src: 'https://picsum.photos/id/1018/800/500', alt: 'A cute cat' },
-    { src: 'https://picsum.photos/id/1020/800/500', alt: 'A delicious looking cake' },
-    { src: 'https://picsum.photos/id/1024/800/500', alt: 'A beautiful beach' }
+    { src: 'https://picsum.photos/id/1015/800/600', alt: 'A beautiful sunset' },
+    { src: 'https://picsum.photos/id/1016/800/600', alt: 'A stunning mountain landscape' },
+    { src: 'https://picsum.photos/id/1018/800/600', alt: 'A cute cat' },
+    { src: 'https://picsum.photos/id/1020/800/600', alt: 'A delicious looking cake' },
+    { src: 'https://picsum.photos/id/1024/800/600', alt: 'A beautiful beach' }
 ];
 let currentIndex = ref(0);
 function resetInterval() {
@@ -18,6 +18,7 @@ function nextImage() {
         currentIndex.value = 0;
     }
     resetInterval();
+
 }
 function prevImage() {
     currentIndex.value = currentIndex.value - 1 ;
@@ -35,7 +36,8 @@ setInterval(nextImage, 10000);
         <div >
             <div id="carouselContainer">
                 <img id="carouselImage" :src="kepek[currentIndex].src" :alt="kepek[currentIndex].alt" />
-                <p style="position: absolute;color: red; top: 200px; left: 1200px; width: 20%; overflow: hidden;">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Est laudantium excepturi illo consectetur iure numquam vitae quo sequi. Quis error magnam non modi vitae atque repellendus dicta distinctio aliquid eius.</p>
+                <h1 id="carouselTitle">{{ kepek[currentIndex].alt }}</h1>
+                <p id="carouselDescription">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Est laudantium excepturi illo consectetur iure numquam vitae quo sequi. Quis error magnam non modi vitae atque repellendus dicta distinctio aliquid eius.</p>
                 <!--
                 <svg xmlns="http://www.w3.org/2000/svg" class="prev" width="56.898" height="91" viewBox="0 0 56.898 91"><path d="M45.5,0,91,56.9,48.452,24.068,0,56.9Z" transform="translate(0 91) rotate(-90)" fill="#fff"></path></svg>
                 
@@ -49,7 +51,7 @@ setInterval(nextImage, 10000);
                     <div 
                         class="helyzetJelzo" 
                         :value="index" 
-                        @click="currentIndex = index-1 " :style="{ borderBlockColor: currentIndex === index-1 ? 'red' : 'white' }" 
+                        @click="currentIndex = index-1 " :style="{ borderBlockColor: currentIndex === index-1 ? 'white' : 'grey', color: currentIndex === index-1 ? 'white' : 'grey' }" 
                         :checked="currentIndex === index-1">
                         {{ index }}</div>
                 </div>
@@ -63,6 +65,46 @@ setInterval(nextImage, 10000);
     position: relative;
     overflow: hidden;
 }
+#carouselTitle, #carouselDescription {
+    position: absolute;
+    color: black; 
+    left: 200px; 
+    width: 20%; 
+    overflow: hidden;
+}
+#carouselTitle {
+    top: 100px;
+    animation: popUP 0.8s ease-in-out;
+    opacity: 1;
+}
+#carouselDescription {
+    top: 150px;
+    animation: fade-in 1s ease-in-out;
+    opacity: 1;
+}
+@keyframes fade-in {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+    
+}
+    
+@keyframes popUP {
+    0% {
+        top: 200px;
+        opacity: 0;
+    }
+    100% {
+        top: 100px;
+        opacity: 1;
+        
+    } 
+}
+
+
 #carouselImage {
     position: relative;
     display: block;
@@ -105,16 +147,15 @@ setInterval(nextImage, 10000);
     transition: all 1.5s ease-in-out;
 }
 .helyzetJelzo {
-    width: 150px;
+    width: 225px;
     height: 15px;
     margin: 0 5px;
     cursor: pointer;
     text-align: center;
     padding-top: 15px;
-    border-top: 6px solid transparent;
-    margin-left: 50px;
+    border-top: 3px solid;
     margin-top: 3px;
-    margin-right: 50px;
-
+    color: gray;
+    transform: translateY(-180%);
 }
 </style>
