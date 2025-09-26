@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 //webáruház meghívása
 
 // Define the array of images
@@ -11,27 +11,25 @@ const kepek = [
     { src: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANEAAACUCAMAAAA6cTwCAAAACVBMVEXan/v58v3WmffsqHDhAAAARUlEQVR4nO3dAQkAQAgEsNP+ob/DIwiyFVnqmvQ1AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADgz3ZQOy7bifC4B+SHBOdHjtdMAAAAAElFTkSuQmCC', alt: 'A beautiful beach' }
 ];
 let currentIndex = ref(0);
-function resetInterval() {
-    clearInterval(intervalId.value);
-    intervalId.value = setInterval(nextImage, 10000);
-}
 function nextImage() {
     currentIndex.value = currentIndex.value + 1 ;
     if (currentIndex.value >= kepek.length) {
         currentIndex.value = 0;
     }
-    resetInterval();
-
 }
 function prevImage() {
     currentIndex.value = currentIndex.value - 1 ;
     if (currentIndex.value < 0) {
         currentIndex.value = kepek.length - 1;
     }
-    resetInterval();
 }
 
-setInterval(nextImage, 10000);
+let interval = setInterval(nextImage, 10000);
+watch(currentIndex, () => {
+    clearInterval(interval);
+    interval = setInterval(nextImage, 10000);
+})
+
 </script>
 
 <template>
@@ -43,7 +41,7 @@ setInterval(nextImage, 10000);
                 <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRy3Kj4qK7M7jT6j9q8lYh7sR7h8q3XhQ&s" alt="A beautiful webshop item">
                 <h2 id="carouselTitle" :key="currentIndex + '-title'" :class="currentIndex % 2 === 0 ? 'leftText' : 'rightText'">{{ kepek[currentIndex].alt }}</h2>
                 <p id="carouselDescription" :key="currentIndex + '-title'" :class="currentIndex % 2 === 0 ? 'leftText' : 'rightText'">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Est laudantium excepturi illo consectetur iure numquam vitae quo sequi. Quis error magnam non modi vitae atque repellendus dicta distinctio aliquid eius.</p>
-                <p id="carouselPrice" :class="currentIndex % 2 === 0 ? 'leftText' : 'rightText'">$29.99</p>
+                <p id="carouselPrice" :key="currentIndex + '-title'"  :class="currentIndex % 2 === 0 ? 'leftText' : 'rightText'">$29.99</p>
                 <button @click="addToCart" :key="currentIndex + '-title'" id="carouselAddToCartButton" :class="currentIndex % 2 === 0 ? 'leftText' : 'rightText'">Add to cart</button> 
             </div>
             <!--
@@ -80,13 +78,13 @@ setInterval(nextImage, 10000);
     overflow: hidden;
 }
 #carouselTitle {
-    animation: popUP 0.8s ease-in-out;
+    animation: popUP 1.5s ease-in-out;
     width: 550px;
     opacity: 1;
 }
 #carouselDescription {
     top: 100px;
-    animation: fade-in 1s ease-in-out;
+    animation: fade-in 1.5s ease-in-out;
     opacity: 1;
 }
 @keyframes fade-in {
@@ -104,7 +102,7 @@ setInterval(nextImage, 10000);
         opacity: 0;
     }
     100% {
-        top: 25 px;
+        top: 18px;
         opacity: 1;
         
     } 
@@ -169,34 +167,52 @@ setInterval(nextImage, 10000);
     position: absolute;
     color: rgb(255, 255, 255);
     top: 50px;
-    width: 1200px;
-    animation: popUP 0.8s ease-in-out;
+    width: 100%;
+    animation: fade-in 0.8s ease-in-out;
     opacity: 1;
 }
 #carouselPrice {
-    position: absolute;
     color: rgb(255, 255, 255);
+    position: absolute;
     top: 250px;
     left: 700px;
     animation: fade-in 0.8s ease-in-out;
     opacity: 1;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+
 }
 #carouselAddToCartButton {
     background-color: #4CAF50;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 5px;
     position: absolute;
     color: rgb(255, 255, 255);
     top: 320px;
-    left: 700px;
     animation: fade-in 0.8s ease-in-out;
     opacity: 1;
 }
 .leftText {
+    justify-content: left;
     float: left;
-    left: 200px ;
+    left: 10% ;
 }
 .rightText {
+    justify-content: right;
     float: right;
-    right: 200px;
+    left: 60%;
 }
 /*#endregion */
 </style>
