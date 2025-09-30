@@ -16,60 +16,57 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      name: 'index',
+      name: 'Index',
       component: Index,
     },
     {
       path: '/aruhaz',
-      name: 'aruhaz',
+      name: 'Aruhaz',
       component: Aruhaz,
     },
     {
       path: '/belepes',
-      name: 'belepes',
+      name: 'Belepes',
       component: Belepes,
     },
     {
+      path: '/regisztracio',
+      name: 'Regisztracio',
+      component: Regisztracio,
+    },
+    {
       path: '/blog',
-      name: 'blog',
+      name: 'Blog',
       component: Blog,
     },
     {
-      path: '/fizetes',
-      name: 'fizetes',
+      path: '/kosar/fizetes',
+      name: 'Fizetes',
       component: Fizetes,
     },
     {
       path: '/kosar',
-      name: 'kosar',
+      name: 'Kosar',
       component: Kosar,
     },
     {
       path: '/mintakeszito',
-      name: 'mintakeszito',
+      name: 'Mintakeszito',
       component: Mintakeszito,
     },
     {
       path: '/profil',
-      name: 'profil',
+      name: 'Profil',
       component: Profil,
     },
     {
-      path: '/regisztracio',
-      name: 'regisztracio',
-      component: Regisztracio,
-    },
-    {
       path: '/rolunk',
-      name: 'rolunk',
+      name: 'Rolunk',
       component: Rolunk,
     },
     {
-      path: '/',
-      component: Mintakeszito
-    },
-    {
-      path: '/mintavaltoztato',
+      path: '/mintakeszito/mintavaltoztato',
+      name: 'Mintavaltoztato',
       component: Mintavaltoztato
     },
   ],
