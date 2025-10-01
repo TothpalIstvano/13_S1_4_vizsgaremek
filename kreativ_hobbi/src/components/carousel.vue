@@ -1,85 +1,90 @@
 <script setup>
-import { callWithAsyncErrorHandling, ref } from 'vue';
+import { ref, watch } from 'vue';
+//webáruház meghívása
+
+// Define the array of images
 const kepek = [
-    { src: 'https://picsum.photos/id/1015/800/600', alt: 'A beautiful sunset' },
-    { src: 'https://picsum.photos/id/1016/800/600', alt: 'A stunning mountain landscape' },
-    { src: 'https://picsum.photos/id/1018/800/600', alt: 'A cute cat' },
-    { src: 'https://picsum.photos/id/1020/800/600', alt: 'A delicious looking cake' },
-    { src: 'https://picsum.photos/id/1024/800/600', alt: 'A beautiful beach' }
+    { src: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQrtQU3c2xsXwINXpu67nm_M--1igQ55tSYqA&s', alt: 'A beautiful sunset' },
+    { src: 'https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcTTRwJNz1yEui-o79WsNSpWJSZ7dWPACZL4S2F4DNgpXNQ9qpptmVhms5tFYzzkDwHEbBKS1h8K4q3KpHY3NBMh3wytwkq5LcTugeF0NEfUMw', alt: 'A stunning mountain landscape' },
+    { src: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKEAAACUCAMAAADMOLmaAAAAA1BMVEVkAAoIcbc4AAAALUlEQVR4nO3BAQEAAACCIP+vbkhAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAB8GV2oAAFi+4XjAAAAAElFTkSuQmCC', alt: 'A cute cat' },
+    { src: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALAAAACUCAMAAAAEVFNMAAAAElBMVEX/67z97sr/8Mr+67n99NT989blvNdPAAAAr0lEQVR4nO3OQQ3AMAwAsXTd+FMeCj8inRF43rPKN+fOIvdZFp7CWmGtsFZYK6wV1gprhbXCWmGtsFZYK6wV1gprhbXCWmGtsFZYK6wV1gprhbXCWmGtsFZYK6wV1gprhbXCWmGtsFZYK6wV1gprhbXCWmGtsFZYK6wV1gprhbXCWmGtsFZYK6wV1gprhbXCWmGtsFZYK6wV1gprhbXCWmGtsFZYK6wV1gprhbV94R8C1gQtK4sb8AAAAABJRU5ErkJggg==', alt: 'A delicious looking cake' },
+    { src: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANEAAACUCAMAAAA6cTwCAAAACVBMVEXan/v58v3WmffsqHDhAAAARUlEQVR4nO3dAQkAQAgEsNP+ob/DIwiyFVnqmvQ1AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADgz3ZQOy7bifC4B+SHBOdHjtdMAAAAAElFTkSuQmCC', alt: 'A beautiful beach' }
 ];
 let currentIndex = ref(0);
-function resetInterval() {
-    clearInterval(intervalId.value);
-    intervalId.value = setInterval(nextImage, 10000);
-}
 function nextImage() {
     currentIndex.value = currentIndex.value + 1 ;
     if (currentIndex.value >= kepek.length) {
         currentIndex.value = 0;
     }
-    resetInterval();
-
 }
 function prevImage() {
     currentIndex.value = currentIndex.value - 1 ;
     if (currentIndex.value < 0) {
         currentIndex.value = kepek.length - 1;
     }
-    resetInterval();
 }
 
-setInterval(nextImage, 10000);
+let interval = setInterval(nextImage, 10000);
+watch(currentIndex, () => {
+    clearInterval(interval);
+    interval = setInterval(nextImage, 10000);
+})
+
 </script>
 
 <template>
     <div>
-        <div >
-            <div id="carouselContainer">
-                <img id="carouselImage" :src="kepek[currentIndex].src" :alt="kepek[currentIndex].alt" />
-                <h1 id="carouselTitle">{{ kepek[currentIndex].alt }}</h1>
-                <p id="carouselDescription">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Est laudantium excepturi illo consectetur iure numquam vitae quo sequi. Quis error magnam non modi vitae atque repellendus dicta distinctio aliquid eius.</p>
-                <!--
-                <svg xmlns="http://www.w3.org/2000/svg" class="prev" width="56.898" height="91" viewBox="0 0 56.898 91"><path d="M45.5,0,91,56.9,48.452,24.068,0,56.9Z" transform="translate(0 91) rotate(-90)" fill="#fff"></path></svg>
-                
-                <svg xmlns="http://www.w3.org/2000/svg" class="next" width="56.898" height="91" viewBox="0 0 56.898 91"><path d="M45.5,0,91,56.9,48.452,24.068,0,56.9Z" transform="translate(56.898) rotate(90)" fill="#fff"></path></svg>
-                -->
-                <button @click="prevImage" type="button" id="balGomb"> 	&#129104;</button>
-                <button @click="nextImage" type="button" id="jobbGomb">&#129106;</button>
+        <div id="carouselContainer">
+            <img id="carouselImage" :src="kepek[currentIndex].src" :alt="kepek[currentIndex].alt" />
+
+            <div class="webshop-item" :key="currentIndex + '-title'">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRy3Kj4qK7M7jT6j9q8lYh7sR7h8q3XhQ&s" alt="A beautiful webshop item">
+                <h2 id="carouselTitle" :key="currentIndex + '-title'" :class="currentIndex % 2 === 0 ? 'leftText' : 'rightText'">{{ kepek[currentIndex].alt }}</h2>
+                <p id="carouselDescription" :key="currentIndex + '-title'" :class="currentIndex % 2 === 0 ? 'leftText' : 'rightText'">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Est laudantium excepturi illo consectetur iure numquam vitae quo sequi. Quis error magnam non modi vitae atque repellendus dicta distinctio aliquid eius.</p>
+                <p id="carouselPrice" :key="currentIndex + '-title'"  :class="currentIndex % 2 === 0 ? 'leftText' : 'rightText'">$29.99</p>
+                <button @click="addToCart" :key="currentIndex + '-title'" id="carouselAddToCartButton" :class="currentIndex % 2 === 0 ? 'leftText' : 'rightText'">Add to cart</button> 
             </div>
-            <div style="display: flex; justify-content: center; gap: 10px; margin-top: 10px;">
-                <div v-for="(index) in kepek.length" :key="index">
-                    <div 
-                        class="helyzetJelzo" 
-                        :value="index" 
-                        @click="currentIndex = index-1 " :style="{ borderBlockColor: currentIndex === index-1 ? 'white' : 'grey', color: currentIndex === index-1 ? 'white' : 'grey' }" 
-                        :checked="currentIndex === index-1">
-                        {{ index }}</div>
-                </div>
+            <!--
+            <svg xmlns="http://www.w3.org/2000/svg" class="prev" width="56.898" height="91" viewBox="0 0 56.898 91"><path d="M45.5,0,91,56.9,48.452,24.068,0,56.9Z" transform="translate(0 91) rotate(-90)" fill="#fff"></path></svg>
+            
+            <svg xmlns="http://www.w3.org/2000/svg" class="next" width="56.898" height="91" viewBox="0 0 56.898 91"><path d="M45.5,0,91,56.9,48.452,24.068,0,56.9Z" transform="translate(56.898) rotate(90)" fill="#fff"></path></svg>
+            -->
+            <button @click="prevImage" type="button" id="balGomb"> 	&#129104;</button>
+            <button @click="nextImage" type="button" id="jobbGomb">&#129106;</button>
+        </div>
+        <div style="display: flex; justify-content: center; gap: 10px; margin-top: 10px;">
+            <div v-for="(index) in kepek.length" :key="index">
+                <div 
+                    class="helyzetJelzo" 
+                    :value="index" 
+                    @click="currentIndex = index-1 " :style="{ borderBlockColor: currentIndex === index-1 ? 'white' : '#bebebe', color: currentIndex === index-1 ? 'white' : '#bebebe' }" 
+                    :checked="currentIndex === index-1">
+                    {{ index }}</div>
             </div>
         </div>
     </div>
 </template>
 
 <style scoped>
+/*#region Carousel elemei */
 #carouselContainer {
     position: relative;
     overflow: hidden;
 }
 #carouselTitle, #carouselDescription {
     position: absolute;
-    color: black; 
-    left: 200px; 
+    color: rgb(255, 255, 255);
     width: 20%; 
     overflow: hidden;
 }
 #carouselTitle {
-    top: 100px;
-    animation: popUP 0.8s ease-in-out;
+    animation: popUP 1.5s ease-in-out;
+    width: 550px;
     opacity: 1;
 }
 #carouselDescription {
-    top: 150px;
-    animation: fade-in 1s ease-in-out;
+    top: 100px;
+    animation: fade-in 1.5s ease-in-out;
     opacity: 1;
 }
 @keyframes fade-in {
@@ -91,22 +96,18 @@ setInterval(nextImage, 10000);
     }
     
 }
-    
 @keyframes popUP {
     0% {
-        top: 200px;
+        top: 100px;
         opacity: 0;
     }
     100% {
-        top: 100px;
+        top: 18px;
         opacity: 1;
         
     } 
 }
-
-
 #carouselImage {
-    position: relative;
     display: block;
     margin: 0 auto ;
     margin-top: 20px;
@@ -117,6 +118,7 @@ setInterval(nextImage, 10000);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     transition: opacity 0.5s ease-in-out;
     z-index: -1;
+    
 }
 #balGomb, #jobbGomb {
     width: 40px;
@@ -158,4 +160,59 @@ setInterval(nextImage, 10000);
     color: gray;
     transform: translateY(-180%);
 }
+/*#endregion */
+
+/*#region Webhop elemek */
+.webshop-item {
+    position: absolute;
+    color: rgb(255, 255, 255);
+    top: 50px;
+    width: 100%;
+    animation: fade-in 0.8s ease-in-out;
+    opacity: 1;
+}
+#carouselPrice {
+    color: rgb(255, 255, 255);
+    position: absolute;
+    top: 250px;
+    left: 700px;
+    animation: fade-in 0.8s ease-in-out;
+    opacity: 1;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+
+}
+#carouselAddToCartButton {
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 5px;
+    position: absolute;
+    color: rgb(255, 255, 255);
+    top: 320px;
+    animation: fade-in 0.8s ease-in-out;
+    opacity: 1;
+}
+.leftText {
+    justify-content: left;
+    float: left;
+    left: 10% ;
+}
+.rightText {
+    justify-content: right;
+    float: right;
+    left: 60%;
+}
+/*#endregion */
 </style>
