@@ -8,7 +8,7 @@ const router = useRouter();
 const latszik = ref(false);
 const logoKalapacs = logo_kalapacs
 const logoReszelo = logo_reszelo
-const xbeValtas = false
+const xbeValtas = ref(false);
 function open() {
   if (window.innerWidth > 1200) {
       router.push('/');
@@ -38,38 +38,37 @@ onUnmounted(() => {
     <div id="felsoGap"></div>
     <header>
       <nav class="navbar">
-        <div id="logoDiv">
-          <img
-            alt="Placeholder"
-            type="image/svg+xml"
-            :src="logoReszelo"
-            width="12"
-            height="50"
-            class="logo"
-            id="reszelo"
-            :style="latszik ? 'transform: rotate(45deg); left: 10px; right: 5px;' : ''"
-            style="cursor: pointer;"
-            @click=open();
-          />
-          <img  
-            alt="Placeholder"
-            type="image/png"
-            :src="logoKalapacs"
-            width="20"
-            height="50"
-            class="logo"
-            id="kalapacs"
-            :style="latszik ? 'transform: rotate(-45deg); left: -10px; rigth: 5px; ' : ''"
-            style="cursor: pointer;"
-            @click=open();
-          />
-        </div>
         <div id="nevDiv">
-          <RouterLink to="/" id="nev">
-            <h1>Hobbitár</h1>
-          </RouterLink>
+          <div id="logoDiv">
+            <img
+              alt="Placeholder"
+              type="image/svg+xml"
+              :src="logoReszelo"
+              width="12"
+              height="50"
+              class="logo"
+              id="reszelo"
+              :style="latszik ? 'transform: rotate(45deg); left: 10px; right: 5px;' : ''"
+              style="cursor: pointer;"
+              @click=open();
+            />
+            <img  
+              alt="Placeholder"
+              type="image/png"
+              :src="logoKalapacs"
+              width="20"
+              height="50"
+              class="logo"
+              id="kalapacs"
+              :style="latszik ? 'transform: rotate(-45deg); left: -10px; rigth: 5px; ' : ''"
+              style="cursor: pointer;"
+              @click=open();
+            />       
+          </div>
+            <RouterLink to="/" id="nev">
+              <h1>Hobbitár</h1>
+            </RouterLink>
         </div>
-
         <RouterLink 
           class="menu_link" 
           id="balraTolas" 
@@ -163,6 +162,7 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   margin-left: 1rem;
+  gap: 15px;
 }
 
 #nev {
@@ -182,7 +182,7 @@ onUnmounted(() => {
   height: 70px;
   padding: 10px;
   z-index: 1;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0px 10px 10px rgba(2, 2, 2, 0.274);
   border-bottom:2px solid #ff8a65;
 }
 
@@ -236,13 +236,16 @@ onUnmounted(() => {
     justify-content: center;
     gap: 10px;
     padding: 10px 0;
+    height: auto;
   }
   #logoDiv {
-    margin-left: 0;
+    margin-left: 20px;
     margin-bottom: 10px;
     align-items: center;
     transform: rotate(90deg);
     float: left;
+    position: static;
+    left: auto;
   }
   .logo {
     float: none;
@@ -255,13 +258,23 @@ onUnmounted(() => {
   .kalapacs{ 
     transition: left 0.7s ease-in-out;
   }
-
-  #nev {
-    margin-right: 0;
+  #nevDiv{
+    display: flex;
+    justify-content: space-between; /* This will push logo left and name right */
+    align-items: center;
     width: 100%;
+    margin-left: 0;
+    padding: 0 20px; /* Add some padding on sides */
+    position: relative;
+  }
+  #nev {
+    margin-right: 52px;
+    width: auto;
     text-align: center;
-    margin-bottom: 10px;
-    float: none;
+    margin-bottom: 0;
+    float: none;    
+    position: static;
+    left: auto;
   }
   .menu_link.hamburgerElem, .vonal {
     float: none !important;
@@ -283,3 +296,4 @@ onUnmounted(() => {
   }
 }
 </style>
+

@@ -46,14 +46,16 @@ watch(currentIndex, () => {
                     id="carouselDescription" 
                     :key="currentIndex + '-title'" 
                     :class="currentIndex % 2 === 0 ? 'leftText' : 'rightText'">
-                    Lorem ipsum dolor sit amet, consectetur adipisicing elit. Est laudantium excepturi illo consectetur iure numquam vitae quo sequi. Quis error magnam non modi vitae atque repellendus dicta distinctio aliquid eius.</p>
+                    Lorem ipsum dolor sit amet, consectetur adipisicing elit. Est laudantium excepturi illo consectetur iure numquam vitae quo sequi. Quis error magnam non modi vitae atque repellendus dicta distinctio aliquid eius.
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Rerum enim eius maiores, sint qui hic necessitatibus at, officia sunt ducimus dicta. Nam explicabo laboriosam aliquid sed dolor atque fuga provident?
+                </p>
                 <button 
-                    @click="addToCart" 
+                    onclick="alert('Termék megtekintése gombra kattintottál!')" 
                     :key="currentIndex + '-title'" 
-                    id="carouselAddToCartButton" 
-                    :class="currentIndex % 2 === 0 ? 'leftText' : 'rightText'">Add to cart</button>
+                    id="termekMegtekinteseGomb" 
+                    :class="currentIndex % 2 === 0 ? 'leftText' : 'rightText'">Termék megtekintése</button>
                 <div id="carouselItemImageContainer"
-                    :style="{ left: currentIndex % 2 === 0 ? '58.6%' : '10%' }"
+                    :style="{ left: currentIndex % 2 === 0 ? '56.6%' : '10%' }"
                     >
                     <img 
                         src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQXfpo2zSyUFO56QdVu_0shk8V-jrcl4ckjog&s"
@@ -91,11 +93,12 @@ watch(currentIndex, () => {
 #carouselTitle, #carouselDescription {
     position: absolute;
     color: rgb(255, 255, 255);
-    width: 20%; 
+    width: 25%; 
     overflow: hidden;
 }
 #carouselTitle {
     animation: titlePopUp 1.5s ease-in-out;
+    margin-top: 45px;
     width: 550px;
     opacity: 1;
 }
@@ -169,7 +172,7 @@ watch(currentIndex, () => {
     animation: fade-in 0.8s ease-in-out;
     opacity: 1;
 }
-#carouselAddToCartButton {
+#termekMegtekinteseGomb {
     background-color: #4CAF50;
     border: none;
     color: white;
@@ -190,7 +193,7 @@ watch(currentIndex, () => {
 .leftText {
     justify-content: left;
     float: left;
-    left: 10% ;
+    left: 12%;
 }
 .rightText {
     justify-content: right;
@@ -244,6 +247,9 @@ watch(currentIndex, () => {
     0% {
         top: 100px;
         opacity: 0;
+    }
+    50% {
+        opacity: 0.2;
     }
     100% {
         top: 0px;
