@@ -9,6 +9,8 @@ const latszik = ref(false);
 const logoKalapacs = logo_kalapacs
 const logoReszelo = logo_reszelo
 const xbeValtas = ref(false);
+const navbarRef = ref(null)
+
 function open() {
   if (window.innerWidth > 1200) {
       router.push('/');
@@ -24,11 +26,25 @@ function handleResize() {
     xbeValtas.value = false;
   }
 }
+// --- Add this function ---
+function handleClickOutside(event) {
+  if (
+    latszik.value &&
+    navbarRef.value &&
+    !navbarRef.value.contains(event.target)
+  ) {
+    latszik.value = false;
+    xbeValtas.value = false;
+  }
+}
+
 onMounted(() => {
   window.addEventListener('resize', handleResize);
+  document.addEventListener('mousedown', handleClickOutside);
 });
 onUnmounted(() => {
   window.removeEventListener('resize', handleResize);
+  document.removeEventListener('mousedown', handleClickOutside);
 });
 
 </script>
@@ -37,7 +53,7 @@ onUnmounted(() => {
   <div>
     <div id="felsoGap"></div>
     <header>
-      <nav class="navbar">
+      <nav class="navbar" ref="navbarRef">
         <div id="nevDiv">
           <div id="logoDiv">
             <img
@@ -187,7 +203,7 @@ onUnmounted(() => {
 }
 
 #balraTolas{
-  margin-left: 50rem;
+  margin-left: auto;
 }
 
 .vonal{
@@ -197,16 +213,18 @@ onUnmounted(() => {
   margin-right: 15px;
 }
 .menu_link {
-  position: relative;
+  position: static;
   padding-bottom: 4px;
   text-decoration: none;
   color: #c68b59;
   margin: 0 10px;
 }
-
+.menu_link:last-child {
+  margin-right: 10rem;
+}
 .menu_link::after {
   content: '';
-  position: absolute;
+  position: relative;
   bottom: 0;
   left: 50%;
   width: 0;
@@ -283,13 +301,16 @@ onUnmounted(() => {
     width: 100%;
     text-align: center;
     display: none;
-
+  }
+  .menu_link {
+    font-size: 1.1rem;
   }
   .vonal {
     display: none !important;
   }
   #balraTolas{
-    margin-left: 1.8%;
+    margin-left: 0;
+    margin-right: 0;
   }
   #felsoGap{
     height: 160px;
