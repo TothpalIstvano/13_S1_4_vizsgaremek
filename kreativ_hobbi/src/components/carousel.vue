@@ -7,7 +7,7 @@ const kepek = [
     { src: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQrtQU3c2xsXwINXpu67nm_M--1igQ55tSYqA&s', alt: 'A beautiful sunset' },
     { src: 'https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcTTRwJNz1yEui-o79WsNSpWJSZ7dWPACZL4S2F4DNgpXNQ9qpptmVhms5tFYzzkDwHEbBKS1h8K4q3KpHY3NBMh3wytwkq5LcTugeF0NEfUMw', alt: 'A stunning mountain landscape' },
     { src: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKEAAACUCAMAAADMOLmaAAAAA1BMVEVkAAoIcbc4AAAALUlEQVR4nO3BAQEAAACCIP+vbkhAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAB8GV2oAAFi+4XjAAAAAElFTkSuQmCC', alt: 'A cute cat' },
-    { src: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALAAAACUCAMAAAAEVFNMAAAAElBMVEX/67z97sr/8Mr+67n99NT989blvNdPAAAAr0lEQVR4nO3OQQ3AMAwAsXTd+FMeCj8inRF43rPKN+fOIvdZFp7CWmGtsFZYK6wV1gprhbXCWmGtsFZYK6wV1gprhbXCWmGtsFZYK6wV1gprhbXCWmGtsFZYK6wV1gprhbXCWmGtsFZYK6wV1gprhbXCWmGtsFZYK6wV1gprhbXCWmGtsFZYK6wV1gprhbXCWmGtsFZYK6wV1gprhbXCWmGtsFZYK6wV1gprhbV94R8C1gQtK4sb8AAAAABJRU5ErkJggg==', alt: 'A delicious looking cake' },
+    { src: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSgMTaSoiKAZMhA13RNwbv53bBD2nnNeS4-2wWmtg2rZTinHoaqyWInX1RraCNzFgyDygt9mxpqpuE6TDQK93JQaWQRhBkmxM2zIXVka90HLw', alt: 'A delicious looking cake' },
     { src: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANEAAACUCAMAAAA6cTwCAAAACVBMVEXan/v58v3WmffsqHDhAAAARUlEQVR4nO3dAQkAQAgEsNP+ob/DIwiyFVnqmvQ1AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADgz3ZQOy7bifC4B+SHBOdHjtdMAAAAAElFTkSuQmCC', alt: 'A beautiful beach' }
 ];
 let currentIndex = ref(0);
@@ -35,20 +35,37 @@ watch(currentIndex, () => {
 <template>
     <div>
         <div id="carouselContainer">
-            <img id="carouselImage" :src="kepek[currentIndex].src" :alt="kepek[currentIndex].alt" />
+            <img id="carouselBackground" :src="kepek[currentIndex].src" :alt="kepek[currentIndex].alt" />
 
             <div class="webshop-item" :key="currentIndex + '-title'">
-                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRy3Kj4qK7M7jT6j9q8lYh7sR7h8q3XhQ&s" alt="A beautiful webshop item">
-                <h2 id="carouselTitle" :key="currentIndex + '-title'" :class="currentIndex % 2 === 0 ? 'leftText' : 'rightText'">{{ kepek[currentIndex].alt }}</h2>
-                <p id="carouselDescription" :key="currentIndex + '-title'" :class="currentIndex % 2 === 0 ? 'leftText' : 'rightText'">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Est laudantium excepturi illo consectetur iure numquam vitae quo sequi. Quis error magnam non modi vitae atque repellendus dicta distinctio aliquid eius.</p>
-                <p id="carouselPrice" :key="currentIndex + '-title'"  :class="currentIndex % 2 === 0 ? 'leftText' : 'rightText'">$29.99</p>
-                <button @click="addToCart" :key="currentIndex + '-title'" id="carouselAddToCartButton" :class="currentIndex % 2 === 0 ? 'leftText' : 'rightText'">Add to cart</button> 
+                <h2 
+                    id="carouselTitle" 
+                    :key="currentIndex + '-title'" 
+                    :class="currentIndex % 2 === 0 ? 'leftText' : 'rightText'">{{ kepek[currentIndex].alt }}</h2>
+                <p 
+                    id="carouselDescription" 
+                    :key="currentIndex + '-title'" 
+                    :class="currentIndex % 2 === 0 ? 'leftText' : 'rightText'">
+                    Lorem ipsum dolor sit amet, consectetur adipisicing elit. Est laudantium excepturi illo consectetur iure numquam vitae quo sequi. Quis error magnam non modi vitae atque repellendus dicta distinctio aliquid eius.</p>
+                <button 
+                    @click="addToCart" 
+                    :key="currentIndex + '-title'" 
+                    id="carouselAddToCartButton" 
+                    :class="currentIndex % 2 === 0 ? 'leftText' : 'rightText'">Add to cart</button>
+                <div id="carouselItemImageContainer"
+                    :style="{ left: currentIndex % 2 === 0 ? '58.6%' : '10%' }"
+                    >
+                    <img 
+                        src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQXfpo2zSyUFO56QdVu_0shk8V-jrcl4ckjog&s"
+                        :key="currentIndex + '-title'"
+                        id="carouselItemImage" 
+                        width="200" 
+                        height="200"
+                        alt="A beautiful webshop item" 
+                    />
+                </div>
+                
             </div>
-            <!--
-            <svg xmlns="http://www.w3.org/2000/svg" class="prev" width="56.898" height="91" viewBox="0 0 56.898 91"><path d="M45.5,0,91,56.9,48.452,24.068,0,56.9Z" transform="translate(0 91) rotate(-90)" fill="#fff"></path></svg>
-            
-            <svg xmlns="http://www.w3.org/2000/svg" class="next" width="56.898" height="91" viewBox="0 0 56.898 91"><path d="M45.5,0,91,56.9,48.452,24.068,0,56.9Z" transform="translate(56.898) rotate(90)" fill="#fff"></path></svg>
-            -->
             <button @click="prevImage" type="button" id="balGomb"> 	&#129104;</button>
             <button @click="nextImage" type="button" id="jobbGomb">&#129106;</button>
         </div>
@@ -78,7 +95,7 @@ watch(currentIndex, () => {
     overflow: hidden;
 }
 #carouselTitle {
-    animation: popUP 1.5s ease-in-out;
+    animation: titlePopUp 1.5s ease-in-out;
     width: 550px;
     opacity: 1;
 }
@@ -87,27 +104,8 @@ watch(currentIndex, () => {
     animation: fade-in 1.5s ease-in-out;
     opacity: 1;
 }
-@keyframes fade-in {
-    0% {
-        opacity: 0;
-    }
-    100% {
-        opacity: 1;
-    }
-    
-}
-@keyframes popUP {
-    0% {
-        top: 100px;
-        opacity: 0;
-    }
-    100% {
-        top: 18px;
-        opacity: 1;
-        
-    } 
-}
-#carouselImage {
+
+#carouselBackground {
     display: block;
     margin: 0 auto ;
     margin-top: 20px;
@@ -171,21 +169,6 @@ watch(currentIndex, () => {
     animation: fade-in 0.8s ease-in-out;
     opacity: 1;
 }
-#carouselPrice {
-    color: rgb(255, 255, 255);
-    position: absolute;
-    top: 250px;
-    left: 700px;
-    animation: fade-in 0.8s ease-in-out;
-    opacity: 1;
-    color: white;
-    padding: 10px 20px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-
-}
 #carouselAddToCartButton {
     background-color: #4CAF50;
     border: none;
@@ -201,7 +184,7 @@ watch(currentIndex, () => {
     position: absolute;
     color: rgb(255, 255, 255);
     top: 320px;
-    animation: fade-in 0.8s ease-in-out;
+    animation: buttonPopUp 0.75s ease-in-out;
     opacity: 1;
 }
 .leftText {
@@ -213,6 +196,71 @@ watch(currentIndex, () => {
     justify-content: right;
     float: right;
     left: 60%;
+}
+#carouselItemImageContainer {
+    width: 600px;
+    height: 350px;
+    display: block;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    position: absolute;
+    top: 20px;
+}
+#carouselItemImage {
+    width: 600px;
+    height: 350px;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    display: block;
+    margin: 0 auto;
+    opacity: 1;
+    transition: fade-in-image  ease-in-out 25s;
+}
+/*#endregion */
+
+/*#region Animációk */
+@keyframes fade-in {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+    
+}
+@keyframes fade-in-image {
+    0% {
+        opacity: 0;
+    }
+    50% {
+        opacity: 0.3;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+@keyframes titlePopUp {
+    0% {
+        top: 100px;
+        opacity: 0;
+    }
+    100% {
+        top: 0px;
+        opacity: 1;
+        
+    } 
+}
+@keyframes buttonPopUp {
+    0% {
+        top: 420px;
+        opacity: 0;
+    }
+    100% {
+        top: 320px;
+        opacity: 1;
+        
+    }
 }
 /*#endregion */
 </style>
