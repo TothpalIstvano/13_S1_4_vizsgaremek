@@ -10,6 +10,8 @@ import Regisztracio from '../views/Regisztracio.vue'
 import Rolunk from '../views/Rolunk.vue'
 import Index from '@/views/index.vue'
 import Mintavaltoztato from "@/views/Mintavaltoztato.vue";
+import Adatvedelem from "@/views/Adatvedelem.vue";
+import Adatfelhasznalas from "@/views/Adatfelhasznalas.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -68,6 +70,16 @@ const router = createRouter({
       path: '/mintakeszito/mintavaltoztato',
       name: 'Mintavaltoztato',
       component: Mintavaltoztato
+    },
+    {
+      path: '/adatvedelem',
+      name: 'Adatvedelem',
+      component: Adatvedelem
+    },
+    {
+      path: '/adatfelhasznalas',
+      name: 'Adatfelhasznalas',
+      component: Adatfelhasznalas
     },
   ],
 })
