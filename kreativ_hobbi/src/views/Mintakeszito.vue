@@ -5,7 +5,6 @@ import { useRouter } from "vue-router"
 const resz = ref(1)
 const elsoLepes = ref(null)
 const masodikLepes = ref(null)
-const harmadikLepes = ref(null)
 const file = ref(null)
 
 const tipusok = ["Horgolás", "Kötés", "Hímzés"]
@@ -42,7 +41,7 @@ function toMintavaltoztato() {
  if (file.value) {
     const url = URL.createObjectURL(file.value)
     router.push({
-      path: '/mintavaltoztato',
+      path: 'mintakeszito/mintavaltoztato',
       query: { 
         imageUrl: url,
         fileName: file.value.name
@@ -51,11 +50,6 @@ function toMintavaltoztato() {
   }
 }
 
-</script>
-<script>
-export default {
-  name: "Mintakeszito",
-};
 </script>
 
 
@@ -97,69 +91,73 @@ export default {
       <!-- 1. rész -->
       <div v-if="resz === 1" id="elsoResz" class="radioStilus">
         <p class="cimek">Válassz típust a projektedhez:</p>
-        <div v-for="option in tipusok" :key="option">
-          <input
-            type="radio"
-            :id="option"
-            name="elsoLepes"
-            :value="option"
-            v-model="elsoLepes"
-            class="gombStilus"
-          />
-          <label :for="option">{{ option }}</label>
+        <div class="radioBelso">
+          <div v-for="option in tipusok" :key="option" >
+            <input
+              type="radio"
+              :id="option"
+              name="elsoLepes"
+              :value="option"
+              v-model="elsoLepes"
+              class="gombStilus"
+            />
+            <label :for="option">{{ option }}</label>
+          </div>
         </div>
+        
         <button
           :disabled="!elsoLepes"
           @click="kovetkezoResz"
           class="tovabbGomb"
         >
-          Következő
+          Következő ⇒
         </button>
       </div>
 
       <!-- 2. rész -->
       <div v-else-if="resz === 2" id="masodikResz" class="radioStilus">
         <p
-          @click="modositas(1)"
           class="vissza"
         >
-          A projekted: <strong>{{ elsoLepes }}</strong> ✅
+          A projekted: <strong>{{ elsoLepes }}</strong> <button @click="modositas(1)" class="visszaGomb">Vissza</button>
         </p>
 
         <p class="cimek">Válassz fonaltípust: </p>
-        <div v-for="option in fonalak" :key="option">
-          <input
-            type="radio"
-            :id="option"
-            name="masodikLepes"
-            :value="option"
-            v-model="masodikLepes"
-            class="gombStilus"
-          />
-          <label :for="option">{{ option }}</label>
+        <div class="radioBelso">
+          <div v-for="option in fonalak" :key="option" >
+            <input
+              type="radio"
+              :id="option"
+              name="masodikLepes"
+              :value="option"
+              v-model="masodikLepes"
+              class="gombStilus"
+            />
+            <label :for="option">{{ option }}</label>
+          </div>
         </div>
+        
         <button
           :disabled="!masodikLepes"
           @click="kovetkezoResz"
           class="tovabbGomb"
         >
-          Következő
+          Következő ⇒
         </button>
       </div>
 
       <!-- 3. rész -->
-      <div v-else-if="resz === 3" id="harmadikResz" class="radioStilus">
+      <div v-else-if="resz === 3" id="harmadikResz">
         <p
-          @click="modositas(1)"
           class="vissza"
         >
-          A projekted: <strong>{{ elsoLepes }}</strong> ✅
+          A projekted: <strong>{{ elsoLepes }}</strong> <button @click="modositas(1)" class="visszaGomb">Vissza</button>
         </p>
         <p
-          @click="modositas(2)"
+          
           class="vissza"
         >
-          A fonaltípusod: <strong>{{ masodikLepes }}</strong> ✅
+          A fonaltípusod: <strong>{{ masodikLepes }}</strong> <button @click="modositas(2)" class="visszaGomb">Vissza</button>
         </p>
 
         <p class="cimek">Fájl feltöltése:</p>
@@ -173,7 +171,7 @@ export default {
             :disabled="!file"
             @click="toMintavaltoztato" 
             class="tovabbGomb">
-          Minta készítése >>
+          Minta készítése ⇒
         </button>
 
       </div>
@@ -184,10 +182,81 @@ export default {
 
 
 <style scoped>
+.radioBelso {
+  background: #ca848938;
+  backdrop-filter: blur(2px);
+  border-radius: 20px;
+  padding: 10px 20px;
+  color: rgb(0, 0, 0);
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+input[type="radio"] {
+	appearance: none;
+	width: 20px;
+	height: 20px;
+	border: 3px solid #000000;
+	border-radius: 5px;
+	margin-right: 10px;
+	position: relative;
+  top: 3px;
+  margin-left: 50px;
+}
+
+input[type="radio"]:hover {
+  opacity: 0.7;
+}
+
+input[type="radio"]:checked::before {
+	content: "";
+	display: block;
+	width: 14px;
+	height: 14px;
+	background-color: #ca8489;
+	border-radius: 2px;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	animation: appear 0.8s;
+}
+
+label {
+	font-size: 22px;
+	color: #000000;
+  font-weight: bold;
+  letter-spacing: 1px;
+  margin-left: 15px;
+}
+
+label:hover {
+  opacity: 0.7;
+}
+
+@keyframes appear {
+	0% {
+		transform: translate(-50%, -50%) scale(0);
+		background-color: #fff;
+	}
+	45% {
+		transform: translate(-50%, -50%) scale(1.3);
+		background-color: #c74f57;
+	}
+	50% {
+		transform: translate(-50%, -50%) scale(1.4);
+		background-color: #c9636a;
+	}
+	55% {
+		transform: translate(-50%, -50%) scale(1.3);
+	}
+	100% {
+		transform: translate(-50%, -50%) scale(1);
+		background-color: #ca8489;
+	}
+}
 /* a színek placeholderesek*/
   main {
     margin: 0 auto 0 auto;
-    background-color: rgb(241, 228, 212);
     padding: 20px;
     height: auto;
   }
@@ -240,9 +309,24 @@ export default {
   }
 
   .cimek {
-    text-align: center;
-    font-size: 30px;
-    margin-bottom: 30px;
+    font-size: 33px;
+    font-weight: bold;
+    background: #ca848938;
+    backdrop-filter: blur(2px);
+    border-radius: 20px;
+    padding: 10px 20px;
+    color: rgb(0, 0, 0);
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  }
+
+  .visszaGomb {
+    max-width: 120px;
+    height: 30px;
+    border-radius: 5px;
+    padding: 5px 10px;
+    font-weight: bold;
+    cursor: pointer;
+    background: #cccfe0;
   }
 
   .tovabbGomb {
@@ -251,6 +335,7 @@ export default {
   border-radius: 5px;
   padding: 10px 25px;
   font-weight: bold;
+  font-size: 16px;
   background: transparent;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -262,13 +347,14 @@ export default {
   outline: none;
   border: none;
   background: rgb(241, 167, 159);
-  background: linear-gradient(0deg, rgb(248, 121, 107) 0%, rgb(236, 182, 158) 100%);
+  background: linear-gradient(0deg, #c26066 0%, #cc8b8f 100%);
   margin-top: 50px;
-  color: rgb(24, 23, 23);
+  color: rgb(49, 0, 0);
+  letter-spacing: 4px;
   }
 
   .tovabbGomb:hover {
-  color: #f0094a;
+  color: #c25b62;
   background: transparent;
   box-shadow:none;
   }
@@ -281,7 +367,7 @@ export default {
     right:0;
     height:2px;
     width:0;
-    background: #f0094a;
+    background: #c25b62;
     box-shadow:
     -1px -1px 5px 0px #fff,
     7px 7px 20px 0px #0003,
@@ -303,32 +389,15 @@ export default {
   }
 
   .tovabbGomb:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
 
-.tovabbGomb:disabled:hover {
-  background: linear-gradient(0deg, rgb(248, 121, 107) 0%, rgb(236, 182, 158) 100%);
-  color: rgb(24, 23, 23);
-  box-shadow: inset 2px 2px 2px 0px rgba(255,255,255,.5),
-              7px 7px 20px 0px rgba(0,0,0,.1),
-              4px 4px 5px 0px rgba(0,0,0,.1);
-}
-
-.image-preview {
-  margin: 20px 0;
-  text-align: center;
-}
-
-.image-preview img {
-  max-width: 300px;
-  max-height: 300px;
-  border: 2px solid #ddd;
-  border-radius: 5px;
-}
-
-.tovabbGomb:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
+  .tovabbGomb:disabled:hover {
+    background: linear-gradient(0deg, #c26066 0%, #cc8b8f 100%);
+    color: rgb(24, 23, 23);
+    box-shadow: inset 2px 2px 2px 0px rgba(255,255,255,.5),
+                7px 7px 20px 0px rgba(0,0,0,.1),
+                4px 4px 5px 0px rgba(0,0,0,.1);
+  }
 </style>
