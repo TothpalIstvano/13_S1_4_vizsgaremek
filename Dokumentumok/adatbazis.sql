@@ -10,16 +10,15 @@ CREATE TABLE felhasznalo(
 
 CREATE TABLE kepek (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    url VARCHAR(255) NOT NULL UNIQUE, -- e.g., '/uploads/posts/summer-vibes.jpg'
+    url_link VARCHAR(255) NOT NULL UNIQUE, -- e.g., '/uploads/posts/summer-vibes.jpg'
     alt_szoveg VARCHAR(255), -- Important for SEO and accessibility
     leiras VARCHAR(255),  -- Optional caption to display with the image
-    letrehozas_datuma TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE posztok(
     id INT PRIMARY KEY AUTO_INCREMENT,
     cim VARCHAR(255) NOT NULL,
-    alternativ VARCHAR(255) NOT NULL UNIQUE,
+    kivonat VARCHAR(255) NOT NULL UNIQUE,
     tartalom TEXT NOT NULL,
     szerzo_id INT,
     fo_kep_id INT NOT NULL, -- a kepek táblából
@@ -110,7 +109,7 @@ CREATE TABLE szinek (
     hex_kod VARCHAR(7) NOT NULL UNIQUE
 );
 
-CREATE TABLE termekek_szinek(
+CREATE TABLE termek_szinek(
     termek_id INT NOT NULL,
     szin_id INT NOT NULL,
     PRIMARY KEY (termek_id, szin_id),
