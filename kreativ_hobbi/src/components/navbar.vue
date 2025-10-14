@@ -143,7 +143,7 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
-/* logo stílusa */
+/*#region logo stílusa */
 #logoDiv{
   display: flex;
   align-items: center;
@@ -186,7 +186,9 @@ onUnmounted(() => {
   color: #ff8a65;
   text-decoration: none;
 }
-/* Naviágációs menű stílusa */
+/*#endregion*/
+
+/*#region Naviágációs menű stílusa */
 .navbar {
   display: flex;
   align-items: center;
@@ -213,11 +215,22 @@ onUnmounted(() => {
   margin-right: 15px;
 }
 .menu_link {
-  position: static;
+  position: relative;
   padding-bottom: 4px;
   text-decoration: none;
   color: #c68b59;
-  margin: 0 10px;
+  margin: 0 10px; 
+  transition: color 0.3s, border-bottom 0.3s;
+  border-bottom: 0px solid transparent;
+}
+
+.menu_link.router-link-exact-active {
+  color: #ff8a65;
+  border-bottom: 2px solid #ff8a65;
+}
+.menu_link:hover {
+  color: #fd835ee0;
+  transition: color 0.4s;
 }
 .menu_link:last-child {
   margin-right: 10rem;
@@ -230,7 +243,6 @@ onUnmounted(() => {
   width: 0;
   height: 2px;
   background-color: #ff8a65;
-  transition: all 0.3s ease-in-out;
 }
 .menu_link.router-link-exact-active::after {
   width: 100%;
@@ -239,13 +251,15 @@ onUnmounted(() => {
 .menu_link.router-link-exact-active {
   color: #ff8a65;
   font-weight: 600;
+  border-bottom: 2px solid #ff8a65;
+  transition: border-color 0.5s;
 }
 #felsoGap{
   height: 90px;
 }
+/*#endregion*/
 
-/* Reszponzív nav bar + hamburger menü */
-
+/*#region Reszponzív nav bar + hamburger menü */
 @media (max-width: 1200px) {
   .navbar {
     flex-direction: column;
@@ -305,6 +319,9 @@ onUnmounted(() => {
   .menu_link {
     font-size: 1.1rem;
   }
+  .menu_link:last-child {
+    margin-right: 10px;
+  }
   .vonal {
     display: none !important;
   }
@@ -316,5 +333,6 @@ onUnmounted(() => {
     height: 160px;
   }
 }
+/*#endregion*/
 </style>
 
