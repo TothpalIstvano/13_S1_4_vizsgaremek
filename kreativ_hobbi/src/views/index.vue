@@ -12,38 +12,33 @@ import Carousel from '@/components/carousel.vue';
         Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, natus.LOREM ipsum dolor sit amet consectetur adipisicing elit."
       </p>
     </div>
-    <div class="atContainer">
+    <div class="mozaikContainer">
       <div>
-        <div class="atSzoveg">
-          <h2 class="atOldalCim">Valami címe</h2>
-          <p class="atOLdalLeiras">
+        <div class="mozaikSzovegContainer">
+          <h2 class="mozaikCim">Valami címe</h2>
+          <p class="mozaikLeiras">
             Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, natus.LOREM ipsum dolor sit amet consectetur adipisicing elit.
           </p>
         </div>
-        <div class="atKep">
-          <img src="" alt="">
-        </div>
+        <div id="mozaikKep1"></div>
       </div>
       <div>
-        <div class="atSzoveg">
-          <h2 class="atOldalCim">Valami címe</h2>
-          <p class="atOLdalLeiras">
+        <div class="mozaikSzovegContainer">
+          <h2 class="mozaikCim">Valami címe</h2>
+          <p class="mozaikLeiras">
             Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, natus.LOREM ipsum dolor sit amet consectetur adipisicing elit.
           </p>
         </div>
-        <div class="atKep">
-        </div>
+        <div id="mozaikKep2"></div>
       </div>
       <div>
-        <div class="atSzoveg">
-          <h2 class="atOldalCim">Valami címe</h2>
-          <p class="atOLdalLeiras">
+        <div class="mozaikSzovegContainer">
+          <h2 class="mozaikCim">Valami címe</h2>
+          <p class="mozaikLeiras">
             Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, natus.LOREM ipsum dolor sit amet consectetur adipisicing elit.
           </p>
         </div>
-        <div class="atKep">
-
-        </div>
+        <div id="mozaikKep3"></div>
       </div>
     </div>
   </main>
@@ -70,7 +65,7 @@ import Carousel from '@/components/carousel.vue';
 /*#endregion*/
 
 /*#region At Container*/
-.atContainer {
+.mozaikContainer {
   display: flex;
   flex-direction: column;
   margin: 8rem 3rem 6rem 3rem; /* top right bottom left */
@@ -79,20 +74,35 @@ import Carousel from '@/components/carousel.vue';
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);       
 }
 
-.atContainer > div {
+.mozaikContainer > div {
   display: flex;
   flex-direction: row;
 }
-.atContainer > div:nth-child(odd) {
+.mozaikContainer > div:nth-child(odd) {
   flex-direction: row-reverse;
 }
 
-.atKep {
+#mozaikKep1, #mozaikKep2, #mozaikKep3  {
   background-color: rgb(255, 0, 0);
   width: 50%;
   height: 300px;
 }
-.atSzoveg{
+#mozaikKep1 {
+  background-image: url('@/images/mozaikKep1.jpg');
+  background-size: cover;
+  background-position: center;
+}
+#mozaikKep2 {
+  background-image: url("@/images/mozaikKep2.jpg");
+  background-size: cover;
+  background-position: center;
+}
+#mozaikKep3 {
+  background-image: url('@/images/mozaikKep3.png');
+  background-size: cover;
+  background-position: center;
+}
+.mozaikSzovegContainer{
   justify-content: center;
   align-items: center;
   background-color: lightgray;
@@ -100,16 +110,18 @@ import Carousel from '@/components/carousel.vue';
   height: 300px;
   text-align: center;
 }
-.atOldalCim {
+.mozaikCim {
   font-size: 2rem;
   color: #000000;
   font-weight: bold;
-  text-decoration: none;
+  padding-left: 2rem;
   border: none;
+  text-align: calc(70% - 9rem);
 }
-.atOLdalLeiras {
-  text-decoration: none;
-  border: none;
+.mozaikLeiras {
+  font-size: 1.2rem;
+  color: #000000;
+  padding-left: 2rem;
 }
 /*#endregion*/
 

@@ -160,6 +160,7 @@ watch(currentIndex, () => {
     margin-top: 3px;
     color: gray;
     transform: translateY(-180%);
+    transition: all 0.6s ease-in-out;
 }
 /*#endregion */
 
