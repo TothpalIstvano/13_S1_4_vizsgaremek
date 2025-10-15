@@ -26,12 +26,18 @@
   --color-background: var(--vt-c-white);
   --color-background-soft: var(--vt-c-white-soft);
   --color-background-mute: var(--vt-c-white-mute);
-
   --color-border: var(--vt-c-divider-light-2);
   --color-border-hover: var(--vt-c-divider-light-1);
-
   --color-heading: var(--vt-c-text-light-1);
   --color-text: var(--vt-c-text-light-1);
-
   --section-gap: 160px;
+
+  --bg: #d9c1ff;
+  --card: #ffffff;
+  --text: #111827;
+  --muted: #6b7280;
+  --accent: #8b5cf6;
+  --accent-soft: #7b00ff;
+  --shadow: 0 8px 20px rgba(17, 24, 39, 0.06);
+  --radius: 30px;
 }
