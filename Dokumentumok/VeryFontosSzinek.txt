@@ -1,0 +1,13 @@
+Deep highlight (burgundy) #612E2B -> esetlegesen a sötét barnánk helyett 
+Cool contrast (muted teal) #5E8B7E -> contrast lehetőség
+Soft neutral (light taupe) #C9B4A0 -> background color
+Light contrast (cream white) #FFF3E8 -> background color
+Deep Brown #3B1E13 -> text/shadow
+Warm Coral #FF8A65 -> cuki szín ?
+Peach Glow #FFB28A -> gradient
+Soft Blush #FFD7C1 -> Blog
+Cream #FFE9D4 -> background color
+Sage Green #A3B18A -> cuki?????
+Mist Gray #D4CFC9 -> background
+Light Taupe #C9B4A0 -> background
+Ivory #FFF3E8 -> background

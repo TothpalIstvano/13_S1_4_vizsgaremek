@@ -12,33 +12,27 @@ import Carousel from '@/components/carousel.vue';
         Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, natus.LOREM ipsum dolor sit amet consectetur adipisicing elit."
       </p>
     </div>
-    <div class="mozaikContainer">
-      <div>
-        <div class="mozaikSzovegContainer">
-          <h2 class="mozaikCim">Valami címe</h2>
-          <p class="mozaikLeiras">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, natus.LOREM ipsum dolor sit amet consectetur adipisicing elit.
-          </p>
-        </div>
+    <div class="mozaikFoContainer">
+      <div class="mozaikContainer">
         <div id="mozaikKep1"></div>
-      </div>
-      <div>
         <div class="mozaikSzovegContainer">
-          <h2 class="mozaikCim">Valami címe</h2>
-          <p class="mozaikLeiras">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, natus.LOREM ipsum dolor sit amet consectetur adipisicing elit.
-          </p>
+          <h2 class="mozaikCim"></h2>
+          <p class="mozaikLeiras"></p>
         </div>
-        <div id="mozaikKep2"></div>
-      </div>
-      <div>
+      </div >
+      <div class="mozaikContainer">
         <div class="mozaikSzovegContainer">
-          <h2 class="mozaikCim">Valami címe</h2>
-          <p class="mozaikLeiras">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, natus.LOREM ipsum dolor sit amet consectetur adipisicing elit.
-          </p>
+          <div id="mozaikKep2"></div>
+          <h2 class="mozaikCim"></h2>
+          <p class="mozaikLeiras"></p>
         </div>
+      </div>
+      <div class="mozaikContainer">
         <div id="mozaikKep3"></div>
+        <div class="mozaikSzovegContainer">
+          <h2 class="mozaikCim"></h2>
+          <p class="mozaikLeiras"></p>
+        </div>
       </div>
     </div>
   </main>
@@ -65,21 +59,20 @@ import Carousel from '@/components/carousel.vue';
 /*#endregion*/
 
 /*#region At Container*/
-.mozaikContainer {
+.mozaikFoContainer {
   display: flex;
   flex-direction: column;
   margin: 8rem 3rem 6rem 3rem; /* top right bottom left */
   border-radius: 24px;      
   overflow: hidden;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);       
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-.mozaikContainer > div {
+.mozaikContainer {
   display: flex;
-  flex-direction: row;
-}
-.mozaikContainer > div:nth-child(odd) {
-  flex-direction: row-reverse;
+  flex-direction: column;
+  width: 100%;
+  height: 300px;
 }
 
 #mozaikKep1, #mozaikKep2, #mozaikKep3  {
@@ -109,6 +102,7 @@ import Carousel from '@/components/carousel.vue';
   width: 50%;
   height: 300px;
   text-align: center;
+  border-radius: 3%;
 }
 .mozaikCim {
   font-size: 2rem;
