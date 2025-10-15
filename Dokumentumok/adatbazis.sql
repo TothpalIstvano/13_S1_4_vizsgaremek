@@ -131,3 +131,24 @@ CREATE TABLE kedvencek(
     FOREIGN KEY (felhasznalo_id) REFERENCES felhasznalo(f_id) ON DELETE CASCADE,
     FOREIGN KEY (termek_id) REFERENCES termekek(t_id) ON DELETE CASCADE
 )
+
+CREATE TABLE rendelesek(
+    r_id INT AUTO_INCREMENT PRIMARY KEY
+    felhasznalo_id INT NOT NULL,
+    statusz ENUM('függőben', 'szállítás alatt', 'teljesítve', 'törölve') DEFAULT 'függőben',
+    osszeg DECIMAL(10, 2) NOT NULL,
+    rendeles_datuma TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (felhasznalo_id) REFERENCES felhasznalo(f_id) ON DELETE CASCADE
+)
+
+CREATE TABLE rendelt_termekek(
+    tetel_id INT AUTO_INCREMENT PRIMARY KEY,
+    rendeles_id INT NOT NULL,
+    termek_id INT NOT NULL,
+    mennyiseg INT NOT NULL,
+    egysegar DECIMAL(10, 2) NOT NULL,
+    szin_id INT,
+    FOREIGN KEY (rendeles_id) REFERENCES rendelesek(r_id) ON DELETE CASCADE,
+    FOREIGN KEY (termek_id) REFERENCES termekek(t_id) ON DELETE CASCADE,
+    FOREIGN KEY (szin_id) REFERENCES szinek(sz_id) ON DELETE SET NULL
+)
