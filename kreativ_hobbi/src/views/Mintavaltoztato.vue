@@ -343,7 +343,7 @@ canvas {
   max-width: 100%;
   border: 2px solid #ddd;
   border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  box-shadow: var(--canvas-shadow);
 }
 
 .gombok {

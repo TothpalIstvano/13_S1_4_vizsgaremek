@@ -153,7 +153,7 @@ onUnmounted(() => {
   transition: transform 0.7s;
 }
 .logo {
-  /*color: #ff8a65;*/
+  /*color: var(--router-link-color);*/
   float: left;
   text-decoration: none;
   transition: transform 0.7s;
@@ -183,7 +183,7 @@ onUnmounted(() => {
 
 #nev {
   float: left;
-  color: #ff8a65;
+  color: var(--router-link-color);
   text-decoration: none;
 }
 /*#endregion*/
@@ -192,7 +192,7 @@ onUnmounted(() => {
 .navbar {
   display: flex;
   align-items: center;
-  background-color: #7a402d;
+  background-color: var(--navbar-bg);
   position: fixed;
   top: 0;
   left: 0;
@@ -200,8 +200,8 @@ onUnmounted(() => {
   height: 70px;
   padding: 10px;
   z-index: 1;
-  box-shadow: 0px 10px 10px rgba(2, 2, 2, 0.274);
-  border-bottom:2px solid #ff8a65;
+  box-shadow: var(--shadow);
+  border-bottom:2px solid var(--router-link-color);
 }
 
 #balraTolas{
@@ -209,7 +209,7 @@ onUnmounted(() => {
 }
 
 .vonal{
-  border-left: #ff8a65 2px solid;
+  border-left: var(--router-link-color) 2px solid;
   margin-left: 10px;
   padding-left: 10px;
   margin-right: 15px;
@@ -218,18 +218,18 @@ onUnmounted(() => {
   position: relative;
   padding-bottom: 4px;
   text-decoration: none;
-  color: #c68b59;
+  color: var(--router-link-muted-color);
   margin: 0 10px; 
   transition: color 0.3s, border-bottom 0.3s;
   border-bottom: 0px solid transparent;
 }
 
 .menu_link.router-link-exact-active {
-  color: #ff8a65;
-  border-bottom: 2px solid #ff8a65;
+  color: var(--router-link-color);
+  border-bottom: 2px solid var(--router-link-color);
 }
 .menu_link:hover {
-  color: #fd835ee0;
+  color: var(--router-link-hover-color);
   transition: color 0.4s;
 }
 .menu_link:last-child {
@@ -242,16 +242,16 @@ onUnmounted(() => {
   left: 50%;
   width: 0;
   height: 2px;
-  background-color: #ff8a65;
+  background-color: var(--router-link-color);
 }
 .menu_link.router-link-exact-active::after {
   width: 100%;
   left: 0;
 }
 .menu_link.router-link-exact-active {
-  color: #ff8a65;
+  color: var(--router-link-color);
   font-weight: 600;
-  border-bottom: 2px solid #ff8a65;
+  border-bottom: 2px solid var(--router-link-color);
   transition: border-color 0.5s;
 }
 #felsoGap{

@@ -31,13 +31,22 @@
   --color-heading: var(--vt-c-text-light-1);
   --color-text: var(--vt-c-text-light-1);
   --section-gap: 160px;
-
-  --bg: #d9c1ff;
-  --card: #ffffff;
-  --text: #111827;
-  --muted: #6b7280;
-  --accent: #8b5cf6;
-  --accent-soft: #7b00ff;
-  --shadow: 0 8px 20px rgba(17, 24, 39, 0.06);
+  --bg:#ffe9d4;
+  --card: #864340;
+  --text: #FFF3E8;
+  --muted: #ada69f;
+  --accent: #fd5757;
+  --accent-soft: #ff6d6d;
+  --shadow: 0 8px 20px rgba(2, 2, 2, 0.274);
   --radius: 30px;
+}
+
+:root{
+  --navbar-bg: #7a402d;
+  --router-link-color: #ff8a65;
+  --router-link-hover-color: #fd835ee0;
+  --router-link-muted-color: #FFB28A;
+
+  --carousel-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  --canvas-shadow: var(--carousel-shadow);
 }

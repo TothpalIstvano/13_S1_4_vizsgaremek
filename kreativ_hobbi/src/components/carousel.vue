@@ -116,7 +116,7 @@ watch(currentIndex, () => {
     width: 97%;
     height: auto;
     max-height: 500px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--carousel-shadow);
     transition: opacity 0.5s ease-in-out;
     z-index: -1;
     
@@ -206,7 +206,7 @@ watch(currentIndex, () => {
     height: 350px;
     display: block;
     border-radius: 15px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--carousel-shadow);
     margin-bottom: 20px;
     position: absolute;
     top: 20px;
@@ -215,7 +215,7 @@ watch(currentIndex, () => {
     width: 600px;
     height: 350px;
     border-radius: 15px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--carousel-shadow);
     display: block;
     margin: 0 auto;
     opacity: 1;

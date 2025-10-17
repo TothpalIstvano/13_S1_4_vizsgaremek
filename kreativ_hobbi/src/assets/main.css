@@ -12,6 +12,6 @@ p {
 
 body {
   margin: 0 auto;
-  background-color: rgb(255, 233, 212);
+  background-color: var(--bg);
 }
 
