@@ -71,7 +71,7 @@ watch(currentIndex, () => {
             <button @click="prevImage" type="button" id="balGomb"> 	&#129104;</button>
             <button @click="nextImage" type="button" id="jobbGomb">&#129106;</button>
         </div>
-        <div style="display: flex; justify-content: center; gap: 10px; margin-top: 10px;">
+        <div id="helyzetJelzoContainer">
             <div v-for="(index) in kepek.length" :key="index">
                 <div 
                     class="helyzetJelzo" 
@@ -148,6 +148,13 @@ watch(currentIndex, () => {
 #balGomb:hover::after, #jobbGomb:hover::after {
     background-color: rgba(0, 0, 0, 0.5);
     transition: all 1.5s ease-in-out;
+}
+#helyzetJelzoContainer {
+    display: flex; 
+    justify-content: center; 
+    gap: 10px; 
+    margin-top: 10px; 
+    margin-bottom: 1rem;
 }
 .helyzetJelzo {
     width: 225px;
