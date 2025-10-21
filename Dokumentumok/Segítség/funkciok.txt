@@ -1,0 +1,85 @@
+
+Index oldal:
+- Top 3 termék lekérése -> 1-2 hét top rated terméke
+- Kiemelt blogok megjelenítése
+
+Webshop:
+- Termékek betöltése + címkék
+- Termékekre való keresés -> tag és név alapján
+- Termékek szűrése -> tagek alapján
+- Nem az összes termék megjelenítése hanem pl.(50 db) után új oldalra és így lapozhatóak
+- Termékek amelyek kifogytak azoknál megjelenik egy restock idő
+
+Checkout:
+- Fizetés és fizetési opciók
+- Bejelentkezett felhasználóknak lehetőség kártya adat mentésére, betöltésére, módosítása
+- Szálitási cím meg adása vagy fox post helyek betöltése( https://webapi-test.foxpost.hu/swagger-ui/index.html )
+- Ha meghiusul a vásárlás a akkor a termék mennyiség vissza töltése, mivel csak ha sikerült a vásárlás akkor csökkenti amúgy pedig csak úgy mond lefoglalja
+- A fizetéseket / rendeléseket elmenti az adatbázisba
+- Szálitás követési lehetőség (progress bar)
+- Confermation email / igazoló email
+
+Blog:
+- Posztok betöltése
+- Blog posztokra való keresés tagek, cím, felhasználok alapján (fejlesztési lehetőség más profiljának megtekintése pl. insta style)
+- Új poszt létrehozása (csak bejelentkezet felhasználok számára)
+- Meglévő posztok módosítása, frissítéssé illetve törlése (a felhasználó saját posztja)
+- Posztok alá kommentelés és posztok értékelés ( csak bejelentkezet felhasználok számára ) a kommenteket mindeki láthatja
+- Ha megnyitjuk a posztok akkor láthatok a kommentek
+
+Login / Register:
+- Saját profil megtekintése, módosítása és törlési kérelem
+- Meglévő adatok látása
+- Saját posztok, rendelések megtekinthetőek
+- Profilkép
+- Bankkártya adatok módosítása
+- Profil létrehozássa (név, nickname, email, profilkép opció, telefonszám, jelszó)
+- Login (nickname/email, jelszó)
+- (Token rendszer)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+data:
+  automataList = []
+  selectedPoint = null
+  map = null
+
+methods:
+  async loadAutomataList():
+    response = await fetch("https://cdn.foxpost.hu/foxplus.json")
+    automataList = await response.json()
+
+  initMap():
+    map = L.map("mapDiv").setView([47.0, 19.0], 7)  // kezdő nézet Magyarországra
+    L.tileLayer(...).addTo(map)
+
+  placeMarkers():
+    for automata in automataList:
+      if automata.latitude && automata.longitude:
+        marker = L.marker([automata.latitude, automata.longitude]).addTo(map)
+        marker.bindPopup(`${automata.name}<br>${automata.address}`)
+        marker.on("click", () => {
+          selectedPoint = automata
+          // esetleg vizuális kiemelés
+        })
+
+mounted():
+  await loadAutomataList()
+  initMap()
+  placeMarkers()
