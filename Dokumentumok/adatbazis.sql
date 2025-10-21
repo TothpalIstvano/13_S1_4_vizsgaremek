@@ -16,18 +16,25 @@ CREATE TABLE felhasznalo(
     email VARCHAR(100) NOT NULL UNIQUE,
     jelszo VARCHAR(255) NOT NULL,
     profilkep_id INT,
+    statusz BOOLEAN DEFAULT TRUE,
+    letrehozas_datuma TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    utolso_belepes TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (profilkep_id) REFERENCES kepek(k_id) ON DELETE SET NULL
+);
+
+CREATE TABLE felhasznalo_adatok (
+    felhasznalo_id INT PRIMARY KEY,
+    vezeteknev VARCHAR(100),
+    keresztnev VARCHAR(100),
     varos INT,
     utca VARCHAR(255),
     hazszam INT,
     emelet_ajto varchar(10),
     telefonszam VARCHAR(20),
     kartyaszam INT,
-    statusz BOOLEAN DEFAULT TRUE,
-    letrehozas_datuma TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    utolso_belepes TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (profilkep_id) REFERENCES kepek(k_id) ON DELETE SET NULL
+    FOREIGN KEY (felhasznalo_id) REFERENCES felhasznalo(f_id) ON DELETE CASCADE
     FOREIGN KEY (varos) REFERENCES varos(v_id) ON DELETE SET NULL
-);
+)
 
 CREATE TABLE kategoriak (
     kat_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -55,6 +62,7 @@ CREATE TABLE posztok(
     szerzo_id INT,
     fo_kep_id INT,
     letrehozas_datuma TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    modositas_datuma TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     statusz ENUM('piszkozat', 'közzétett', 'archivált') DEFAULT 'piszkozat',
     FOREIGN KEY (szerzo_id) REFERENCES felhasznalo(f_id) ON DELETE SET NULL,
     FOREIGN KEY (fo_kep_id) REFERENCES kepek(k_id) ON DELETE SET NULL
