@@ -5,6 +5,11 @@ CREATE TABLE kepek (
     leiras VARCHAR(255) -- opcionális szerintem
 );
 
+CREATE TABLE varosok(
+    v_id INT AUTO_INCREMENT PRIMARY KEY,
+    varos_nev VARCHAR(100) NOT NULL UNIQUE
+)
+
 CREATE TABLE felhasznalok(
     f_id INT PRIMARY KEY AUTO_INCREMENT,
     felhasz_nev VARCHAR(100) NOT NULL UNIQUE,
@@ -16,6 +21,20 @@ CREATE TABLE felhasznalok(
     utolso_belepes TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (profilkep_id) REFERENCES kepek(k_id) ON DELETE SET NULL
 );
+
+CREATE TABLE felhasznalokAdatai (
+    felhasznalo_id INT PRIMARY KEY,
+    vezeteknev VARCHAR(100),
+    keresztnev VARCHAR(100),
+    varos INT,
+    utca VARCHAR(255),
+    hazszam INT,
+    emelet_ajto varchar(10),
+    telefonszam VARCHAR(20),
+    kartyaszam INT,
+    FOREIGN KEY (felhasznalo_id) REFERENCES felhasznalo(f_id) ON DELETE CASCADE
+    FOREIGN KEY (varos) REFERENCES varos(v_id) ON DELETE SET NULL
+)
 
 CREATE TABLE kategoriak (
     kat_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -43,8 +62,9 @@ CREATE TABLE posztok(
     szerzo_id INT,
     fo_kep_id INT,
     letrehozas_datuma TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    modositas_datuma TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     statusz ENUM('piszkozat', 'közzétett', 'archivált') DEFAULT 'piszkozat',
-    FOREIGN KEY (szerzo_id) REFERENCES felhasznalo(felhasz_id) ON DELETE SET NULL,
+    FOREIGN KEY (szerzo_id) REFERENCES felhasznalo(f_id) ON DELETE SET NULL,
     FOREIGN KEY (fo_kep_id) REFERENCES kepek(k_id) ON DELETE SET NULL
 );
 
@@ -73,7 +93,7 @@ CREATE TABLE kommentek(
     elozo_komment_id INT,
     letrehozas_datuma TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (poszt_id) REFERENCES posztok(p_id) ON DELETE CASCADE,
-    FOREIGN KEY (kommentelo) REFERENCES felhasznalo(felhasz_id) ON DELETE CASCADE,
+    FOREIGN KEY (kommentelo) REFERENCES felhasznalo(f_id) ON DELETE CASCADE,
     FOREIGN KEY (elozo_komment_id) REFERENCES kommentek(kom_id) ON DELETE CASCADE
 );
 
@@ -83,7 +103,7 @@ CREATE TABLE posztReakciok(
     reakcio ENUM('tetszik', 'nem tetszik'),
     PRIMARY KEY (poszt_id, felhasznalo_id) -- Egy felhasználó csak egyszer reagálhat egy posztoktra
     FOREIGN KEY (poszt_id) REFERENCES posztok(p_id) ON DELETE CASCADE,
-    FOREIGN KEY (felhasznalo_id) REFERENCES felhasznalo(felhasz_id) ON DELETE CASCADE
+    FOREIGN KEY (felhasznalo_id) REFERENCES felhasznalo(f_id) ON DELETE CASCADE
 );
 
 CREATE TABLE termekek (
@@ -107,7 +127,7 @@ CREATE TABLE termekKepek (
     FOREIGN KEY (kep_id) REFERENCES kepek(k_id) ON DELETE CASCADE
 );
 
-CREATE TABLE termekekCimkek(
+CREATE TABLE termekCimkek(
     termek_id INT,
     cimke_id INT,
     PRIMARY KEY (termek_id, cimke_id),
@@ -127,6 +147,28 @@ CREATE TABLE kedvencek(
     felhasznalo_id INT,
     termek_id INT,
     PRIMARY KEY (felhasznalo_id, termek_id),
-    FOREIGN KEY (felhasznalo_id) REFERENCES felhasznalo(felhasz_id),
+    FOREIGN KEY (felhasznalo_id) REFERENCES felhasznalo(f_id),
     FOREIGN KEY (termek_id) REFERENCES termekek(t_id),
+)
+
+CREATE TABLE rendelesek(
+    r_id INT AUTO_INCREMENT PRIMARY KEY,
+    felhasznalo_id INT NOT NULL,
+    statusz ENUM('függőben', 'szállítás alatt', 'befejezve', 'törölve') NOT NULL DEFAULT 'függőben',
+    osszeg DECIMAL(10, 2) NOT NULL,
+    rendeles_datuma TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (felhasznalo_id) REFERENCES felhasznalo(f_id) ON DELETE CASCADE,
+    FOREIGN KEY (termek_id) REFERENCES termekek(t_id) ON DELETE CASCADE
+)
+
+CREATE TABLE rendeltTermekek(
+    tetel_id INT AUTO_INCREMENT PRIMARY KEY,
+    rendeles_id INT NOT NULL,
+    termek_id INT NOT NULL,
+    mennyiseg INT NOT NULL,
+    egysegar DECIMAL(10, 2) NOT NULL,
+    szin_id INT NOT NULL,
+    FOREIGN KEY (rendeles_id) REFERENCES rendelesek(r_id) ON DELETE CASCADE,
+    FOREIGN KEY (termek_id) REFERENCES termekek(t_id) ON DELETE CASCADE,
+    FOREIGN KEY (szin_id) REFERENCES szinek(sz_id) ON DELETE SET NULL
 )
