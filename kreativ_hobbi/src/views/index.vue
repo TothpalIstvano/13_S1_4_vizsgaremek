@@ -99,7 +99,7 @@ onUnmounted(() => {
           </article>
         </router-link>
 
-        <router-link class="feature-link">
+        <router-link class="feature-link" to="/">
             <article class="feature-card">
               <div class="feature-icon" aria-hidden="true">🚚</div>
               <h3 class="feature-title">Gyors szállítás</h3>
@@ -281,6 +281,31 @@ onUnmounted(() => {
 .feature-link{
   text-decoration: none;
 }
+@keyframes feature-card-appear-left {
+  0% {
+    color: transparent;
+    transform: translatex(-125px);
+    opacity: 0;
+  }
+  100% {
+    color: black;
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes feature-card-appear-right {
+  0% {
+    color: transparent;
+    transform: translatex(125px);
+    opacity: 0;
+  }
+  100% {
+    color: black;
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
 
 .feature-card{
   background: var(--card);
@@ -290,6 +315,12 @@ onUnmounted(() => {
   padding: 60px ;
   text-align: center;
   transition: transform .15s ease, box-shadow .15s ease;
+}
+.feature-link:nth-child(odd).in-view{
+  animation: feature-card-appear-left 1s ease both;
+}
+.feature-link:nth-child(even).in-view{
+  animation: feature-card-appear-right 1s ease both;
 }
 
 .feature-card:hover{
