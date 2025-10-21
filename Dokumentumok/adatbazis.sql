@@ -5,7 +5,7 @@ CREATE TABLE kepek (
     leiras VARCHAR(255) -- opcionális szerintem
 );
 
-CREATE TABLE felhasznalo(
+CREATE TABLE felhasznalok(
     f_id INT PRIMARY KEY AUTO_INCREMENT,
     felhasz_nev VARCHAR(100) NOT NULL UNIQUE,
     email VARCHAR(100) NOT NULL UNIQUE,
@@ -48,7 +48,7 @@ CREATE TABLE posztok(
     FOREIGN KEY (fo_kep_id) REFERENCES kepek(k_id) ON DELETE SET NULL
 );
 
-CREATE TABLE poszt_kepek (
+CREATE TABLE posztKepek (
     poszt_id INT NOT NULL,
     kep_id INT NOT NULL,
     sorrend INT DEFAULT 0, -- Befolyásolni lehet a sorrendet (kihagyható szerintem)
@@ -57,7 +57,7 @@ CREATE TABLE poszt_kepek (
     FOREIGN KEY (kep_id) REFERENCES kepek(k_id) ON DELETE CASCADE
 );
 
-CREATE TABLE poszt_cimkek (
+CREATE TABLE posztCimkek (
     poszt_id INT NOT NULL,
     cimke_id INT NOT NULL,
     PRIMARY KEY (poszt_id, cimke_id),
@@ -77,7 +77,7 @@ CREATE TABLE kommentek(
     FOREIGN KEY (elozo_komment_id) REFERENCES kommentek(kom_id) ON DELETE CASCADE
 );
 
-CREATE TABLE poszt_reakciok(
+CREATE TABLE posztReakciok(
     poszt_id INT,
     felhasznalo_id INT,
     reakcio ENUM('tetszik', 'nem tetszik'),
@@ -98,7 +98,7 @@ CREATE TABLE termekek (
     FOREIGN KEY (fo_kep_id) REFERENCES kepek(k_id) ON DELETE SET NULL
 );
 
-CREATE TABLE termek_kepek (
+CREATE TABLE termekKepek (
     termek_id INT NOT NULL,
     kep_id INT NOT NULL,
     sort_order INT DEFAULT 0,
@@ -107,7 +107,7 @@ CREATE TABLE termek_kepek (
     FOREIGN KEY (kep_id) REFERENCES kepek(k_id) ON DELETE CASCADE
 );
 
-CREATE TABLE termekek_cimkek(
+CREATE TABLE termekekCimkek(
     termek_id INT,
     cimke_id INT,
     PRIMARY KEY (termek_id, cimke_id),
@@ -115,7 +115,7 @@ CREATE TABLE termekek_cimkek(
     FOREIGN KEY (cimke_id) REFERENCES cimkek(c_id) ON DELETE CASCADE
 );
 
-CREATE TABLE termek_szinek(
+CREATE TABLE termekSzinek(
     termek_id INT NOT NULL,
     szin_id INT NOT NULL,
     PRIMARY KEY (termek_id, szin_id),
