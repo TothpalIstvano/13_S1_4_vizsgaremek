@@ -1,3 +1,13 @@
+Fontos:
+- Regisztráció és belépés
+- Webshop és termékek betöltése
+- Kosárhoz adás
+- Fizetés, adatok mentése ott
+- Blog posztok betöltése és poszt írás
+- Mintakészítő és fonalmennyiség kiszámolás
+- Keresés (ha van rá magyarázatunk)
+
+
 Főoldal:
 - Top 5 termék lekérése
 - Kiemelt blogok megjelenítése
@@ -16,7 +26,7 @@ Checkout:
 - Ha meghiusul a vásárlás a akkor a termék mennyiség vissza töltése, mivel csak ha sikerült a vásárlás akkor csökkenti amúgy pedig csak úgy mond lefoglalja
 - A fizetéseket / rendeléseket elmenti az adatbázisba
 - Szálitás követési lehetőség (progress bar)
-- Confermation email / igazoló email
+- Confirmation email / igazoló email
 
 Blog:
 - Posztok betöltése
