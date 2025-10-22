@@ -29,6 +29,8 @@ function modositas(target) {
   resz.value = target
 }
 
+const imageUrl = ref(null)
+
 function kepfeltoltes(event) {
   const selectedFile = event.target.files[0]
   if (selectedFile) {
@@ -55,41 +57,44 @@ function toMintavaltoztato() {
 
 <template>
   <main>
-
     <h1 class="title">Mintakészítő</h1>
-
-    <hr>
     
     <div id="bemutato">
-      <h2 class="cim" style="color:black; border-bottom: none;">Mi is ez az oldal?</h2>
-      <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Harum, consequuntur natus sed eius minima ipsa ipsum nesciunt perferendis iure repellat ducimus, nemo facilis doloremque consectetur accusantium nisi, vel quibusdam. Distinctio.</p>
-      <ul>
-        <li>Horgolás</li>
-        <li>Kötés</li>
-        <li>Hímzés</li>
-      </ul>
-      <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Rerum quod, blanditiis nostrum deserunt quas possimus saepe tempora earum consequuntur doloribus debitis voluptatibus atque totam accusamus aut. Vero modi quod vitae!</p>
-    </div>
-
-    <div class="harom_oszlop">
+      <h2 class="cim">Mi is ez az oldal?</h2>
+      <p>Lorem ipsum dolor sit amet consectetur adipisicing elit...</p>
+      
+      <div class="harom_oszlop">
         <div class="kartya">
           <h3>Horgolás</h3>
-          <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Ut ipsum exercitationem fugit dolores facere totam? Ex sit deserunt laudantium ab quasi iure consequuntur, repellendus et dicta sapiente explicabo dolorum! Sunt.</p>
+          <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit...</p>
         </div>
         <div class="kartya">
           <h3>Kötés</h3>
-          <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Suscipit asperiores minima perferendis officiis aliquam quis facilis fuga eum doloremque ipsam, nostrum, dolorem dicta quidem eaque veniam quisquam, a molestiae quibusdam!</p>
+          <p>Lorem ipsum dolor sit amet consectetur adipisicing elit...</p>
         </div>
         <div class="kartya">
           <h3>Hímzés</h3>
-          <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Soluta, aliquam dolores. Fugiat, dolorum! Earum sint quae laudantium ea consectetur ducimus placeat ab, ipsum incidunt veniam ullam soluta hic excepturi illum.</p>
+          <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit...</p>
         </div>
+      </div>
     </div>
 
-
     <div id="adatok">
+      <div class="progress-container">
+        <div class="progress-bar">
+          <div class="progress-step" :class="{ active: resz >= 1 }">1</div>
+          <div class="progress-step" :class="{ active: resz >= 2 }">2</div>
+          <div class="progress-step" :class="{ active: resz >= 3 }">3</div>
+        </div>
+        <div class="progress-labels">
+          <div class="progress-label">Típus</div>
+          <div class="progress-label">Fonal</div>
+          <div class="progress-label">Fájl</div>
+        </div>
+      </div>
+      
       <!-- 1. rész -->
-      <div v-if="resz === 1" id="elsoResz" class="radioStilus">
+      <div v-show="resz === 1" id="elsoResz" class="radioStilus">
         <p class="cimek">Válassz típust a projektedhez:</p>
         <div class="radioBelso">
           <div v-for="option in tipusok" :key="option" >
@@ -99,7 +104,6 @@ function toMintavaltoztato() {
               name="elsoLepes"
               :value="option"
               v-model="elsoLepes"
-              class="gombStilus"
             />
             <label :for="option">{{ option }}</label>
           </div>
@@ -113,16 +117,15 @@ function toMintavaltoztato() {
           Következő ⇒
         </button>
       </div>
-
+      
       <!-- 2. rész -->
-      <div v-else-if="resz === 2" id="masodikResz" class="radioStilus">
-        <p
-          class="vissza"
-        >
-          A projekted: <strong>{{ elsoLepes }}</strong> <button @click="modositas(1)" class="visszaGomb">Vissza</button>
+      <div v-show="resz === 2" id="masodikResz" class="radioStilus">
+        <p class="vissza">
+          A projekted: <strong>{{ elsoLepes }}</strong> 
+          <button @click="modositas(1)" class="visszaGomb">Vissza</button>
         </p>
 
-        <p class="cimek">Válassz fonaltípust: </p>
+        <p class="cimek">Válassz fonaltípust:</p>
         <div class="radioBelso">
           <div v-for="option in fonalak" :key="option" >
             <input
@@ -131,7 +134,6 @@ function toMintavaltoztato() {
               name="masodikLepes"
               :value="option"
               v-model="masodikLepes"
-              class="gombStilus"
             />
             <label :for="option">{{ option }}</label>
           </div>
@@ -145,27 +147,28 @@ function toMintavaltoztato() {
           Következő ⇒
         </button>
       </div>
-
+      
       <!-- 3. rész -->
-      <div v-else-if="resz === 3" id="harmadikResz">
-        <p
-          class="vissza"
-        >
-          A projekted: <strong>{{ elsoLepes }}</strong> <button @click="modositas(1)" class="visszaGomb">Vissza</button>
+      <div v-show="resz === 3" id="harmadikResz">
+        <p class="vissza">
+          A projekted: <strong>{{ elsoLepes }}</strong> 
+          <button @click="modositas(1)" class="visszaGomb">Vissza</button>
         </p>
-        <p
-          
-          class="vissza"
-        >
-          A fonaltípusod: <strong>{{ masodikLepes }}</strong> <button @click="modositas(2)" class="visszaGomb">Vissza</button>
+        <p class="vissza">
+          A fonaltípusod: <strong>{{ masodikLepes }}</strong> 
+          <button @click="modositas(2)" class="visszaGomb">Vissza</button>
         </p>
 
         <p class="cimek">Fájl feltöltése:</p>
-        <input
-          type="file"
-          @change="kepfeltoltes"
-        />
-        <br>
+        <label for="file-upload" class="file-upload-label">
+          Kép kiválasztása
+        </label>
+        <input id="file-upload" type="file" @change="kepfeltoltes" />
+        
+        <div v-if="file" class="file-preview-container">
+          <img :src="imageUrl" alt="Preview" class="file-preview" />
+          <p>{{ file.name }}</p>
+        </div>
 
         <button
             :disabled="!file"
@@ -173,231 +176,355 @@ function toMintavaltoztato() {
             class="tovabbGomb">
           Minta készítése ⇒
         </button>
-
       </div>
     </div>
-    
   </main>
 </template>
 
+<!--Benne akarom tartani az animációs rádiógombokat, és rendbe kell szedni a stílust és színeket
+Most a rádiógombokon nem látszanak ha ki vannak jelölve, meg furák az árnyékok-->
 
 <style scoped>
-.radioBelso {
-  background: #ca848938;
-  backdrop-filter: blur(2px);
-  border-radius: 20px;
-  padding: 10px 20px;
+:root {
+  --primary-color: #c74f57;
+  --primary-light: #ca8489;
+  --primary-dark: #a63840;
+  --secondary-color: #f3c78e;
+  --secondary-light: #f8e6d0;
+  --text-dark: #333;
+  --text-light: #666;
+  --background-light: #f9f5f2;
+  --white: #ffffff;
+  --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-hover: 0 8px 15px rgba(0, 0, 0, 0.2);
+} /*ezek nem működnek, de ki lehetne őket rakni base.css-be */
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+body {
+  font-family: 'Poppins', sans-serif;
+  color: var(--text-dark);
+  background-color: rgb(255, 211, 144);
+}
+
+.title {
+  font-weight: 700;
   color: rgb(0, 0, 0);
-  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+  position: relative;
+  display: inline-block;
+}
+
+.title::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 4px;
+  background: linear-gradient(90deg, rgb(209, 94, 0), rgb(95, 58, 2));
+  border-radius: 2px;
+}
+
+#adatok {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+  background-color: rgb(206, 16, 133);
+  border-radius: 15px;
+  box-shadow: rgb(133, 5, 58);
+}
+
+.radioStilus {
+  padding: 1.5rem;
+  transition: opacity 0.3s ease;
+}
+
+.cimek {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: rgb(0, 0, 0);
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.radioBelso {
+  background-color: rgb(247, 30, 210);
+  border-radius: 15px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
 }
 
 input[type="radio"] {
-	appearance: none;
-	width: 20px;
-	height: 20px;
-	border: 3px solid #000000;
-	border-radius: 5px;
-	margin-right: 10px;
-	position: relative;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  border: 2px solid rgb(69, 0, 78);
+  border-radius: 50%;
+  margin-right: 12px;
+  position: relative;
   top: 3px;
-  margin-left: 50px;
-}
-
-input[type="radio"]:hover {
-  opacity: 0.7;
+  transition: all 0.2s ease;
 }
 
 input[type="radio"]:checked::before {
-	content: "";
-	display: block;
-	width: 14px;
-	height: 14px;
-	background-color: #ca8489;
-	border-radius: 2px;
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-	animation: appear 0.8s;
+  content: "";
+  display: block;
+  width: 12px;
+  height: 12px;
+  background-color: rgb(236, 34, 226);
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 label {
-	font-size: 22px;
-	color: #000000;
-  font-weight: bold;
-  letter-spacing: 1px;
-  margin-left: 15px;
+  font-size: 1.1rem;
+  color: rgb(0, 0, 0);
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.2s ease;
 }
 
 label:hover {
-  opacity: 0.7;
+  color: rgb(110, 2, 105);
 }
 
-@keyframes appear {
-	0% {
-		transform: translate(-50%, -50%) scale(0);
-		background-color: #fff;
-	}
-	45% {
-		transform: translate(-50%, -50%) scale(1.3);
-		background-color: #c74f57;
-	}
-	50% {
-		transform: translate(-50%, -50%) scale(1.4);
-		background-color: #c9636a;
-	}
-	55% {
-		transform: translate(-50%, -50%) scale(1.3);
-	}
-	100% {
-		transform: translate(-50%, -50%) scale(1);
-		background-color: #ca8489;
-	}
+main {
+  margin: 0 auto;
+  padding: 20px;
+  height: auto;
 }
-/* a színek placeholderesek*/
-  main {
-    margin: 0 auto 0 auto;
-    padding: 20px;
-    height: auto;
-  }
 
-  .title {
-    text-align: center;
-    margin-bottom: 30px;
-    font-size: 50px;
-  }
+.cim {
+  text-align: center;
+  font-size: 26px;
+  margin-bottom: 30px;
+}
 
-  hr {
-    border-top: 1px solid black;
-  }
+#bemutato {
+  max-width: 1200px;
+  margin: auto;
+  padding: 10px 50px 10px 50px;
+  text-align: justify;
+  margin-bottom: 50px;
+  border-radius: 10px;
+}
 
-  .cim {
-    text-align: center;
-    font-size: 30px;
-    margin-bottom: 30px;
-  }
+.harom_oszlop {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
+  padding: 1rem;
+}
 
-  #bemutato {
-    max-width: 1200px;
-    margin: auto;
-    padding: 10px 50px 10px 50px;
-    text-align: justify;
-    margin-bottom: 50px;
-    border-radius: 10px;
-  }
+.kartya {
+  background-color: rgb(137, 44, 212);
+  border-radius: 15px;
+  padding: 2rem;
+  box-shadow: rgb(87, 5, 155);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
 
-  /*3 oszlop - még nem reszponzív */
-  .harom_oszlop {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 50px;
-    margin-bottom: 50px;
-    padding:1rem;
-  }
+.kartya::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 5px;
+  background: linear-gradient(90deg, red, red);
+}
 
-  .kartya {
-    background-color: rgb(243, 199, 142);
-    text-align: justify;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
-    /* vagy innen valami: https://getcssscan.com/css-box-shadow-examples */
-  }
+.kartya:hover {
+  transform: translateY(-10px);
+  box-shadow: rgb(69, 8, 182);
+}
 
-  #adatok {
-    justify-items: center;
-  }
+.kartya h3 {
+  color: rgb(0, 0, 0);
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
 
-  .cimek {
-    font-size: 33px;
-    font-weight: bold;
-    background: #ca848938;
-    backdrop-filter: blur(2px);
-    border-radius: 20px;
-    padding: 10px 20px;
-    color: rgb(0, 0, 0);
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-  }
-
-  .visszaGomb {
-    max-width: 120px;
-    height: 30px;
-    border-radius: 5px;
-    padding: 5px 10px;
-    font-weight: bold;
-    cursor: pointer;
-    background: #cccfe0;
-  }
-
-  .tovabbGomb {
-  max-width: 200px;
-  height: 40px;
-  border-radius: 5px;
-  padding: 10px 25px;
-  font-weight: bold;
-  font-size: 16px;
-  background: transparent;
+.tovabbGomb {
+  display: block;
+  width: 200px;
+  height: 50px;
+  margin: 2rem auto 0;
+  border: none;
+  border-radius: 50px;
+  background: linear-gradient(135deg, rgb(70, 255, 79), rgb(133, 245, 157));
+  color: var(--white);
+  font-weight: 600;
+  font-size: 1rem;
+  letter-spacing: 1px;
   cursor: pointer;
   transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(199, 79, 87, 0.4);
+  overflow: hidden;
   position: relative;
-  /*display: inline-block;*/
-   box-shadow:inset 2px 2px 2px 0px rgba(255,255,255,.5),
-   7px 7px 20px 0px rgba(0,0,0,.1),
-   4px 4px 5px 0px rgba(0,0,0,.1);
-  outline: none;
+}
+
+.tovabbGomb::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.tovabbGomb:hover::before {
+  left: 100%;
+}
+
+.tovabbGomb:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(199, 79, 87, 0.5);
+}
+
+.visszaGomb {
+  padding: 0.5rem 1rem;
   border: none;
-  background: rgb(241, 167, 159);
+  border-radius: 20px;
+  background-color: rgb(57, 45, 235);
+  color: rgb(0, 0, 0);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-left: 1rem;
+}
+
+.visszaGomb:hover {
+  background-color: rgb(3, 0, 177);
+  transform: translateY(-2px);
+}
+
+.tovabbGomb:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.tovabbGomb:disabled:hover {
   background: linear-gradient(0deg, #c26066 0%, #cc8b8f 100%);
-  margin-top: 50px;
-  color: rgb(49, 0, 0);
-  letter-spacing: 4px;
-  }
+  color: rgb(24, 23, 23);
+  box-shadow: inset 2px 2px 2px 0px rgba(255,255,255,.5),
+              7px 7px 20px 0px rgba(0,0,0,.1),
+              4px 4px 5px 0px rgba(0,0,0,.1);
+}
 
-  .tovabbGomb:hover {
-  color: #c25b62;
-  background: transparent;
-  box-shadow:none;
-  }
+input[type="file"] {
+  display: none;
+}
 
-  .tovabbGomb:before,
-  .tovabbGomb:after{
-    content:'';
-    position:absolute;
-    top:0;
-    right:0;
-    height:2px;
-    width:0;
-    background: #c25b62;
-    box-shadow:
-    -1px -1px 5px 0px #fff,
-    7px 7px 20px 0px #0003,
-    4px 4px 5px 0px #0002;
-    transition:400ms ease all;
-  }
+.file-upload-label {
+  display: inline-block;
+  padding: 1rem 2rem;
+  background-color: rgb(0, 168, 180);
+  color: rgb(0, 0, 0);
+  border-radius: 10px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 1rem;
+}
 
-  .tovabbGomb:after{
-    right:inherit;
-    top:inherit;
-    left:0;
-    bottom:0;
-  }
+.file-upload-label:hover {
+  background-color: rgb(109, 253, 241);
+  transform: translateY(-3px);
+}
 
-  .tovabbGomb:hover:before,
-  .tovabbGomb:hover:after{
-    width:100%;
-    transition:800ms ease all;
-  }
+.file-preview {
+  max-width: 100%;
+  max-height: 300px;
+  margin: 1rem auto;
+  border-radius: 10px;
+  box-shadow: rgb(176, 241, 250);
+}
 
-  .tovabbGomb:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
+.progress-container {
+  margin-bottom: 2rem;
+}
 
-  .tovabbGomb:disabled:hover {
-    background: linear-gradient(0deg, #c26066 0%, #cc8b8f 100%);
-    color: rgb(24, 23, 23);
-    box-shadow: inset 2px 2px 2px 0px rgba(255,255,255,.5),
-                7px 7px 20px 0px rgba(0,0,0,.1),
-                4px 4px 5px 0px rgba(0,0,0,.1);
+.progress-bar {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.progress-step {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #e0e0e0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  color: #999;
+  position: relative;
+}
+
+.progress-step.active {
+  background-color: rgb(34, 48, 247);
+  color: white;
+}
+
+.progress-step:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 100%;
+  width: 100%;
+  height: 2px;
+  background-color: #e0e0e0;
+  z-index: -1;
+}
+
+.progress-step.active:not(:last-child)::after {
+  background-color: rgb(248, 233, 24);
+}
+
+.progress-labels {
+  display: flex;
+  justify-content: space-between;
+}
+
+.progress-label {
+  font-size: 0.9rem;
+  color: rgb(29, 235, 22);
+}
+
+@media (max-width: 768px) {
+  .harom_oszlop {
+    grid-template-columns: 1fr;
   }
+  
+  .title {
+    font-size: 2rem;
+  }
+  
+  #adatok {
+    padding: 1.5rem;
+  }
+  
+  input[type="radio"] {
+    width: 18px;
+    height: 18px;
+  }
+  
+  label {
+    font-size: 1rem;
+  }
+}
 </style>
