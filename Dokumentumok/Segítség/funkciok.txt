@@ -1,5 +1,5 @@
 Főoldal:
-- Top 3 termék lekérése -> 1-2 hét top rated terméke
+- Top 5 termék lekérése
 - Kiemelt blogok megjelenítése
 
 Webshop:
