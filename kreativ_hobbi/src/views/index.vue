@@ -14,7 +14,7 @@ onMounted(() => {
       // if you want the animation to run only once, uncomment:
       // if (entry.isIntersecting) io.unobserve(entry.target);
     },
-    { threshold: 0.5 }
+    { threshold: 1 }
   );
   if (featureTitleRef.value) io.observe(featureTitleRef.value);
 });
@@ -49,7 +49,7 @@ onUnmounted(() => {
 
     <section class="feature-section">
       <div class="feature-grid">
-        <router-link class="feature-link" to="/mintakeszito">
+        <router-link class="feature-link" to="/mintakeszito"  :class="{ 'in-view': isInView }">
           <article class="feature-card">
             <div class="feature-icon" aria-hidden="true">🎨</div>
             <h3 class="feature-title">Mintakészítő</h3>
@@ -59,7 +59,7 @@ onUnmounted(() => {
           </article>
         </router-link>
 
-        <router-link class="feature-link" to="/aruhaz">      
+        <router-link class="feature-link" to="/aruhaz"  :class="{ 'in-view': isInView }">      
           <article class="feature-card">
             <div class="feature-icon" aria-hidden="true">📦</div>
             <h3 class="feature-title">Minőségi termékek</h3>
@@ -69,7 +69,7 @@ onUnmounted(() => {
           </article>
         </router-link>
 
-        <router-link class="feature-link" to="/blog">
+        <router-link class="feature-link" to="/blog"  :class="{ 'in-view': isInView }">
           <article class="feature-card">
             <div class="feature-icon" aria-hidden="true">📚</div>
             <h3 class="feature-title">Blog és közösség</h3>
@@ -79,7 +79,7 @@ onUnmounted(() => {
           </article>
         </router-link>
 
-        <router-link class="feature-link" to="/rolunk">
+        <router-link class="feature-link" to="/rolunk"  :class="{ 'in-view': isInView }">
           <article class="feature-card">
             <div class="feature-icon" aria-hidden="true">👥</div>
             <h3 class="feature-title">Szakértő segítség</h3>
@@ -89,7 +89,7 @@ onUnmounted(() => {
           </article>
         </router-link>
 
-        <router-link class="feature-link" to="/">
+        <router-link class="feature-link" to="/"  :class="{ 'in-view': isInView }">
           <article class="feature-card">
             <div class="feature-icon" aria-hidden="true">⭐</div>
             <h3 class="feature-title">Elégedettség garancia</h3>
@@ -99,7 +99,7 @@ onUnmounted(() => {
           </article>
         </router-link>
 
-        <router-link class="feature-link">
+        <router-link class="feature-link" to="/" :class="{ 'in-view': isInView }">
             <article class="feature-card">
               <div class="feature-icon" aria-hidden="true">🚚</div>
               <h3 class="feature-title">Gyors szállítás</h3>
@@ -281,6 +281,31 @@ onUnmounted(() => {
 .feature-link{
   text-decoration: none;
 }
+@keyframes feature-card-appear-left {
+  0% {
+    color: transparent;
+    transform: translatex(-125px);
+    opacity: 0;
+  }
+  100% {
+    color: black;
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes feature-card-appear-right {
+  0% {
+    color: transparent;
+    transform: translatex(125px);
+    opacity: 0;
+  }
+  100% {
+    color: black;
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
 
 .feature-card{
   background: var(--card);
@@ -290,6 +315,12 @@ onUnmounted(() => {
   padding: 60px ;
   text-align: center;
   transition: transform .15s ease, box-shadow .15s ease;
+}
+.feature-link:nth-child(odd).in-view{
+  animation: feature-card-appear-left 1s ease both;
+}
+.feature-link:nth-child(even).in-view{
+  animation: feature-card-appear-right 1s ease both;
 }
 
 .feature-card:hover{
