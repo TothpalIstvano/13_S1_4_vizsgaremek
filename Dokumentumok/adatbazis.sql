@@ -26,7 +26,7 @@ CREATE TABLE felhasznalo(
     FOREIGN KEY (profilKep_id) REFERENCES kepek(id) ON DELETE SET NULL
 );
 
-CREATE TABLE felhasznalo_adatok (
+CREATE TABLE felhasznaloAdatok (
     felhasznalo_id INT PRIMARY KEY,
     vezeteknev VARCHAR(100),
     keresztnev VARCHAR(100),
@@ -164,7 +164,7 @@ CREATE TABLE rendelesek(
     FOREIGN KEY (termek_id) REFERENCES termekek(id) ON DELETE CASCADE
 )
 
-CREATE TABLE rendelt_termekek(
+CREATE TABLE rendeltTermekek(
     id INT AUTO_INCREMENT PRIMARY KEY,
     rendeles_id INT NOT NULL,
     termek_id INT NOT NULL,
