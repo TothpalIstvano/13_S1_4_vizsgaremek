@@ -12,7 +12,7 @@ CREATE TABLE kepek (
 CREATE TABLE varosok(
     id INT AUTO_INCREMENT PRIMARY KEY,
     varos_Nev VARCHAR(100) NOT NULL UNIQUE
-)
+);
 
 CREATE TABLE felhasznalo(
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -36,9 +36,9 @@ CREATE TABLE felhasznaloAdatok (
     emeletAjto varchar(10),
     telefonszam VARCHAR(20),
     kartyaszam INT,
-    FOREIGN KEY (felhasznalo_id) REFERENCES felhasznalo(id) ON DELETE CASCADE
+    FOREIGN KEY (felhasznalo_id) REFERENCES felhasznalo(id) ON DELETE CASCADE,
     FOREIGN KEY (varos) REFERENCES varosok(id) ON DELETE SET NULL
-)
+);
 
 CREATE TABLE kategoriak (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -151,8 +151,8 @@ CREATE TABLE kedvencek(
     termek_id INT,
     PRIMARY KEY (felhasznalo_id, termek_id),
     FOREIGN KEY (felhasznalo_id) REFERENCES felhasznalo(id),
-    FOREIGN KEY (termek_id) REFERENCES termekek(id),
-)
+    FOREIGN KEY (termek_id) REFERENCES termekek(id)
+);
 
 CREATE TABLE rendelesek(
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -162,7 +162,7 @@ CREATE TABLE rendelesek(
     rendeles_Datuma TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (felhasznalo_id) REFERENCES felhasznalo(id) ON DELETE CASCADE,
     FOREIGN KEY (termek_id) REFERENCES termekek(id) ON DELETE CASCADE
-)
+);
 
 CREATE TABLE rendeltTermekek(
     id INT AUTO_INCREMENT PRIMARY KEY,
