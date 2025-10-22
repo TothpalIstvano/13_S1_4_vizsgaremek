@@ -12,7 +12,7 @@ onMounted(() => {
       // play animation when at least 50% visible; change threshold as needed
       isInView.value = entry.isIntersecting;
       // if you want the animation to run only once, uncomment:
-      // if (entry.isIntersecting) io.unobserve(entry.target);
+      if (entry.isIntersecting) io.unobserve(entry.target);
     },
     { threshold: 1 }
   );
@@ -356,7 +356,10 @@ onUnmounted(() => {
 }
 /*#endregion*/
 
+/*#region Blog cards*/
 
+
+/*#endregion*/
 </style>
 
 
