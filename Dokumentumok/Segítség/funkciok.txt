@@ -1,5 +1,4 @@
-
-Index oldal:
+Főoldal:
 - Top 3 termék lekérése -> 1-2 hét top rated terméke
 - Kiemelt blogok megjelenítése
 
