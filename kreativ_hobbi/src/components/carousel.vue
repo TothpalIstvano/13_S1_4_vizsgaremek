@@ -98,7 +98,7 @@ watch(currentIndex, () => {
 }
 #carouselTitle {
     animation: titlePopUp 1.5s ease-in-out;
-    margin-top: 45px;
+    margin-top: 60px;
     width: 550px;
     opacity: 1;
 }
