@@ -185,6 +185,8 @@ function toMintavaltoztato() {
 Most a rádiógombokon nem látszanak ha ki vannak jelölve, meg furák az árnyékok-->
 
 <style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
 :root {
   --primary-color: #c74f57;
   --primary-light: #ca8489;
@@ -199,7 +201,7 @@ Most a rádiógombokon nem látszanak ha ki vannak jelölve, meg furák az árny
   --shadow-hover: 0 8px 15px rgba(0, 0, 0, 0.2);
 } /*ezek nem működnek, de ki lehetne őket rakni base.css-be */
 
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
 
 body {
   font-family: 'Poppins', sans-serif;
