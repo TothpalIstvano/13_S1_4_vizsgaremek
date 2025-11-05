@@ -6,6 +6,7 @@ const featureTitleRef = ref(null);
 const isInView = ref(false);
 let io = null;
 
+
 onMounted(() => {
   io = new IntersectionObserver(
     ([entry]) => {
@@ -14,7 +15,7 @@ onMounted(() => {
       // if you want the animation to run only once, uncomment:
       if (entry.isIntersecting) io.unobserve(entry.target);
     },
-    { threshold: 1 }
+    { threshold: 1 } // 100% visible
   );
   if (featureTitleRef.value) io.observe(featureTitleRef.value);
 });
