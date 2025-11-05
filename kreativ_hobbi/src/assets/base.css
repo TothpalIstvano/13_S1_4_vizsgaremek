@@ -50,3 +50,18 @@
   --carousel-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   --canvas-shadow: var(--carousel-shadow);
 }
+
+/*Mintakészítő*/
+:root {
+  --primary-color: #c74f57;
+  --primary-light: #ca8489;
+  --primary-dark: #a63840;
+  --secondary-color: #f3c78e;
+  --secondary-light: #f8e6d0;
+  --text-dark: #333;
+  --text-light: #666;
+  --background-light: #f9f5f2;
+  --white: #ffffff;
+  --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-hover: 0 8px 15px rgba(0, 0, 0, 0.2);
+}

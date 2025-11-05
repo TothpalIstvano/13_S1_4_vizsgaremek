@@ -54,7 +54,6 @@ function toMintavaltoztato() {
 
 </script>
 
-
 <template>
   <main>
     <h1 class="title">Mintakészítő</h1>
@@ -97,7 +96,7 @@ function toMintavaltoztato() {
       <div v-show="resz === 1" id="elsoResz" class="radioStilus">
         <p class="cimek">Válassz típust a projektedhez:</p>
         <div class="radioBelso">
-          <div v-for="option in tipusok" :key="option" >
+          <div v-for="option in tipusok" :key="option" class="radio-container">
             <input
               type="radio"
               :id="option"
@@ -127,7 +126,7 @@ function toMintavaltoztato() {
 
         <p class="cimek">Válassz fonaltípust:</p>
         <div class="radioBelso">
-          <div v-for="option in fonalak" :key="option" >
+          <div v-for="option in fonalak" :key="option" class="radio-container">
             <input
               type="radio"
               :id="option"
@@ -181,27 +180,8 @@ function toMintavaltoztato() {
   </main>
 </template>
 
-<!--Benne akarom tartani az animációs rádiógombokat, és rendbe kell szedni a stílust és színeket
-Most a rádiógombokon nem látszanak ha ki vannak jelölve, meg furák az árnyékok-->
-
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
-
-:root {
-  --primary-color: #c74f57;
-  --primary-light: #ca8489;
-  --primary-dark: #a63840;
-  --secondary-color: #f3c78e;
-  --secondary-light: #f8e6d0;
-  --text-dark: #333;
-  --text-light: #666;
-  --background-light: #f9f5f2;
-  --white: #ffffff;
-  --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  --shadow-hover: 0 8px 15px rgba(0, 0, 0, 0.2);
-} /*ezek nem működnek, de ki lehetne őket rakni base.css-be */
-
-
 
 body {
   font-family: 'Poppins', sans-serif;
@@ -215,6 +195,7 @@ body {
   margin-bottom: 2rem;
   position: relative;
   display: inline-block;
+  text-align: center;
 }
 
 .title::after {
@@ -233,9 +214,9 @@ body {
   max-width: 800px;
   margin: 0 auto;
   padding: 2rem;
-  background-color: rgb(206, 16, 133);
+  background-color: var(--primary-color);
   border-radius: 15px;
-  box-shadow: rgb(133, 5, 58);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
 .radioStilus {
@@ -252,35 +233,64 @@ body {
 }
 
 .radioBelso {
-  background-color: rgb(247, 30, 210);
+  background-color: var(--secondary-color);
   border-radius: 15px;
   padding: 1.5rem;
   margin-bottom: 2rem;
 }
 
+.radio-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
 input[type="radio"] {
   appearance: none;
+  -webkit-appearance: none;
   width: 22px;
   height: 22px;
   border: 2px solid rgb(69, 0, 78);
-  border-radius: 50%;
+  border-radius: 25%;
   margin-right: 12px;
   position: relative;
   top: 3px;
   transition: all 0.2s ease;
+  background-color: transparent;
 }
 
 input[type="radio"]:checked::before {
   content: "";
   display: block;
-  width: 12px;
-  height: 12px;
-  background-color: rgb(236, 34, 226);
-  border-radius: 50%;
+  width: 14px;
+  height: 14px;
+  background-color: rgb(209, 94, 0);
+  border-radius: 25%;
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+  animation: appear 0.6s;
+}
+
+input[type="radio"]:hover {
+  border-color: rgb(209, 94, 0);
+  transform: scale(1.1);
+}
+
+@keyframes appear {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    background-color: #fff;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.5);
+    background-color: #853304;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    background-color: rgb(209, 94, 0);
+  }
 }
 
 label {
@@ -325,10 +335,10 @@ main {
 }
 
 .kartya {
-  background-color: rgb(137, 44, 212);
+  background-color: rgb(85, 10, 0);
   border-radius: 15px;
   padding: 2rem;
-  box-shadow: rgb(87, 5, 155);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   position: relative;
   overflow: hidden;
@@ -341,12 +351,12 @@ main {
   left: 0;
   width: 100%;
   height: 5px;
-  background: linear-gradient(90deg, red, red);
+  background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
 }
 
 .kartya:hover {
   transform: translateY(-10px);
-  box-shadow: rgb(69, 8, 182);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
 }
 
 .kartya h3 {
@@ -363,7 +373,7 @@ main {
   margin: 2rem auto 0;
   border: none;
   border-radius: 50px;
-  background: linear-gradient(135deg, rgb(70, 255, 79), rgb(133, 245, 157));
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
   color: var(--white);
   font-weight: 600;
   font-size: 1rem;
@@ -399,7 +409,7 @@ main {
   padding: 0.5rem 1rem;
   border: none;
   border-radius: 20px;
-  background-color: rgb(57, 45, 235);
+  background-color: var(--secondary-color);
   color: rgb(0, 0, 0);
   font-weight: 500;
   cursor: pointer;
@@ -408,7 +418,7 @@ main {
 }
 
 .visszaGomb:hover {
-  background-color: rgb(3, 0, 177);
+  background-color: var(--secondary-light);
   transform: translateY(-2px);
 }
 
@@ -451,7 +461,7 @@ input[type="file"] {
   max-height: 300px;
   margin: 1rem auto;
   border-radius: 10px;
-  box-shadow: rgb(176, 241, 250);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
 .progress-container {
@@ -504,7 +514,7 @@ input[type="file"] {
 
 .progress-label {
   font-size: 0.9rem;
-  color: rgb(29, 235, 22);
+  color: var(--text-dark);
 }
 
 @media (max-width: 768px) {
