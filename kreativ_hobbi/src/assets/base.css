@@ -65,3 +65,9 @@
   --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   --shadow-hover: 0 8px 15px rgba(0, 0, 0, 0.2);
 }
+
+/*Index blog kártyák*/
+:root {
+  --color: #3c3163;
+  --transition-time: 0.5s;
+}
