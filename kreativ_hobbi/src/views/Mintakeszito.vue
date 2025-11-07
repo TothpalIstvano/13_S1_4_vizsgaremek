@@ -60,22 +60,41 @@ function toMintavaltoztato() {
     
     <div id="bemutato">
       <h2 class="cim">Mi is ez az oldal?</h2>
-      <p>Lorem ipsum dolor sit amet consectetur adipisicing elit...</p>
-      
-      <div class="harom_oszlop">
-        <div class="kartya">
-          <h3>Horgolás</h3>
-          <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit...</p>
+      <div class="ket_oszlop">
+        <div class="harom_oszlop">
+          <div class="kartya">
+            <h3>Horgolás</h3>
+            <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Alias odio accusantium nihil impedit quam repellendus dolore, atque ducimus voluptates natus blanditiis, eaque, inventore quod! Exercitationem repellat repellendus esse corporis eaque.
+              <ul>
+                <li>pontok</li>
+              </ul>
+            </p>
+          </div>
+          <div class="kartya">
+            <h3>Kötés</h3>
+            <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Alias odio accusantium nihil impedit quam repellendus dolore, atque ducimus voluptates natus blanditiis, eaque, inventore quod! Exercitationem repellat repellendus esse corporis eaque.
+              <ul>
+                <li>pontok</li>
+              </ul>
+            </p>
+          </div>
+          <div class="kartya">
+            <h3>Hímzés</h3>
+            <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Alias odio accusantium nihil impedit quam repellendus dolore, atque ducimus voluptates natus blanditiis, eaque, inventore quod! Exercitationem repellat repellendus esse corporis eaque.
+              <ul>
+                <li>pontok</li>
+              </ul>
+            </p>
+          </div>
         </div>
-        <div class="kartya">
-          <h3>Kötés</h3>
-          <p>Lorem ipsum dolor sit amet consectetur adipisicing elit...</p>
-        </div>
-        <div class="kartya">
-          <h3>Hímzés</h3>
-          <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit...</p>
+        <div class="blog_info">
+          <div>
+            szöveg
+          </div>
         </div>
       </div>
+
+
     </div>
 
     <div id="adatok">
@@ -189,29 +208,26 @@ body {
   background-color: rgb(255, 211, 144);
 }
 
-.title {
-  font-weight: 700;
-  color: rgb(0, 0, 0);
-  margin-bottom: 2rem;
-  position: relative;
-  display: inline-block;
+main {
+  margin: 0 auto;
+  height: auto;
   text-align: center;
 }
 
-.title::after {
-  content: '';
-  position: absolute;
-  bottom: -10px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 80px;
-  height: 4px;
-  background: linear-gradient(90deg, rgb(209, 94, 0), rgb(95, 58, 2));
-  border-radius: 2px;
+.title {
+  display: inline-block;
+  font-weight: 700;
+  font-size: 45px;
+  color: rgb(0, 0, 0);
+  background-image: linear-gradient(90deg, rgb(128, 40, 0), rgb(177, 67, 4));
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 100% 4px;
+  padding-bottom: 6px;
 }
 
 #adatok {
-  max-width: 800px;
+  max-width: 900px;
   margin: 0 auto;
   padding: 2rem;
   background-color: var(--primary-color);
@@ -312,13 +328,11 @@ main {
 }
 
 .cim {
-  text-align: center;
   font-size: 26px;
   margin-bottom: 30px;
 }
 
 #bemutato {
-  max-width: 1200px;
   margin: auto;
   padding: 10px 50px 10px 50px;
   text-align: justify;
@@ -328,14 +342,16 @@ main {
 
 .harom_oszlop {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 2rem;
-  margin-bottom: 3rem;
-  padding: 1rem;
+  grid-template-columns: repeat(3, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .kartya {
-  background-color: rgb(85, 10, 0);
+  background-color: var(--primary-dark);
   border-radius: 15px;
   padding: 2rem;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
@@ -364,6 +380,22 @@ main {
   margin-bottom: 1rem;
   font-size: 1.5rem;
   font-weight: 600;
+}
+
+.ket_oszlop {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  gap: 2rem;
+  align-items: start;
+  width: 100%;
+  margin: 0 auto 3rem;
+  padding: 1rem;
+}
+
+.blog_info {
+  width: 100%;
+  box-sizing: border-box;
+  align-self: start;
 }
 
 .tovabbGomb {
@@ -515,6 +547,16 @@ input[type="file"] {
 .progress-label {
   font-size: 0.9rem;
   color: var(--text-dark);
+}
+
+@media (max-width: 1100px) {
+  .ket_oszlop {
+    grid-template-columns: 1fr;
+  }
+
+  .harom_oszlop {
+    grid-template-columns: repeat(2, minmax(180px, 1fr));
+  }
 }
 
 @media (max-width: 768px) {

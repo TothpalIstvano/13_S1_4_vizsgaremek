@@ -1,7 +1,3 @@
-
---a neveket lehet hoyg normalizálni kéne (vagy többesszámú vagy egyesszámú legyen minden tábla neve), és táblanévhez camelCase
---azokat a rekordokat amik nem idegenkulcs pedig camelCase-el kéne átnevezni esetleg (pl léterhozás dátuma)
-
 CREATE TABLE kepek (
     id INT AUTO_INCREMENT PRIMARY KEY,
     url_Link VARCHAR(255) NOT NULL UNIQUE,
@@ -14,13 +10,13 @@ CREATE TABLE varosok(
     varos_Nev VARCHAR(100) NOT NULL UNIQUE
 );
 
-CREATE TABLE felhasznalo(
+CREATE TABLE felhasznalok (
     id INT PRIMARY KEY AUTO_INCREMENT,
     felhasz_nev VARCHAR(100) NOT NULL UNIQUE,
     email VARCHAR(100) NOT NULL UNIQUE,
     jelszo VARCHAR(255) NOT NULL,
     profilKep_id INT,
-    statusz BOOLEAN DEFAULT TRUE,
+    statusz ENUM('aktív', 'inaktív'),
     letrehozas_Datuma TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     utolso_Belepes TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (profilKep_id) REFERENCES kepek(id) ON DELETE SET NULL
@@ -124,7 +120,7 @@ CREATE TABLE termekek (
 CREATE TABLE termekKepek (
     termek_id INT NOT NULL,
     kep_id INT NOT NULL,
-    sort_order INT DEFAULT 0,
+    rendezes INT DEFAULT 0,
     PRIMARY KEY (termek_id, kep_id),
     FOREIGN KEY (termek_id) REFERENCES termekek(id) ON DELETE CASCADE,
     FOREIGN KEY (kep_id) REFERENCES kepek(id) ON DELETE CASCADE
