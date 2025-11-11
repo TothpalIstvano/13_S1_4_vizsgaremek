@@ -118,41 +118,42 @@ Például a database/migrations/YYYY\_MM\_DD\_HHMMSS\_create\_termekek\_table.ph
 
 *{*
 
-    *public function up(): void*
+&nbsp;   \*public function up(): void\*
 
-    *{*
+    \*{\*
 
-        *Schema::create('products', function (Blueprint $table) {*
+        \*Schema::create('products', function (Blueprint $table) {\*
 
-            *$table->id();*
+            \*$table->id();\*
 
-            *$table->string('nev');*
+            \*$table->string('nev');\*
 
-            *$table->text('leiras')->nullable();*
+            \*$table->text('leiras')->nullable();\*
 
-            *$table->decimal('ar', 10, 2);*
+            \*$table->decimal('ar', 10, 2);\*
 
-            *$table->integer('darab')->default(0);*
+            \*$table->integer('darab')->default(0);\*
 
-            *$table->foreignId('kategoria\_id')->nullable()->constrained('kategoriak')->onDelete('set null');*
+            \*$table->foreignId('kategoria\\\_id')->nullable()->constrained('kategoriak')->onDelete('set null');\*
 
-            *$table->foreignId('fo\_kep\_id')->nullable()->constrained('kepek')->onDelete('set null');*
+            \*$table->foreignId('fo\\\_kep\\\_id')->nullable()->constrained('kepek')->onDelete('set null');\*
 
-            *$table->timestamps();*
+            \*$table->timestamps();\*
 
-        *});*
+        \*});\*
 
-    *}*
+    \*}\*
 
 
 
-    *public function down(): void*
+    \*public function down(): void\*
 
-    *{*
+    \*{\*
 
-        *Schema::dropIfExists('products');*
+        \*Schema::dropIfExists('products');\*
 
-    *}*
+    \*}\*
+
 
 *};*
 
@@ -212,87 +213,88 @@ Például app/Models/Product.php-ba:
 
 *{*
 
-    *use HasFactory;*
+&nbsp;   \*use HasFactory;\*
 
 
 
-    *protected $fillable = \[*
+    \*protected $fillable = \\\[\*
 
-        *'name', 'description', 'sku', 'price', 'stock\_quantity', 'category\_id', 'featured\_image\_id'*
+        \*'name', 'description', 'sku', 'price', 'stock\\\_quantity', 'category\\\_id', 'featured\\\_image\\\_id'\*
 
-    *];*
-
-
-
-    *// A product belongs to one category*
-
-    *public function category()*
-
-    *{*
-
-        *return $this->belongsTo(Category::class);*
-
-    *}*
+    \*];\*
 
 
 
-    *// A product belongs to one featured image*
+    \*// A product belongs to one category\*
 
-    *public function featuredImage()*
+    \*public function category()\*
 
-    *{*
+    \*{\*
 
-        *return $this->belongsTo(Image::class, 'featured\_image\_id');*
+        \*return $this->belongsTo(Category::class);\*
 
-    *}*
-
-
-
-    *// A product can have many gallery images (many-to-many)*
-
-    *public function images()*
-
-    *{*
-
-        *return $this->belongsToMany(Image::class, 'product\_images')->withPivot('sort\_order');*
-
-    *}*
+    \*}\*
 
 
 
-    *// A product can have many tags (many-to-many)*
+    \*// A product belongs to one featured image\*
 
-    *public function tags()*
+    \*public function featuredImage()\*
 
-    *{*
+    \*{\*
 
-        *return $this->belongsToMany(Tag::class, 'product\_tags');*
+        \*return $this->belongsTo(Image::class, 'featured\\\_image\\\_id');\*
 
-    *}*
-
-
-
-    *// A product can have many colors (many-to-many)*
-
-    *public function colors()*
-
-    *{*
-
-        *return $this->belongsToMany(Color::class, 'product\_colors');*
-
-    *}*
+    \*}\*
 
 
 
-    *// A product can be favorited by many users (many-to-many)*
+    \*// A product can have many gallery images (many-to-many)\*
 
-    *public function favoritedBy()*
+    \*public function images()\*
 
-    *{*
+    \*{\*
 
-        *return $this->belongsToMany(User::class, 'user\_favorites');*
+        \*return $this->belongsToMany(Image::class, 'product\\\_images')->withPivot('sort\\\_order');\*
 
-    *}*
+    \*}\*
+
+
+
+    \*// A product can have many tags (many-to-many)\*
+
+    \*public function tags()\*
+
+    \*{\*
+
+        \*return $this->belongsToMany(Tag::class, 'product\\\_tags');\*
+
+    \*}\*
+
+
+
+    \*// A product can have many colors (many-to-many)\*
+
+    \*public function colors()\*
+
+    \*{\*
+
+        \*return $this->belongsToMany(Color::class, 'product\\\_colors');\*
+
+    \*}\*
+
+
+
+    \*// A product can be favorited by many users (many-to-many)\*
+
+    \*public function favoritedBy()\*
+
+    \*{\*
+
+        \*return $this->belongsToMany(User::class, 'user\\\_favorites');\*
+
+    \*}\*
+
 
 *}*
 
@@ -352,27 +354,28 @@ Open app/Http/Controllers/Api/ProductController.php and fill in the index method
 
 *{*
 
-    */\*\**
+&nbsp;   \*/\\\*\\\*\*
 
-     *\* Display a listing of the resource.*
+     \*\\\* Display a listing of the resource.\*
 
-     *\*/*
+     \*\\\*/\*
 
-    *public function index()*
+    \*public function index()\*
 
-    *{*
+    \*{\*
 
-        *// Eager load relationships to avoid N+1 problems*
+        \*// Eager load relationships to avoid N+1 problems\*
 
-        *$products = Product::with(\['category', 'featuredImage', 'tags', 'colors'])->get();*
+        \*$products = Product::with(\\\['category', 'featuredImage', 'tags', 'colors'])->get();\*
 
-        *return response()->json($products);*
+        \*return response()->json($products);\*
 
-    *}*
+    \*}\*
 
 
 
-    *// ... other methods (show, store, etc.)*
+    \*// ... other methods (show, store, etc.)\*
+
 
 *}*
 
@@ -429,15 +432,16 @@ Navigate to your Vue project's root directory in the terminal and install Axios,
 
 *const apiClient = axios.create({*
 
-  *baseURL: 'http://localhost:8000/api', // Your Laravel API URL*
+*baseURL: 'http://localhost:8000/api', // Your Laravel API URL*
 
-  *headers: {*
+*headers: {*
 
-    *'Accept': 'application/json',*
+&nbsp;   \*'Accept': 'application/json',\*
 
-    *'Content-Type': 'application/json',*
+    \*'Content-Type': 'application/json',\*
 
-  *}*
+
+*}*
 
 *});*
 
@@ -445,47 +449,49 @@ Navigate to your Vue project's root directory in the terminal and install Axios,
 
 *export const useProductsStore = defineStore('products', {*
 
-  *state: () => ({*
+*state: () => ({*
 
-    *products: \[],*
+&nbsp;   \*products: \\\[],\*
 
-    *loading: false,*
+    \*loading: false,\*
 
-    *error: null,*
-
-  *}),*
+    \*error: null,\*
 
 
+*}),*
 
-  *actions: {*
 
-    *async fetchProducts() {*
 
-      *this.loading = true;*
+*actions: {*
 
-      *this.error = null;*
+&nbsp;   \*async fetchProducts() {\*
 
-      *try {*
+      \*this.loading = true;\*
 
-        *const response = await apiClient.get('/products');*
+      \*this.error = null;\*
 
-        *this.products = response.data;*
+      \*try {\*
 
-      *} catch (error) {*
+        \*const response = await apiClient.get('/products');\*
 
-        *this.error = 'Failed to fetch products. Please try again.';*
+        \*this.products = response.data;\*
 
-        *console.error("Error fetching products:", error);*
+      \*} catch (error) {\*
 
-      *} finally {*
+        \*this.error = 'Failed to fetch products. Please try again.';\*
 
-        *this.loading = false;*
+        \*console.error("Error fetching products:", error);\*
 
-      *}*
+      \*} finally {\*
 
-    *},*
+        \*this.loading = false;\*
 
-  *},*
+      \*}\*
+
+    \*},\*
+
+
+*},*
 
 *});*
 
@@ -513,7 +519,7 @@ Egy alap kinézet az áruház részre Piniát használva:
 
 *onMounted(() => {*
 
-  *productsStore.fetchProducts();*
+*productsStore.fetchProducts();*
 
 *});*
 
@@ -523,49 +529,50 @@ Egy alap kinézet az áruház részre Piniát használva:
 
 *<template>*
 
-  *<div>*
+*<div>*
 
-    *<h1>Our Products</h1>*
-
-
-
-    *<!-- Loading state -->*
-
-    *<div v-if="productsStore.loading">Loading products...</div>*
+&nbsp;   \*<h1>Our Products</h1>\*
 
 
 
-    *<!-- Error state -->*
+    \*<!-- Loading state -->\*
 
-    *<div v-if="productsStore.error" class="error">{{ productsStore.error }}</div>*
+    \*<div v-if="productsStore.loading">Loading products...</div>\*
 
 
 
-    *<!-- Products list -->*
+    \*<!-- Error state -->\*
 
-    *<div v-if="!productsStore.loading \&\& !productsStore.error" class="product-grid">*
+    \*<div v-if="productsStore.error" class="error">{{ productsStore.error }}</div>\*
 
-      *<div v-for="product in productsStore.products" :key="product.id" class="product-card">*
 
-        *<img v-if="product.featured\_image" :src="`http://localhost:8000/storage/${product.featured\_image.url}`" :alt="product.featured\_image.alt\_text" />*
 
-        *<h2>{{ product.name }}</h2>*
+    \*<!-- Products list -->\*
 
-        *<p class="price">${{ product.price }}</p>*
+    \*<div v-if="!productsStore.loading \\\&\\\& !productsStore.error" class="product-grid">\*
 
-        *<p>{{ product.description }}</p>*
+      \*<div v-for="product in productsStore.products" :key="product.id" class="product-card">\*
 
-        *<div class="tags">*
+        \*<img v-if="product.featured\\\_image" :src="`http://localhost:8000/storage/${product.featured\\\_image.url}`" :alt="product.featured\\\_image.alt\\\_text" />\*
 
-          *<span v-for="tag in product.tags" :key="tag.id" class="tag">{{ tag.name }}</span>*
+        \*<h2>{{ product.name }}</h2>\*
 
-        *</div>*
+        \*<p class="price">${{ product.price }}</p>\*
 
-      *</div>*
+        \*<p>{{ product.description }}</p>\*
 
-    *</div>*
+        \*<div class="tags">\*
 
-  *</div>*
+          \*<span v-for="tag in product.tags" :key="tag.id" class="tag">{{ tag.name }}</span>\*
+
+        \*</div>\*
+
+      \*</div>\*
+
+    \*</div>\*
+
+
+*</div>*
 
 *</template>*
 
@@ -575,11 +582,11 @@ Egy alap kinézet az áruház részre Piniát használva:
 
 *.product-grid {*
 
-  *display: grid;*
+*display: grid;*
 
-  *grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));*
+*grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));*
 
-  *gap: 20px;*
+*gap: 20px;*
 
 *}*
 
@@ -606,41 +613,42 @@ Your Vue app (e.g., on localhost:5173) and Laravel API (on localhost:8000) are o
 
 *return \[*
 
-    *// ...*
+&nbsp;   \*// ...\*
 
-    *'paths' => \['api/\*', 'sanctum/csrf-cookie'],*
-
-
-
-    *'allowed\_methods' => \['\*'],*
+    \*'paths' => \\\['api/\\\*', 'sanctum/csrf-cookie'],\*
 
 
 
-    *'allowed\_origins' => \[*
-
-        *'http://localhost:5173', // Add your Vue dev server URL here*
-
-    *],*
+    \*'allowed\\\_methods' => \\\['\\\*'],\*
 
 
 
-    *'allowed\_origins\_patterns' => \[],*
+    \*'allowed\\\_origins' => \\\[\*
+
+        \*'http://localhost:5173', // Add your Vue dev server URL here\*
+
+    \*],\*
 
 
 
-    *'allowed\_headers' => \['\*'],*
+    \*'allowed\\\_origins\\\_patterns' => \\\[],\*
 
 
 
-    *'exposed\_headers' => \[],*
+    \*'allowed\\\_headers' => \\\['\\\*'],\*
 
 
 
-    *'max\_age' => 0,*
+    \*'exposed\\\_headers' => \\\[],\*
 
 
 
-    *'supports\_credentials' => false,*
+    \*'max\\\_age' => 0,\*
+
+
+
+    \*'supports\\\_credentials' => false,\*
+
 
 *];*
 

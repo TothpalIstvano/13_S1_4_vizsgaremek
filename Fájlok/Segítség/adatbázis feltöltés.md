@@ -51,43 +51,44 @@ Open database/seeders/CategorySeeder.php and add the data you want to insert.
 
 *{*
 
-    */\*\**
+&nbsp;   \*/\\\*\\\*\*
 
-     *\* Run the database seeds.*
+     \*\\\* Run the database seeds.\*
 
-     *\*/*
+     \*\\\*/\*
 
-    *public function run(): void*
+    \*public function run(): void\*
 
-    *{*
+    \*{\*
 
-        *// Define the categories we want to insert*
+        \*// Define the categories we want to insert\*
 
-        *$categories = \[*
+        \*$categories = \\\[\*
 
-            *\['nev' => 'Crafts', 'fo\_kategoria\_id' => null],*
+            \*\\\['nev' => 'Crafts', 'fo\\\_kategoria\\\_id' => null],\*
 
-            *\['nev' => 'Knitting \& Crochet', 'fo\_kategoria\_id' => 1], // Child of 'Crafts'*
+            \*\\\['nev' => 'Knitting \\\& Crochet', 'fo\\\_kategoria\\\_id' => 1], // Child of 'Crafts'\*
 
-            *\['nev' => 'DIY \& Woodworking', 'fo\_kategoria\_id' => 1], // Child of 'Crafts'*
+            \*\\\['nev' => 'DIY \\\& Woodworking', 'fo\\\_kategoria\\\_id' => 1], // Child of 'Crafts'\*
 
-            *\['nev' => 'Yarn', 'fo\_kategoria\_id' => 2], // Child of 'Knitting \& Crochet'*
+            \*\\\['nev' => 'Yarn', 'fo\\\_kategoria\\\_id' => 2], // Child of 'Knitting \\\& Crochet'\*
 
-            *\['nev' => 'Tools', 'fo\_kategoria\_id' => 2],*
+            \*\\\['nev' => 'Tools', 'fo\\\_kategoria\\\_id' => 2],\*
 
-            *\['nev' => 'Hand Tools', 'fo\_kategoria\_id' => 3], // Child of 'DIY \& Woodworking'*
+            \*\\\['nev' => 'Hand Tools', 'fo\\\_kategoria\\\_id' => 3], // Child of 'DIY \\\& Woodworking'\*
 
-            *\['nev' => 'Materials', 'fo\_kategoria\_id' => 3],*
+            \*\\\['nev' => 'Materials', 'fo\\\_kategoria\\\_id' => 3],\*
 
-        *];*
+        \*];\*
 
 
 
-        *// Insert them into the categories table*
+        \*// Insert them into the categories table\*
 
-        *DB::table('categories')->insert($categories);*
+        \*DB::table('categories')->insert($categories);\*
 
-    *}*
+    \*}\*
+
 
 *}*
 
@@ -115,25 +116,26 @@ Open the main seeder file: database/seeders/DatabaseSeeder.php. You need to tell
 
 *{*
 
-    */\*\**
+&nbsp;   \*/\\\*\\\*\*
 
-     *\* Seed the application's database.*
+     \*\\\* Seed the application's database.\*
 
-     *\*/*
+     \*\\\*/\*
 
-    *public function run(): void*
+    \*public function run(): void\*
 
-    *{*
+    \*{\*
 
-        *$this->call(\[*
+        \*$this->call(\\\[\*
 
-            *CategorySeeder::class,*
+            \*CategorySeeder::class,\*
 
-            *// You will add other seeders here, like TagSeeder, ColorSeeder, etc.*
+            \*// You will add other seeders here, like TagSeeder, ColorSeeder, etc.\*
 
-        *]);*
+        \*]);\*
 
-    *}*
+    \*}\*
+
 
 *}*
 
@@ -177,47 +179,48 @@ Open the factory file and define what a fake product should look like.
 
 */\*\**
 
- *\* @extends \\Illuminate\\Database\\Eloquent\\Factories\\Factory<\\App\\Models\\Product>*
+*\* @extends \\Illuminate\\Database\\Eloquent\\Factories\\Factory<\\App\\Models\\Product>*
 
- *\*/*
+*\*/*
 
 *class ProductFactory extends Factory*
 
 *{*
 
-    */\*\**
+&nbsp;   \*/\\\*\\\*\*
 
-     *\* Define the model's default state.*
+     \*\\\* Define the model's default state.\*
 
-     *\**
+     \*\\\*\*
 
-     *\* @return array<string, mixed>*
+     \*\\\* @return array<string, mixed>\*
 
-     *\*/*
+     \*\\\*/\*
 
-    *public function definition(): array*
+    \*public function definition(): array\*
 
-    *{*
+    \*{\*
 
-        *return \[*
+        \*return \\\[\*
 
-            *'name' => fake()->words(3, true), // e.g., "Soft Wool Yarn"*
+            \*'name' => fake()->words(3, true), // e.g., "Soft Wool Yarn"\*
 
-            *'description' => fake()->sentence(10),*
+            \*'description' => fake()->sentence(10),\*
 
-            *'sku' => 'PRD-' . fake()->unique()->numerify('######'),*
+            \*'sku' => 'PRD-' . fake()->unique()->numerify('######'),\*
 
-            *'price' => fake()->randomFloat(2, 5, 100), // Random price between 5 and 100*
+            \*'price' => fake()->randomFloat(2, 5, 100), // Random price between 5 and 100\*
 
-            *'stock\_quantity' => fake()->numberBetween(10, 200),*
+            \*'stock\\\_quantity' => fake()->numberBetween(10, 200),\*
 
-            *'category\_id' => fake()->numberBetween(4, 7), // Assumes categories 4-7 are leaf nodes*
+            \*'category\\\_id' => fake()->numberBetween(4, 7), // Assumes categories 4-7 are leaf nodes\*
 
-            *// We'll handle images and tags later in a more advanced seeder*
+            \*// We'll handle images and tags later in a more advanced seeder\*
 
-        *];*
+        \*];\*
 
-    *}*
+    \*}\*
+
 
 *}*
 
@@ -247,21 +250,22 @@ Open database/seeders/ProductSeeder.php and use the factory.
 
 *{*
 
-    */\*\**
+&nbsp;   \*/\\\*\\\*\*
 
-     *\* Run the database seeds.*
+     \*\\\* Run the database seeds.\*
 
-     *\*/*
+     \*\\\*/\*
 
-    *public function run(): void*
+    \*public function run(): void\*
 
-    *{*
+    \*{\*
 
-        *// Create 20 products using the ProductFactory*
+        \*// Create 20 products using the ProductFactory\*
 
-        *Product::factory(20)->create();*
+        \*Product::factory(20)->create();\*
 
-    *}*
+    \*}\*
+
 
 *}*
 
@@ -275,21 +279,11 @@ Run all seeders at once:
 
 **php artisan db:seed**
 
-*Or* 
+*Or*
 
 \# This will drop all tables, re-run all migrations, and then run all seeders
 
 **php artisan migrate:fresh --seed**
 
 This migrate:fresh --seed command will become your best friend during development. It lets you reset your entire database to a perfectly structured and populated state in seconds.
-
-
-
-
-
-
-
-
-
-
 
