@@ -64,6 +64,11 @@ const ctx = ref(null)
 const jelenlegiKep = ref(null)
 const canvas = ref(null)
 
+// New variables for pixel grid
+const pixelRows = ref([])
+const checkedRows = ref({})
+const gridOpacity = ref(30)
+
 function initializePixelation() {
   if (!imageUrl.value) return
   
@@ -89,6 +94,9 @@ function kepFrissites() {
   
   vaszonFeldolgozas(eredetiKep.value)
   kinyertSzinPaletta()
+  
+  // Process canvas for pixel grid display
+  processCanvas(eredetiKep.value)
 }
 
 function vaszonFeldolgozas(img) {
@@ -163,6 +171,71 @@ function kepElkeszitesKevesebbSzin(data, width, height, pixelSize) {
         }
       }
     }
+  }
+}
+
+function toggleRowOpacity(rowIndex) {
+  // Toggle between full opacity (1) and lowered opacity (0.5)
+  pixelRows.value[rowIndex].rowOpacity = checkedRows.value[rowIndex] ? 0.5 : 1
+}
+
+function processCanvas(img) {
+  const pxSize = parseInt(pixelMeret.value) // Use pixelMeret instead of pixelSize
+  const targetWidth = img.width * 2
+  const targetHeight = img.height
+  
+  canvas.value.width = targetWidth
+  canvas.value.height = targetHeight
+
+  const ctx = canvas.value.getContext('2d')
+  ctx.drawImage(img, 0, 0, targetWidth, targetHeight)
+
+  const data = ctx.getImageData(0, 0, targetWidth, targetHeight).data
+
+  const cols = Math.ceil(targetWidth / pxSize)
+  const rows = Math.ceil(targetHeight / pxSize)
+  pixelRows.value = []
+
+  for (let i = 0; i < rows; i++) {
+    checkedRows.value[i] = false
+  }
+
+  for (let y = 0; y < rows; y++) {
+    const pixels = []
+    for (let x = 0; x < cols; x++) {
+      const avg = getAverageColor(data, targetWidth, x * pxSize, y * pxSize, pxSize)
+      pixels.push({
+        color: `rgba(${avg.r}, ${avg.g}, ${avg.b}, ${avg.a})`
+      })
+    }
+    pixelRows.value.push({
+      pixels,
+      rowOpacity: 1 // Default full opacity
+    })
+  }
+}
+
+function getAverageColor(data, width, startX, startY, blockSize) {
+  let r = 0, g = 0, b = 0, a = 0, count = 0
+
+  for (let y = startY; y < startY + blockSize && y < width; y++) {
+    for (let x = startX; x < startX + blockSize && x < width; x++) {
+      const i = (y * width + x) * 4
+      if (i >= data.length - 3) continue
+
+      r += data[i]
+      g += data[i + 1]
+      b += data[i + 2]
+      a += data[i + 3]
+      count++
+    }
+  }
+
+  return {
+    r: Math.round(r / count),
+    g: Math.round(g / count),
+    b: Math.round(b / count),
+    a: a / count / 255
   }
 }
 
@@ -281,16 +354,8 @@ function backToForm() {
       <div id="adatok">
         <div class="progress-container">
           <div class="progress-bar">
-            <div 
-            class="progress-step" 
-            :class="{ active: resz >= 1, clickable: resz !== 1 }" 
-            @click="resz !== 1 && (resz = 1)"
-            >1</div>
-            <div 
-            class="progress-step" 
-            :class="{ active: resz >= 2, clickable: resz !== 1 && resz !== 2 }"
-            @click="resz !== 1 && resz !== 2 && (resz = 2)"
-            >2</div>
+            <div class="progress-step" :class="{ active: resz >= 1 }">1</div>
+            <div class="progress-step" :class="{ active: resz >= 2 }">2</div>
             <div class="progress-step" :class="{ active: resz >= 3 }">3</div>
           </div>
           <div class="progress-labels">
@@ -452,7 +517,39 @@ function backToForm() {
           </div>
         </div>
 
-        <canvas ref="canvas"></canvas>
+        <canvas ref="canvas" style="display:none;"></canvas>
+
+        <div class="pixel-grid-container">
+          <div class="pixel-container">
+            <div
+              v-for="(row, rowIndex) in pixelRows"
+              :key="rowIndex"
+              class="pixel-row"
+              :style="{ opacity: row.rowOpacity }"
+            >
+              <div
+                v-for="(pixel, pixelIndex) in row.pixels"
+                :key="pixelIndex"
+                class="pixel"
+                :style="{
+                  width: pixelMeret + 'px',
+                  height: pixelMeret + 'px',
+                  backgroundColor: pixel.color,
+                  borderColor: `rgba(0, 0, 0, ${gridOpacity / 100})`,
+                }"
+              ></div>
+              <div class="checkbox-container">
+                <input
+                  type="checkbox"
+                  :id="`row-${rowIndex}`"
+                  v-model="checkedRows[rowIndex]"
+                  @change="toggleRowOpacity(rowIndex)"
+                />
+                <label :for="`row-${rowIndex}`">{{ rowIndex + 1 }}</label>
+              </div>
+            </div>
+          </div>
+        </div>
 
         <div class="gombok">
           <button @click="backToForm" class="gombok">Vissza a módosításhoz</button>
@@ -787,14 +884,6 @@ input[type="file"] {
   color: white;
 }
 
-.progress-step.clickable {
-  cursor: pointer;
-}
-
-.progress-step.clickable:hover {
-  background-color: slateblue;
-}
-
 .progress-step:not(:last-child)::after {
   content: '';
   position: absolute;
@@ -924,6 +1013,46 @@ canvas {
 .gombok.letolt {
   background-color: #4CAF50;
   color: white;
+}
+
+/* Pixel grid styles */
+.pixel-grid-container {
+
+  background: var(--mk-primary-light);
+  overflow-x: auto;
+}
+
+.pixel-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.pixel-row {
+  display: flex;
+  align-items: center;
+  transition: opacity 0.3s ease;
+}
+
+.pixel {
+  border: 1px solid;
+  box-sizing: border-box;
+}
+
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  margin-left: 10px;
+}
+
+.checkbox-container input[type="checkbox"] {
+  margin-right: 5px;
+}
+
+.checkbox-container label {
+  font-size: 0.8rem;
+  margin: 0;
+  cursor: pointer;
 }
 
 @media (max-width: 1100px) {
