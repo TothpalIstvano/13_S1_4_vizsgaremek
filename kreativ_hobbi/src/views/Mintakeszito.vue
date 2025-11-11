@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, nextTick } from "vue"
+import { ref, onMounted, nextTick, reactive } from "vue"
 import { useRouter } from "vue-router"
 
 const resz = ref(1)
@@ -64,6 +64,12 @@ const ctx = ref(null)
 const jelenlegiKep = ref(null)
 const canvas = ref(null)
 
+// New variables for checkbox functionality
+const pixelRows = ref([])
+const checkedRows = reactive({})
+const gridOpacity = ref(20)
+const useCanvasView = ref(true) // Toggle between canvas and pixel grid view
+
 function initializePixelation() {
   if (!imageUrl.value) return
   
@@ -89,6 +95,11 @@ function kepFrissites() {
   
   vaszonFeldolgozas(eredetiKep.value)
   kinyertSzinPaletta()
+  
+  // Update pixel rows for checkbox view
+  if (!useCanvasView.value) {
+    updatePixelRows()
+  }
 }
 
 function vaszonFeldolgozas(img) {
@@ -232,6 +243,53 @@ function kepletoltes() {
 
 function backToForm() {
   showPixelation.value = false
+}
+
+// New functions for checkbox functionality
+function updatePixelRows() {
+  if (!jelenlegiKep.value) return
+  
+  const { data, width, height } = jelenlegiKep.value
+  const pixelSize = parseInt(pixelMeret.value)
+  const cols = Math.ceil(width / pixelSize)
+  const rows = Math.ceil(height / pixelSize)
+  
+  pixelRows.value = []
+  
+  // Initialize checked rows
+  for (let i = 0; i < rows; i++) {
+    if (checkedRows[i] === undefined) {
+      checkedRows[i] = false
+    }
+  }
+  
+  // Create pixel rows
+  for (let y = 0; y < rows; y++) {
+    const pixels = []
+    for (let x = 0; x < cols; x++) {
+      const avg = szinekKinyeres(data, width, x * pixelSize, y * pixelSize, pixelSize)
+      pixels.push({
+        color: `rgba(${avg.r}, ${avg.g}, ${avg.b}, ${avg.a})`
+      })
+    }
+    pixelRows.value.push({
+      pixels,
+      rowOpacity: checkedRows[y] ? 0.5 : 1
+    })
+  }
+}
+
+function toggleRowOpacity(rowIndex) {
+  // Toggle between full opacity (1) and lowered opacity (0.5)
+  pixelRows.value[rowIndex].rowOpacity = checkedRows[rowIndex] ? 0.5 : 1
+}
+
+function toggleView() {
+  useCanvasView.value = !useCanvasView.value
+  console.log('Toggled view, useCanvasView:', useCanvasView.value)
+  if (!useCanvasView.value) {
+    updatePixelRows()
+  }
 }
 </script>
 
@@ -429,6 +487,26 @@ function backToForm() {
               @input="kepFrissites"
             />
           </div>
+
+          <!-- New control for grid opacity -->
+          <div class="valtoztatok">
+            <label>Rács Átlátszóság: {{ gridOpacity }}%</label>
+            <input 
+              type="range" 
+              min="0" 
+              max="60" 
+              v-model="gridOpacity" 
+              class="csuszka"
+              @input="kepFrissites"
+            />
+          </div>
+
+          <!-- New toggle for view mode -->
+          <div class="valtoztatok">
+            <button @click="toggleView" class="view-toggle">
+              {{ useCanvasView ? 'Sorok Kezelése' : 'Vászon Nézet' }}
+            </button>
+          </div>
         </div>
 
         <div v-if="szinPaletta.length > 0" class="szin-paletta">
@@ -452,7 +530,46 @@ function backToForm() {
           </div>
         </div>
 
-        <canvas ref="canvas"></canvas>
+        <!-- Canvas View (original) -->
+        <div v-if="useCanvasView" class="canvas-container">
+          <canvas ref="canvas"></canvas>
+        </div>
+
+        <!-- Pixel Grid View (new) with checkboxes -->
+        <div v-else class="pixel-grid-container">
+          <div class="pixel-grid">
+            <div
+              v-for="(row, rowIndex) in pixelRows"
+              :key="rowIndex"
+              class="pixel-row"
+              :style="{ opacity: row.rowOpacity }"
+            >
+              <div class="pixel-row-content">
+                <div
+                  v-for="(pixel, pixelIndex) in row.pixels"
+                  :key="pixelIndex"
+                  class="pixel"
+                  :style="{
+                    width: pixelMeret + 'px',
+                    height: pixelMeret + 'px',
+                    backgroundColor: pixel.color,
+                    borderColor: `rgba(0, 0, 0, ${gridOpacity / 100})`,
+                  }"
+                ></div>
+              </div>
+
+              <div class="checkbox-container">
+                <input
+                  type="checkbox"
+                  :id="`row-${rowIndex}`"
+                  v-model="checkedRows[rowIndex]"
+                  @change="toggleRowOpacity(rowIndex)"
+                />
+                <label :for="`row-${rowIndex}`">{{ rowIndex + 1 }}</label>
+              </div>
+            </div>
+          </div>
+        </div>
 
         <div class="gombok">
           <button @click="backToForm" class="gombok">Vissza a módosításhoz</button>
@@ -484,8 +601,8 @@ main {
   display: inline-block;
   font-weight: 700;
   font-size: 45px;
-  color: rgb(0, 0, 0);
-  background-image: linear-gradient(90deg, rgb(128, 40, 0), rgb(177, 67, 4));
+  color: var(--mk-text-dark);
+  background-image: linear-gradient(90deg, #b4a2ee, #3a11c0);
   background-repeat: no-repeat;
   background-position: 0 100%;
   background-size: 100% 4px;
@@ -496,9 +613,9 @@ main {
   max-width: 900px;
   margin: 0 auto;
   padding: 2rem;
-  background-color: var(--mk-primary-color);
-  border-radius: 15px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  background-color: var(--mk-hatterszin);
+  border-radius: 8px;
+  box-shadow: 0 2px 15px var(--mk-arnyekszin);
 }
 
 .radioStilus {
@@ -509,22 +626,23 @@ main {
 .cimek {
   font-size: 1.5rem;
   font-weight: 600;
-  color: rgb(0, 0, 0);
+  color: var(--mk-text-dark);
   margin-bottom: 1.5rem;
   text-align: center;
 }
 
 .radioBelso {
-  background-color: var(--mk-secondary-color);
-  border-radius: 15px;
-  padding: 1.5rem;
-  margin-bottom: 2rem;
+  background-color: var(--mk-radioszin);
+  border-radius: 5px;
+  padding: 25px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 5px var(--mk-arnyekszin);
 }
 
 .radio-container {
   display: flex;
   align-items: center;
-  margin-bottom: 1rem;
+  margin-bottom: 5px;
 }
 
 input[type="radio"] {
@@ -532,13 +650,13 @@ input[type="radio"] {
   -webkit-appearance: none;
   width: 22px;
   height: 22px;
-  border: 2px solid rgb(69, 0, 78);
+  border: 2px solid rgb(29, 3, 61);
   border-radius: 25%;
   margin-right: 12px;
   position: relative;
-  top: 3px;
   transition: all 0.2s ease;
   background-color: transparent;
+  margin-bottom: 7px;
 }
 
 input[type="radio"]:checked::before {
@@ -546,45 +664,46 @@ input[type="radio"]:checked::before {
   display: block;
   width: 14px;
   height: 14px;
-  background-color: rgb(209, 94, 0);
-  border-radius: 25%;
+  background-color: var(--mk-checkbox);
+  border-radius: 20%;
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  animation: appear 0.6s;
+  animation: checkboxValaszt 0.6s;
 }
 
 input[type="radio"]:hover {
-  border-color: rgb(209, 94, 0);
+  border-color: var(--mk-checkbox);
   transform: scale(1.1);
 }
 
-@keyframes appear {
+@keyframes checkboxValaszt {
   0% {
-    transform: translate(-50%, -50%) scale(0);
-    background-color: #fff;
+    transform: translate(-50%, -50%) scale(0.5);
+    background-color: #9b4be1;
   }
   50% {
     transform: translate(-50%, -50%) scale(1.5);
-    background-color: #853304;
+    background-color: #43167f;
   }
   100% {
     transform: translate(-50%, -50%) scale(1);
-    background-color: rgb(209, 94, 0);
+    background-color: var(--mk-checkbox);
   }
 }
 
 label {
-  font-size: 1.1rem;
-  color: rgb(0, 0, 0);
-  font-weight: 500;
+  color: var(--mk-text-dark);
   cursor: pointer;
   transition: color 0.2s ease;
+  font-size: 18px;
+  margin-bottom: 5px;
 }
 
 label:hover {
-  color: rgb(110, 2, 105);
+  color: rgb(16, 1, 27);
+  transform: scale(1.1);
 }
 
 main {
@@ -617,10 +736,10 @@ main {
 }
 
 .kartya {
-  background-color: var(--mk-primary-dark);
-  border-radius: 15px;
+  background-color: var(--mk-szovegdoboz);
+  border-radius: 8px;
   padding: 2rem;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 15px var(--mk-arnyekszin);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   position: relative;
   overflow: hidden;
@@ -628,11 +747,11 @@ main {
 
 .kartya:hover {
   transform: translateY(-10px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 6px 20px var(--mk-arnyekszin);
 }
 
 .kartya h3 {
-  color: rgb(0, 0, 0);
+  color: var(--mk-text-dark);
   margin-bottom: 1rem;
   font-size: 1.5rem;
   font-weight: 600;
@@ -652,7 +771,7 @@ main {
   width: 100%;
   box-sizing: border-box;
   align-self: start;
-  background-color: var(--mk-primary-dark);
+  background-color: var(--mk-szovegdoboz);
   border-radius: 15px;
   padding: 2rem;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
@@ -667,15 +786,15 @@ main {
   height: 50px;
   margin: 2rem auto 0;
   border: none;
-  border-radius: 50px;
-  background: linear-gradient(135deg, var(--mk-primary-color), var(--mk-primary-light));
+  border-radius: 15px;
+  background: linear-gradient(135deg, var(--mk-gomb-foszin), var(--mk-gomb-masodszin));
   color: var(--white);
   font-weight: 600;
   font-size: 1rem;
   letter-spacing: 1px;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(199, 79, 87, 0.4);
+  box-shadow: 0 4px 15px var(--mk-arnyekszin);
   overflow: hidden;
   position: relative;
 }
@@ -697,24 +816,25 @@ main {
 
 .tovabbGomb:hover {
   transform: translateY(-3px);
-  box-shadow: 0 6px 20px rgba(199, 79, 87, 0.5);
+  box-shadow: 0 6px 20px rgba(70, 6, 119, 0.473);
 }
 
 .visszaGomb {
   padding: 0.5rem 1rem;
   border: none;
-  border-radius: 20px;
-  background-color: var(--mk-secondary-color);
-  color: rgb(0, 0, 0);
+  border-radius: 10px;
+  background-color: var(--mk-visszagomb);
+  color: var(--mk-text-light);
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
-  margin-left: 1rem;
+  margin-left: 15px;
 }
 
 .visszaGomb:hover {
-  background-color: var(--mk-secondary-light);
+  background-color: var(--mk-gomb-masodszin);
   transform: translateY(-2px);
+  color: var(--mk-text-dark);
 }
 
 .tovabbGomb:disabled {
@@ -723,9 +843,9 @@ main {
 }
 
 .tovabbGomb:disabled:hover {
-  background: linear-gradient(0deg, #c26066 0%, #cc8b8f 100%);
+  background: linear-gradient(0deg, var(--mk-gomb-masodszin) 0%, var(--mk-gomb-foszin) 100%);
   color: rgb(24, 23, 23);
-  box-shadow: inset 2px 2px 2px 0px rgba(255,255,255,.5),
+  box-shadow: inset 2px 2px 2px 0px var(--mk-arnyekszin),
               7px 7px 20px 0px rgba(0,0,0,.1),
               4px 4px 5px 0px rgba(0,0,0,.1);
 }
@@ -737,8 +857,8 @@ input[type="file"] {
 .file-upload-label {
   display: inline-block;
   padding: 1rem 2rem;
-  background-color: rgb(0, 168, 180);
-  color: rgb(0, 0, 0);
+  background-color: var(--mk-gomb-masodszin);
+  color: var(--mk-text-dark);
   border-radius: 10px;
   font-weight: 500;
   cursor: pointer;
@@ -747,7 +867,7 @@ input[type="file"] {
 }
 
 .file-upload-label:hover {
-  background-color: rgb(109, 253, 241);
+  background-color: var(--mk-gomb-foszin);
   transform: translateY(-3px);
 }
 
@@ -773,7 +893,7 @@ input[type="file"] {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background-color: var(--mk-primary-dark);
+  background-color: var(--mk-arnyekszin);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -783,7 +903,7 @@ input[type="file"] {
 }
 
 .progress-step.active {
-  background-color: rgb(34, 48, 247);
+  background-color: var(--mk-radioszin);
   color: white;
 }
 
@@ -792,7 +912,7 @@ input[type="file"] {
 }
 
 .progress-step.clickable:hover {
-  background-color: slateblue;
+  background-color: rgb(96, 65, 136);
 }
 
 .progress-step:not(:last-child)::after {
@@ -824,8 +944,9 @@ input[type="file"] {
   padding: 2rem;
   max-width: 1200px;
   margin: 0 auto;
-  background-color: var(--mk-primary-color);
+  background-color: var(--mk-hatterszin);
   min-height: 100vh;
+  border-radius: 10px;
 }
 
 .feltoltes {
@@ -839,7 +960,7 @@ input[type="file"] {
   gap: 2rem;
   margin-bottom: 2rem;
   padding: 1rem;
-  background: var(--mk-secondary-color);
+  background: var(--mk-radioszin);
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
@@ -860,10 +981,24 @@ input[type="file"] {
   border: 1px solid #ddd;
 }
 
+.view-toggle {
+  padding: 8px 16px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.view-toggle:hover {
+  background-color: #45a049;
+}
+
 .szin-paletta {
   margin: 2rem 0;
   padding: 1rem;
-  background: var(--mk-primary-light);
+  background: var(--mk-radioszin);
   border-radius: 8px;
 }
 
@@ -886,10 +1021,6 @@ input[type="file"] {
   justify-content: center;
 }
 
-.szinek-class.selected {
-  border-color: #007bff;
-}
-
 .szinek-class input[type="color"] {
   opacity: 0;
   position: absolute;
@@ -898,12 +1029,63 @@ input[type="file"] {
   cursor: pointer;
 }
 
+.canvas-container {
+  display: flex;
+  justify-content: center;
+  margin: 1rem 0;
+}
+
 canvas {
   max-width: 100%;
-  border: 2px solid #ddd;
-  border-radius: 8px;
   box-shadow: var(--canvas-shadow);
   margin: 1rem 0;
+}
+
+.pixel-grid-container {
+  margin-top: 20px;
+  overflow: auto;
+  max-height: 70vh;
+  border: 1px solid #ddd;
+  padding: 10px;
+  background-color: #f9f9f9;
+  display: flex;
+  justify-content: center;
+}
+
+.pixel-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.pixel-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pixel-row-content {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+}
+
+.pixel {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  min-width: 60px;
+  justify-content: center;
+}
+
+.checkbox-container label {
+  margin-left: 5px;
+  font-size: 0.9em;
 }
 
 .gombok {
