@@ -21,5 +21,15 @@ class DatabaseSeeder extends Seeder
             'name' => 'Test User',
             'email' => 'test@example.com',
         ]);
+
+        $this->call([
+            // 1. Seed images first, as users depend on them.
+            KepSeeder::class,
+
+            // 2. Then seed users.
+            FelhasznaloSeeder::class,
+
+            // Add other seeders here...
+        ]);
     }
 }
