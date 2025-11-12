@@ -12,13 +12,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('felhasznalok', function (Blueprint $table) {
-            $table->id();
-            $table->string('felhasznalo_nev', 100)->unique()->isNotEmpty();
+            $table->unsignedInteger('id')->autoIncrement();
+            $table->string('felhasz_nev', 100)->unique()->isNotEmpty();
             $table->string('email', 150)->unique()->isNotEmpty();
             $table->string('jelszo')->isNotEmpty();
             $table->unsignedInteger('profilKep_id');
             $table->enum('statusz', ['aktív', 'inaktív']);
-            $table->timestamp('utolso_bejelentkezes')->nullable();
+            $table->timestamp('letrehozas_Datuma');
+            $table->timestamp('utolso_Belepes')->nullable()->useCurrent()->useCurrentOnUpdate();
+            $table->foreign('profilKep_id')->references('id')->on('kepek');
             $table->timestamps();
         });
     }
