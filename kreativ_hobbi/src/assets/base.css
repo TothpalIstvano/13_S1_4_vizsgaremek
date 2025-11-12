@@ -53,12 +53,12 @@
 
 /*Mintakészítő*/
 :root {
-  --mk-szovegdoboz: #8775c0;
-  --mk-hatterszin: #c7bed5;
-  --mk-radioszin: #9d8db5;
-  --mk-gomb-foszin: #9d5dad;
-  --mk-gomb-masodszin: #996a88;
-  --mk-visszagomb: #4c3164;
+  --mk-szovegdoboz: #937ca9d4;
+  --mk-hatterszin: #c7bed5a1;
+  --mk-radioszin: #a494bbb3;
+  --mk-gomb-foszin: #9d5dadb5;
+  --mk-gomb-masodszin: #916280ba;
+  --mk-visszagomb: #5c486dcf;
   --mk-arnyekszin: #727171;
   --mk-checkbox: #2f0b49;
   --mk-text-dark: #000000;

@@ -1,186 +1,136 @@
 <script setup>
-import { ref, onMounted, nextTick, reactive } from "vue"
-import { useRouter } from "vue-router"
+import { ref, reactive, onMounted, nextTick } from "vue"
 
+// Multi-step form variables
 const resz = ref(1)
 const elsoLepes = ref(null)
 const masodikLepes = ref(null)
 const file = ref(null)
-const showPixelation = ref(false) // Controls which view to show
+const showPixelation = ref(false)
+const imageUrl = ref(null)
 
 const tipusok = ["Horgolás", "Kötés", "Hímzés"]
 const fonalak = [" 'A' fonal csoport", " 'B' fonal csoport", " 'C' fonal csoport", " 'D' fonal csoport", " 'E' fonal csoport"]
 
-const router = useRouter()
+// Pixelation variables from tapestry.vue
+const pixelSize = ref(15)
+const gridOpacity = ref(20)
+const canvas = ref(null)
+const pixelRows = ref([])
+const checkedRows = reactive({})
+const currentImage = ref(null)
+const imageLoaded = ref(false)
 
-// Creator functions
+// Multi-step form functions
 function kovetkezoResz() {
-  // ha a hímzés van kiválasztva átugorja a fonalválasztást
   if (resz.value === 1 && elsoLepes.value === "Hímzés") {
     masodikLepes.value = "A fonal csoport"
     resz.value = 3
     return
   }
-
   resz.value++
 }
 
 function modositas(target) {
-  // ha hímzés van kiválasztva ne lehessen módosítani a fonaltípust
   resz.value = target
 }
-
-const imageUrl = ref(null)
 
 function kepfeltoltes(event) {
   const selectedFile = event.target.files[0]
   if (selectedFile) {
     file.value = selectedFile
-    imageUrl.value = URL.createObjectURL(selectedFile)
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      imageUrl.value = e.target.result
+      
+      const img = new Image()
+      img.onload = () => {
+        currentImage.value = img
+        imageLoaded.value = true
+        // Process immediately when image loads
+        if (showPixelation.value) {
+          nextTick(() => {
+            processCanvas(img)
+          })
+        }
+        saveToLocalStorage(imageUrl.value)
+      }
+      img.src = imageUrl.value
+    }
+    reader.readAsDataURL(selectedFile)
   }
 }
 
 function toMintavaltoztato() {
- if (file.value) {
-    const url = URL.createObjectURL(file.value)
-    imageUrl.value = url
+  if (file.value) {
     showPixelation.value = true
-    
-    // Initialize the pixelation tool after the DOM is updated
+    // Wait for the view to render and then process the image
     nextTick(() => {
-      initializePixelation()
+      if (currentImage.value && imageLoaded.value) {
+        processCanvas(currentImage.value)
+      } else {
+        checkForSavedImage()
+      }
     })
   }
 }
 
-// Pixelation functions
-const eredetiKep = ref(null)
-const pixelMeret = ref(10)
-const szinezes = ref("eredeti")
-const szinekSzama = ref(20)
-const szinPaletta = ref([])
-const valasztottSzin = ref(null)
-const ctx = ref(null)
-const jelenlegiKep = ref(null)
-const canvas = ref(null)
-
-// New variables for checkbox functionality
-const pixelRows = ref([])
-const checkedRows = reactive({})
-const gridOpacity = ref(20)
-const useCanvasView = ref(true) // Toggle between canvas and pixel grid view
-
-function initializePixelation() {
-  if (!imageUrl.value) return
+// Pixelation functions from tapestry.vue (fixed version)
+function processCanvas(img) {
+  const pxSize = parseInt(pixelSize.value)
   
-  eredetiKep.value = new Image()
-  eredetiKep.value.onload = () => {
-    vaszonLetrehozasa()
-    kepFrissites()
+  if (!canvas.value) {
+    console.error('Canvas not found')
+    return
   }
-  eredetiKep.value.crossOrigin = "anonymous"  //más domain-ről is be tud tölteni a kép
-  eredetiKep.value.src = imageUrl.value
-}
+  
+  // Use original image dimensions
+  const targetWidth = img.width
+  const targetHeight = img.height
+  
+  canvas.value.width = targetWidth
+  canvas.value.height = targetHeight
 
-function vaszonLetrehozasa() {
-  if (!canvas.value) return
-  
-  ctx.value = canvas.value.getContext("2d")
-  canvas.value.width = eredetiKep.value.width
-  canvas.value.height = eredetiKep.value.height
-}
+  const ctx = canvas.value.getContext('2d')
+  ctx.drawImage(img, 0, 0, targetWidth, targetHeight)
 
-function kepFrissites() {
-  if (!eredetiKep.value || !canvas.value) return
-  
-  vaszonFeldolgozas(eredetiKep.value)
-  kinyertSzinPaletta()
-  
-  // Update pixel rows for checkbox view
-  if (!useCanvasView.value) {
-    updatePixelRows()
-  }
-}
-
-function vaszonFeldolgozas(img) {
-  const pixelMeretValue = parseInt(pixelMeret.value)
-  const canvasEl = canvas.value
-  const ctxValue = ctx.value
-  
-  if (!canvasEl || !ctxValue) return
-  
-  const szelesseg = img.width
-  const magassag = img.height
-  
-  canvasEl.width = szelesseg
-  canvasEl.height = magassag
-
-  ctxValue.drawImage(img, 0, 0, szelesseg, magassag)
-
-  const imageData = ctxValue.getImageData(0, 0, szelesseg, magassag)
+  const imageData = ctx.getImageData(0, 0, targetWidth, targetHeight)
   const data = imageData.data
+
+  const cols = Math.ceil(targetWidth / pxSize)
+  const rows = Math.ceil(targetHeight / pxSize)
   
-  jelenlegiKep.value = { data, width: szelesseg, height: magassag }
+  console.log(`Processing: ${cols}x${rows} pixels, image: ${targetWidth}x${targetHeight}`)
+  
+  pixelRows.value = []
 
-  if (szinezes.value === 'eredeti') {
-    kepElkeszites(data, szelesseg, magassag, pixelMeretValue)
-  }
-  else if (szinezes.value === 'kevesebbSzin') {
-    kepElkeszitesKevesebbSzin(data, szelesseg, magassag, pixelMeretValue)
-  }
-
-  ctxValue.putImageData(imageData, 0, 0)
-}
-
-function kepElkeszites(data, width, height, pixelSize) {
-  const cols = Math.ceil(width / pixelSize)
-  const rows = Math.ceil(height / pixelSize)
-
-  for (let y = 0; y < rows; y++) {
-    for (let x = 0; x < cols; x++) {
-      const avg = szinekKinyeres(data, width, x * pixelSize, y * pixelSize, pixelSize)
-      
-      for (let Ytengely = y * pixelSize; Ytengely < (y + 1) * pixelSize && Ytengely < height; Ytengely++) {
-        for (let Xtengely = x * pixelSize; Xtengely < (x + 1) * pixelSize && Xtengely < width; Xtengely++) {
-          const i = (Ytengely * width + Xtengely) * 4
-          data[i] = avg.r
-          data[i + 1] = avg.g
-          data[i + 2] = avg.b
-        }
-      }
+  // Initialize checked rows
+  for (let i = 0; i < rows; i++) {
+    if (checkedRows[i] === undefined) {
+      checkedRows[i] = false
     }
   }
-}
 
-function kepElkeszitesKevesebbSzin(data, width, height, pixelSize) {
-  const cols = Math.ceil(width / pixelSize)
-  const rows = Math.ceil(height / pixelSize)
-
+  // Create pixel rows without cropping
   for (let y = 0; y < rows; y++) {
+    const pixels = []
     for (let x = 0; x < cols; x++) {
-      const avg = szinekKinyeres(data, width, x * pixelSize, y * pixelSize, pixelSize)
-      
-      const precision = Math.round(255 / szinekSzama.value)
-      const limitedR = Math.round(avg.r / precision) * precision
-      const limitedG = Math.round(avg.g / precision) * precision
-      const limitedB = Math.round(avg.b / precision) * precision
-      
-      for (let Ytengely = y * pixelSize; Ytengely < (y + 1) * pixelSize && Ytengely < height; Ytengely++) {
-        for (let Xtengely = x * pixelSize; Xtengely < (x + 1) * pixelSize && Xtengely < width; Xtengely++) {
-          const i = (Ytengely * width + Xtengely) * 4
-          data[i] = limitedR
-          data[i + 1] = limitedG
-          data[i + 2] = limitedB
-        }
-      }
+      const avg = getAverageColor(data, targetWidth, targetHeight, x * pxSize, y * pxSize, pxSize)
+      pixels.push({
+        color: `rgba(${avg.r}, ${avg.g}, ${avg.b}, ${avg.a})`
+      })
     }
+    pixelRows.value.push({
+      pixels,
+      rowOpacity: checkedRows[y] ? 0.5 : 1
+    })
   }
 }
 
-function szinekKinyeres(data, width, startX, startY, blockSize) {
+function getAverageColor(data, width, height, startX, startY, blockSize) {
   let r = 0, g = 0, b = 0, a = 0, count = 0
 
-  for (let y = startY; y < startY + blockSize && y < width; y++) {
+  for (let y = startY; y < startY + blockSize && y < height; y++) {
     for (let x = startX; x < startX + blockSize && x < width; x++) {
       const i = (y * width + x) * 4
       if (i >= data.length - 3) continue
@@ -193,6 +143,11 @@ function szinekKinyeres(data, width, startX, startY, blockSize) {
     }
   }
 
+  // Avoid division by zero
+  if (count === 0) {
+    return { r: 0, g: 0, b: 0, a: 0 }
+  }
+
   return {
     r: Math.round(r / count),
     g: Math.round(g / count),
@@ -201,153 +156,181 @@ function szinekKinyeres(data, width, startX, startY, blockSize) {
   }
 }
 
-function kinyertSzinPaletta() {
-  if (!jelenlegiKep.value) return
-  
-  const { data, width, height } = jelenlegiKep.value
-  const szinek = new Set()
-  
-  for (let i = 0; i < data.length; i += 80) {
-    const r = data[i]
-    const g = data[i + 1]
-    const b = data[i + 2]
-    const color = `rgb(${r}, ${g}, ${b})`
-    szinek.add(color)
+function toggleRowOpacity(rowIndex) {
+  pixelRows.value[rowIndex].rowOpacity = checkedRows[rowIndex] ? 0.5 : 1
+}
+
+function updatePixelation() {
+  if (currentImage.value) {
+    processCanvas(currentImage.value)
+    saveSettingsToLocalStorage()
   }
+}
+
+function saveToLocalStorage(imageData) {
+  localStorage.setItem('pixelatedImage', imageData)
+  saveSettingsToLocalStorage()
+}
+
+function saveSettingsToLocalStorage() {
+  localStorage.setItem('pixelatorSettings', JSON.stringify({
+    pixelSize: pixelSize.value,
+    gridOpacity: gridOpacity.value
+  }))
+}
+
+function checkForSavedImage() {
+  const saved = localStorage.getItem('pixelatedImage')
+  if (!saved) {
+    // If no saved image but we have current image, process it
+    if (currentImage.value) {
+      processCanvas(currentImage.value)
+    }
+    return
+  }
+
+  const img = new Image()
+  img.onload = () => {
+    currentImage.value = img
+    imageLoaded.value = true
+    processCanvas(img)
+  }
+  img.src = saved
+
+  const settings = localStorage.getItem('pixelatorSettings')
+  if (settings) {
+    const parsed = JSON.parse(settings)
+    pixelSize.value = parseInt(parsed.pixelSize)
+    gridOpacity.value = parseInt(parsed.gridOpacity)
+  }
+}
+
+function clearImage() {
+  pixelRows.value = []
+  file.value = null
+  imageUrl.value = null
+  currentImage.value = null
+  imageLoaded.value = false
+  localStorage.removeItem('pixelatedImage')
+  localStorage.removeItem('pixelatorSettings')
   
-  szinPaletta.value = Array.from(szinek).slice(0, szinekSzama.value)
-}
-
-function szinValaszto(color) {
-  valasztottSzin.value = color
-}
-
-function frissítettSzin(index, newColor) {
-  szinPaletta.value[index] = newColor
-  // színcserélő (a képen frissüljön a szín)
-}
-
-function ujrakedzes() {
-  kepFrissites()
-}
-
-function kepletoltes() {
-  const canvasEl = canvas.value
-  if (!canvasEl) return
-  
-  const link = document.createElement('a')
-  link.download = 'minta.png'
-  link.href = canvasEl.toDataURL()
-  link.click()
+  // Reset file input
+  const fileInput = document.getElementById('file-upload')
+  if (fileInput) fileInput.value = ''
 }
 
 function backToForm() {
   showPixelation.value = false
 }
 
-// New functions for checkbox functionality
-function updatePixelRows() {
-  if (!jelenlegiKep.value) return
+function kepletoltes() {
+  if (!canvas.value) return
   
-  const { data, width, height } = jelenlegiKep.value
-  const pixelSize = parseInt(pixelMeret.value)
-  const cols = Math.ceil(width / pixelSize)
-  const rows = Math.ceil(height / pixelSize)
-  
-  pixelRows.value = []
-  
-  // Initialize checked rows
-  for (let i = 0; i < rows; i++) {
-    if (checkedRows[i] === undefined) {
-      checkedRows[i] = false
-    }
-  }
-  
-  // Create pixel rows
-  for (let y = 0; y < rows; y++) {
-    const pixels = []
-    for (let x = 0; x < cols; x++) {
-      const avg = szinekKinyeres(data, width, x * pixelSize, y * pixelSize, pixelSize)
-      pixels.push({
-        color: `rgba(${avg.r}, ${avg.g}, ${avg.b}, ${avg.a})`
-      })
-    }
-    pixelRows.value.push({
-      pixels,
-      rowOpacity: checkedRows[y] ? 0.5 : 1
+  const link = document.createElement('a')
+  link.download = 'minta.png'
+  link.href = canvas.value.toDataURL()
+  link.click()
+}
+
+function resetToOriginal() {
+  if (currentImage.value) {
+    processCanvas(currentImage.value)
+    // Reset all checkboxes
+    Object.keys(checkedRows).forEach(key => {
+      checkedRows[key] = false
+    })
+    // Reset row opacities
+    pixelRows.value.forEach((row, index) => {
+      row.rowOpacity = 1
     })
   }
 }
 
-function toggleRowOpacity(rowIndex) {
-  // Toggle between full opacity (1) and lowered opacity (0.5)
-  pixelRows.value[rowIndex].rowOpacity = checkedRows[rowIndex] ? 0.5 : 1
-}
+// Watch for when pixelation view becomes active and process image
+import { watch } from 'vue'
 
-function toggleView() {
-  useCanvasView.value = !useCanvasView.value
-  console.log('Toggled view, useCanvasView:', useCanvasView.value)
-  if (!useCanvasView.value) {
-    updatePixelRows()
+watch(showPixelation, (newVal) => {
+  if (newVal && currentImage.value && imageLoaded.value) {
+    nextTick(() => {
+      processCanvas(currentImage.value)
+    })
   }
-}
+})
+
+// Initialize when component mounts
+onMounted(() => {
+  // Check for saved image when component mounts
+  checkForSavedImage()
+})
 </script>
 
 <template>
   <main>
     <h1 class="title">Mintakészítő</h1>
       
-      <div id="bemutato">
-        <h2 class="cim">Mi is ez az oldal?</h2>
-        <div class="ket_oszlop">
-          <div class="harom_oszlop">
-            <div class="kartya">
-              <h3>Horgolás</h3>
-              <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Alias odio accusantium nihil impedit quam repellendus dolore, atque ducimus voluptates natus blanditiis, eaque, inventore quod! Exercitationem repellat repellendus esse corporis eaque.
-                <ul>
-                  <li>pontok</li>
-                </ul>
-              </p>
-            </div>
-            <div class="kartya">
-              <h3>Kötés</h3>
-              <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Alias odio accusantium nihil impedit quam repellendus dolore, atque ducimus voluptates natus blanditiis, eaque, inventore quod! Exercitationem repellat repellendus esse corporis eaque.
-                <ul>
-                  <li>pontok</li>
-                </ul>
-              </p>
-            </div>
-            <div class="kartya">
-              <h3>Hímzés</h3>
-              <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Alias odio accusantium nihil impedit quam repellendus dolore, atque ducimus voluptates natus blanditiis, eaque, inventore quod! Exercitationem repellat repellendus esse corporis eaque.
-                <ul>
-                  <li>pontok</li>
-                </ul>
-              </p>
-            </div>
+    <div id="bemutato">
+      <h2 class="cim">Mi is ez az oldal?</h2>
+      <div class="ket_oszlop">
+        <div class="harom_oszlop">
+          <div class="kartya">
+            <h3>Horgolás</h3>
+            <p>Készítsd el saját horgolt mintádat kedvenc képeidből. Az alkalmazás pixelizálja a képet, hogy könnyen követhető mintaformátumban kapd meg.
+              <ul>
+                <li>Pixel alapú minták</li>
+                <li>Színpaletta testreszabás</li>
+                <li>Sortörések kezelése</li>
+              </ul>
+            </p>
           </div>
-          <div class="blog_info">
-            <div>
-              szöveg
-            </div>
+          <div class="kartya">
+            <h3>Kötés</h3>
+    <p>Alakítsd át a fotóidat kötött mintává. A pixelizálás segít a színek és minták pontos reprodukálásában.
+              <ul>
+                <li>Pontos színátalakítás</li>
+                <li>Reszponzív mintaméret</li>
+                <li>Könnyű nyomkövetés</li>
+              </ul>
+            </p>
+          </div>
+          <div class="kartya">
+            <h3>Hímzés</h3>
+            <p>Hímzéshez optimalizált mintákat készíthetsz. A részletes pixelrács segít a pontos varratmegtervezésben.
+              <ul>
+                <li>Részletes rácsnézet</li>
+                <li>Sortükrözés lehetősége</li>
+                <li>Exportálás nyomtatható formátumban</li>
+              </ul>
+            </p>
           </div>
         </div>
+        <div class="blog_info">
+          <h3>Használati útmutató</h3>
+          <ol>
+            <li>Válaszd ki a kívánt technikát</li>
+            <li>Add meg a használni kívánt fonal típusát</li>
+            <li>Tölts fel egy képet</li>
+            <li>Állítsd be a pixel méretet és átlátszóságot</li>
+            <li>Jelöld meg a kívánt sorokat</li>
+            <li>Töltsd le a mintát</li>
+          </ol>
+        </div>
       </div>
-    <!-- Creator View (shown when showPixelation is false) -->
-    <div v-if="!showPixelation">
+    </div>
 
+    <!-- Creator View -->
+    <div v-if="!showPixelation">
       <div id="adatok">
         <div class="progress-container">
           <div class="progress-bar">
             <div 
-            class="progress-step" 
-            :class="{ active: resz >= 1, clickable: resz !== 1 }" 
-            @click="resz !== 1 && (resz = 1)"
+              class="progress-step" 
+              :class="{ active: resz >= 1, clickable: resz !== 1 }" 
+              @click="resz !== 1 && (resz = 1)"
             >1</div>
             <div 
-            class="progress-step" 
-            :class="{ active: resz >= 2, clickable: resz !== 1 && resz !== 2 }"
-            @click="resz !== 1 && resz !== 2 && (resz = 2)"
+              class="progress-step" 
+              :class="{ active: resz >= 2, clickable: resz !== 1 && resz !== 2 }"
+              @click="resz !== 1 && resz !== 2 && (resz = 2)"
             >2</div>
             <div class="progress-step" :class="{ active: resz >= 3 }">3</div>
           </div>
@@ -428,7 +411,7 @@ function toggleView() {
           <label for="file-upload" class="file-upload-label">
             Kép kiválasztása
           </label>
-          <input id="file-upload" type="file" @change="kepfeltoltes" />
+          <input id="file-upload" type="file" @change="kepfeltoltes" accept="image/*" />
           
           <div v-if="file" class="file-preview-container">
             <img :src="imageUrl" alt="Preview" class="file-preview" />
@@ -436,21 +419,21 @@ function toggleView() {
           </div>
 
           <button
-              :disabled="!file"
-              @click="toMintavaltoztato" 
-              class="tovabbGomb">
+            :disabled="!file"
+            @click="toMintavaltoztato" 
+            class="tovabbGomb">
             Minta készítése ⇒
           </button>
         </div>
       </div>
     </div>
 
-    <!-- Pixelation View (shown when showPixelation is true) -->
-    <div v-else>
+    <!-- Pixelation View -->
+    <div v-else >
       <div class="pixelesContainer oszlop">
         <h1>Minta Változtató</h1>
         
-        <div v-if="!imageUrl" class="feltoltes">
+        <div v-if="!currentImage" class="feltoltes">
           <p>Nincs kép betöltve. Kérjük, menj vissza és tölts fel egy képet.</p>
           <button @click="backToForm" class="visszaGomb">Vissza a feltöltéshez</button>
         </div>
@@ -458,38 +441,17 @@ function toggleView() {
         <div v-else class="modositoContainer">
           <div class="modositas">
             <div class="valtoztatok">
-              <p>Pixel Méret: {{ pixelMeret }}px</p>
+              <p>Pixel Méret: {{ pixelSize }}px</p>
               <input 
                 type="range" 
                 min="5" 
                 max="40" 
-                v-model="pixelMeret" 
+                v-model="pixelSize" 
                 class="csuszka"
-                @input="kepFrissites"
+                @input="updatePixelation"
               />
             </div>
 
-            <div class="valtoztatok">
-              <p>Szín Mód:</p>
-              <select v-model="szinezes" class="lenyiloBox" @change="kepFrissites">
-                <option value="eredeti">Eredeti színek</option>
-                <option value="kevesebbSzin">Korlátozott színpaletta</option>
-              </select>
-            </div>
-
-            <div class="valtoztatok" v-if="szinezes === 'kevesebbSzin'">
-              <p>Színek száma: {{ szinekSzama }}</p>
-              <input 
-                type="range" 
-                min="2" 
-                max="20" 
-                v-model="szinekSzama" 
-                class="csuszka"
-                @input="kepFrissites"
-              />
-            </div>
-
-            <!-- New control for grid opacity -->
             <div class="valtoztatok">
               <p>Rács Átlátszóság: {{ gridOpacity }}%</p>
               <input 
@@ -498,47 +460,21 @@ function toggleView() {
                 max="60" 
                 v-model="gridOpacity" 
                 class="csuszka"
-                @input="kepFrissites"
+                @input="updatePixelation"
               />
             </div>
+          </div>
 
-            <!-- New toggle for view mode -->
-            <div class="valtoztatok">
-              <button @click="toggleView" class="view-toggle">
-                {{ useCanvasView ? 'Sorok Kezelése' : 'Vászon Nézet' }}
-              </button>
+          <!-- Hidden canvas for processing -->
+          <canvas ref="canvas" style="display: none;"></canvas>
+
+          <!-- Pixel Grid Display -->
+          <div class="pixel-grid-container">
+            <div class="pixel-info">
+              <p>Kép mérete: {{ currentImage.width }}×{{ currentImage.height }} px | 
+                Pixel rács: {{ pixelRows.length }}×{{ pixelRows[0]?.pixels.length || 0 }}</p>
             </div>
-          </div>
-
-          <div v-if="szinPaletta.length > 0" class="szin-paletta">
-            <h3>Színpaletta</h3>
-            <div class="szinek">
-              <div 
-                v-for="(color, index) in szinPaletta" 
-                :key="index" 
-                class="szinek-class"
-                :style="{ backgroundColor: color }"
-                @click="szinValaszto(color)"
-                :class="{ selected: valasztottSzin === color }"
-              >
-                <input 
-                  type="color" 
-                  :value="color" 
-                  @input="frissítettSzin(index, $event.target.value)"
-                  @click.stop
-                />
-              </div>
-            </div>
-          </div>
-
-          <!-- Canvas View (original) -->
-          <div v-if="useCanvasView" class="canvas-container">
-            <canvas ref="canvas"></canvas>
-          </div>
-
-          <!-- Pixel Grid View (new) with checkboxes -->
-          <div v-else class="pixel-grid-container">
-            <div class="pixel-grid">
+            <div class="pixel-container" v-if="pixelRows.length > 0">
               <div
                 v-for="(row, rowIndex) in pixelRows"
                 :key="rowIndex"
@@ -551,8 +487,8 @@ function toggleView() {
                     :key="pixelIndex"
                     class="pixel"
                     :style="{
-                      width: pixelMeret + 'px',
-                      height: pixelMeret + 'px',
+                      width: pixelSize + 'px',
+                      height: pixelSize + 'px',
                       backgroundColor: pixel.color,
                       borderColor: `rgba(0, 0, 0, ${gridOpacity / 100})`,
                     }"
@@ -570,34 +506,45 @@ function toggleView() {
                 </div>
               </div>
             </div>
+            <div v-else>
+              <p>Kép feldolgozása folyamatban van</p>
+            </div>
           </div>
 
           <div class="gombok">
-            <button @click="backToForm" class="gombok">Vissza a módosításhoz</button>
-            <button @click="ujrakedzes" class="gombok">Eredeti kép</button>
-            <button @click="kepletoltes" class="gombok letolt">Letöltés</button>
-            <button @click="backToForm" class="gombok">Új kép</button>
+            <button @click="backToForm" class="gomb">Vissza a feltöltéshez</button>
+            <button @click="resetToOriginal" class="gomb">Eredeti állapot</button>
+            <button @click="kepletoltes" class="gomb letolt">Letöltés</button>
+            <button @click="clearImage" class="gomb">Új kép</button>
           </div>
         </div>
       </div>
       
+
+
       <div class="oldalsav oszlop">
-        <div class="oldalKartya">
-          <p>{{ fonalak.values }}</p>
+          <div class="oldalKartya">
+            <h3>Projekt adatai</h3>
+            <p><strong>Technika:</strong> {{ elsoLepes }}</p>
+            <p><strong>Fonal típus:</strong> {{ masodikLepes }}</p>
+            <p><strong>Pixel méret:</strong> {{ pixelSize }}px</p>
+            <p><strong>Kiválasztott sorok:</strong> {{ Object.values(checkedRows).filter(Boolean).length }}</p>
+          </div>
+          <div class="oldalKartya">
+            <h3>Tippek</h3>
+            <ul>
+              <li>Jelöld meg azokat a sorokat, amelyeket külön szeretnél kezelni</li>
+              <li>Kisebb pixel méret részletesebb mintát ad</li>
+              <li>A rács átlátszósága segít a minta követésében</li>
+            </ul>
+          </div>
         </div>
-        <div class="oldalKartya">
-          Adatok
-        </div>
-      </div>
 
     </div>
-
   </main>
 </template>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
-
 body {
   font-family: 'Poppins', sans-serif;
   color: var(--mk-text-dark);
@@ -608,6 +555,8 @@ main {
   margin: 0 auto;
   height: auto;
   text-align: center;
+  overflow-x: hidden;
+  padding: 20px;
 }
 
 .title {
@@ -620,12 +569,6 @@ main {
   background-position: 0 100%;
   background-size: 100% 4px;
   padding-bottom: 6px;
-}
-
-main {
-  margin: 0 auto;
-  padding: 20px;
-  height: auto;
 }
 
 .cim {
@@ -664,14 +607,13 @@ main {
 .kartya {
   background-color: var(--mk-szovegdoboz);
   border-radius: 8px;
-  padding: 10px 30px;
+  padding: 20px;
   box-shadow: 0 4px 15px var(--mk-arnyekszin);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   position: relative;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  justify-content: end;
 }
 
 .kartya:hover {
@@ -686,17 +628,34 @@ main {
   font-weight: 600;
 }
 
+.kartya ul {
+  text-align: left;
+  margin-top: 10px;
+}
+
+.kartya li {
+  margin-bottom: 5px;
+}
+
 .blog_info {
   width: 100%;
   box-sizing: border-box;
   align-self: start;
   background-color: var(--mk-szovegdoboz);
   border-radius: 8px;
-  padding: 10px 30px;
+  padding: 20px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
   position: relative;
   overflow: hidden;
+}
+
+.blog_info ol {
+  text-align: left;
+  padding-left: 20px;
+}
+
+.blog_info li {
+  margin-bottom: 10px;
 }
 /*#endregion*/
 
@@ -734,7 +693,7 @@ main {
 .radio-container {
   display: flex;
   align-items: center;
-  margin-bottom: 5px;
+  margin-bottom: 15px;
 }
 
 input[type="radio"] {
@@ -748,7 +707,6 @@ input[type="radio"] {
   position: relative;
   transition: all 0.2s ease;
   background-color: transparent;
-  margin-bottom: 7px;
 }
 
 input[type="radio"]:checked::before {
@@ -790,12 +748,11 @@ label {
   cursor: pointer;
   transition: color 0.2s ease;
   font-size: 18px;
-  margin-bottom: 5px;
 }
 
 label:hover {
   color: rgb(16, 1, 27);
-  transform: scale(1.1);
+  transform: scale(1.02);
 }
 
 .tovabbGomb {
@@ -866,6 +823,7 @@ label:hover {
   box-shadow: inset 2px 2px 2px 0px var(--mk-arnyekszin),
               7px 7px 20px 0px rgba(0,0,0,.1),
               4px 4px 5px 0px rgba(0,0,0,.1);
+  transform: none;
 }
 
 input[type="file"] {
@@ -895,6 +853,10 @@ input[type="file"] {
   margin: 1rem auto;
   border-radius: 10px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.file-preview-container {
+  margin: 20px 0;
 }
 
 .progress-container {
@@ -959,32 +921,21 @@ input[type="file"] {
 }
 /*#endregion*/
 
-/*#region oldalsáv*/
-.oszlop {
-  float: left;
-}
-
-.oldalsav {
-  background-color: #3a11c0;
-  margin-left: 10px;
-  border: 4px solid hotpink;
-}
-
-.oldalKartya {
-  background-color: #9b4be1;
-  border: 2px solid black;
-}
-
-/*#endregion*/
-
 /*#region mintaváltozásos box*/
 .pixelesContainer {
   padding: 2rem;
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
   background-color: var(--mk-hatterszin);
   min-height: 100vh;
   border-radius: 10px;
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 20px;
+}
+
+.modositoContainer {
+  grid-column: 1;
 }
 
 .feltoltes {
@@ -1007,76 +958,12 @@ input[type="file"] {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  min-width: 200px;
 }
 
 .csuszka {
-  width: 200px;
-}
-
-.lenyiloBox {
-  padding: 5px;
-  border-radius: 4px;
-  border: 1px solid #ddd;
-}
-
-.view-toggle {
-  padding: 8px 16px;
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.view-toggle:hover {
-  background-color: #45a049;
-}
-
-.szin-paletta {
-  margin: 2rem 0;
-  padding: 1rem;
-  background: var(--mk-radioszin);
-  border-radius: 8px;
-}
-
-.szinek {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 1rem;
-}
-
-.szinek-class {
-  position: relative;
-  width: 50px;
-  height: 50px;
-  border: 2px solid transparent;
-  border-radius: 4px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.szinek-class input[type="color"] {
-  opacity: 0;
-  position: absolute;
   width: 100%;
-  height: 100%;
-  cursor: pointer;
-}
-
-.canvas-container {
-  display: flex;
-  justify-content: center;
-  margin: 1rem 0;
-}
-
-canvas {
-  max-width: 100%;
-  box-shadow: var(--canvas-shadow);
-  margin: 1rem 0;
+  accent-color: #6c5ce7;
 }
 
 .pixel-grid-container {
@@ -1086,26 +973,32 @@ canvas {
   border: 1px solid #ddd;
   padding: 10px;
   background-color: #f9f9f9;
-  display: flex;
-  justify-content: center;
+  border-radius: 8px;
 }
 
-.pixel-grid {
+.pixel-info {
+  text-align: center;
+  margin-bottom: 10px;
+  font-size: 0.9em;
+  color: #666;
+}
+
+.pixel-container {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  width: fit-content;
+  margin: 0 auto;
 }
 
 .pixel-row {
   display: flex;
   align-items: center;
-  gap: 10px;
+  margin-bottom: 2px;
+  transition: opacity 0.3s ease;
 }
 
 .pixel-row-content {
   display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
 }
 
 .pixel {
@@ -1117,8 +1010,8 @@ canvas {
 .checkbox-container {
   display: flex;
   align-items: center;
+  margin-left: 10px;
   min-width: 60px;
-  justify-content: center;
 }
 
 .checkbox-container label {
@@ -1131,21 +1024,71 @@ canvas {
   justify-content: center;
   gap: 1rem;
   margin-top: 2rem;
+  flex-wrap: wrap;
 }
 
-.gombok {
+.gomb {
   padding: 10px 20px;
   border: none;
   border-radius: 5px;
   cursor: pointer;
   font-weight: bold;
-}
-
-.gombok.letolt {
-  background-color: #4CAF50;
+  background-color: #6c5ce7;
   color: white;
+  transition: background-color 0.3s;
+  min-width: 120px;
 }
 
+.gomb:hover {
+  background-color: #5649c0;
+  transform: translateY(-2px);
+}
+
+.gomb.letolt {
+  background-color: #4CAF50;
+}
+
+.gomb.letolt:hover {
+  background-color: #45a049;
+}
+/*#endregion*/
+
+/*#region Oldalsáv */
+.oszlop {
+  float: left;
+}
+
+.oldalsav {
+  grid-column: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-left: 30px;
+}
+
+.oldalKartya {
+  background-color: var(--mk-szovegdoboz);
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 4px 15px var(--mk-arnyekszin);
+}
+
+.oldalKartya h3 {
+  color: var(--mk-text-dark);
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.oldalKartya ul {
+  text-align: left;
+  padding-left: 20px;
+}
+
+.oldalKartya li {
+  margin-bottom: 8px;
+  font-size: 0.9em;
+}
 /*#endregion*/
 
 @media (max-width: 1100px) {
@@ -1155,6 +1098,15 @@ canvas {
 
   .harom_oszlop {
     grid-template-columns: repeat(2, minmax(180px, 1fr));
+  }
+  
+  .pixelesContainer {
+    grid-template-columns: 1fr;
+  }
+  
+  .oldalsav {
+    grid-column: 1;
+    margin-top: 20px;
   }
 }
 
@@ -1178,6 +1130,20 @@ canvas {
   
   label {
     font-size: 1rem;
+  }
+  
+  .gombok {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .modositas {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .valtoztatok {
+    min-width: auto;
   }
 }
 </style>
