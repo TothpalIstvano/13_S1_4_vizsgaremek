@@ -429,7 +429,7 @@ onMounted(() => {
     </div>
 
     <!-- Pixelation View -->
-    <div v-else >
+    <div v-else class="pixelation-main-container">
       <div class="pixelesContainer oszlop">
         <h1>Minta Változtató</h1>
         
@@ -922,20 +922,25 @@ input[type="file"] {
 /*#endregion*/
 
 /*#region mintaváltozásos box*/
-.pixelesContainer {
-  padding: 2rem;
+.pixelation-main-container {
+  display: flex;
+  gap: 20px;
   max-width: 1400px;
   margin: 0 auto;
+  padding: 2rem;
+  align-items: flex-start;
+}
+
+.pixelesContainer {
+  flex: 1; /* This makes it take all available space */
+  padding: 2rem;
   background-color: var(--mk-hatterszin);
   min-height: 100vh;
   border-radius: 10px;
-  display: grid;
-  grid-template-columns: 1fr 300px;
-  gap: 20px;
 }
 
 .modositoContainer {
-  grid-column: 1;
+  width: 100%;
 }
 
 .feltoltes {
@@ -1059,11 +1064,15 @@ input[type="file"] {
 }
 
 .oldalsav {
-  grid-column: 2;
+  flex: 0 0 auto; /* This makes it take only the space it needs */
   display: flex;
   flex-direction: column;
   gap: 20px;
-  margin-left: 30px;
+  padding: 10px;
+  border: 2px solid black;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px var(--mk-arnyekszin);
 }
 
 .oldalKartya {
@@ -1144,6 +1153,17 @@ input[type="file"] {
   
   .valtoztatok {
     min-width: auto;
+  }
+}
+
+@media (max-width: 1100px) {
+  .pixelation-main-container {
+    flex-direction: column;
+  }
+  
+  .oldalsav {
+    width: 100%;
+    margin-top: 20px;
   }
 }
 </style>
