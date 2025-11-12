@@ -446,139 +446,152 @@ function toggleView() {
     </div>
 
     <!-- Pixelation View (shown when showPixelation is true) -->
-    <div v-else class="pixelesContainer">
-      <h1>Minta Változtató</h1>
-      
-      <div v-if="!imageUrl" class="feltoltes">
-        <p>Nincs kép betöltve. Kérjük, menj vissza és tölts fel egy képet.</p>
-        <button @click="backToForm" class="visszaGomb">Vissza a feltöltéshez</button>
-      </div>
-
-      <div v-else class="modositoContainer">
-        <div class="modositas">
-          <div class="valtoztatok">
-            <label>Pixel Méret: {{ pixelMeret }}px</label>
-            <input 
-              type="range" 
-              min="5" 
-              max="40" 
-              v-model="pixelMeret" 
-              class="csuszka"
-              @input="kepFrissites"
-            />
-          </div>
-
-          <div class="valtoztatok">
-            <label>Szín Mód:</label>
-            <select v-model="szinezes" class="lenyiloBox" @change="kepFrissites">
-              <option value="eredeti">Eredeti színek</option>
-              <option value="kevesebbSzin">Korlátozott színpaletta</option>
-            </select>
-          </div>
-
-          <div class="valtoztatok" v-if="szinezes === 'kevesebbSzin'">
-            <label>Színek száma: {{ szinekSzama }}</label>
-            <input 
-              type="range" 
-              min="2" 
-              max="20" 
-              v-model="szinekSzama" 
-              class="csuszka"
-              @input="kepFrissites"
-            />
-          </div>
-
-          <!-- New control for grid opacity -->
-          <div class="valtoztatok">
-            <label>Rács Átlátszóság: {{ gridOpacity }}%</label>
-            <input 
-              type="range" 
-              min="0" 
-              max="60" 
-              v-model="gridOpacity" 
-              class="csuszka"
-              @input="kepFrissites"
-            />
-          </div>
-
-          <!-- New toggle for view mode -->
-          <div class="valtoztatok">
-            <button @click="toggleView" class="view-toggle">
-              {{ useCanvasView ? 'Sorok Kezelése' : 'Vászon Nézet' }}
-            </button>
-          </div>
+    <div v-else>
+      <div class="pixelesContainer oszlop">
+        <h1>Minta Változtató</h1>
+        
+        <div v-if="!imageUrl" class="feltoltes">
+          <p>Nincs kép betöltve. Kérjük, menj vissza és tölts fel egy képet.</p>
+          <button @click="backToForm" class="visszaGomb">Vissza a feltöltéshez</button>
         </div>
 
-        <div v-if="szinPaletta.length > 0" class="szin-paletta">
-          <h3>Színpaletta</h3>
-          <div class="szinek">
-            <div 
-              v-for="(color, index) in szinPaletta" 
-              :key="index" 
-              class="szinek-class"
-              :style="{ backgroundColor: color }"
-              @click="szinValaszto(color)"
-              :class="{ selected: valasztottSzin === color }"
-            >
+        <div v-else class="modositoContainer">
+          <div class="modositas">
+            <div class="valtoztatok">
+              <p>Pixel Méret: {{ pixelMeret }}px</p>
               <input 
-                type="color" 
-                :value="color" 
-                @input="frissítettSzin(index, $event.target.value)"
-                @click.stop
+                type="range" 
+                min="5" 
+                max="40" 
+                v-model="pixelMeret" 
+                class="csuszka"
+                @input="kepFrissites"
               />
             </div>
+
+            <div class="valtoztatok">
+              <p>Szín Mód:</p>
+              <select v-model="szinezes" class="lenyiloBox" @change="kepFrissites">
+                <option value="eredeti">Eredeti színek</option>
+                <option value="kevesebbSzin">Korlátozott színpaletta</option>
+              </select>
+            </div>
+
+            <div class="valtoztatok" v-if="szinezes === 'kevesebbSzin'">
+              <p>Színek száma: {{ szinekSzama }}</p>
+              <input 
+                type="range" 
+                min="2" 
+                max="20" 
+                v-model="szinekSzama" 
+                class="csuszka"
+                @input="kepFrissites"
+              />
+            </div>
+
+            <!-- New control for grid opacity -->
+            <div class="valtoztatok">
+              <p>Rács Átlátszóság: {{ gridOpacity }}%</p>
+              <input 
+                type="range" 
+                min="0" 
+                max="60" 
+                v-model="gridOpacity" 
+                class="csuszka"
+                @input="kepFrissites"
+              />
+            </div>
+
+            <!-- New toggle for view mode -->
+            <div class="valtoztatok">
+              <button @click="toggleView" class="view-toggle">
+                {{ useCanvasView ? 'Sorok Kezelése' : 'Vászon Nézet' }}
+              </button>
+            </div>
           </div>
-        </div>
 
-        <!-- Canvas View (original) -->
-        <div v-if="useCanvasView" class="canvas-container">
-          <canvas ref="canvas"></canvas>
-        </div>
-
-        <!-- Pixel Grid View (new) with checkboxes -->
-        <div v-else class="pixel-grid-container">
-          <div class="pixel-grid">
-            <div
-              v-for="(row, rowIndex) in pixelRows"
-              :key="rowIndex"
-              class="pixel-row"
-              :style="{ opacity: row.rowOpacity }"
-            >
-              <div class="pixel-row-content">
-                <div
-                  v-for="(pixel, pixelIndex) in row.pixels"
-                  :key="pixelIndex"
-                  class="pixel"
-                  :style="{
-                    width: pixelMeret + 'px',
-                    height: pixelMeret + 'px',
-                    backgroundColor: pixel.color,
-                    borderColor: `rgba(0, 0, 0, ${gridOpacity / 100})`,
-                  }"
-                ></div>
-              </div>
-
-              <div class="checkbox-container">
-                <input
-                  type="checkbox"
-                  :id="`row-${rowIndex}`"
-                  v-model="checkedRows[rowIndex]"
-                  @change="toggleRowOpacity(rowIndex)"
+          <div v-if="szinPaletta.length > 0" class="szin-paletta">
+            <h3>Színpaletta</h3>
+            <div class="szinek">
+              <div 
+                v-for="(color, index) in szinPaletta" 
+                :key="index" 
+                class="szinek-class"
+                :style="{ backgroundColor: color }"
+                @click="szinValaszto(color)"
+                :class="{ selected: valasztottSzin === color }"
+              >
+                <input 
+                  type="color" 
+                  :value="color" 
+                  @input="frissítettSzin(index, $event.target.value)"
+                  @click.stop
                 />
-                <label :for="`row-${rowIndex}`">{{ rowIndex + 1 }}</label>
               </div>
             </div>
           </div>
-        </div>
 
-        <div class="gombok">
-          <button @click="backToForm" class="gombok">Vissza a módosításhoz</button>
-          <button @click="ujrakedzes" class="gombok">Eredeti kép</button>
-          <button @click="kepletoltes" class="gombok letolt">Letöltés</button>
-          <button @click="backToForm" class="gombok">Új kép</button>
+          <!-- Canvas View (original) -->
+          <div v-if="useCanvasView" class="canvas-container">
+            <canvas ref="canvas"></canvas>
+          </div>
+
+          <!-- Pixel Grid View (new) with checkboxes -->
+          <div v-else class="pixel-grid-container">
+            <div class="pixel-grid">
+              <div
+                v-for="(row, rowIndex) in pixelRows"
+                :key="rowIndex"
+                class="pixel-row"
+                :style="{ opacity: row.rowOpacity }"
+              >
+                <div class="pixel-row-content">
+                  <div
+                    v-for="(pixel, pixelIndex) in row.pixels"
+                    :key="pixelIndex"
+                    class="pixel"
+                    :style="{
+                      width: pixelMeret + 'px',
+                      height: pixelMeret + 'px',
+                      backgroundColor: pixel.color,
+                      borderColor: `rgba(0, 0, 0, ${gridOpacity / 100})`,
+                    }"
+                  ></div>
+                </div>
+
+                <div class="checkbox-container">
+                  <input
+                    type="checkbox"
+                    :id="`row-${rowIndex}`"
+                    v-model="checkedRows[rowIndex]"
+                    @change="toggleRowOpacity(rowIndex)"
+                  />
+                  <label :for="`row-${rowIndex}`">{{ rowIndex + 1 }}</label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="gombok">
+            <button @click="backToForm" class="gombok">Vissza a módosításhoz</button>
+            <button @click="ujrakedzes" class="gombok">Eredeti kép</button>
+            <button @click="kepletoltes" class="gombok letolt">Letöltés</button>
+            <button @click="backToForm" class="gombok">Új kép</button>
+          </div>
         </div>
       </div>
+      
+      <div class="oldalsav oszlop">
+        <div class="oldalKartya">
+          <p>{{ fonalak.values }}</p>
+        </div>
+        <div class="oldalKartya">
+          Adatok
+        </div>
+      </div>
+
     </div>
+
   </main>
 </template>
 
@@ -609,6 +622,85 @@ main {
   padding-bottom: 6px;
 }
 
+main {
+  margin: 0 auto;
+  padding: 20px;
+  height: auto;
+}
+
+.cim {
+  font-size: 26px;
+  margin-bottom: 30px;
+}
+
+/*#region felső szövegdobozok*/
+#bemutato {
+  margin: auto;
+  text-align: justify;
+  margin-bottom: 50px;
+  border-radius: 10px;
+}
+
+.ket_oszlop {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  gap: 35px;
+  align-items: start;
+  width: 100%;
+  margin: 0 auto 3rem;
+  padding: 1rem;
+}
+
+.harom_oszlop {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(200px, 1fr));
+  gap: 30px;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.kartya {
+  background-color: var(--mk-szovegdoboz);
+  border-radius: 8px;
+  padding: 10px 30px;
+  box-shadow: 0 4px 15px var(--mk-arnyekszin);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: end;
+}
+
+.kartya:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 6px 20px var(--mk-arnyekszin);
+}
+
+.kartya h3 {
+  color: var(--mk-text-dark);
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.blog_info {
+  width: 100%;
+  box-sizing: border-box;
+  align-self: start;
+  background-color: var(--mk-szovegdoboz);
+  border-radius: 8px;
+  padding: 10px 30px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+/*#endregion*/
+
+/*#region adatbekérés*/
 #adatok {
   max-width: 900px;
   margin: 0 auto;
@@ -704,80 +796,6 @@ label {
 label:hover {
   color: rgb(16, 1, 27);
   transform: scale(1.1);
-}
-
-main {
-  margin: 0 auto;
-  padding: 20px;
-  height: auto;
-}
-
-.cim {
-  font-size: 26px;
-  margin-bottom: 30px;
-}
-
-#bemutato {
-  margin: auto;
-  padding: 10px 50px 10px 50px;
-  text-align: justify;
-  margin-bottom: 50px;
-  border-radius: 10px;
-}
-
-.harom_oszlop {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(200px, 1fr));
-  gap: 1.5rem;
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.kartya {
-  background-color: var(--mk-szovegdoboz);
-  border-radius: 8px;
-  padding: 2rem;
-  box-shadow: 0 4px 15px var(--mk-arnyekszin);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  position: relative;
-  overflow: hidden;
-}
-
-.kartya:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 6px 20px var(--mk-arnyekszin);
-}
-
-.kartya h3 {
-  color: var(--mk-text-dark);
-  margin-bottom: 1rem;
-  font-size: 1.5rem;
-  font-weight: 600;
-}
-
-.ket_oszlop {
-  display: grid;
-  grid-template-columns: 3fr 2fr;
-  gap: 2rem;
-  align-items: start;
-  width: 100%;
-  margin: 0 auto 3rem;
-  padding: 1rem;
-}
-
-.blog_info {
-  width: 100%;
-  box-sizing: border-box;
-  align-self: start;
-  background-color: var(--mk-szovegdoboz);
-  border-radius: 15px;
-  padding: 2rem;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  position: relative;
-  overflow: hidden;
 }
 
 .tovabbGomb {
@@ -939,7 +957,27 @@ input[type="file"] {
   font-size: 0.9rem;
   color: var(--mk-text-dark);
 }
+/*#endregion*/
 
+/*#region oldalsáv*/
+.oszlop {
+  float: left;
+}
+
+.oldalsav {
+  background-color: #3a11c0;
+  margin-left: 10px;
+  border: 4px solid hotpink;
+}
+
+.oldalKartya {
+  background-color: #9b4be1;
+  border: 2px solid black;
+}
+
+/*#endregion*/
+
+/*#region mintaváltozásos box*/
 .pixelesContainer {
   padding: 2rem;
   max-width: 1200px;
@@ -1107,6 +1145,8 @@ canvas {
   background-color: #4CAF50;
   color: white;
 }
+
+/*#endregion*/
 
 @media (max-width: 1100px) {
   .ket_oszlop {
