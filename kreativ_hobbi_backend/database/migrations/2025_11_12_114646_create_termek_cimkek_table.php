@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('posztCimkek', function (Blueprint $table) {
-            $table->unsignedInteger('poszt_id')->nullable(false);
+        Schema::create('termekCimkek', function (Blueprint $table) {
+            $table->unsignedInteger('termek_id')->nullable(false);
             $table->unsignedInteger('cimke_id')->nullable(false);
-            $table->primary(['poszt_id', 'cimke_id']);
-            $table->foreign('poszt_id')->references('id')->on('posztok')->onDelete('cascade');
+            $table->primary(['termek_id', 'cimke_id']);
+            $table->foreign('termek_id')->references('id')->on('termekek')->onDelete('cascade');
             $table->foreign('cimke_id')->references('id')->on('cimkek')->onDelete('cascade');
             $table->timestamps();
         });
@@ -26,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('posztCimkek');
+        Schema::dropIfExists('termekCimkek');
     }
 };

@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('varosok', function (Blueprint $table) {
             $table->unsignedInteger('id')->primary()->autoIncrement();
-            $table->string('varos_nev', 100)->unique()->isNotEmpty();
+            $table->string('varos_nev', 100)->unique()->nullable(false);
         });
     }
 

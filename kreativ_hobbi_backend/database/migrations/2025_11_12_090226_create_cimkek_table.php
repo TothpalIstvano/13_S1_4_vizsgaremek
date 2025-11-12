@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('cimkek', function (Blueprint $table) {
             $table->unsignedInteger('id')->primary()->autoIncrement();
-            $table->string('nev')->unique()->isNotEmpty();
+            $table->string('nev')->unique()->nullable(false);
             $table->timestamps();
         });
     }

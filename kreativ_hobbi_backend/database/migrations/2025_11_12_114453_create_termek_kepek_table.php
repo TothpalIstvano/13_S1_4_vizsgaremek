@@ -11,11 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('posztKepek', function (Blueprint $table) {
-            $table->unsignedInteger('poszt_id')->nullable(false);
+        Schema::create('termekKepek', function (Blueprint $table) {
+            $table->unsignedInteger('termek_id')->nullable(false);
             $table->unsignedInteger('kep_id')->nullable(false);
-            $table->primary(['poszt_id','kep_id']);
-            $table->foreign('poszt_id')->references('id')->on('posztok')->onDelete('cascade');
+            $table->integer('rendezes')->default(0);
+            $table->primary(['termek_id', 'kep_id']);
+            $table->foreign('termek_id')->references('id')->on('termekek')->onDelete('cascade');
             $table->foreign('kep_id')->references('id')->on('kepek')->onDelete('cascade');
             $table->timestamps();
         });
@@ -26,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('posztKepek');
+        Schema::dropIfExists('termekKepek');
     }
 };
