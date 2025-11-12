@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('kepek', function (Blueprint $table) {
             $table->unsignedInteger('id')->primary()->autoIncrement();
-            $table->string('url_Link',255)->unique()->isNotEmpty();
+            $table->string('url_Link',255)->unique()->nullable(false);
             $table->string('alt_Szoveg',255)->nullable();
             $table->string('leiras',255)->nullable();
             $table->timestamps();

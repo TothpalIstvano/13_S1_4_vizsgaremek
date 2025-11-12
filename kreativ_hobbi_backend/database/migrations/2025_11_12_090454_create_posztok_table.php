@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('posztok', function (Blueprint $table) {
             $table->unsignedInteger('id')->primary()->autoIncrement();
-            $table->string('cim',255)->isNotEmpty();
-            $table->string('kivonat',255)->isNotEmpty();
-            $table->string('tartalom',)->isNotEmpty();
+            $table->string('cim',255)->nullable(false);
+            $table->string('kivonat',255)->nullable(false);
+            $table->string('tartalom',)->nullable(false);
             $table->unsignedInteger('szerzo_id')->nullable();
             $table->unsignedInteger('fo_kep_id')->nullable();
             $table->timestamp('letrehozas_datuma')->useCurrent()->useCurrentOnUpdate();

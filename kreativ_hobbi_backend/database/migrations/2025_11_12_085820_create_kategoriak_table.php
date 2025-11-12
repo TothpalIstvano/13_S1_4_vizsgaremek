@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('kategoriak', function (Blueprint $table) {
             $table->unsignedInteger('id')->primary()->autoIncrement();
-            $table->string('nev')->unique()->isNotEmpty();
+            $table->string('nev')->unique()->nullable(false);
             $table->unsignedInteger('fo_kategoria_id')->nullable();
             $table->foreign('fo_kategoria_id')->references('id')->on('kategoriak')->onDelete('set null');
             $table->timestamps();

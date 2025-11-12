@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('felhasznalo_adatok', function (Blueprint $table) {
+        Schema::create('felhasznaloAdatok', function (Blueprint $table) {
             $table->unsignedInteger('felhasznalo_id')->primary();
             $table->string('vezeteknev', 100);
             $table->string('keresztnev', 100);
@@ -31,7 +31,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('felhasznalo_adatok');
+        Schema::dropIfExists('felhasznaloAdatok');
     }
 };
 
