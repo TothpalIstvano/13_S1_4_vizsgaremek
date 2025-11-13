@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive, onMounted, nextTick } from "vue"
+import { ref, reactive, onMounted, nextTick, computed } from "vue"
 
 // Multi-step form variables
 const resz = ref(1)
@@ -10,7 +10,34 @@ const showPixelation = ref(false)
 const imageUrl = ref(null)
 
 const tipusok = ["Horgolás", "Kötés", "Hímzés"]
-const fonalak = [" 'A' fonal csoport", " 'B' fonal csoport", " 'C' fonal csoport", " 'D' fonal csoport", " 'E' fonal csoport"]
+//const fonalak = [" 'A' fonal csoport", " 'B' fonal csoport", " 'C' fonal csoport", " 'D' fonal csoport", " 'E' fonal csoport"]
+const fonalak = [
+  {
+    fonalTipus: "A fonal csoport",
+    meromintaSor: 10,
+    meromintaOszlop: 20
+  },
+  {
+    fonalTipus: "B fonal csoport",
+    meromintaSor: 25,
+    meromintaOszlop: 35
+  },
+  {
+    fonalTipus: "C fonal csoport",
+    meromintaSor: 45,
+    meromintaOszlop: 50
+  },
+  {
+    fonalTipus: "D fonal csoport",
+    meromintaSor: 55,
+    meromintaOszlop: 65
+  },
+  {
+    fonalTipus: "E fonal csoport",
+    meromintaSor: 70,
+    meromintaOszlop: 80
+  }
+]
 
 // Pixelation variables from tapestry.vue
 const pixelSize = ref(15)
@@ -24,15 +51,18 @@ const imageLoaded = ref(false)
 // Multi-step form functions
 function kovetkezoResz() {
   if (resz.value === 1 && elsoLepes.value === "Hímzés") {
-    masodikLepes.value = "A fonal csoport"
+    masodikLepes.value = fonalak.find(f => f.fonalTipus === "A fonal csoport")
     resz.value = 3
+    saveFormState()
     return
   }
   resz.value++
+  saveFormState()
 }
 
 function modositas(target) {
   resz.value = target
+  saveFormState()
 }
 
 function kepfeltoltes(event) {
@@ -62,8 +92,9 @@ function kepfeltoltes(event) {
 }
 
 function toMintavaltoztato() {
-  if (file.value) {
+ if (file.value) {
     showPixelation.value = true
+    saveFormState()
     // Wait for the view to render and then process the image
     nextTick(() => {
       if (currentImage.value && imageLoaded.value) {
@@ -213,6 +244,7 @@ function clearImage() {
   imageLoaded.value = false
   localStorage.removeItem('pixelatedImage')
   localStorage.removeItem('pixelatorSettings')
+  localStorage.removeItem('mintakeszitoForm')
   
   // Reset file input
   const fileInput = document.getElementById('file-upload')
@@ -221,6 +253,7 @@ function clearImage() {
 
 function backToForm() {
   showPixelation.value = false
+  saveFormState()
 }
 
 function kepletoltes() {
@@ -259,9 +292,75 @@ watch(showPixelation, (newVal) => {
 
 // Initialize when component mounts
 onMounted(() => {
-  // Check for saved image when component mounts
+  // Load form state first
+  loadFormState()
+  // Then check for saved image when component mounts
   checkForSavedImage()
 })
+
+// Add computed property for yarn length calculation
+const fonalHossz = computed(() => {
+console.log('masodikLepes.value:', masodikLepes.value)
+  console.log('pixelRows.value length:', pixelRows.value.length)
+  
+  // Check if we have the required data
+  if (!masodikLepes.value || !pixelRows.value.length) {
+    console.log('Missing required data')
+    return 0
+  }
+  
+  // Check if masodikLepes is an object with the required properties
+  if (typeof masodikLepes.value === 'string') {
+    console.log('masodikLepes is string, not object')
+    return 0
+  }
+  
+  const pixelRacsSor = pixelRows.value.length
+  const pixelRacsOszlop = pixelRows.value[0]?.pixels.length || 0
+  
+  console.log('Pixel rács:', pixelRacsSor, 'x', pixelRacsOszlop)
+  console.log('Mérési minta:', masodikLepes.value.meromintaSor, 'x', masodikLepes.value.meromintaOszlop)
+  
+  if (!masodikLepes.value.meromintaSor || !masodikLepes.value.meromintaOszlop) {
+    console.log('Missing measurement values')
+    return 0
+  }
+  
+  const hossz = ((pixelRacsSor * pixelRacsOszlop) / 
+                (masodikLepes.value.meromintaSor * masodikLepes.value.meromintaOszlop)) * 10
+  
+  console.log('Calculated length:', hossz)
+  
+  return isNaN(hossz) ? 0 : Number(hossz.toFixed(2))
+})
+
+// Add watch to recalculate yarn length when pixel grid changes
+watch([pixelSize, pixelRows], () => {
+  // This will trigger the computed property to recalculate
+  console.log('Pixel settings changed, recalculating yarn length')
+}, { deep: true })
+
+// Add these functions to save/restore form state
+function saveFormState() {
+  const formState = {
+    resz: resz.value,
+    elsoLepes: elsoLepes.value,
+    masodikLepes: masodikLepes.value,
+    showPixelation: showPixelation.value
+  }
+  localStorage.setItem('mintakeszitoForm', JSON.stringify(formState))
+}
+
+function loadFormState() {
+  const saved = localStorage.getItem('mintakeszitoForm')
+  if (saved) {
+    const formState = JSON.parse(saved)
+    resz.value = formState.resz || 1
+    elsoLepes.value = formState.elsoLepes || null
+    masodikLepes.value = formState.masodikLepes || null
+    showPixelation.value = formState.showPixelation || false
+  }
+}
 </script>
 
 <template>
@@ -375,15 +474,15 @@ onMounted(() => {
 
           <p class="cimek">Válassz fonaltípust:</p>
           <div class="radioBelso">
-            <div v-for="option in fonalak" :key="option" class="radio-container">
+            <div v-for="(option, index) in fonalak" :key="index" class="radio-container">
               <input
                 type="radio"
-                :id="option"
+                :id="option.fonalTipus"
                 name="masodikLepes"
                 :value="option"
                 v-model="masodikLepes"
               />
-              <label :for="option">{{ option }}</label>
+              <label :for="option.fonalTipus">{{ option.fonalTipus }}</label>
             </div>
           </div>
           
@@ -403,7 +502,7 @@ onMounted(() => {
             <button @click="modositas(1)" class="visszaGomb">Vissza</button>
           </p>
           <p class="vissza">
-            A fonaltípusod: <strong>{{ masodikLepes }}</strong> 
+            A fonaltípusod: <strong>{{masodikLepes?.fonalTipus || masodikLepes}}</strong> 
             <button @click="modositas(2)" class="visszaGomb">Vissza</button>
           </p>
 
@@ -528,6 +627,8 @@ onMounted(() => {
             <p><strong>Technika:</strong> {{ elsoLepes }}</p>
             <p><strong>Fonal típus:</strong> {{ masodikLepes }}</p>
             <p><strong>Pixel méret:</strong> {{ pixelSize }}px</p>
+            <p><strong>Pixel rács:</strong> {{ pixelRows.length }}×{{ pixelRows[0]?.pixels.length || 0 }}</p>
+            <p><strong>Fonalhossz becslés:</strong> {{ fonalHossz }} cm</p>
             <p><strong>Kiválasztott sorok:</strong> {{ Object.values(checkedRows).filter(Boolean).length }}</p>
           </div>
           <div class="oldalKartya">
