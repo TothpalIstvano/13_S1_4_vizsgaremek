@@ -14,28 +14,28 @@ const tipusok = ["Horgolás", "Kötés", "Hímzés"]
 const fonalak = [
   {
     fonalTipus: "A fonal csoport",
-    meromintaSor: 10,
-    meromintaOszlop: 20
+    meromintaSor: 33,
+    meromintaOszlop: 40
   },
   {
     fonalTipus: "B fonal csoport",
-    meromintaSor: 25,
-    meromintaOszlop: 35
+    meromintaSor: 27,
+    meromintaOszlop: 32
   },
   {
     fonalTipus: "C fonal csoport",
-    meromintaSor: 45,
-    meromintaOszlop: 50
+    meromintaSor: 23,
+    meromintaOszlop: 26
   },
   {
     fonalTipus: "D fonal csoport",
-    meromintaSor: 55,
-    meromintaOszlop: 65
+    meromintaSor: 21,
+    meromintaOszlop: 24
   },
   {
     fonalTipus: "E fonal csoport",
-    meromintaSor: 70,
-    meromintaOszlop: 80
+    meromintaSor: 12,
+    meromintaOszlop: 15
   }
 ]
 
@@ -300,36 +300,12 @@ onMounted(() => {
 
 // Add computed property for yarn length calculation
 const fonalHossz = computed(() => {
-console.log('masodikLepes.value:', masodikLepes.value)
-  console.log('pixelRows.value length:', pixelRows.value.length)
-  
-  // Check if we have the required data
-  if (!masodikLepes.value || !pixelRows.value.length) {
-    console.log('Missing required data')
-    return 0
-  }
-  
-  // Check if masodikLepes is an object with the required properties
-  if (typeof masodikLepes.value === 'string') {
-    console.log('masodikLepes is string, not object')
-    return 0
-  }
-  
   const pixelRacsSor = pixelRows.value.length
   const pixelRacsOszlop = pixelRows.value[0]?.pixels.length || 0
-  
-  console.log('Pixel rács:', pixelRacsSor, 'x', pixelRacsOszlop)
-  console.log('Mérési minta:', masodikLepes.value.meromintaSor, 'x', masodikLepes.value.meromintaOszlop)
-  
-  if (!masodikLepes.value.meromintaSor || !masodikLepes.value.meromintaOszlop) {
-    console.log('Missing measurement values')
-    return 0
-  }
   
   const hossz = ((pixelRacsSor * pixelRacsOszlop) / 
                 (masodikLepes.value.meromintaSor * masodikLepes.value.meromintaOszlop)) * 10
   
-  console.log('Calculated length:', hossz)
   
   return isNaN(hossz) ? 0 : Number(hossz.toFixed(2))
 })
@@ -625,7 +601,7 @@ function loadFormState() {
           <div class="oldalKartya">
             <h3>Projekt adatai</h3>
             <p><strong>Technika:</strong> {{ elsoLepes }}</p>
-            <p><strong>Fonal típus:</strong> {{ masodikLepes }}</p>
+            <p><strong>Fonal típus:</strong> {{ masodikLepes.fonalTipus }}</p>
             <p><strong>Pixel méret:</strong> {{ pixelSize }}px</p>
             <p><strong>Pixel rács:</strong> {{ pixelRows.length }}×{{ pixelRows[0]?.pixels.length || 0 }}</p>
             <p><strong>Fonalhossz becslés:</strong> {{ fonalHossz }} cm</p>
