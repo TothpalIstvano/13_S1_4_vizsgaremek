@@ -1,18 +1,18 @@
 <?php 
 namespace App\Http\Controllers;
-use App\Models\Felhasznalok;
+use App\Models\Felhasznalo;
 
-class FelhasznalokController
+
+class FelhasznaloController
 {
-    public function felhasznalok()
+    public function felhasznalo()
     {
-        $felhasznalok = Felhasznalok::all();
-
+        $felhasznalok = Felhasznalo::all();
         return view('teszt', compact('felhasznalok'));
     }
-    public function felhasznalokCreate($felhasznalo)
+    public function felhasznaloCreate($felhasznalo)
     {
-        $ujFelhasznalo = new Felhasznalok();
+        $ujFelhasznalo = new Felhasznalo();
         $ujFelhasznalo->nev = $felhasznalo;
         $ujFelhasznalo->email = $felhasznalo . '@example.com';
         $ujFelhasznalo->jelszo = bcrypt('defaultpassword');
