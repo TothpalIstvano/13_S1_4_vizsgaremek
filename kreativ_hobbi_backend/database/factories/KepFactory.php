@@ -21,7 +21,7 @@ class KepFactory extends Factory
 
         return [
             // Append a unique random number to the URL to guarantee uniqueness
-            'url_Link' => $baseUrl . '?v=' . fake()->unique()->randomNumber(5),
+            'url_Link' => $baseUrl . '?v=' . fake()->randomNumber(5),
         ];
     }
 }

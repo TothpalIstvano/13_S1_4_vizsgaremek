@@ -1,10 +1,12 @@
 <?php
 
-use App\Http\Controllers\FelhasznalokController;
+use App\Http\Controllers\FelhasznaloController;
+use App\Http\Controllers\KepController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
 });
-Route::get('/teszt', [FelhasznalokController::class, 'felhasznalok']);
-Route::get('/teszt/create/{felhasznalo}', [FelhasznalokController::class, 'felhasznalokCreate']);
+
+Route::get('/teszt', [FelhasznaloController::class, 'felhasznalo']);
+Route::get('/teszt/create/{felhasznalo}', [FelhasznaloController::class, 'felhasznaloCreate']);
