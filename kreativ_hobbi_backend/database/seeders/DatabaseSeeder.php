@@ -23,13 +23,17 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $this->call([
-            // 1. Seed images first, as users depend on them.
-            KepSeeder::class,
+            // 1. Képek seedelése mivel a felhasználók függnek tőle
+            KepekSeeder::class,
 
-            // 2. Then seed users.
-            FelhasznaloSeeder::class,
+            // 2. Felhasználók seedelése.
+            FelhasznalokSeeder::class,
 
-            // Add other seeders here...
+            // 3. Városok seedelése.
+            VarosokSeeder::class,
+
+            // 4. Felhasználói adatok seedelése.
+            FelhasznaloAdatokSeeder::class,
         ]);
     }
 }

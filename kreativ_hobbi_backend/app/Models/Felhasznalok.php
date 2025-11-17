@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable; // Use Authenticatable for user models
 use Illuminate\Notifications\Notifiable;
 
-class Felhasznalo extends Authenticatable
+class Felhasznalok extends Authenticatable
 {
     use HasFactory, Notifiable;
 
@@ -81,7 +81,7 @@ class Felhasznalo extends Authenticatable
     {
         // 'profilKep_id' is the foreign key in the 'felhasznalok' table
         // 'id' is the primary key in the 'kepek' table
-        return $this->belongsTo(Kep::class, 'profilKep_id', 'id');
+        return $this->belongsTo(Kepek::class, 'profilKep_id', 'id');
     }
 
     /**

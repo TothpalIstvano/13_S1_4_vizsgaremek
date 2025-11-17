@@ -20,7 +20,7 @@ return new class extends Migration
             $table->integer('hazszam');
             $table->string('emeletAjto', 10);
             $table->string('telefonszam', 20);
-            $table->integer('kartyaszam');
+            $table->string('kartyaszam');
             $table->foreign('felhasznalo_id')->references('id')->on('felhasznalok')->onDelete('cascade');
             $table->foreign('varos')->references('id')->on('varosok')->onDelete('set null');
         });
