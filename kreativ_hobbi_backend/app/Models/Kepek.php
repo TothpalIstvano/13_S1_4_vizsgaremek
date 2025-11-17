@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Kep extends Model
+class Kepek extends Model
 {
     use HasFactory;
 
@@ -32,6 +32,6 @@ class Kep extends Model
     public function felhasznalok()
     {
         // 'profilKep_id' is the foreign key in the 'felhasznalok' table
-        return $this->hasMany(Felhasznalo::class, 'profilKep_id');
+        return $this->hasMany(Felhasznalok::class, 'profilKep_id');
     }
 }

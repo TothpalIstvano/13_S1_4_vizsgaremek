@@ -2,12 +2,12 @@
 
 namespace Database\Seeders;
 
-// ADD THIS LINE: Import the Kep model
-use App\Models\Kep;
+// ADD THIS LINE: Import the Kepek model
+use App\Models\Kepek;
 
 use Illuminate\Database\Seeder;
 
-class KepSeeder extends Seeder
+class KepekSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -15,7 +15,7 @@ class KepSeeder extends Seeder
     public function run(): void
     {
         // Create a pool of 50 profile pictures to be used by users.
-        Kep::factory(50)->create();
+        Kepek::factory(50)->create();
 
         $this->command->info('Kep table seeded with 50 images!');
     }
