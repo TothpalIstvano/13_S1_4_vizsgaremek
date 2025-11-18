@@ -18,10 +18,11 @@ class KepekFactory extends Factory
     {
         // Get a base URL from Faker
         $baseUrl = fake()->imageUrl(400, 400, 'people');
-
         return [
             // Append a unique random number to the URL to guarantee uniqueness
             'url_Link' => $baseUrl . '?v=' . fake()->randomNumber(5),
+            'alt_Szoveg' => fake()->sentence(),
+            'leiras' => fake()->sentence(),
         ];
     }
 }
