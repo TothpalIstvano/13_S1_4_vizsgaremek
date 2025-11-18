@@ -686,8 +686,8 @@ main {
   gap: 35px;
   align-items: start;
   width: 100%;
-  margin: 0 auto 3rem;
-  padding: 1rem;
+  margin: 0 auto 48px;
+  padding: 16px;
 }
 
 .harom_oszlop {
@@ -719,8 +719,8 @@ main {
 
 .kartya h3 {
   color: var(--mk-text-dark);
-  margin-bottom: 1rem;
-  font-size: 1.5rem;
+  margin-bottom: 16px;
+  font-size: 24px;
   font-weight: 600;
 }
 
@@ -764,22 +764,22 @@ main {
 #adatok {
   max-width: 900px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 32px;
   background-color: var(--mk-hatterszin);
   border-radius: 8px;
   box-shadow: 0 2px 15px var(--mk-arnyekszin);
 }
 
 .radioStilus {
-  padding: 1.5rem;
+  padding: 24px;
   transition: opacity 0.3s ease;
 }
 
 .cimek {
-  font-size: 1.5rem;
+  font-size: 24px;
   font-weight: 600;
   color: var(--mk-text-dark);
-  margin-bottom: 1.5rem;
+  margin-bottom: 24px;
   text-align: center;
 }
 
@@ -860,13 +860,13 @@ label:hover {
   display: block;
   width: 200px;
   height: 50px;
-  margin: 2rem auto 0;
+  margin: 32px auto 0;
   border: none;
   border-radius: 15px;
   background: linear-gradient(135deg, var(--mk-gomb-foszin), var(--mk-gomb-masodszin));
   color: var(--white);
   font-weight: 600;
-  font-size: 1rem;
+  font-size: 16px;
   letter-spacing: 1px;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -896,7 +896,7 @@ label:hover {
 }
 
 .visszaGomb {
-  padding: 0.5rem 1rem;
+  padding: 8px 16px;
   border: none;
   border-radius: 10px;
   background-color: var(--mk-visszagomb);
@@ -933,14 +933,14 @@ input[type="file"] {
 
 .file-upload-label {
   display: inline-block;
-  padding: 1rem 2rem;
+  padding: 16px 32px;
   background-color: var(--mk-gomb-masodszin);
   color: var(--mk-text-dark);
   border-radius: 10px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
-  margin-bottom: 1rem;
+  margin-bottom: 16px;
 }
 
 .file-upload-label:hover {
@@ -951,7 +951,7 @@ input[type="file"] {
 .file-preview {
   max-width: 100%;
   max-height: 300px;
-  margin: 1rem auto;
+  margin: 16px auto;
   border-radius: 10px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
@@ -961,13 +961,13 @@ input[type="file"] {
 }
 
 .progress-container {
-  margin-bottom: 2rem;
+  margin-bottom: 32px;
 }
 
 .progress-bar {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 0.5rem;
+  margin-bottom: 8px;
 }
 
 .progress-step {
@@ -1017,7 +1017,7 @@ input[type="file"] {
 }
 
 .progress-label {
-  font-size: 0.9rem;
+  font-size: 14px;
   color: var(--mk-text-dark);
 }
 /*#endregion*/
@@ -1027,7 +1027,7 @@ input[type="file"] {
   display: flex;
   gap: 20px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 32px;
   align-items: flex-start;
   flex-wrap: nowrap;
   max-width: 100%;
@@ -1036,7 +1036,7 @@ input[type="file"] {
 
 .pixelesContainer {
   flex: 1 1 auto; /* This makes it take all available space */
-  padding: 2rem;
+  padding: 32px;
   background-color: var(--mk-hatterszin);
   /*min-height: 100vh;*/
   border-radius: 10px;
@@ -1051,15 +1051,15 @@ input[type="file"] {
 
 .feltoltes {
   text-align: center;
-  padding: 2rem;
+  padding: 32px;
 }
 
 .modositas {
   display: flex;
   flex-wrap: wrap;
-  gap: 2rem;
-  margin-bottom: 2rem;
-  padding: 1rem;
+  gap: 32px;
+  margin-bottom: 32px;
+  padding: 16px;
   background: var(--mk-radioszin);
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
@@ -1068,7 +1068,7 @@ input[type="file"] {
 .valtoztatok {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 8px;
   min-width: 200px;
 }
 
@@ -1133,8 +1133,8 @@ input[type="file"] {
 .gombok {
   display: flex;
   justify-content: center;
-  gap: 1rem;
-  margin-top: 2rem;
+  gap: 16px;
+  margin-top: 32px;
   flex-wrap: wrap;
 }
 
@@ -1190,8 +1190,8 @@ input[type="file"] {
 
 .oldalKartya h3 {
   color: var(--mk-text-dark);
-  margin-bottom: 1rem;
-  font-size: 1.2rem;
+  margin-bottom: 16px;
+  font-size: 20px;
   font-weight: 600;
 }
 
@@ -1231,11 +1231,11 @@ input[type="file"] {
   }
   
   .title {
-    font-size: 2rem;
+    font-size: 32px;
   }
   
   #adatok {
-    padding: 1.5rem;
+    padding: 24px;
   }
   
   input[type="radio"] {
@@ -1244,7 +1244,7 @@ input[type="file"] {
   }
   
   label {
-    font-size: 1rem;
+    font-size: 16px;
   }
   
   .gombok {
@@ -1254,7 +1254,7 @@ input[type="file"] {
   
   .modositas {
     flex-direction: column;
-    gap: 1rem;
+    gap: 16px;
   }
   
   .valtoztatok {
