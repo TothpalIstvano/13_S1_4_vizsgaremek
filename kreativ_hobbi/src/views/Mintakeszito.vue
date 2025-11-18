@@ -256,13 +256,27 @@ function backToForm() {
   saveFormState()
 }
 
-function kepletoltes() {
+function kepletoltes(canvas, filename = 'modified-image.png') {
   if (!canvas.value) return
   
-  const link = document.createElement('a')
+  /*const link = document.createElement('a')
   link.download = 'minta.png'
   link.href = canvas.value.toDataURL()
-  link.click()
+  link.click()*/
+
+    // Convert canvas to blob
+  canvas.toBlob((blob) => {
+    // Create a temporary download link
+    const link = document.createElement('a');
+    link.download = filename;
+    link.href = URL.createObjectURL(blob);
+    
+
+    link.click();
+
+    
+
+  })
 }
 
 function resetToOriginal() {
@@ -505,7 +519,7 @@ function loadFormState() {
 
     <!-- Pixelation View -->
     <div v-else class="pixelation-main-container">
-      <div class="pixelesContainer oszlop">
+      <div class="pixelesContainer">
         <h1>Minta Változtató</h1>
         
         <div v-if="!currentImage" class="feltoltes">
@@ -589,7 +603,7 @@ function loadFormState() {
           <div class="gombok">
             <button @click="backToForm" class="gomb">Vissza a feltöltéshez</button>
             <button @click="resetToOriginal" class="gomb">Eredeti állapot</button>
-            <button @click="kepletoltes" class="gomb letolt">Letöltés</button>
+            <button @click="kepletoltes(canvas)" class="gomb letolt">Letöltés</button>
             <button @click="clearImage" class="gomb">Új kép</button>
           </div>
         </div>
@@ -597,7 +611,7 @@ function loadFormState() {
       
 
 
-      <div class="oldalsav oszlop">
+      <div class="oldalsav">
           <div class="oldalKartya">
             <h3>Projekt adatai</h3>
             <p><strong>Technika:</strong> {{ elsoLepes }}</p>
@@ -622,17 +636,22 @@ function loadFormState() {
 </template>
 
 <style scoped>
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
 body {
   font-family: 'Poppins', sans-serif;
   color: var(--mk-text-dark);
   background-color: rgb(255, 211, 144);
+  margin: 0;
+  padding: 0;
 }
 
 main {
   margin: 0 auto;
   height: auto;
   text-align: center;
-  overflow-x: hidden;
   padding: 20px;
 }
 
@@ -719,11 +738,11 @@ main {
   box-sizing: border-box;
   align-self: start;
   background-color: var(--mk-szovegdoboz);
+  box-shadow: 0 4px 15px var(--mk-arnyekszin);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
   border-radius: 8px;
   padding: 20px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   position: relative;
-  overflow: hidden;
 }
 
 .blog_info ol {
@@ -733,6 +752,11 @@ main {
 
 .blog_info li {
   margin-bottom: 10px;
+}
+
+.blog_info:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 6px 20px var(--mk-arnyekszin);
 }
 /*#endregion*/
 
@@ -1002,18 +1026,23 @@ input[type="file"] {
 .pixelation-main-container {
   display: flex;
   gap: 20px;
-  max-width: 1400px;
   margin: 0 auto;
   padding: 2rem;
   align-items: flex-start;
+  flex-wrap: nowrap;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .pixelesContainer {
-  flex: 1; /* This makes it take all available space */
+  flex: 1 1 auto; /* This makes it take all available space */
   padding: 2rem;
   background-color: var(--mk-hatterszin);
-  min-height: 100vh;
+  /*min-height: 100vh;*/
   border-radius: 10px;
+  max-width: calc(100% - 320px);
+  overflow: auto;
+  box-sizing: border-box;
 }
 
 .modositoContainer {
@@ -1136,12 +1165,9 @@ input[type="file"] {
 /*#endregion*/
 
 /*#region Oldalsáv */
-.oszlop {
-  float: left;
-}
-
 .oldalsav {
-  flex: 0 0 auto; /* This makes it take only the space it needs */
+  flex: 0 0 320px;
+  width: 320px;
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -1150,6 +1176,9 @@ input[type="file"] {
   background-color: white;
   border-radius: 8px;
   box-shadow: 0 4px 15px var(--mk-arnyekszin);
+  align-self: flex-start;
+  position: sticky;
+  overflow: auto;
 }
 
 .oldalKartya {
