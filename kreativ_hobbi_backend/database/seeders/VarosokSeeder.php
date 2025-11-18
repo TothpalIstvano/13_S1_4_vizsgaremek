@@ -15,5 +15,6 @@ class VarosokSeeder extends Seeder
     public function run(): void
     {
         Varosok::factory()->count(20)->create();
+        $this->command->info('Varosok table seeded successfully!');
     }
 }
