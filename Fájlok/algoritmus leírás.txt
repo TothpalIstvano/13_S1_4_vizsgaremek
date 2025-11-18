@@ -1,0 +1,64 @@
+Az oldalunk egyik alapvető funkciója, hogy a felhasználók regisztrálni és bejelentkezni tudnak az oldalra, mivel ezáltal tudnak termékeket kedvencelni, posztokat írni, kommentelni vagy éppen elmenteni a személyes adataikat későbbi vásárláshoz. 
+Ezt a funkciót az oldal navigációs sávjából érik el, ahol a ’Belépés’ gombra kattintva először a bejelentkezés felülete jelenik meg, ám egy kattintással arrébb megtalálhatják a regisztrációs felületet is. 
+Ezen a felületen a felhasználó beírja a regisztrációhoz szükséges adatait input mezőkbe, amik a következőket tartalmazzák: felhasználónév, e-mail cím, jelszó és ha szeretne, profilképet is tölthet itt fel. A mezők közül a felhasználónév és az e-mail cím egy sima szövegmező (<input type=”text”>), a jelszó pedig 2 darab jelszó mező (<input type=” password”>), amiből az első átváltoztatható, hogy a felhasználó megnézhesse a jelszavát amit éppen beírt. A profilképhez a felhasználó egy kép fájlt (.jpg, .jpeg, .png, .svg, .webp) választhat az eszközéről, azonban ez nem kötelező, és később is tudja módosítani.
+A ’Regisztráció’ gomb megnyomása után a felhasználó kap egy megerősítő e-mailt. Amennyiben ott meg tudja erősíteni a regisztrációját, a felvitt adatai mentésre kerülnek az adatbázisba.
+
+
+A regisztrált felhasználók be tudnak jelentkezni, hogy elérjék azokat a funkciókat, amiket vendégként böngészve nem érhetnek el. 
+Bejelentkezni ugyanúgy a menüsávból tud, ahol a ’Belépés’ gombra kattintva egyből az előjött belépés űrlapra tudja beírni az adatait. Ide a felhasználónevét vagy e-mail címét és a jelszavát kell beírnia a belépéshez.
+A megadott adatokat összehasonlítja az adatbázisban tárolt adatokkal, így ha felhasználónévvel jelentkezett be akkor a ’felhasz_Nev’ értékeiből keresi az egyezőt, ha e-mail-el akkor pedig az ’email’-ből. Ha van egyező adat, és a beírt jelszó is az adathoz tartozik, akkor a felhasználó a ’Belépés’ gombra kattintva továbbléphet az oldalra és hozzáfér az extra funkciókhoz.
+Amennyiben a felhasználó elfelejti a jelszavát, egy e-mail-t kap annak a helyreállításához.
+
+
+A navigációs sávból az ’Áruház’ menüponttal a webáruházhoz jutunk, ahol a termékek megjelenítését lekéréssel végezzük. Kártyákon tekinthető meg a termékek egy képe, a termék neve, az ára és a címkéi. Ezen adatokat az adatbázis termékek táblájából kérjük le, onnan is az id-t, a nevet, a képet és az árat. Egy másik táblából, a termekCimkek-ből kérjük le a termékekhez kötött címkéket, amit idegen kulccsal kapcsolunk össze, és kérünk le.
+Minden termék kártyán van egy ’Kosár’ gomb, amivel a termék teljes megnézése nélkül hozzá lehet adni a kosárhoz.
+A termékre kattintás átvisz minket egy másik oldalra, ahol megjelenik a termék minden jellemzője. Ehhez minden elemet lekérünk a termékek táblából, és így jelenítjük meg a képernyőn. Így a termék képeit, leírását, címkéit, rendelhető mennyiségét és az árát láthatja a felhasználó.
+
+
+A termék kosárba helyezésére kettő opció áll rendelkezésre: a termék kártyákról helyezzük kosárba, vagy a termék teljes adatlapján lévő gomb segítéségével végezzük a folyamatot.
+A kosárba a termék képe, neve, ára, és a kiválasztott mennyisége kerül. A mennyiséget mind a termék adatlapján, mind a kosárban lehet változtatni. Ennek az értéknek a maximuma a rendelhető mennyiség, így a felhasználó nem tud többet rendelni mint amennyi elérhető. Az ár dinamikusan változik a mennyiség változásával. Ezek mellett a kosárból törölni is lehet a termékeket, akár egyesével, akár az összeset egyben, gomb segítségével.
+A kosarat a felső menüsávból bármelyik oldalról elérheti a felhasználó, és bármikor megtekintheti a benne lévő termékeit. A kosár ikonján egy szám jelzi a kosárban lévő termékek mennyiségét egészen 99-ig, több mennyiségénél pedig egy ’+’ karakter kerül a szám után.
+
+
+Amennyiben van a kosárban termék, a felhasználó bármikor átmehet a kosár oldalára, ahol még egyszer le tudja ellenőrizni a vásárolt termékeit. Ha végezett, a ’Fizetés’ gomb megnyomásával a fizetés oldalára kerül, ahol megtekintheti a vásárolt termékeit, ám módosítani itt már nem tud. 
+Szintén ezen az oldalon adja meg a felhasználó a számlázási adatait is, ami a következőket tartalmazza: 
+•	Külön adatmezőkben a vezetéknév és keresztnév (<input type=”text”>)
+•	Város neve (legördülő listából, ahol a felhasználó is tud írni, így gyorsabban megtalálhatja a városát)
+•	Irányítószám
+•	Utca neve
+•	Házszám
+•	Emelet és ajtó szám amennyiben szükséges
+•	Telefonszám
+Ezen adatok alatt egy checkbox segítségével bejelölhető, hogy a fenti adatokat elmentsük e a rendszerünkbe. Ha a felhasználó már vásárolt és elmentette az adatait, akkor mi automatikusan kitöltjük helyette, így neki csak a rendelési adatokat kell megadnia.
+Ezután a rendelési adatait is felvesszük:
+•	Város neve (ugyanúgy mint fentebb)
+•	Irányítószám
+•	Utca neve
+•	Házszám
+•	Emelet és ajtó szám amennyiben szükséges
+Amennyiben nem házhozszállítással szeretne vásárolni a vevő, választhatja a ’csomagpont’ opciót is.
+Végül, az adtok felvétele után, a fizetésre kerül a sor, ahol a felhasználó a bankkártya adatait viszi fel. Itt dönthet úgy a felhasználó, hogy a bankkártya számát elmentse. A bankkártya adatokat, a fontosságuk miatt, ellenőrizzük, vagyis a számnak megfelelőnek kell lennie, a név hossza nem haladhatja meg a hivatalos karakterszámot, illetve a lejárati dátum sem lehet régebbi mint az aznapi dátum.
+A ’Fizetés mentése’ gombbal tudja véglegesíteni a felhasználó minden adatát, ilyenkor kerülnek mentésre az adatai, illetve ilyenkor kap egy e-mailt a felhasználó a rendelése részleteiről, így később is ellenőrizheti az adatait.
+
+
+A felhasználók számára először nem a teljes poszt tartalma jelenik meg, hanem egy rövid leírás a poszt tartalmáról a poszt címével és borítóképével együtt. Ezek kattintható kártyák, amik továbbviszik a felhasználót a poszt komplett tartalmára. Itt jelennek meg a további képek és a kommentek is, illetve innen lehet értékelést adni a posztra.
+A főoldalról is elérhetőek a legutolsó három legfrissebb bejegyzés, ezen felül természetesen a menüsávból éri el a felhasználó a blog oldalát.
+
+
+Amennyiben regisztrált a felhasználó, tud posztot írni a blogra. Ehhez  a blog oldalon, illetve a saját profiljában a posztjai mellett lát egy ’Létrehozás’ gombot, aminek segítségével tud posztot írni.
+Ezen a felületen egy űrlap található. Itt szövegmezőkkel tud címet és tartalmat adni, ahol mindkettőnek van egy maximum karakter száma, így a cím és a tartalom szövege sem lehet irracionálisan hosszú. Szintén szövegmezővel írhat egy rövid összegzést a posztról, ami megjelenik a posztok kis nézetében, viszont ha nem ad meg ilyet, akkor a tartalom első pár mondata kerül megjelenítésre. Fájl feltöltés segítségével képeket is feltölthet a megfelelő formátumban, amiből szintén legfeljebb 10 lehet. Végül a tartalomhoz tartozó címkéket választja ki, ahol elsősorban a már meglévőkből választ, ám ha fel szeretne venni másik címkét ami még nem létezik, azt is megteheti.
+A felületen írt posztoknak van egy státusza is, vagyis lehetőség van rá, hogy csak vázlatban legyen egy bejegyzés, amihez később vissza tud térni a szerző.
+
+
+A mintakészítő célja nem csak az útmutató létrehozása, hanem hogy a minta segítségével a weboldalról közvetlenül terméket is tudjon rendelni: a kiválasztott adatok és a kép méret alapján a program kiszámolja, hogy mennyi fonalmennyiség szükséges a projekt elkészítéséhez. Ezen adatok a webáruházunkon alapulnak, tehát csak az elérhető termékekből számol, így viszont ha a felhasználó elégedett az ajánlásunkkal, egyből kosárhoz is tudja adni a termékeket.
+Elsőként három opció közül választhat a felhasználó: horgolás, kötés, vagy hímzés. Hímzés kiválasztása esetén egyből a képfájl feltöltése következik, mivel a fonalmennyiség automatikusan kiválasztásra kerül. A másik két opció választása után a felhasználó kiválasztja, hogy milyen vastagságú fonallal tervezi készíteni a projektjét. Ezek az opciók rádiógombokkal jelennek meg, és a továbblépés csak akkor lehetséges, ha a felhasználó kiválaszt egy opciót. Amennyiben a választását később módosítaná, a lépések melletti ’Vissza’ gombokkal könnyedén visszamehet, és megteheti.
+A kép feltöltése csak a megfelelő formátumokban engedélyezett, majd amennyiben ez megtörtént a rendszer előnézetet mutat a képről. Ha a felhasználó tovább megy, akkor a ’Minta készítése’ gomb megnyomásával a kiválasztott adatai átkerülnek a következő oldalra, és a felhasználó is átirányításra kerül.
+
+
+A feltöltött kép megjelenik egy vásznon, immár olyan verzióban, ami alapján a felhasználó el tudja kezdeni a projektjét. A program egy pixeles stílusú táblát hoz létre az eredeti képből, a megadott kép nagyságának és a kiválasztott cellaméretnek az elosztásával. Az itt kiszámolt érték szerint csoportosítja a program a kép pixeleit, és a leggyakrabban előforduló színt jeleníti meg, viszont amennyiben mindegyik más, átlagolja a színeket.
+Ezen a felületen a felhasználó számtalan optimalizációs eszközt használhat:
+•	Állíthatja a pixelek méretét, így a projektje méretét közvetetten befolyásolja. Az érték változtatásakor a program automatikusan újrakalibrálja a képet.
+•	Kiválaszthatja, hogy mennyi szín legyen a mintában, illetve módosíthatja azokat.
+•	Állíthatják a szegély méretét, hogy jobban kivehetőek legyenek a négyzetek.
+•	Nyomonkövetheti a haladását a sorok végén lévő checkbox-okkal, amik elhalványítják az adott sort.
+•	Letölthetik az elkészült mintát, a kész, pixeles változatban.
