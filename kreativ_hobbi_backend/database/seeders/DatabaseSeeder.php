@@ -34,6 +34,24 @@ class DatabaseSeeder extends Seeder
 
             // 4. Felhasználói adatok seedelése.
             FelhasznaloAdatokSeeder::class,
+           
+            // 5. Kategóriák seedelése.
+            KategoriakSeeder::class,
+            
+            // 6. Címkék seedelése.
+            CimkekSeeder::class,
+
+            // 7. Szinek seedelése.
+            SzinekSeeder::class,
+
+            // 8. Posztok seedelése.
+            PosztokSeeder::class,
+
+            // 9. PosztKépek seedelése.
+            PosztKepekSeeder::class,
+
+            // 10. PosztCímkék seedelése.
+            PosztCimkekSeeder::class,
         ]);
     }
 }

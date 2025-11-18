@@ -22,6 +22,7 @@ return new class extends Migration
             $table->enum('statusz', ['piszkozat','közzétett','archivált'])->default('piszkozat');
             $table->foreign('szerzo_id')->references('id')->on('felhasznalok')->onDelete('set null');
             $table->foreign('fo_kep_id')->references('id')->on('kepek')->onDelete('set null');
+            $table->timestamps();
         });
     }
 

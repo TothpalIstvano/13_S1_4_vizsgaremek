@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use App\Models\FelhasznaloAdatok;
 
 class FelhasznaloAdatokSeeder extends Seeder
 {
@@ -11,6 +12,7 @@ class FelhasznaloAdatokSeeder extends Seeder
      */
     public function run(): void
     {
-        \App\Models\FelhasznaloAdatok::factory()->count(50)->create();
+       FelhasznaloAdatok::factory()->count(30)->create();
+        $this->command->info('FelhasznaloAdatok table seeded successfully!');
     }
 }

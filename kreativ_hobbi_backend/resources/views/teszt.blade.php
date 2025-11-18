@@ -20,19 +20,38 @@
             </tr>
         </thead>
         <tbody>
-            @foreach ($felhasznalok as $felhasznalo)
+            @php
+            $per_page = 10;
+            $current_page = (isset($_GET['page'])) ? (int)$_GET['page'] : 1;
+            $start = ($current_page - 1) * $per_page;
+            $end = $start + $per_page;
+            $felhasznalok_to_display = $felhasznalok->slice($start, $per_page);
+            @endphp
+
+            @foreach ($felhasznalok_to_display as $felhasznalo)
             <tr>
                 <td>{{ $felhasznalo->id }}</td>
-                <td>{{ $felhasznalo->felhasz_nev}}</td>
+                <td>{{ $felhasznalo->felhasz_nev }}</td>
                 <td>{{ $felhasznalo->email }}</td>
                 <td>{{ $felhasznalo->jelszo }}</td>
                 <td>{{ $felhasznalo->profilKep_id }}</td>
                 <td>{{ $felhasznalo->statusz }}</td>
                 <td>{{ $felhasznalo->created_at }}</td>
             </tr>
-            @endforeach
+            @endforeach           
+              @if (count($felhasznalok) > $per_page)
+                <tr>
+                  <td colspan="7">
+                    <div class="d-flex justify-content-center">
+                        <a href="{{ request()->url() }}?page={{ $current_page - 1 }}" class="btn btn-primary" style="float: left;">Előző 10</a>
+                        <a href="{{ request()->url() }}?page={{ $current_page + 1 }}" class="btn btn-primary" style="float: right;">Következő 10</a>
+                    </div>
+                  </td>
+                </tr>
+              @endif
         </tbody>
     </table>
+    </div>
 </body>
 <style>
 /* Layout */
