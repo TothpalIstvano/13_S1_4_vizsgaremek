@@ -12,7 +12,7 @@ class PosztokSeeder extends Seeder
      */
     public function run(): void
     {
-        Posztok::factory(50)->create();
+        Posztok::factory(30)->create();
         $this->command->info('Posztok table seeded successfully!');
     }
 }

@@ -41,5 +41,6 @@ class PosztCimkekSeeder extends Seeder
                 })->toArray()
             );
         }
+        $this->command->info('PosztCimkek table seeded successfully!');
     }
 }

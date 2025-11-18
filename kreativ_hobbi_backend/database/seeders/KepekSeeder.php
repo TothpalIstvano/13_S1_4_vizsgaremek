@@ -15,7 +15,7 @@ class KepekSeeder extends Seeder
     public function run(): void
     {
         // Create a pool of 50 profile pictures to be used by users.
-        Kepek::factory(50)->create();
+        Kepek::factory(400)->create();
 
         $this->command->info('Kep table seeded with 50 images!');
     }

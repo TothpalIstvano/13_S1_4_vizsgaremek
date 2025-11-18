@@ -31,7 +31,7 @@ class FelhasznalokSeeder extends Seeder
         ]);
 
         // Create 20 random users
-        Felhasznalok::factory()->count(20)->create();
+        Felhasznalok::factory()->count(30)->create();
         
 
         $this->command->info('Felhasznalok table seeded successfully!');

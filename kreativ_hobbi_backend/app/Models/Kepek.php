@@ -15,6 +15,7 @@ class Kepek extends Model
      * @var string
      */
     protected $table = 'kepek';
+    protected $primaryKey = 'id';
 
     /**
      * The attributes that are mass assignable.
@@ -23,6 +24,8 @@ class Kepek extends Model
      */
     protected $fillable = [
         'url_Link',
+        'leiras',
+        'alt_szoveg',
     ];
 
     /**
@@ -33,5 +36,6 @@ class Kepek extends Model
     {
         // 'profilKep_id' is the foreign key in the 'felhasznalok' table
         return $this->hasMany(Felhasznalok::class, 'profilKep_id');
+
     }
 }

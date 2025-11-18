@@ -12,7 +12,7 @@ class FelhasznaloAdatokSeeder extends Seeder
      */
     public function run(): void
     {
-       FelhasznaloAdatok::factory()->count(30)->create();
+       FelhasznaloAdatok::factory()->count(100)->create();
         $this->command->info('FelhasznaloAdatok table seeded successfully!');
     }
 }
