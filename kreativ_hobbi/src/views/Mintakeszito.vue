@@ -318,7 +318,7 @@ const fonalHossz = computed(() => {
   const pixelRacsOszlop = pixelRows.value[0]?.pixels.length || 0
   
   const hossz = ((pixelRacsSor * pixelRacsOszlop) / 
-                (masodikLepes.value.meromintaSor * masodikLepes.value.meromintaOszlop)) * 10
+                (masodikLepes.value.meromintaSor * masodikLepes.value.meromintaOszlop)) * 100
   
   
   return isNaN(hossz) ? 0 : Number(hossz.toFixed(2))
@@ -677,7 +677,7 @@ main {
   margin: auto;
   text-align: justify;
   margin-bottom: 50px;
-  border-radius: 10px;
+  border-radius: 8px;
 }
 
 .ket_oszlop {
@@ -710,6 +710,7 @@ main {
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  color: var(--mk-text-light);
 }
 
 .kartya:hover {
@@ -718,7 +719,6 @@ main {
 }
 
 .kartya h3 {
-  color: var(--mk-text-dark);
   margin-bottom: 16px;
   font-size: 24px;
   font-weight: 600;
@@ -743,6 +743,7 @@ main {
   border-radius: 8px;
   padding: 20px;
   position: relative;
+  color: var(--mk-text-light);
 }
 
 .blog_info ol {
@@ -862,7 +863,7 @@ label:hover {
   height: 50px;
   margin: 32px auto 0;
   border: none;
-  border-radius: 15px;
+  border-radius: 8px;
   background: linear-gradient(135deg, var(--mk-gomb-foszin), var(--mk-gomb-masodszin));
   color: var(--white);
   font-weight: 600;
@@ -1002,13 +1003,13 @@ input[type="file"] {
   top: 50%;
   left: 100%;
   width: 100%;
-  height: 2px;
-  background-color: var(--mk-secondary-light);
+  height: 8px;
+  background-color: rgb(233, 0, 213);
   z-index: -1;
 }
 
 .progress-step.active:not(:last-child)::after {
-  background-color: rgb(248, 233, 24);
+  background-color: rgb(0, 204, 10);
 }
 
 .progress-labels {
