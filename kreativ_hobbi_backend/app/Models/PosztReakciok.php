@@ -8,7 +8,7 @@ use Laravel\Sanctum\HasApiTokens;
 
 class PosztReakciok extends Model
 {
-    use HasFactory, HasApiTokens;
+    use HasFactory;
     protected $table = "posztReakciok";
     protected $fillable = ["poszt_id", "felhasznalo_id", "reakcio"];
 

@@ -10,7 +10,7 @@ use Laravel\Sanctum\HasApiTokens;
 
 class Posztok extends Model
 {
-    use HasFactory, HasApiTokens;
+    use HasFactory;
     protected $table = 'posztok';
     protected $primaryKey = 'id';
     protected $fillable = [
