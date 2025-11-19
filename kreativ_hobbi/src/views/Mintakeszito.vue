@@ -358,51 +358,61 @@ function loadFormState() {
     <h1 class="title">Mintakészítő</h1>
       
     <div id="bemutato">
-      <h2 class="cim">Mi is ez az oldal?</h2>
       <div class="ket_oszlop">
+        <div class="blog_info_kontener">
+          <img src="../assets/public/mk-kep.jpg" alt="">
+          <div class="blog_info">
+            <h3>Használati útmutató</h3>
+            <ol>
+              <li>Válaszd ki a kívánt technikát</li>
+              <li>Add meg a használni kívánt fonal típusát</li>
+              <li>Tölts fel egy képet</li>
+              <li>Állítsd be a pixel méretet és átlátszóságot</li>
+              <li>Jelöld meg a kívánt sorokat</li>
+              <li>Töltsd le a mintát</li>
+            </ol>
+          </div>
+        </div>
+
         <div class="harom_oszlop">
           <div class="kartya">
-            <h3>Horgolás</h3>
-            <p>Készítsd el saját horgolt mintádat kedvenc képeidből. Az alkalmazás pixelizálja a képet, hogy könnyen követhető mintaformátumban kapd meg.
-              <ul>
-                <li>Pixel alapú minták</li>
-                <li>Színpaletta testreszabás</li>
-                <li>Sortörések kezelése</li>
-              </ul>
-            </p>
+            <div class="szoveg">
+              <h3>Horgolás</h3>
+              <p>Készítsd el saját horgolt mintádat kedvenc képeidből. Az alkalmazás pixelizálja a képet, hogy könnyen követhető mintaformátumban kapd meg. Lorem ipsum dolor sit, amet consectetur adipisicing elit. 
+                <ul>
+                  <li>Pixel alapú minták</li>
+                  <li>Színpaletta testreszabás</li>
+                  <li>Sortörések kezelése</li>
+                </ul>
+              </p>
+            </div>
           </div>
           <div class="kartya">
-            <h3>Kötés</h3>
-    <p>Alakítsd át a fotóidat kötött mintává. A pixelizálás segít a színek és minták pontos reprodukálásában.
-              <ul>
-                <li>Pontos színátalakítás</li>
-                <li>Reszponzív mintaméret</li>
-                <li>Könnyű nyomkövetés</li>
-              </ul>
-            </p>
+            <div class="szoveg">
+              <h3>Kötés</h3>
+              <p>Alakítsd át a fotóidat kötött mintává. A pixelizálás segít a színek és minták pontos reprodukálásában. Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                <ul>
+                  <li>Pontos színátalakítás</li>
+                  <li>Reszponzív mintaméret</li>
+                  <li>Könnyű nyomkövetés</li>
+                </ul>
+              </p>              
+            </div>
           </div>
           <div class="kartya">
-            <h3>Hímzés</h3>
-            <p>Hímzéshez optimalizált mintákat készíthetsz. A részletes pixelrács segít a pontos varratmegtervezésben.
-              <ul>
-                <li>Részletes rácsnézet</li>
-                <li>Sortükrözés lehetősége</li>
-                <li>Exportálás nyomtatható formátumban</li>
-              </ul>
-            </p>
+            <div class="szoveg">
+              <h3>Hímzés</h3>
+              <p>Hímzéshez optimalizált mintákat készíthetsz. A részletes pixelrács segít a pontos varratmegtervezésben. Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                <ul>
+                  <li>Részletes rácsnézet</li>
+                  <li>Sortükrözés lehetősége</li>
+                  <li>Exportálás nyomtatható formátumban</li>
+                </ul>
+              </p>
+            </div>
           </div>
         </div>
-        <div class="blog_info">
-          <h3>Használati útmutató</h3>
-          <ol>
-            <li>Válaszd ki a kívánt technikát</li>
-            <li>Add meg a használni kívánt fonal típusát</li>
-            <li>Tölts fel egy képet</li>
-            <li>Állítsd be a pixel méretet és átlátszóságot</li>
-            <li>Jelöld meg a kívánt sorokat</li>
-            <li>Töltsd le a mintát</li>
-          </ol>
-        </div>
+
       </div>
     </div>
 
@@ -667,11 +677,6 @@ main {
   padding-bottom: 6px;
 }
 
-.cim {
-  font-size: 26px;
-  margin-bottom: 30px;
-}
-
 /*#region felső szövegdobozok*/
 #bemutato {
   margin: auto;
@@ -682,7 +687,7 @@ main {
 
 .ket_oszlop {
   display: grid;
-  grid-template-columns: 3fr 2fr;
+  grid-template-columns: 2fr 3fr;
   gap: 35px;
   align-items: start;
   width: 100%;
@@ -701,7 +706,8 @@ main {
 }
 
 .kartya {
-  background-color: var(--mk-szovegdoboz);
+  /*background-color: var(--mk-szovegdoboz);*/
+  background-color: black;
   border-radius: 8px;
   padding: 20px;
   box-shadow: 0 4px 15px var(--mk-arnyekszin);
@@ -710,7 +716,51 @@ main {
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  color: var(--mk-text-light);
+  color: var(--mk-text-dark);
+}
+
+/* If you want different images for each card, you can use specific classes */
+.kartya:nth-child(1)::before {
+  background-image: url('../assets/public/mk-lila.png');
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-size: cover;
+  background-position: center;
+  filter: blur(1px);
+  opacity: 0.6;
+}
+
+.kartya:nth-child(2)::before {
+  background-image: url('../assets/public/mk-kotes.jpg');
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-size: cover;
+  background-position: center;
+  filter: blur(2px);
+  opacity: 0.7;
+}
+
+.kartya:nth-child(3)::before {
+  background-image: url('../assets/public/mk-himzes.png');
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-size: cover;
+  background-position: center;
+  filter: blur(2px);
+  opacity: 0.7;
+  z-index: -1;
 }
 
 .kartya:hover {
@@ -718,10 +768,18 @@ main {
   box-shadow: 0 6px 20px var(--mk-arnyekszin);
 }
 
+.szoveg {
+  background-color: rgba(247, 239, 255, 0.8);
+  border-radius: 6px;
+  position: relative; /* Ensure text stays above background */
+  padding: 20px;
+}
+
 .kartya h3 {
   margin-bottom: 16px;
   font-size: 24px;
   font-weight: 600;
+  text-align: center;
 }
 
 .kartya ul {
@@ -734,7 +792,7 @@ main {
 }
 
 .blog_info {
-  width: 100%;
+  /*width: 100%;
   box-sizing: border-box;
   align-self: start;
   background-color: var(--mk-szovegdoboz);
@@ -743,7 +801,15 @@ main {
   border-radius: 8px;
   padding: 20px;
   position: relative;
-  color: var(--mk-text-light);
+  color: var(--mk-text-light);*/
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #72478fcc;
+  color: white;
+  padding: 30px 20px 20px;
+  transition: all 0.3s ease;
 }
 
 .blog_info ol {
@@ -759,6 +825,26 @@ main {
   transform: translateY(-10px);
   box-shadow: 0 6px 20px var(--mk-arnyekszin);
 }
+
+.blog_info_kontener {
+  position: relative;
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px var(--mk-arnyekszin);
+}
+
+.blog_info_kontener img {
+  width: 100%;
+  height: auto;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.blog_info_kontener:hover img {
+  transform: scale(1.05);
+}
+
 /*#endregion*/
 
 /*#region adatbekérés*/
@@ -1000,16 +1086,15 @@ input[type="file"] {
 .progress-step:not(:last-child)::after {
   content: '';
   position: absolute;
-  top: 50%;
   left: 100%;
-  width: 100%;
+  width: 900%;
   height: 8px;
-  background-color: rgb(233, 0, 213);
+  background-color: rgb(71, 60, 70);
   z-index: -1;
 }
 
 .progress-step.active:not(:last-child)::after {
-  background-color: rgb(0, 204, 10);
+  background-color: rgb(153, 42, 153);
 }
 
 .progress-labels {
@@ -1020,6 +1105,12 @@ input[type="file"] {
 .progress-label {
   font-size: 14px;
   color: var(--mk-text-dark);
+}
+
+@media (max-width: 900px) {
+  .progress-step:not(:last-child)::after {
+    width: 400%;
+  }
 }
 /*#endregion*/
 

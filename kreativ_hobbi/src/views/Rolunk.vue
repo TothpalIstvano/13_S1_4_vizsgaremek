@@ -19,7 +19,7 @@ export default {
     <div class="kontener egesz-kontener">
       <div class="kontener felso-resz">
         <div class="kepdiv">
-          <img class="kep" src="@\assets\Public\rolunk_asztal.avif">
+          <img class="kep" src="@\assets\public\rolunk_asztal.avif">
           <div class="piros-doboz">
             <p class="piros-doboz-szoveg">
               Lorem ipsum dolor sit amet, consectetur adipiscing elit. Eget purus lectus viverra in semper nec pretium mus.
@@ -55,7 +55,7 @@ export default {
           </button>
           
           <div class="profile-pic">
-              <img src="@\assets\Public\noi_profil.jpg" alt="Profilkép">
+              <img src="@\assets\public\noi_profil.jpg" alt="Profilkép">
           </div>
           
           <div class="bottom">
@@ -89,7 +89,7 @@ export default {
           </button>
           
           <div class="profilkep">
-              <img src="@\assets\Public\ferfi_profil.jpg" alt="Profilkép">
+              <img src="@\assets\public\ferfi_profil.jpg" alt="Profilkép">
           </div>
           
           <div class="alsosav">
