@@ -25,8 +25,8 @@ class KedvencekSeeder extends Seeder
         }
 
         // 3. Hozzuk létre az egyedi párosításokat
-        // Tegyük fel, hogy átlagosan minden felhasználónak 10 kedvence van
-        $numberOfFavorites = $felhasznaloIds->count() * 10;
+        // Tegyük fel, hogy átlagosan minden felhasználónak 2 kedvence van
+        $numberOfFavorites = $felhasznaloIds->count() * 2;
         $maxPossibleFavorites = $felhasznaloIds->count() * $termekIds->count();
 
         if ($numberOfFavorites > $maxPossibleFavorites) {
