@@ -1,11 +1,9 @@
 <?php
 
-use App\Http\Controllers\FelhasznaloController;
-use App\Http\Controllers\KepController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    return ['Laravel' => app()->version()];
 });
 
-Route::get('/teszt', [FelhasznaloController::class, 'felhasznalo']);
+require __DIR__.'/auth.php';
