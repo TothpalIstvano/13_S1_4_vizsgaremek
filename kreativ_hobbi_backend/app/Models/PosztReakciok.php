@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Laravel\Sanctum\HasApiTokens;
 
 class PosztReakciok extends Model
 {
-    use HasFactory;
+    use HasFactory, HasApiTokens;
     protected $table = "posztReakciok";
     protected $fillable = ["poszt_id", "felhasznalo_id", "reakcio"];
 

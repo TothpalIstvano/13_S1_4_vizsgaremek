@@ -6,10 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\Felhasznalok;
 use App\Models\Kepek;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Laravel\Sanctum\HasApiTokens;
 
 class Posztok extends Model
 {
-    use HasFactory;
+    use HasFactory, HasApiTokens;
     protected $table = 'posztok';
     protected $primaryKey = 'id';
     protected $fillable = [

@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\termekSzinek; 
+use App\Models\TermekSzinek;
 use App\Models\Termekek;
 use App\Models\Szinek;
 use Illuminate\Database\Seeder;
@@ -39,12 +39,12 @@ class TermekSzinekSeeder extends Seeder
 
         // 4. Hozzuk létre a kapcsolatokat az egyedi párokkal
         foreach ($uniquePairs as $pair) {
-            termekSzinek::create([
+            TermekSzinek::create([
                 'termek_id' => $pair[0], // A crossJoin tömböt ad vissza: [termek_id, szin_id]
                 'szin_id' => $pair[1],
             ]);
         }
 
-        $this->command->info('TermekSzinek tábla sikeresen feltöltve!');
+        $this->command->info('TermekekSzinek tábla sikeresen feltöltve!');
     }
 }

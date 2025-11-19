@@ -6,10 +6,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Felhasznalok;
 use App\Models\Varosok;
+use Laravel\Sanctum\HasApiTokens;
 
 class FelhasznaloAdatok extends Model
 {
-    use HasFactory;
+   use HasFactory, HasApiTokens;
     protected $table = 'felhasznaloAdatok';
 
     protected $fillable = [
