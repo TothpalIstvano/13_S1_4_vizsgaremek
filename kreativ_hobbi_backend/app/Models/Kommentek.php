@@ -8,7 +8,7 @@ use Laravel\Sanctum\HasApiTokens;
 
 class Kommentek extends Model
 {
-    use HasFactory,HasApiTokens;
+    use HasFactory;
     protected $table = "kommentek";
     protected $primarykey = "id";
     protected $fillable = [

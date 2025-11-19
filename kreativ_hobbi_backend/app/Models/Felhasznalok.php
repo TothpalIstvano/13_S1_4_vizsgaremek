@@ -9,7 +9,7 @@ use Laravel\Sanctum\HasApiTokens;
 
 class Felhasznalok extends Authenticatable
 {
-    use HasFactory, Notifiable, HasApiTokens;
+    use HasFactory, Notifiable;
 
     /**
      * The table associated with the model.

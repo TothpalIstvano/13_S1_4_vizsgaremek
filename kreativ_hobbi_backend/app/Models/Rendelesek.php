@@ -8,7 +8,7 @@ use Laravel\Sanctum\HasApiTokens;
 
 class Rendelesek extends Model
 {
-    use HasFactory, HasApiTokens;
+    use HasFactory;
     protected $table = "rendelesek";
     protected $PrimaryKey = "id";
     protected $fillable = ['felhasznalo_id', 'statusz', 'osszeg', 'rendeles_datuma'];
