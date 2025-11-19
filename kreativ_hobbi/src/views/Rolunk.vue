@@ -16,34 +16,34 @@ export default {
   <main>
     <h1 id="cim">Rólunk</h1>
 
-    <div class="responsive-container-block bigContainer">
-      <div class="responsive-container-block Container bottomContainer">
-        <div class="ultimateImg">
-          <img class="mainImg" src="@\assets\Public\rolunk_asztal.avif">
-          <div class="purpleBox">
-            <p class="purpleText">
+    <div class="kontener egesz-kontener">
+      <div class="kontener felso-resz">
+        <div class="kepdiv">
+          <img class="kep" src="@\assets\Public\rolunk_asztal.avif">
+          <div class="piros-doboz">
+            <p class="piros-doboz-szoveg">
               Lorem ipsum dolor sit amet, consectetur adipiscing elit. Eget purus lectus viverra in semper nec pretium mus.
             </p>
             <img class="stars" src="https://workik-widget-assets.s3.amazonaws.com/widget-assets/images/mp5.svg">
           </div>
         </div>
-        <div class="allText bottomText">
-          <p class="text-blk headingText">
+        <div class="szovegek">
+          <p class="szoveg-stilus cimszoveg">
             About Me
           </p>
-          <p class="text-blk subHeadingText">
+          <p class="szoveg-stilus also-cimszoveg">
             Lorem ipsum dolor sit amet, consectetur adipiscing elit.
           </p>
-          <p class="text-blk description">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fermentum pulvinar ullamcorper suspendisse ac eget. Pellentesque tempus leo in ullamcorper quis vestibulum ligula elementum ut.
+          <p class="szoveg-stilus leiras">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fermentum pulvinar ullamcorper suspendisse ac eget. Pellentesque tempus leo in ullamcorper quis vestibulum ligula elementum ut. Lorem ipsum dolor sit amet consectetur adipisicing elit. Optio odit inventore, obcaecati dolore atque modi doloribus, deleniti quae, quis rem totam. Magnam distinctio esse adipisci qui delectus repellendus in corporis?
           </p>
-          <a class="explore">
+          <a class="gomb">
             View Services
           </a>
         </div>
       </div>
 
-
+      <hr>
 
       <h1>Csapatunk: </h1>
       <div class="cardscontainer">
@@ -140,7 +140,7 @@ main {
 }
 
 /* #region felső boxok */
-.responsive-container-block {
+.kontener {
   min-height: 75px;
   height: fit-content;
   width: 100%;
@@ -151,27 +151,34 @@ main {
   justify-content: flex-start;
 }
 
-.text-blk {
+.szoveg-stilus {
   margin: 0px;
   padding: 10px;
   line-height: 25px;
 }
 
-.responsive-container-block.bigContainer {
+.kontener.egesz-kontener {
   flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 10px 50px;
 }
 
-.mainImg {
+.kep {
   color: black;
   width: 100%;
   height: auto;
   border-radius: 10px;
 }
 
-.text-blk.headingText {
+.szovegek {
+  padding: 0px;
+  width: 45%;
+  margin: 0px;
+  text-align: justify;
+}
+
+.szoveg-stilus.cimszoveg {
   font-size: 22px;
   font-weight: 700;
   line-height: 30px;
@@ -179,13 +186,7 @@ main {
   margin-bottom: 5px;
 }
 
-.allText {
-  padding: 0px;
-  width: 40%;
-  margin: 0px;
-}
-
-.text-blk.subHeadingText {
+.szoveg-stilus.also-cimszoveg {
   color: rgb(102, 102, 102);
   font-size: 26px;
   line-height: 32px;
@@ -193,7 +194,7 @@ main {
   margin-bottom: 15px;
 }
 
-.text-blk.description {
+.szoveg-stilus.leiras {
   font-size: 18px;
   line-height: 26px;
   color: rgb(102, 102, 102);
@@ -202,7 +203,7 @@ main {
   padding-right: 10px;
 }
 
-.explore {
+.gomb {
   font-size: 16px;
   line-height: 28px;
   color: rgb(102, 102, 102);
@@ -213,12 +214,12 @@ main {
   padding: 8px 40px;
 }
 
-.explore:hover {
+.gomb:hover {
   background-color: rgb(199, 71, 71);
   color: white;
 }
 
-.responsive-container-block.Container {
+.kontener.felso-resz {
   margin-top: 80px;
   margin-right: auto;
   margin-bottom: 50px;
@@ -227,23 +228,11 @@ main {
   align-items: center;
   max-width: 1320px;
   padding: 10px;
-}
-
-.responsive-container-block.Container.bottomContainer {
   flex-direction: row-reverse;
-  margin-top: 80px;
-  margin-right: auto;
-  margin-bottom: 50px;
-  margin-left: auto;
   position: static;
-  border-bottom: 2px solid black;
 }
 
-.allText.aboveText {
-  margin-left: 40px;
-}
-
-.allText.bottomText {
+.szovegek{
   margin-right: 40px;
   display: flex;
   flex-direction: column;
@@ -252,7 +241,7 @@ main {
   padding-right: 15px;
 }
 
-.purpleBox {
+.piros-doboz {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -265,75 +254,59 @@ main {
   left: -8%;
 }
 
-.purpleText {
+.piros-doboz-szoveg {
   font-size: 18px;
   line-height: 26px;
   color: white;
   margin-bottom: 10px;
 }
 
-.ultimateImg {
+.kepdiv {
   width: 50%;
   position: relative;
 }
 
 @media (max-width: 1024px) {
-  .responsive-container-block.Container {
+  .kontener.felso-resz {
     max-width: 850px;
   }
 
-  .mainImg {
+  .kep {
     width: 55%;
     height: auto;
   }
 
-  .responsive-container-block.Container {
+  .kontener.felso-resz {
     max-width: 830px;
   }
 
-  .allText.aboveText {
-    margin-top: 30px;
-    margin-left: 40px;
-  }
-
-  .allText.aboveText {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    margin-top: 30px;
-  }
-
-  .text-blk.subHeadingText {
+  .szoveg-stilus.also-cimszoveg {
     text-align: left;
     font-size: 26px;
     line-height: 32px;
   }
 
-  .responsive-container-block.Container {
+  .kontener.felso-resz {
     justify-content: space-evenly;
-  }
-
-  .purpleBox {
-    margin-top: 80px;
-  }
-
-  .responsive-container-block.Container.bottomContainer {
     padding: 10px 0px;
     max-width: 930px;
   }
 
-  .allText.bottomText {
+  .piros-doboz {
+    margin-top: 80px;
+  }
+
+  .szovegek {
     width: 40%;
   }
 
-  .mainImg {
+  .kep {
     width: 100%;
   }
 }
 
 @media (max-width: 768px) {
-  .allText {
+  .szovegek {
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -341,34 +314,31 @@ main {
     align-items: center;
   }
 
-  .responsive-container-block.Container {
+  .kontener.felso-resz {
     flex-direction: column;
     height: auto;
+    flex-direction: column;
   }
 
-  .mainImg {
+  .kep {
     width: 100%;
     margin-bottom: -70px;
   }
 
-  .responsive-container-block.Container.bottomContainer {
-    flex-direction: column;
-  }
-
-  .purpleBox {
+  .piros-doboz {
     position: static;
   }
 
-  .allText.bottomText {
+  .szovegek {
     width: 100%;
     align-items: flex-start;
   }
 
-  .text-blk.headingText, .text-blk.subHeadingText, .text-blk.description{
+  .szoveg-stilus.cimszoveg, .szoveg-stilus.also-cimszoveg, .szoveg-stilus.leiras{
     text-align: left;
   }
 
-  .ultimateImg {
+  .kepdiv {
     position: relative;
     width: 100%;
   }
@@ -376,12 +346,30 @@ main {
 }
 
 @media (max-width: 500px) {
-  .allText.bottomText {
+  .szovegek {
     margin-top: 30px;
   }
 
 }
 /* #endregion*/
+
+hr {
+  width: 96%;
+  border: none;
+  border-top: 3px double #333333;
+  color: #333333;
+  overflow: visible;
+  text-align: center;
+  height: 5px;
+}
+
+hr::after {
+  background-color: var(--bg);
+  content: "(ﾉ◕ヮ◕)ﾉ*:･ﾟ✧";
+  padding: 0 4px;
+  position: relative;
+  top: -13px;
+}
 
 .card, .kártya{
   width: 340px;

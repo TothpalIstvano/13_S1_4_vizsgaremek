@@ -53,7 +53,7 @@
 
 /*Mintakészítő*/
 :root {
-  --mk-szovegdoboz: #937ca9d4;
+  --mk-szovegdoboz: #59426bd2;
   --mk-hatterszin: #c7bed5a1;
   --mk-radioszin: #a494bbb3;
   --mk-gomb-foszin: #9d5dadb5;
@@ -62,8 +62,8 @@
   --mk-arnyekszin: #727171;
   --mk-checkbox: #2f0b49;
   --mk-oldalsav: #7d7287ab;
-  --mk-text-dark: #ebdcdc;
-  --mk-text-light: #b5b3b3;
+  --mk-text-dark: #000000;
+  --mk-text-light: #e7e0de;
 }
 
 /*Index blog kártyák*/
