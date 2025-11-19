@@ -73,6 +73,9 @@ class DatabaseSeeder extends Seeder
 
             // 17. TermekSzinek seedelése.
             RendelesekSeeder::class,
+
+            // 18. RendeltTermekek seedelése.
+            RendeltTermekekSeeder::class,
         ]);
     }
 }

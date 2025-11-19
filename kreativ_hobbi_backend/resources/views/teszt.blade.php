@@ -43,8 +43,12 @@
                 <tr>
                   <td colspan="7">
                     <div class="d-flex justify-content-center">
-                        <a href="{{ request()->url() }}?page={{ $current_page - 1 }}" class="btn btn-primary" style="float: left;">Előző 10</a>
-                        <a href="{{ request()->url() }}?page={{ $current_page + 1 }}" class="btn btn-primary" style="float: right;">Következő 10</a>
+                        @if ($current_page * $per_page < count($felhasznalok))
+                            <a href="{{ request()->url() }}?page={{ $current_page + 1 }}" class="btn btn-primary" style="float: right;">Következő 10</a>
+                        @endif
+                        @if ($current_page > 1)
+                          <a href="{{ request()->url() }}?page={{ $current_page - 1 }}" class="btn btn-primary" style="float: left;">Előző 10</a>
+                        @endif
                     </div>
                   </td>
                 </tr>
