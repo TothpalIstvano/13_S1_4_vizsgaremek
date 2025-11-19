@@ -9,4 +9,3 @@ Route::get('/', function () {
 });
 
 Route::get('/teszt', [FelhasznaloController::class, 'felhasznalo']);
-Route::get('/teszt/create/{felhasznalo}', [FelhasznaloController::class, 'felhasznaloCreate']);
