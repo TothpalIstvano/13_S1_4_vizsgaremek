@@ -42,7 +42,7 @@ import { RouterLink } from 'vue-router'
   color: #fff;
   padding: 30px ;
   font-size: 1rem;
-  margin-top: 100%;
+  margin-top: 10%;
 }
 .footer-content {
   display: flex;

@@ -1,6 +1,6 @@
 <script setup>
 import Carousel from '@/components/carousel.vue';
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted,nextTick } from 'vue';
 
 const featureTitleRef = ref(null);
 const isInView = ref(false);
@@ -48,6 +48,36 @@ const blogPosts = [
     tag: "Hímzés"
   }
 ];
+
+function BlogCardequalizer() {
+  let maxHeight = 0;
+    const blogCards = document.querySelectorAll('.blog-card');
+    // Find the tallest card
+    blogCards.forEach(card => {
+      const cardHeight = card.offsetHeight;
+      if (cardHeight > maxHeight) {
+        maxHeight = cardHeight;
+      }
+    });
+
+    // Apply the maximum height to all cards
+    if (maxHeight > 0) {
+      blogCards.forEach(card => {
+        card.style.height = `${maxHeight}px`;
+      });
+    };
+};
+
+onMounted(() => {
+  // Wait for all images and other resources to load
+  window.addEventListener('load', () => {
+    // Use nextTick to ensure the DOM is fully updated
+    nextTick(() => {
+      BlogCardequalizer();
+    });
+  });
+});
+
 </script>
 
 <template>
@@ -136,6 +166,8 @@ const blogPosts = [
         </router-link>
       </div>
     </section>
+
+    <h2 class="blog-main-title">A hét kiemelt blogposztjai</h2>
     <section class="blog-section">
         <div class="blog-card-grid-space"v-for="n in blogPosts" :key="n">
           <div class="blog-card">
@@ -410,6 +442,13 @@ const blogPosts = [
 /*#region Blog cards*/
 
 /* Cards Grid */
+.blog-main-title {
+  text-align: center;
+  font-size: 2.5rem;
+  margin: 10rem 1rem 1.5rem 1rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
 .blog-section {
   display: grid;
   justify-content: center;
@@ -428,7 +467,7 @@ const blogPosts = [
 /* Hybrid Card Styles */
 .blog-card {
   width: 30rem;
-  height: auto;
+  height:auto;
   background: #fff;
   border-radius: 1.5rem;
   padding: 1.5rem;
