@@ -7,9 +7,10 @@ use Illuminate\Foundation\Auth\User as Authenticatable; // Use Authenticatable f
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
+
 class Felhasznalok extends Authenticatable
 {
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, HasApiTokens;
 
     /**
      * The table associated with the model.
@@ -92,5 +93,10 @@ class Felhasznalok extends Authenticatable
     public function setJelszoAttribute($value)
     {
         $this->attributes['jelszo'] = bcrypt($value);
+    }
+
+    public function getAuthPassword()
+    {
+        return $this->jelszo;
     }
 }

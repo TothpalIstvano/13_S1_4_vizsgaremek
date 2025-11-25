@@ -7,7 +7,7 @@ import { onMounted } from 'vue';
 import axios from 'axios';
 
 // If backend runs on another origin, set baseURL to it; otherwise leave empty
-axios.defaults.baseURL = 'http://127.0.0.1:8000';
+axios.defaults.baseURL = 'http://localhost:8000';
 axios.defaults.withCredentials = true; // critical: send cookies
 
 onMounted(async () => {
@@ -17,8 +17,8 @@ onMounted(async () => {
 
     // then login (cookies and XSRF header will be handled automatically)
     const loginResp = await axios.post('/login', {
-      email: 'teszt@user.hu',
-      password: 'titkos'
+      email: 'test@example.com',
+      password: 'password',
     });
 
     console.log('login response', loginResp.data);

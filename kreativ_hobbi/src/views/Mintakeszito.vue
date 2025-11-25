@@ -378,37 +378,34 @@ function loadFormState() {
           <div class="kartya">
             <div class="szoveg">
               <h3>Horgolás</h3>
-              <p>Készítsd el saját horgolt mintádat kedvenc képeidből. Az alkalmazás pixelizálja a képet, hogy könnyen követhető mintaformátumban kapd meg. Lorem ipsum dolor sit, amet consectetur adipisicing elit. 
-                <ul>
-                  <li>Pixel alapú minták</li>
-                  <li>Színpaletta testreszabás</li>
-                  <li>Sortörések kezelése</li>
-                </ul>
-              </p>
+              <p>Készítsd el saját horgolt mintádat kedvenc képeidből. Az alkalmazás pixelizálja a képet, hogy könnyen követhető mintaformátumban kapd meg. Lorem ipsum dolor sit, amet consectetur adipisicing elit. </p>                
+              <ul>
+                <li>Pixel alapú minták</li>
+                <li>Színpaletta testreszabás</li>
+                <li>Sortörések kezelése</li>
+              </ul>
             </div>
           </div>
           <div class="kartya">
             <div class="szoveg">
               <h3>Kötés</h3>
-              <p>Alakítsd át a fotóidat kötött mintává. A pixelizálás segít a színek és minták pontos reprodukálásában. Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                <ul>
-                  <li>Pontos színátalakítás</li>
-                  <li>Reszponzív mintaméret</li>
-                  <li>Könnyű nyomkövetés</li>
-                </ul>
-              </p>              
+              <p>Alakítsd át a fotóidat kötött mintává. A pixelizálás segít a színek és minták pontos reprodukálásában. Lorem ipsum dolor sit amet consectetur adipisicing elit.</p> 
+              <ul>
+                <li>Pontos színátalakítás</li>
+                <li>Reszponzív mintaméret</li>
+                <li>Könnyű nyomkövetés</li>
+              </ul>
             </div>
           </div>
           <div class="kartya">
             <div class="szoveg">
               <h3>Hímzés</h3>
-              <p>Hímzéshez optimalizált mintákat készíthetsz. A részletes pixelrács segít a pontos varratmegtervezésben. Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                <ul>
-                  <li>Részletes rácsnézet</li>
-                  <li>Sortükrözés lehetősége</li>
-                  <li>Exportálás nyomtatható formátumban</li>
-                </ul>
-              </p>
+              <p>Hímzéshez optimalizált mintákat készíthetsz. A részletes pixelrács segít a pontos varratmegtervezésben. Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
+              <ul>
+                <li>Részletes rácsnézet</li>
+                <li>Sortükrözés lehetősége</li>
+                <li>Exportálás nyomtatható formátumban</li>
+              </ul>
             </div>
           </div>
         </div>
