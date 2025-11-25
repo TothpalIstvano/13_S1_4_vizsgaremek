@@ -6,8 +6,8 @@ const resz = ref(1)
 const elsoLepes = ref(null)
 const masodikLepes = ref(null)
 const file = ref(null)
-const showPixelation = ref(false)
-const imageUrl = ref(null)
+const pixelesKep = ref(false)
+const kepUrl = ref(null)
 
 const tipusok = ["Horgolás", "Kötés", "Hímzés"]
 //const fonalak = [" 'A' fonal csoport", " 'B' fonal csoport", " 'C' fonal csoport", " 'D' fonal csoport", " 'E' fonal csoport"]
@@ -71,21 +71,21 @@ function kepfeltoltes(event) {
     file.value = selectedFile
     const reader = new FileReader()
     reader.onload = (e) => {
-      imageUrl.value = e.target.result
+      kepUrl.value = e.target.result
       
       const img = new Image()
       img.onload = () => {
         currentImage.value = img
         imageLoaded.value = true
         // Process immediately when image loads
-        if (showPixelation.value) {
+        if (pixelesKep.value) {
           nextTick(() => {
             processCanvas(img)
           })
         }
-        saveToLocalStorage(imageUrl.value)
+        saveToLocalStorage(kepUrl.value)
       }
-      img.src = imageUrl.value
+      img.src = kepUrl.value
     }
     reader.readAsDataURL(selectedFile)
   }
@@ -93,7 +93,7 @@ function kepfeltoltes(event) {
 
 function toMintavaltoztato() {
  if (file.value) {
-    showPixelation.value = true
+    pixelesKep.value = true
     saveFormState()
     // Wait for the view to render and then process the image
     nextTick(() => {
@@ -239,7 +239,7 @@ function checkForSavedImage() {
 function clearImage() {
   pixelRows.value = []
   file.value = null
-  imageUrl.value = null
+  kepUrl.value = null
   currentImage.value = null
   imageLoaded.value = false
   localStorage.removeItem('pixelatedImage')
@@ -252,7 +252,7 @@ function clearImage() {
 }
 
 function backToForm() {
-  showPixelation.value = false
+  pixelesKep.value = false
   saveFormState()
 }
 
@@ -296,7 +296,7 @@ function resetToOriginal() {
 // Watch for when pixelation view becomes active and process image
 import { watch } from 'vue'
 
-watch(showPixelation, (newVal) => {
+watch(pixelesKep, (newVal) => {
   if (newVal && currentImage.value && imageLoaded.value) {
     nextTick(() => {
       processCanvas(currentImage.value)
@@ -336,7 +336,7 @@ function saveFormState() {
     resz: resz.value,
     elsoLepes: elsoLepes.value,
     masodikLepes: masodikLepes.value,
-    showPixelation: showPixelation.value
+    pixelesKep: pixelesKep.value
   }
   localStorage.setItem('mintakeszitoForm', JSON.stringify(formState))
 }
@@ -348,7 +348,7 @@ function loadFormState() {
     resz.value = formState.resz || 1
     elsoLepes.value = formState.elsoLepes || null
     masodikLepes.value = formState.masodikLepes || null
-    showPixelation.value = formState.showPixelation || false
+    pixelesKep.value = formState.pixelesKep || false
   }
 }
 </script>
@@ -356,7 +356,8 @@ function loadFormState() {
 <template>
   <main>
     <h1 class="title">Mintakészítő</h1>
-      
+    
+    <!-- Felső sávos szövegbobozok-->
     <div id="bemutato">
       <div class="ket_oszlop">
         <div class="blog_info_kontener">
@@ -389,6 +390,7 @@ function loadFormState() {
           <div class="kartya">
             <div class="szoveg">
               <h3>Kötés</h3>
+
               <p>Alakítsd át a fotóidat kötött mintává. A pixelizálás segít a színek és minták pontos reprodukálásában. Lorem ipsum dolor sit amet consectetur adipisicing elit.</p> 
               <ul>
                 <li>Pontos színátalakítás</li>
@@ -413,8 +415,8 @@ function loadFormState() {
       </div>
     </div>
 
-    <!-- Creator View -->
-    <div v-if="!showPixelation">
+    <!-- Adatok bekérése -->
+    <div v-if="!pixelesKep">
       <div id="adatok">
         <div class="progress-container">
           <div class="progress-bar">
@@ -510,7 +512,7 @@ function loadFormState() {
           <input id="file-upload" type="file" @change="kepfeltoltes" accept="image/*" />
           
           <div v-if="file" class="file-preview-container">
-            <img :src="imageUrl" alt="Preview" class="file-preview" />
+            <img :src="kepUrl" alt="Preview" class="file-preview" />
             <p>{{ file.name }}</p>
           </div>
 
@@ -524,7 +526,7 @@ function loadFormState() {
       </div>
     </div>
 
-    <!-- Pixelation View -->
+    <!-- Pixelesített kép -->
     <div v-else class="pixelation-main-container">
       <div class="pixelesContainer">
         <h1>Minta Változtató</h1>
@@ -538,33 +540,53 @@ function loadFormState() {
           <div class="modositas">
             <div class="valtoztatok">
               <p>Pixel Méret: {{ pixelSize }}px</p>
-              <input 
-                type="range" 
-                min="5" 
-                max="40" 
-                v-model="pixelSize" 
-                class="csuszka"
-                @input="updatePixelation"
-              />
+              <div class="input-group">
+      <input 
+        type="range" 
+        min="5" 
+        max="40" 
+        v-model.number="pixelSize" 
+        class="csuszka"
+        @input="updatePixelation"
+      />
+      <input 
+        type="number" 
+        min="5" 
+        max="40" 
+        v-model.number="pixelSize"
+        class="number-input"
+        @input="updatePixelation"
+      />
+    </div>
             </div>
 
             <div class="valtoztatok">
               <p>Rács Átlátszóság: {{ gridOpacity }}%</p>
-              <input 
-                type="range" 
-                min="0" 
-                max="60" 
-                v-model="gridOpacity" 
-                class="csuszka"
-                @input="updatePixelation"
-              />
+              <div class="input-group">
+      <input 
+        type="range" 
+        min="0" 
+        max="60" 
+        v-model.number="gridOpacity" 
+        class="csuszka"
+        @input="updatePixelation"
+      />
+      <input 
+        type="number" 
+        min="0" 
+        max="60" 
+        v-model.number="gridOpacity"
+        class="number-input"
+        @input="updatePixelation"
+      />
+    </div>
             </div>
           </div>
 
-          <!-- Hidden canvas for processing -->
+          <!--Canvas -->
           <canvas ref="canvas" style="display: none;"></canvas>
 
-          <!-- Pixel Grid Display -->
+          <!-- Pixeles kép konténere -->
           <div class="pixel-grid-container">
             <div class="pixel-info">
               <p>Kép mérete: {{ currentImage.width }}×{{ currentImage.height }} px | 
@@ -598,7 +620,7 @@ function loadFormState() {
                     v-model="checkedRows[rowIndex]"
                     @change="toggleRowOpacity(rowIndex)"
                   />
-                  <label :for="`row-${rowIndex}`">{{ rowIndex + 1 }}</label>
+                  <label :for="`row-${rowIndex}`" class="pixeles-label">{{ rowIndex + 1 }}</label>
                 </div>
               </div>
             </div>
@@ -607,6 +629,7 @@ function loadFormState() {
             </div>
           </div>
 
+          <!-- Mintaváltoztató gombok -->
           <div class="gombok">
             <button @click="backToForm" class="gomb">Vissza a feltöltéshez</button>
             <button @click="resetToOriginal" class="gomb">Eredeti állapot</button>
@@ -617,7 +640,7 @@ function loadFormState() {
       </div>
       
 
-
+      <!-- Oldalsáv -->
       <div class="oldalsav">
           <div class="oldalKartya">
             <h3>Projekt adatai</h3>
@@ -667,7 +690,7 @@ main {
   font-weight: 700;
   font-size: 45px;
   color: var(--mk-text-dark);
-  background-image: linear-gradient(90deg, #b4a2ee, #3a11c0);
+  background-image: linear-gradient(90deg, #f08686, #5f0707);
   background-repeat: no-repeat;
   background-position: 0 100%;
   background-size: 100% 4px;
@@ -704,9 +727,9 @@ main {
 
 .kartya {
   /*background-color: var(--mk-szovegdoboz);*/
-  background-color: black;
+  background-color: var(--mk-szovegdoboz);
   border-radius: 8px;
-  padding: 20px;
+  padding: 10px;
   box-shadow: 0 4px 15px var(--mk-arnyekszin);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   position: relative;
@@ -718,7 +741,7 @@ main {
 
 /* If you want different images for each card, you can use specific classes */
 .kartya:nth-child(1)::before {
-  background-image: url('../assets/public/mk-lila.png');
+  background-image: url('../assets/public/mk-horgolas.png');
   content: '';
   position: absolute;
   top: 0;
@@ -746,7 +769,7 @@ main {
 }
 
 .kartya:nth-child(3)::before {
-  background-image: url('../assets/public/mk-himzes.png');
+  background-image: url('../assets/public/mk-himzes.jpg');
   content: '';
   position: absolute;
   top: 0;
@@ -757,7 +780,6 @@ main {
   background-position: center;
   filter: blur(2px);
   opacity: 0.7;
-  z-index: -1;
 }
 
 .kartya:hover {
@@ -766,7 +788,7 @@ main {
 }
 
 .szoveg {
-  background-color: rgba(247, 239, 255, 0.8);
+  background-color: rgba(255, 235, 235, 0.925);
   border-radius: 6px;
   position: relative; /* Ensure text stays above background */
   padding: 20px;
@@ -803,7 +825,7 @@ main {
   bottom: 0;
   left: 0;
   right: 0;
-  background-color: #72478fcc;
+  background-color: #720b18cc;
   color: white;
   padding: 30px 20px 20px;
   transition: all 0.3s ease;
@@ -886,7 +908,7 @@ input[type="radio"] {
   -webkit-appearance: none;
   width: 22px;
   height: 22px;
-  border: 2px solid rgb(29, 3, 61);
+  border: 2px solid rgb(202, 200, 200);
   border-radius: 25%;
   margin-right: 12px;
   position: relative;
@@ -916,11 +938,11 @@ input[type="radio"]:hover {
 @keyframes checkboxValaszt {
   0% {
     transform: translate(-50%, -50%) scale(0.5);
-    background-color: #9b4be1;
+    background-color: #ac8888;
   }
   50% {
     transform: translate(-50%, -50%) scale(1.5);
-    background-color: #43167f;
+    background-color: #ac7e7e;
   }
   100% {
     transform: translate(-50%, -50%) scale(1);
@@ -929,7 +951,7 @@ input[type="radio"]:hover {
 }
 
 label {
-  color: var(--mk-text-dark);
+  color: var(--mk-text-light);
   cursor: pointer;
   transition: color 0.2s ease;
   font-size: 18px;
@@ -957,6 +979,7 @@ label:hover {
   box-shadow: 0 4px 15px var(--mk-arnyekszin);
   overflow: hidden;
   position: relative;
+  color: var(--mk-text-light);
 }
 
 .tovabbGomb::before {
@@ -976,7 +999,7 @@ label:hover {
 
 .tovabbGomb:hover {
   transform: translateY(-3px);
-  box-shadow: 0 6px 20px rgba(70, 6, 119, 0.473);
+  box-shadow: 0 6px 20px rgba(119, 6, 6, 0.589);
 }
 
 .visszaGomb {
@@ -1030,6 +1053,7 @@ input[type="file"] {
 .file-upload-label:hover {
   background-color: var(--mk-gomb-foszin);
   transform: translateY(-3px);
+  color: var(--mk-text-light);
 }
 
 .file-preview {
@@ -1077,7 +1101,7 @@ input[type="file"] {
 }
 
 .progress-step.clickable:hover {
-  background-color: rgb(96, 65, 136);
+  background-color: rgb(110, 29, 29);
 }
 
 .progress-step:not(:last-child)::after {
@@ -1086,12 +1110,12 @@ input[type="file"] {
   left: 100%;
   width: 900%;
   height: 8px;
-  background-color: rgb(71, 60, 70);
+  background-color: rgb(71, 60, 60);
   z-index: -1;
 }
 
 .progress-step.active:not(:last-child)::after {
-  background-color: rgb(153, 42, 153);
+  background-color: rgb(82, 3, 3);
 }
 
 .progress-labels {
@@ -1149,9 +1173,10 @@ input[type="file"] {
   gap: 32px;
   margin-bottom: 32px;
   padding: 16px;
-  background: var(--mk-radioszin);
+  background-color: #704848e5;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  color: var(--mk-text-light);
 }
 
 .valtoztatok {
@@ -1161,9 +1186,40 @@ input[type="file"] {
   min-width: 200px;
 }
 
-.csuszka {
+.slider-with-input {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
   width: 100%;
-  accent-color: #6c5ce7;
+}
+
+.input-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.csuszka {
+  flex: 1;
+  accent-color: #dad7d7;
+}
+
+.number-input {
+  width: 70px;
+  padding: 6px 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: white;
+  color: var(--mk-text-dark);
+  font-size: 14px;
+  text-align: center;
+}
+
+.number-input:focus {
+  outline: none;
+  border-color: var(--mk-gomb-foszin);
+  box-shadow: 0 0 0 2px rgba(119, 6, 6, 0.1);
 }
 
 .pixel-grid-container {
@@ -1214,9 +1270,10 @@ input[type="file"] {
   min-width: 60px;
 }
 
-.checkbox-container label {
+.pixeles-label {
   margin-left: 5px;
   font-size: 0.9em;
+  color: var(--mk-text-dark);
 }
 
 .gombok {
@@ -1233,19 +1290,19 @@ input[type="file"] {
   border-radius: 5px;
   cursor: pointer;
   font-weight: bold;
-  background-color: #6c5ce7;
+  background-color: #853939d7;
   color: white;
   transition: background-color 0.3s;
   min-width: 120px;
 }
 
 .gomb:hover {
-  background-color: #5649c0;
+  background-color: #5c1919;
   transform: translateY(-2px);
 }
 
 .gomb.letolt {
-  background-color: #4CAF50;
+  background-color: #4caf5c;
 }
 
 .gomb.letolt:hover {
@@ -1261,8 +1318,7 @@ input[type="file"] {
   flex-direction: column;
   gap: 20px;
   padding: 10px;
-  border: 2px solid black;
-  background-color: white;
+  background-color: rgb(255, 235, 235);
   border-radius: 8px;
   box-shadow: 0 4px 15px var(--mk-arnyekszin);
   align-self: flex-start;
@@ -1271,14 +1327,15 @@ input[type="file"] {
 }
 
 .oldalKartya {
-  background-color: var(--mk-szovegdoboz);
+  background-color: var(--mk-oldaldoboz);
   border-radius: 8px;
   padding: 20px;
   box-shadow: 0 4px 15px var(--mk-arnyekszin);
+  color: var(--mk-text-light);
 }
 
 .oldalKartya h3 {
-  color: var(--mk-text-dark);
+  color: var(--mk-text-light);
   margin-bottom: 16px;
   font-size: 20px;
   font-weight: 600;
@@ -1344,6 +1401,19 @@ input[type="file"] {
   .modositas {
     flex-direction: column;
     gap: 16px;
+  }
+  
+  .valtoztatok {
+    min-width: auto;
+  }
+
+    .input-group {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .number-input {
+    width: 100%;
   }
   
   .valtoztatok {

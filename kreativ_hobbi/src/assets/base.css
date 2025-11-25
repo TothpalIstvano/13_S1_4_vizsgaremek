@@ -53,17 +53,18 @@
 
 /*Mintakészítő*/
 :root {
-  --mk-szovegdoboz: #59426bd2;
-  --mk-hatterszin: #c7bed5a1;
-  --mk-radioszin: #a494bbb3;
-  --mk-gomb-foszin: #9d5dadb5;
-  --mk-gomb-masodszin: #916280ba;
-  --mk-visszagomb: #5c486dcf;
+  --mk-szovegdoboz: #550300e8;
+  --mk-hatterszin: #a17a7a8e;
+  --mk-radioszin: #9e3636a8;
+  --mk-gomb-foszin: #5f0808b5;
+  --mk-gomb-masodszin: #b44848ba;
+  --mk-visszagomb: #5f3030cf;
   --mk-arnyekszin: #727171;
-  --mk-checkbox: #2f0b49;
+  --mk-checkbox: #c2afaf;
   --mk-oldalsav: #7d7287ab;
+  --mk-oldaldoboz: #773838ee;
   --mk-text-dark: #000000;
-  --mk-text-light: #e7e0de;
+  --mk-text-light: #e0dddd;
 }
 
 /*Index blog kártyák*/
