@@ -9,7 +9,6 @@ import Profil from '../views/Profil.vue'
 import Regisztracio from '../views/Regisztracio.vue'
 import Rolunk from '../views/Rolunk.vue'
 import Index from '@/views/index.vue'
-import Mintavaltoztato from "@/views/Mintavaltoztato.vue";
 import Adatvedelem from "@/views/Adatvedelem.vue";
 import Adatfelhasznalas from "@/views/Adatfelhasznalas.vue";
 import Teszt from "@/views/Teszt.vue";
@@ -66,11 +65,6 @@ const router = createRouter({
       path: '/rolunk',
       name: 'Rolunk',
       component: Rolunk,
-    },
-    {
-      path: '/mintakeszito/mintavaltoztato',
-      name: 'Mintavaltoztato',
-      component: Mintavaltoztato
     },
     {
       path: '/adatvedelem',
