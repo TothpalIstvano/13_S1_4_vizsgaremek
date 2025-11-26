@@ -13,7 +13,7 @@ Route::post('/register', [RegisteredUserController::class, 'store'])
     ->name('register');
 
 Route::post('/login', [AuthenticatedSessionController::class, 'store'])
-    ->middleware('web', 'guest')
+    ->middleware('guest')
     ->name('login');
 
 Route::post('/forgot-password', [PasswordResetLinkController::class, 'store'])
