@@ -167,7 +167,10 @@ onMounted(() => {
       </div>
     </section>
 
-    <h2 class="blog-main-title">A hét kiemelt blogposztjai</h2>
+    
+    <div class="blog-main-title-container">
+      <h2 class="blog-main-title">A hét kiemelt blogposztjai</h2>
+    </div>
     <section class="blog-section">
         <div class="blog-card-grid-space"v-for="n in blogPosts" :key="n">
           <div class="blog-card">
@@ -202,6 +205,7 @@ onMounted(() => {
 @import url('https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600&display=swap');
 @import url('https://fonts.googleapis.com/css?family=Heebo:400,700|Open+Sans:400,700');
 /*#endregion*/
+
 /*#region Motto Container*/
 #mottoContainer {
   text-align: center;
@@ -231,7 +235,7 @@ onMounted(() => {
   content: "";
   position: absolute;
   height: 3px;
-  background: rgba(122,64,45,1);
+  background: var(--navbar-bg);
   border-radius: 2px;
   z-index: 1;
 }
@@ -241,7 +245,7 @@ onMounted(() => {
   content: "";
   position: absolute;
   height: 3px;
-  background: rgba(122,64,45,1);
+  background: var(--navbar-bg);
   top: -1.1rem;
   left: 0;
   width: 75%;
@@ -254,7 +258,7 @@ onMounted(() => {
   content: "";
   position: absolute;
   height: 3px;
-  background: rgba(122,64,45,1);
+  background: var(--navbar-bg);
   bottom: -1.1rem;
   left: 25%;
   width: 75%;
@@ -267,7 +271,7 @@ onMounted(() => {
   content: "";
   position: absolute;
   height: 3px;
-  background: rgba(122,64,45,1);
+  background: var(--navbar-bg);
   top: -1.6rem;   /* slightly above the container::before */
   left: 25%;
   width: 75%;
@@ -280,7 +284,7 @@ onMounted(() => {
   content: "";
   position: absolute;
   height: 3px;
-  background: rgba(122,64,45,1);
+  background: var(--navbar-bg);
   bottom: -1.6rem; /* slightly below the container::after */
   left: 0;
   width: 75%;
@@ -306,15 +310,19 @@ onMounted(() => {
 }
 /*#endregion*/
 
-/*#region At Container*/
+/*#region Feature Container*/
 #featureTitle {
+  max-width: 650px;
+  width: 100%;
   text-align: center;
   font-size: 2.5rem;
+  justify-self: center;
   margin: 10rem 1rem 1.5rem 1rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   padding: 0.6rem 1rem;
   color: transparent; /* keep this if animation sets color */
+  border-bottom: 5px solid var(--navbar-bg);
   /* no animation here */
 }
 
@@ -440,9 +448,15 @@ onMounted(() => {
 /*#endregion*/
 
 /*#region Blog cards*/
-
 /* Cards Grid */
-.blog-main-title {
+.blog-main-title-container {
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: center;
+  padding: 0 1rem;
+  border-bottom: 5px solid var(--navbar-bg);
+}
+.blog-main-title{
   text-align: center;
   font-size: 2.5rem;
   margin: 10rem 1rem 1.5rem 1rem;
