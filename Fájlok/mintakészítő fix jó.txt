@@ -1,15 +1,13 @@
 <script setup>
 import { ref, reactive, onMounted, nextTick, computed } from "vue"
 
-// Adat bekérés változók
+// Multi-step form variables
 const resz = ref(1)
 const elsoLepes = ref(null)
 const masodikLepes = ref(null)
 const file = ref(null)
 const pixelesKep = ref(false)
 const kepUrl = ref(null)
-const aktualisKep = ref(null)
-const betoltottKep = ref(false)
 
 const tipusok = ["Horgolás", "Kötés", "Hímzés"]
 //const fonalak = [" 'A' fonal csoport", " 'B' fonal csoport", " 'C' fonal csoport", " 'D' fonal csoport", " 'E' fonal csoport"]
@@ -41,7 +39,17 @@ const fonalak = [
   }
 ]
 
-// Adatok feldolgozása
+// Pixelation variables from tapestry.vue
+const pixelMeret = ref(15)
+const racsLathatosag = ref(20)
+const szinSzam = ref(5)
+const canvas = ref(null)
+const pixelSorok = ref([])
+const pipaltSorok = reactive({})
+const aktualisKep = ref(null)
+const betoltottKep = ref(false)
+
+// Multi-step form functions
 function kovetkezoResz() {
   if (resz.value === 1 && elsoLepes.value === "Hímzés") {
     masodikLepes.value = fonalak.find(f => f.fonalTipus === "A fonal csoport")
@@ -89,85 +97,24 @@ function toMintavaltoztato() {
     pixelesKep.value = true
     betoltesKorabbrol()
     // Wait for the view to render and then process the image
-    // Wait for DOM update and ensure canvas is ready
     nextTick(() => {
-      setTimeout(() => {
-        if (aktualisKep.value && betoltottKep.value && canvas.value) {
-          canvasFeldolgozas(aktualisKep.value)
-        } else {
-          elozoKep()
-        }
-      }, 100)
+      if (aktualisKep.value && betoltottKep.value) {
+        canvasFeldolgozas(aktualisKep.value)
+      } else {
+        elozoKep()
+      }
     })
   }
-}
-
-// Pixelesítés változók
-const pixelMeret = ref(15)
-const racsLathatosag = ref(20)
-const szinSzam = ref(5)
-const canvas = ref(null)
-const pixelSorok = ref([])
-const pipaltSorok = reactive({})
-const szinPaletta = ref([])
-const kivalasztottSzinIndex = ref(null)
-const szinValtoztatasModal = ref(false)
-const ujSzin = ref('#000000')
-
-
-function automatikusSzinCsoportositas(pixelAdatok = null) {
-  if (pixelSorok.value.length === 0) return
-  
-  const szinGyakorisag = {}
-  
-  // Count color frequency from current pixel data
-  pixelSorok.value.forEach(row => {
-    row.pixels.forEach(pixel => {
-      const color = pixel.color
-      szinGyakorisag[color] = (szinGyakorisag[color] || 0) + 1
-    })
-  })
-  
-  // Sort colors by frequency and take the most frequent ones
-  const leggyakoribbSzinek = Object.entries(szinGyakorisag)
-    .sort(([,a], [,b]) => b - a)
-    .slice(0, szinSzam.value)
-    .map(([color]) => color)
-  
-  // Update palette with most frequent colors
-  szinPaletta.value = leggyakoribbSzinek.map((color, index) => ({
-    id: index,
-    eredeti: color,
-    jelenlegi: color,
-    hasznalva: true
-  }))
-  
-  // Update all pixels to use the new limited palette
-  pixelSorok.value.forEach(row => {
-    row.pixels.forEach(pixel => {
-      // Find the closest color in the new limited palette
-      pixel.color = legkozelebbiSzinKereses(pixel.color, szinPaletta.value)
-    })
-  })
 }
 
 // Pixelation functions from tapestry.vue (fixed version)
 function canvasFeldolgozas(img) {
-  if (!canvas.value || !canvas.value.getContext) {
-    setTimeout(() => {
-      if (canvas.value && aktualisKep.value) {
-        canvasFeldolgozas(aktualisKep.value)
-      }
-    }, 100)
+  const pxMeret = parseInt(pixelMeret.value)
+  
+  if (!canvas.value) {
+    console.error('Canvas not found')
     return
   }
-
-  // Now we know canvas is ready, proceed with the actual processing
-  processImageWithColors(img)
-}
-
-function processImageWithColors(img) {
-  const pxMeret = parseInt(pixelMeret.value)
   
   // Use original image dimensions
   const szelesseg = img.width
@@ -176,7 +123,7 @@ function processImageWithColors(img) {
   canvas.value.width = szelesseg
   canvas.value.height = magassag
 
-  const ctx = canvas.value.getContext('2d', { willReadFrequently: true })
+  const ctx = canvas.value.getContext('2d')
   ctx.drawImage(img, 0, 0, szelesseg, magassag)
 
   const imageData = ctx.getImageData(0, 0, szelesseg, magassag)
@@ -184,6 +131,8 @@ function processImageWithColors(img) {
 
   const cols = Math.ceil(szelesseg / pxMeret)
   const rows = Math.ceil(magassag / pxMeret)
+  
+  console.log(`Processing: ${cols}x${rows} pixels, image: ${szelesseg}x${magassag}`)
   
   pixelSorok.value = []
 
@@ -194,49 +143,13 @@ function processImageWithColors(img) {
     }
   }
 
-  // First pass: collect all pixel colors
-  const szinGyakorisag = {}
-  const atmenetiPixelAdatok = []
-
+  // Create pixel rows without cropping
   for (let y = 0; y < rows; y++) {
     const pixels = []
     for (let x = 0; x < cols; x++) {
       const avg = osszevontSzin(data, szelesseg, magassag, x * pxMeret, y * pxMeret, pxMeret)
-      const color = `rgba(${avg.r}, ${avg.g}, ${avg.b}, ${avg.a})`
-      szinGyakorisag[color] = (szinGyakorisag[color] || 0) + 1
       pixels.push({
-        originalColor: color,
-        color: color
-      })
-    }
-    atmenetiPixelAdatok.push({ pixels })
-  }
-
-  // Create limited palette based on szinSzam
-  const leggyakoribbSzinek = Object.entries(szinGyakorisag)
-    .sort(([,a], [,b]) => b - a)
-    .slice(0, szinSzam.value)
-    .map(([color]) => color)
-  
-  // Update palette
-  szinPaletta.value = leggyakoribbSzinek.map((color, index) => ({
-    id: index,
-    eredeti: color,
-    jelenlegi: color,
-    hasznalva: true
-  }))
-
-  // Second pass: apply color limitation using the palette
-  for (let y = 0; y < rows; y++) {
-    const pixels = []
-    for (let x = 0; x < cols; x++) {
-      const originalColor = atmenetiPixelAdatok[y].pixels[x].originalColor
-      
-      // Find the closest color in our limited palette
-      const legkozelebbiSzin = legkozelebbiSzinKereses(originalColor, szinPaletta.value)
-      
-      pixels.push({
-        color: legkozelebbiSzin
+        color: `rgba(${avg.r}, ${avg.g}, ${avg.b}, ${avg.a})`
       })
     }
     pixelSorok.value.push({
@@ -246,273 +159,32 @@ function processImageWithColors(img) {
   }
 }
 
-// Add this function for finding closest color
-function legkozelebbiSzinKereses(color, palette) {
-    if (palette.length === 0) return color
-  
-  const [r1, g1, b1] = color.match(/\d+/g).map(Number)
-  
-  let legkozelebbiIndex = 0
-  let legkisebbTavolsag = Infinity
-  
-  palette.forEach((szinObj, index) => {
-    const [r2, g2, b2] = szinObj.jelenlegi.match(/\d+/g).map(Number)
-    
-    // Improved color distance calculation using Delta E (perceptual difference)
-    const tavolsag = szinTavolsag(r1, g1, b1, r2, g2, b2)
-    
-    if (tavolsag < legkisebbTavolsag) {
-      legkisebbTavolsag = tavolsag
-      legkozelebbiIndex = index
-    }
-  })
-  
-  return palette[legkozelebbiIndex].jelenlegi
-}
-
-// Improved color distance calculation
-function szinTavolsag(r1, g1, b1, r2, g2, b2) {
-  // Convert RGB to Lab for better perceptual difference
-  const lab1 = rgbToLab(r1, g1, b1)
-  const lab2 = rgbToLab(r2, g2, b2)
-  
-  // Delta E 2000 formula (complex but very accurate)
-  return deltaE00(lab1, lab2)
-  
-  // Simpler alternative: weighted Euclidean distance
-  // return Math.sqrt(
-  //   Math.pow((r1 - r2) * 0.3, 2) +
-  //   Math.pow((g1 - g2) * 0.59, 2) + 
-  //   Math.pow((b1 - b2) * 0.11, 2)
-  // )
-}
-
-// RGB to Lab conversion helpers
-function rgbToLab(r, g, b) {
-  // First convert RGB to XYZ
-  let rn = r / 255
-  let gn = g / 255
-  let bn = b / 255
-  
-  rn = rn > 0.04045 ? Math.pow((rn + 0.055) / 1.055, 2.4) : rn / 12.92
-  gn = gn > 0.04045 ? Math.pow((gn + 0.055) / 1.055, 2.4) : gn / 12.92
-  bn = bn > 0.04045 ? Math.pow((bn + 0.055) / 1.055, 2.4) : bn / 12.92
-  
-  rn *= 100
-  gn *= 100
-  bn *= 100
-  
-  const x = rn * 0.4124 + gn * 0.3576 + bn * 0.1805
-  const y = rn * 0.2126 + gn * 0.7152 + bn * 0.0722
-  const z = rn * 0.0193 + gn * 0.1192 + bn * 0.9505
-  
-  // Then convert XYZ to Lab
-  const xn = 95.047
-  const yn = 100.0
-  const zn = 108.883
-  
-  const xr = x / xn
-  const yr = y / yn
-  const zr = z / zn
-  
-  const fx = xr > 0.008856 ? Math.pow(xr, 1/3) : (7.787 * xr) + 16/116
-  const fy = yr > 0.008856 ? Math.pow(yr, 1/3) : (7.787 * yr) + 16/116
-  const fz = zr > 0.008856 ? Math.pow(zr, 1/3) : (7.787 * zr) + 16/116
-  
-  return {
-    l: (116 * fy) - 16,
-    a: 500 * (fx - fy),
-    b: 200 * (fy - fz)
-  }
-}
-
-// Delta E 2000 calculation
-function deltaE00(lab1, lab2) {
-  const L1 = lab1.l, a1 = lab1.a, b1 = lab1.b
-  const L2 = lab2.l, a2 = lab2.a, b2 = lab2.b
-  
-  const kL = 1, kC = 1, kH = 1
-  
-  const C1 = Math.sqrt(a1 * a1 + b1 * b1)
-  const C2 = Math.sqrt(a2 * a2 + b2 * b2)
-  
-  const aC = (C1 + C2) / 2
-  const aC7 = Math.pow(aC, 7)
-  const G = 0.5 * (1 - Math.sqrt(aC7 / (aC7 + 6103515625))) // 25^7
-  
-  const a1p = a1 * (1 + G)
-  const a2p = a2 * (1 + G)
-  
-  const C1p = Math.sqrt(a1p * a1p + b1 * b1)
-  const C2p = Math.sqrt(a2p * a2p + b2 * b2)
-  
-  const h1p = Math.atan2(b1, a1p) * 180 / Math.PI
-  const h2p = Math.atan2(b2, a2p) * 180 / Math.PI
-  
-  const dLp = L2 - L1
-  const dCp = C2p - C1p
-  
-  let dhp = h2p - h1p
-  if (dhp > 180) dhp -= 360
-  else if (dhp < -180) dhp += 360
-  
-  const dHp = 2 * Math.sqrt(C1p * C2p) * Math.sin(dhp * Math.PI / 360)
-  
-  const aL = (L1 + L2) / 2
-  const aCp = (C1p + C2p) / 2
-  
-  let aHp = (h1p + h2p) / 2
-  if (Math.abs(h1p - h2p) > 180) {
-    aHp += 180
-  }
-  
-  const T = 1 - 0.17 * Math.cos((aHp - 30) * Math.PI / 180) +
-              0.24 * Math.cos(2 * aHp * Math.PI / 180) +
-              0.32 * Math.cos((3 * aHp + 6) * Math.PI / 180) -
-              0.20 * Math.cos((4 * aHp - 63) * Math.PI / 180)
-  
-  const dRo = 30 * Math.exp(-Math.pow((aHp - 275) / 25, 2))
-  const RC = 2 * Math.sqrt(Math.pow(aCp, 7) / (Math.pow(aCp, 7) + 6103515625)) // 25^7
-  const SL = 1 + (0.015 * Math.pow(aL - 50, 2)) / Math.sqrt(20 + Math.pow(aL - 50, 2))
-  const SC = 1 + 0.045 * aCp
-  const SH = 1 + 0.015 * aCp * T
-  const RT = -Math.sin(2 * dRo * Math.PI / 180) * RC
-  
-  return Math.sqrt(
-    Math.pow(dLp / (kL * SL), 2) +
-    Math.pow(dCp / (kC * SC), 2) +
-    Math.pow(dHp / (kH * SH), 2) +
-    RT * (dCp / (kC * SC)) * (dHp / (kH * SH))
-  )
-}
-
 function osszevontSzin(data, width, height, startX, startY, blockSize) {
   let r = 0, g = 0, b = 0, a = 0, count = 0
-  
-  // Different sampling strategies for better accuracy
-  const pixels = []
-  
+
   for (let y = startY; y < startY + blockSize && y < height; y++) {
     for (let x = startX; x < startX + blockSize && x < width; x++) {
       const i = (y * width + x) * 4
       if (i >= data.length - 3) continue
 
-      const pixelR = data[i]
-      const pixelG = data[i + 1]
-      const pixelB = data[i + 2]
-      const pixelA = data[i + 3]
-      
-      pixels.push({ r: pixelR, g: pixelG, b: pixelB, a: pixelA })
-      
-      r += pixelR
-      g += pixelG
-      b += pixelB
-      a += pixelA
+      r += data[i]
+      g += data[i + 1]
+      b += data[i + 2]
+      a += data[i + 3]
       count++
     }
   }
 
+  // Avoid division by zero
   if (count === 0) {
     return { r: 0, g: 0, b: 0, a: 0 }
   }
 
-  // Strategy 1: Simple average (current method)
-  const averageColor = {
+  return {
     r: Math.round(r / count),
     g: Math.round(g / count),
     b: Math.round(b / count),
     a: a / count / 255
-  }
-
-  // Strategy 2: Median color (reduces outlier influence)
-  const medianColor = getMedianColor(pixels)
-  
-  // Strategy 3: Dominant color (most frequent color in the block)
-  const dominantColor = getDominantColor(pixels)
-  
-  // Strategy 4: Weighted average based on luminance (human perception)
-  const perceptualColor = getPerceptualColor(pixels)
-  
-  // You can choose which strategy to use:
-  // return averageColor; // Simple but fast
-  // return medianColor; // Better for images with noise
-  return dominantColor; // Best for preserving important colors
-  // return perceptualColor; // Most accurate for human vision
-}
-
-// Helper function to get median color (reduces outlier influence)
-function getMedianColor(pixels) {
-  if (pixels.length === 0) return { r: 0, g: 0, b: 0, a: 1 }
-  
-  const rValues = pixels.map(p => p.r).sort((a, b) => a - b)
-  const gValues = pixels.map(p => p.g).sort((a, b) => a - b)
-  const bValues = pixels.map(p => p.b).sort((a, b) => a - b)
-  
-  const mid = Math.floor(pixels.length / 2)
-  
-  return {
-    r: pixels.length % 2 === 0 ? Math.round((rValues[mid - 1] + rValues[mid]) / 2) : rValues[mid],
-    g: pixels.length % 2 === 0 ? Math.round((gValues[mid - 1] + gValues[mid]) / 2) : gValues[mid],
-    b: pixels.length % 2 === 0 ? Math.round((bValues[mid - 1] + bValues[mid]) / 2) : bValues[mid],
-    a: 1
-  }
-}
-
-// Helper function to get dominant color (most frequent)
-function getDominantColor(pixels) {
-  if (pixels.length === 0) return { r: 0, g: 0, b: 0, a: 1 }
-  
-  const colorMap = new Map()
-  const tolerance = 10 // Color grouping tolerance
-  
-  pixels.forEach(pixel => {
-    // Quantize colors to reduce noise
-    const quantizedR = Math.round(pixel.r / tolerance) * tolerance
-    const quantizedG = Math.round(pixel.g / tolerance) * tolerance
-    const quantizedB = Math.round(pixel.b / tolerance) * tolerance
-    const key = `${quantizedR},${quantizedG},${quantizedB}`
-    
-    colorMap.set(key, (colorMap.get(key) || 0) + 1)
-  })
-  
-  // Find the most frequent color
-  let maxCount = 0
-  let dominantKey = ''
-  
-  colorMap.forEach((count, key) => {
-    if (count > maxCount) {
-      maxCount = count
-      dominantKey = key
-    }
-  })
-  
-  const [r, g, b] = dominantKey.split(',').map(Number)
-  
-  return { r, g, b, a: 1 }
-}
-
-// Helper function for perceptual color (weighted by luminance)
-function getPerceptualColor(pixels) {
-  if (pixels.length === 0) return { r: 0, g: 0, b: 0, a: 1 }
-  
-  let r = 0, g = 0, b = 0, totalWeight = 0
-  
-  pixels.forEach(pixel => {
-    // Calculate luminance (human perception weights)
-    const luminance = 0.299 * pixel.r + 0.587 * pixel.g + 0.114 * pixel.b
-    const weight = luminance / 255 // Normalize weight
-    
-    r += pixel.r * weight
-    g += pixel.g * weight
-    b += pixel.b * weight
-    totalWeight += weight
-  })
-  
-  return {
-    r: Math.round(r / totalWeight),
-    g: Math.round(g / totalWeight),
-    b: Math.round(b / totalWeight),
-    a: 1
   }
 }
 
@@ -520,94 +192,12 @@ function sorLathatosagValtas(rowIndex) {
   pixelSorok.value[rowIndex].sorLathatosag = pipaltSorok[rowIndex] ? 0.5 : 1
 }
 
-function szinValasztas(index) {
-  kivalasztottSzinIndex.value = index
-  ujSzin.value = rgbToHex(szinPaletta.value[index].jelenlegi)
-  szinValtoztatasModal.value = true
-}
-
-function szinFrissites() {
-   if (kivalasztottSzinIndex.value === null) return
-    
-    const regiSzin = szinPaletta.value[kivalasztottSzinIndex.value].jelenlegi
-    const ujSzinErtek = ujSzin.value
-    const ujSzinRgb = hexToRgb(ujSzinErtek)
-    
-    // Update the color in palette
-    szinPaletta.value[kivalasztottSzinIndex.value].jelenlegi = ujSzinRgb
-    
-    // Update all pixels that exactly match the old palette color
-    pixelSorok.value.forEach(row => {
-        row.pixels.forEach(pixel => {
-            if (pixel.color === regiSzin) {
-                pixel.color = ujSzinRgb
-            }
-        })
-    })
-    
-    szinValtoztatasModal.value = false
-    kivalasztottSzinIndex.value = null
-}
-
-// Helper functions for color conversion
-function rgbToHex(rgb) {
-   // Convert rgba(r, g, b, a) to hex
-    const match = rgb.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/)
-    if (!match) return '#000000'
-    
-    const r = parseInt(match[1])
-    const g = parseInt(match[2])
-    const b = parseInt(match[3])
-    
-    // Convert to hex and ensure 2 digits
-    const toHex = (num) => {
-        const hex = num.toString(16)
-        return hex.length === 1 ? '0' + hex : hex
-    }
-    
-    return "#" + toHex(r) + toHex(g) + toHex(b)
-}
-
-function hexToRgb(hex) {
-  // Convert hex to rgba
-    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
-    if (!result) return 'rgba(0, 0, 0, 1)'
-    
-    return `rgba(${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}, 1)`
-}
-
-// new helper: return true when color is dark
-function isDarkColor(rgba) {
-  const m = rgba.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/i)
-  if (!m) return false
-  const r = Number(m[1]), g = Number(m[2]), b = Number(m[3])
-  const srgb = [r, g, b].map(v => {
-    v = v / 255
-    return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4)
-  })
-  const lum = 0.2126 * srgb[0] + 0.7152 * srgb[1] + 0.0722 * srgb[2]
-  return lum < 0.5
-}
-
-
-
-
 function mintaFrissites() {
-    if (aktualisKep.value) {
-        canvasFeldolgozas(aktualisKep.value)
-        adatokLocalStorage()
-    }
-}
-
-// Watch for color number changes and update palette
-watch(szinSzam, (newVal) => {
-if (aktualisKep.value && pixelSorok.value.length > 0) {
-    // Use the new function to update colors without reprocessing the entire image
-    nextTick(() => {
-      automatikusSzinCsoportositas()
-    })
+  if (aktualisKep.value) {
+    canvasFeldolgozas(aktualisKep.value)
+    adatokLocalStorage()
   }
-})
+}
 
 function localStorageMentes(imageData) {
   localStorage.setItem('pixelesKep', imageData)
@@ -615,39 +205,36 @@ function localStorageMentes(imageData) {
 }
 
 function adatokLocalStorage() {
-    localStorage.setItem('pixelesValtoztatasok', JSON.stringify({
-        pixelMeret: pixelMeret.value,
-        racsLathatosag: racsLathatosag.value,
-        szinSzam: szinSzam.value
-    }))
+  localStorage.setItem('pixelesValtoztatasok', JSON.stringify({
+    pixelMeret: pixelMeret.value,
+    racsLathatosag: racsLathatosag.value
+  }))
 }
 
 function elozoKep() {
   const saved = localStorage.getItem('pixelesKep')
-    if (!saved) {
-        return
+  if (!saved) {
+    // If no saved image but we have current image, process it
+    if (aktualisKep.value) {
+      canvasFeldolgozas(aktualisKep.value)
     }
+    return
+  }
 
-    const img = new Image()
-    img.onload = () => {
-        aktualisKep.value = img
-        betoltottKep.value = true
-        // Wait for next tick to ensure canvas is mounted
-        nextTick(() => {
-            if (pixelesKep.value && canvas.value) {
-                canvasFeldolgozas(img)
-            }
-        })
-    }
-    img.src = saved
+  const img = new Image()
+  img.onload = () => {
+    aktualisKep.value = img
+    betoltottKep.value = true
+    canvasFeldolgozas(img)
+  }
+  img.src = saved
 
-    const settings = localStorage.getItem('pixelesValtoztatasok')
-    if (settings) {
-        const parsed = JSON.parse(settings)
-        pixelMeret.value = parseInt(parsed.pixelMeret) || 15
-        racsLathatosag.value = parseInt(parsed.racsLathatosag) || 20
-        szinSzam.value = parseInt(parsed.szinSzam) || 5
-    }
+  const settings = localStorage.getItem('pixelesValtoztatasok')
+  if (settings) {
+    const parsed = JSON.parse(settings)
+    pixelMeret.value = parseInt(parsed.pixelMeret)
+    racsLathatosag.value = parseInt(parsed.racsLathatosag)
+  }
 }
 
 function kepTorles() {
@@ -690,17 +277,17 @@ function kepletoltes(canvas, filename = 'modified-image.png') {
 }
 
 function visszaallitas() {
-if (aktualisKep.value) {
-        canvasFeldolgozas(aktualisKep.value)
-        // Reset all checkboxes
-        Object.keys(pipaltSorok).forEach(key => {
-            pipaltSorok[key] = false
-        })
-        // Reset row opacities
-        pixelSorok.value.forEach((row, index) => {
-            row.sorLathatosag = 1
-        })
-    }
+  if (aktualisKep.value) {
+    canvasFeldolgozas(aktualisKep.value)
+    // Reset all checkboxes
+    Object.keys(pipaltSorok).forEach(key => {
+      pipaltSorok[key] = false
+    })
+    // Reset row opacities
+    pixelSorok.value.forEach((row, index) => {
+      row.sorLathatosag = 1
+    })
+  }
 }
 
 // Watch for when pixelation view becomes active and process image
@@ -709,12 +296,7 @@ import { watch } from 'vue'
 watch(pixelesKep, (newVal) => {
   if (newVal && aktualisKep.value && betoltottKep.value) {
     nextTick(() => {
-      // Add a small delay to ensure DOM is fully updated
-      setTimeout(() => {
-        if (canvas.value) {
-          canvasFeldolgozas(aktualisKep.value)
-        }
-      }, 50)
+      canvasFeldolgozas(aktualisKep.value)
     })
   }
 })
@@ -742,6 +324,7 @@ const fonalHossz = computed(() => {
 // Add watch to recalculate yarn length when pixel grid changes
 watch([pixelMeret, pixelSorok], () => {
   // This will trigger the computed property to recalculate
+  console.log('Pixel settings changed, recalculating yarn length')
 }, { deep: true })
 
 // Add these functions to save/restore form state
@@ -991,7 +574,7 @@ function formBetoltes() {
                 <input 
                   type="number" 
                   min="2" 
-                  max="20"
+                  max="20" 
                   v-model.number="szinSzam"
                   class="szam-input"
                   @input="mintaFrissites"
@@ -1001,18 +584,6 @@ function formBetoltes() {
 
             <div class="valtoztatok">
               <p>Színek változtatása: </p>
-              <div class="szin-paletta">
-                <div
-                  v-for="(szin, index) in szinPaletta"
-                  :key="szin.id"
-                  class="szin-negyzet"
-                  :style="{ backgroundColor: szin.jelenlegi }"
-                  @click="szinValasztas(index)"
-                  :title="'Kattints a szín módosításához'"
-                >
-                  <div class="szin-sorszam">{{ index + 1 }}</div>
-                </div>
-              </div>
             </div>
 
           </div>
@@ -1042,11 +613,8 @@ function formBetoltes() {
                       width: pixelMeret + 'px',
                       height: pixelMeret + 'px',
                       backgroundColor: pixel.color,
-                      borderColor: isDarkColor(pixel.color)
-                      ? 'rgba(255,255,255,0.6)'
-                      : `rgba(0,0,0, ${racsLathatosag / 100})`,
-                      color: isDarkColor(pixel.color) ? '#fff' : '#000'
-                      }"
+                      borderColor: `rgba(0, 0, 0, ${racsLathatosag / 100})`,
+                    }"
                   ></div>
                 </div>
 
@@ -1097,22 +665,6 @@ function formBetoltes() {
           </div>
         </div>
 
-        <div v-if="szinValtoztatasModal" class="modal-overlay" @click="szinValtoztatasModal = false">
-          <div class="modal-content" @click.stop>
-            <h3 style="color: var(--mk-text-light);">Szín módosítása</h3>
-            <div class="szin-osszehasonlitas">
-              <div class="szin-minta" :style="{ backgroundColor: szinPaletta[kivalasztottSzinIndex]?.eredeti }"></div>
-              <span style="color: var(--mk-text-light);">→</span>
-              <div class="szin-minta" :style="{ backgroundColor: ujSzin }"></div>
-            </div>
-            <input type="color" v-model="ujSzin" class="szin-valaszto" />
-            <div class="modal-gombok">
-              <button @click="szinValtoztatasModal = false" class="szinek-gomb-megse">Mégse</button>
-              <button @click="szinFrissites" class="szinek-gomb-mentes">Mentés</button>
-            </div>
-          </div>
-        </div>
-
     </div>
   </main>
 </template>
@@ -1147,129 +699,6 @@ main {
   background-position: 0 100%;
   background-size: 100% 4px;
   padding-bottom: 6px;
-}
-
-/* Add these new styles for color palette */
-
-.szin-paletta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  justify-content: center;
-}
-
-.szin-negyzet {
-  width: 40px;
-  height: 40px;
-  border: 1px solid #fff0de;
-  border-radius: 4px;
-  cursor: pointer;
-  position: relative;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.szin-negyzet:hover {
-  transform: scale(1.1);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-}
-
-.szin-sorszam {
-  position: absolute;
-  top: -5px;
-  right: -5px;
-  background: rgba(0,0,0,0.7);
-  color: white;
-  border-radius: 50%;
-  width: 18px;
-  height: 18px;
-  font-size: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-}
-
-/* Modal styles */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0,0,0,0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.modal-content {
-  background: var(--mk-hatterszin);
-  padding: 24px;
-  border-radius: 8px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-  max-width: 400px;
-  width: 90%;
-}
-
-.szin-osszehasonlitas {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  margin: 20px 0;
-}
-
-.szin-minta {
-  width: 60px;
-  height: 60px;
-  border: 2px solid #fff;
-  border-radius: 4px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-}
-
-.szin-valaszto {
-  width: 100%;
-  height: 50px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  margin: 16px 0;
-}
-
-.szinek-gomb-megse, .szinek-gomb-mentes {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-weight: bold;
-  color: white;
-  transition: background-color 0.3s;
-  min-width: 120px;
-}
-
-.szinek-gomb-megse {
-  background-color: #802929;
-}
-
-.szinek-gomb-mentes {
-  background-color: #195c3d;
-}
-
-.szinek-gomb-megse:hover {
-  background-color: #4b0d0d;
-  transform: translateY(-2px);
-}
-
-.szinek-gomb-mentes:hover {
-  background-color: #034110;
-  transform: translateY(-2px);
-}
-
-.modal-gombok {
-  display: flex;
-  gap: 12px;
-  justify-content: center;
 }
 
 /*#region felső szövegdobozok*/
@@ -1404,7 +833,7 @@ main {
 }
 
 .blog-info:hover {
-  transform: translateY(-30px);
+  transform: translateY(-10px);
   box-shadow: 0 6px 20px var(--mk-arnyekszin);
 }
 
@@ -1986,19 +1415,6 @@ input[type="file"] {
   
   .valtoztatok {
     min-width: auto;
-  }
-
-    .szin-paletta {
-    gap: 6px;
-  }
-  
-  .szin-negyzet {
-    width: 35px;
-    height: 35px;
-  }
-  
-  .modal-content {
-    padding: 16px;
   }
 }
 
