@@ -19,12 +19,14 @@ onMounted(async () => {
     // This is a simple helper function to read a cookie by name
     const getCookie = (name) => {
       const value = `; ${document.cookie}`;
+      console.log('value', value);
       const parts = value.split(`; ${name}=`);
+      console.log('parts', parts);
       if (parts.length === 2) return parts.pop().split(';').shift();
     };
 
     const xsrfToken = getCookie('XSRF-TOKEN');
-
+    console.log('xsrf token', xsrfToken);
     // 3. then login, manually setting the header
     const loginResp = await axios.post('/login', {
       email: 'test@example.com', // Make sure this user exists from your seeder
