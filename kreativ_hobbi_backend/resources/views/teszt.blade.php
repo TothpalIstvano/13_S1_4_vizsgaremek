@@ -21,11 +21,11 @@
         </thead>
         <tbody>
             @php
-            $per_page = 10;
-            $current_page = (isset($_GET['page'])) ? (int)$_GET['page'] : 1;
-            $start = ($current_page - 1) * $per_page;
-            $end = $start + $per_page;
-            $felhasznalok_to_display = $felhasznalok->slice($start, $per_page);
+              $per_page = 10;
+              $current_page = (isset($_GET['page'])) ? (int)$_GET['page'] : 1;
+              $start = ($current_page - 1) * $per_page;
+              $end = $start + $per_page;
+              $felhasznalok_to_display = $felhasznalok->slice($start, $per_page);
             @endphp
 
             @foreach ($felhasznalok_to_display as $felhasznalo)
