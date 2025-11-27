@@ -1,14 +1,14 @@
 ## 1. Főoldal / Landing page:
 - [x] Navbar alapok
-- [ ] Navbar
+- [x] Navbar
 - [ ] Regsiztráció / Belépés
 - [ ] Profil
-- [ ] Nav animációk
-- [ ] Carousel
+- [x] Nav animációk
+- [x] Carousel
 - [ ] Képek
 - [ ] Szövegek
-- [ ] Blog kártyák
-- [ ] Footer
+- [x] Blog kártyák
+- [x] Footer
 - [ ] Térkép javítása
 - [ ] Itemek
 - [ ] További animációk és ikonok
