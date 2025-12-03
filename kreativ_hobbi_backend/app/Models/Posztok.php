@@ -11,6 +11,7 @@ use Laravel\Sanctum\HasApiTokens;
 class Posztok extends Model
 {
     use HasFactory;
+
     protected $table = 'posztok';
     protected $primaryKey = 'id';
     protected $fillable = [
@@ -23,12 +24,29 @@ class Posztok extends Model
         'statusz',
     ];
 
+    protected $casts = [
+        'letrehozas_datuma' => 'datetime',
+    ];
+
     public function szerzo()
     {
         return $this->belongsTo(Felhasznalok::class, 'szerzo_id');
     }
+
     public function foKep()
     {
-        return $this->belongsToMany(Kepek::class, 'fo_kep_id');
+        return $this->belongsTo(Kepek::class, 'fo_kep_id');
+    }
+
+    public function cimkek()
+    {
+        return $this->belongsToMany(Cimkek::class, 'posztCimkek', 'poszt_id', 'cimke_id');
+    }
+
+    public function kepek()
+    {
+        return $this->belongsToMany(Kepek::class, 'posztKepek', 'poszt_id', 'kep_id')
+            ->withPivot('sorrend')
+            ->orderBy('sorrend');
     }
 }
