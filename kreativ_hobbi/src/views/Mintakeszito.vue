@@ -1062,7 +1062,7 @@ function formBetoltes() {
               </div>
             </div>
             <div v-else>
-              <p>Kép feldolgozása folyamatban van</p>
+              <img src="../assets/public/loading.gif" alt="Kép betöltése folyamatban">
             </div>
           </div>
 

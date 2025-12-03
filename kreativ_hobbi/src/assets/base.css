@@ -68,6 +68,18 @@
   --mk-text-light: #e0dddd;
 }
 
+/*Blog*/
+:root {
+  --b-kartya: #a08283; /*vagy #906767 vagy a #551515 és az #ffffff mixéből valami*/
+  --b-tag: #551515;
+  --b-tag-hover: #551515;
+  --b-gomb: #551515;
+  --b-gomb-hover: #551515;
+  --b-text-dark: #000000;
+  --b-text-light: #e0dddd;
+  --b-transition-time: 0.5s;
+}
+
 /*Index blog kártyák*/
 :root {
   --color: #3c3163;

@@ -168,6 +168,7 @@ body {
 }
 
 .form {
+
     display: flex;
     justify-content: center;
     align-items: center;
@@ -382,4 +383,5 @@ body {
     }
 
 }
+
 </style>
