@@ -1,13 +1,158 @@
+<template>
+<main>
+  <h1 class="title">Blog</h1>
+    <section class="cards-wrapper">
+      <!-- Loading state -->
+      <div v-if="loading" class="loading">
+        <p>Blog bejegyzések betöltése...</p>
+      </div>
+      
+      <!-- Error state -->
+      <div v-if="error" class="error">
+        <p>{{ error }}</p>
+      </div>
+      
+      <!-- Blog posts -->
+      <div class="card-grid-space" v-for="post in posts" :key="post.id">
+        <div class="card">
+          <div class="card-img-holder">
+            <img 
+              :src="getImageUrl(post.main_image)" 
+              :alt="post.title"
+              @error="handleImageError"
+            />
+          </div>
+          <h3 class="blog-title">{{ post.title }}</h3>
+          <span class="blog-time"> 
+            <font-awesome-icon icon="fa-solid fa-calendar" class="naptar"/> 
+            {{ formatDate(post.created_at) }}
+          </span>
+          <p class="description">
+            {{ post.excerpt || post.content || 'Nincs leírás...' }}
+          </p>
+          <div class="tags">
+            <div class="tag" v-for="tag in post.tags" :key="tag">{{ tag }}</div>
+          </div>
+          <div class="options">
+            <span>Teljes bejegyzés olvasása</span>
+            <button class="btn" @click="navigateToBlog(post.id)">Blog →</button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- No posts message -->
+      <div v-if="!loading && posts.length === 0" class="no-posts">
+        <p>Még nincsenek blog bejegyzések.</p>
+      </div>
+    </section>
+</main>
+</template>
+
 <script>
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import api from '@/services/api.js'
 
 export default {
-  name: 'HybridCard',
-  methods: {
-    navigateToBlog() {
-      // Handle navigation to blog
-      this.$router.push('/');
+  name: 'Blog',
+  data() {
+    return {
+      posts: [],
+      loading: true,
+      error: null
     }
+  },
+  methods: {
+    async navigateToBlog(postId) {
+      // Navigate to single blog post
+      this.$router.push(`/blog/${postId}`);
+    },
+    async fetchBlogPosts() {
+      try {
+        this.loading = true;
+        this.error = null;
+        
+        // For GET requests, we don't need CSRF token, but we'll get it just in case
+        await api.get('/sanctum/csrf-cookie');
+        
+        // Fetch blog posts
+        const response = await api.get('/api/blog');
+        this.posts = response.data;
+        
+        // Fallback to dummy data if no posts returned
+        if (this.posts.length === 0) {
+          this.posts = this.getDummyPosts();
+        }
+      } catch (error) {
+        console.error('Error fetching blog posts:', error);
+        this.error = 'Hiba történt a blog bejegyzések betöltése közben.';
+        
+        // Use dummy data as fallback
+        this.posts = this.getDummyPosts();
+      } finally {
+        this.loading = false;
+      }
+    },
+    getImageUrl(imagePath) {
+      // If no image or invalid path, use default
+      if (!imagePath || typeof imagePath !== 'string') {
+        return require('@/assets/Public/b-pl1.jpg');
+      }
+      
+      // If it's already a full URL, return as is
+      if (imagePath.startsWith('http')) {
+        return imagePath;
+      }
+      
+      // Otherwise, assume it's a relative path from storage
+      return `http://localhost:8000/storage/${imagePath}`;
+    },
+    handleImageError(event) {
+      // Set fallback image
+      event.target.src = require('@/assets/Public/b-pl1.jpg');
+    },
+    formatDate(dateString) {
+      if (!dateString) return 'Ismeretlen dátum';
+      return dateString;
+    },
+    getDummyPosts() {
+      return [
+        {
+          id: 1,
+          title: "HTML Syntax",
+          excerpt: "The syntax of a language is how it works. How to actually write it. Learn HTML syntax…",
+          created_at: "6 Oct 2017",
+          tags: ["HTML"],
+          main_image: null
+        },
+        {
+          id: 2,
+          title: "Basic types of HTML tags",
+          excerpt: "Learn about some of the most common HTML tags…",
+          created_at: "9 Oct 2017",
+          tags: ["HTML", "CSS", "JavaScript", "Vue"],
+          main_image: null
+        },
+        {
+          id: 3,
+          title: "Links, images and about file paths",
+          excerpt: "Learn how to use links and images along with file paths…",
+          created_at: "14 Oct 2017",
+          tags: ["HTML"],
+          main_image: null
+        },
+        {
+          id: 4,
+          title: "Your favourite lorem ipsum",
+          excerpt: "Learn how to use links and images along with file paths…",
+          created_at: "14 Oct 2017",
+          tags: ["HTML", "CSS"],
+          main_image: null
+        }
+      ];
+    }
+  },
+  mounted() {
+    this.fetchBlogPosts();
   },
   components: {
     FontAwesomeIcon
@@ -15,111 +160,27 @@ export default {
 }
 </script>
 
-<template>
-<main>
-    <section class="cards-wrapper">
-      <div class="card-grid-space">
-        <div class="card">
-          <div class="card-img-holder">
-            <img src="..\assets\Public\b-pl1.jpg" alt="HTML Syntax">
-          </div>
-          <h3 class="blog-title">HTML Syntax</h3>
-          <span class="blog-time"> <font-awesome-icon icon="fa-solid fa-calendar" class="naptar"/> 6 Oct 2017</span>
-          <p class="description">
-            The syntax of a language is how it works. How to actually write it. Learn HTML syntax…
-          </p>
-          <div class="tags">
-            <div class="tag">HTML</div>
-          </div>
-          <div class="options">
-            <span>
-              Read Full Blog
-            </span>
-            <button class="btn" @click="navigateToBlog">Blog</button>
-          </div>
-        </div>
-      </div>
-      
-      <div class="card-grid-space">
-        <div class="card">
-          <div class="card-img-holder">
-            <img src="..\assets\Public\b-pl2.jpg" alt="HTML Tags">
-          </div>
-          <h3 class="blog-title">Basic types of HTML tags</h3>
-          <span class="blog-time"> <font-awesome-icon icon="fa-solid fa-calendar" class="naptar"/> 9 Oct 2017</span>
-          <p class="description">
-            Learn about some of the most common HTML tags…
-          </p>
-          <div class="tags">
-            <div class="tag">HTML</div>
-            <div class="tag">CSS</div>
-            <div class="tag">JavaScript</div>
-            <div class="tag">Vue</div>
-          </div>
-          <div class="options">
-            <span>
-              Read Full Blog
-            </span>
-            <button class="btn" @click="navigateToBlog">Blog</button>
-          </div>
-        </div>
-      </div>
-      
-      <div class="card-grid-space">
-        <div class="card">
-          <div class="card-img-holder">
-            <img src="..\assets\Public\b-pl3.jpg" alt="Links and Images">
-          </div>
-          <h3 class="blog-title">Links, images and about file paths</h3>
-          <span class="blog-time"> <font-awesome-icon icon="fa-solid fa-calendar" class="naptar"/> 14 Oct 2017</span>
-          <p class="description">
-            Learn how to use links and images along with file paths…
-          </p>
-          <div class="tags">
-            <div class="tag">HTML</div>
-          </div>
-          <div class="options">
-            <span>
-              Read Full Blog
-            </span>
-            <button class="btn" @click="navigateToBlog">Blog</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="card-grid-space">
-        <div class="card">
-          <div class="card-img-holder">
-            <img src="..\assets\Public\b-pl4.jpg" alt="Links and Images">
-          </div>
-          <h3 class="blog-title">Your favourite lorem ipsum</h3>
-          <span class="blog-time"> <font-awesome-icon icon="fa-solid fa-calendar" class="naptar"/> 14 Oct 2017</span>
-          <p class="description">
-            Learn how to use links and images along with file paths…
-          </p>
-          <div class="tags">
-            <div class="tag">HTML</div>
-            <div class="tag">CSS</div>
-          </div>
-          <div class="options">
-            <span>
-              Read Full Blog
-            </span>
-            <button class="btn" @click="navigateToBlog">Blog</button>
-          </div>
-        </div>
-      </div>
-    </section>
-</main>
-</template>
-
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600&display=swap');
 @import url('https://fonts.googleapis.com/css?family=Heebo:400,700|Open+Sans:400,700');
 
 main {
   min-height: 100vh;
-  padding: 32px 0;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+}
+
+.title {
+  display: inline-block;
+  font-weight: 700;
+  font-size: 45px;
+  color: var(--mk-text-dark);
+  background-image: linear-gradient(90deg, #a08283, #4d0303);
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 100% 4px;
+  padding-bottom: 6px;
 }
 
 .cards-wrapper {
@@ -131,6 +192,7 @@ main {
   padding: 64px;
   margin: 0 auto;
   width: max-content;
+  text-align: left;
 }
 
 .card-grid-space {
@@ -138,7 +200,7 @@ main {
 }
 
 .card {
-  width: 480px;
+  width: 520px;
   height: auto;
   background: var(--b-kartya);
   color: var(--b-text-light);
@@ -150,33 +212,28 @@ main {
   box-sizing: border-box;
   box-shadow: 0 0 80px -16px rgba(0,0,0,0.1);
   transition: all, var(--b-transition-time);
-  /* border: 10px solid #f0f0f0; */
 }
 
 .card:hover {
   transform: translateY(-5px);
   box-shadow: 0 10px 30px rgba(0,0,0,0.15);
   color: var(--b-text-dark);
-  /*border-color: #e0dddd;*/
 }
-
 
 .card-img-holder {
   width: 100%;
-  height: auto;
+  height: 240px;
   position: relative;
   overflow: hidden;
-  border-radius: 4px 60px 8px 60px;
+  border-radius: 6px 60px 6px 60px;
   margin-bottom: 16px;
 }
 
 .card-img-holder img {
   width: 100%;
-  height: auto;
-  max-height: 240px;
+  height: 100%;
   object-fit: cover;
   transition: all, var(--b-transition-time);
-  transform: scale(1.05); /* azért kell hogy rendesen nézzen ki a bal alsó border radiusa */
 }
 
 .card:hover .card-img-holder img {
@@ -199,6 +256,8 @@ main {
   font-size: 16px;
   margin: 0;
   line-height: 1.6;
+  min-height: 80px;
+  overflow: hidden;
 }
 
 .card:hover .description {
@@ -213,25 +272,27 @@ main {
 
 .tags {
   display: flex;
+  flex-wrap: wrap;
   margin: 16px 0;
+  gap: 8px;
 }
 
 .tag {
   font-size: 12px;
   background: var(--b-tag);
   color: var(--b-text-light);
-  border-radius: 0.3rem;
-  padding: 0.3em 0.8em;
-  margin-right: 0.5em;
-  line-height: 1.5em;
+  border-radius: 5px;
+  padding: 5px 13px;
+  line-height: 24px;
   transition: all, var(--b-transition-time);
   font-weight: 500;
+  box-shadow: inset 0px 0px 10px 1px rgba(80, 33, 0, 0.5);
 }
 
 .card:hover .tag {
-    background: var(--b-tag-hover);
-    color: var(--b-text-dark);
-    transform: translateY(-2px);
+  background: var(--b-tag-hover);
+  color: var(--b-text-dark);
+  transform: translateY(-2px);
 }
 
 .options {
@@ -259,17 +320,43 @@ main {
   padding: 8px 24px;
   border-radius: 8px;
   font-weight: 400;
+  letter-spacing: 0.7px;
   background: var(--b-gomb);
   color: var(--b-text-light);
   cursor: pointer;
   border: none;
   transition: all, var(--b-transition-time);
+  box-shadow: inset 0px 0px 10px 1px rgba(255, 254, 254, 0.5);
 }
 
 .btn:hover {
   background: var(--b-gomb-hover);
   color: var(--b-text-dark);
   transform: translateY(-2px);
+}
+
+/* Loading and error states */
+.loading, .error, .no-posts {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 40px;
+  font-size: 18px;
+  color: var(--b-text-light);
+}
+
+.error {
+  color: #ff6b6b;
+}
+
+/* Animation for loading */
+.loading p {
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.5; }
+  50% { opacity: 1; }
+  100% { opacity: 0.5; }
 }
 
 /* Card hover effects */
@@ -287,7 +374,6 @@ main {
 }
 
 .card:before {
-  /*background: rgba(60, 49, 99, 0.05);*/
   width: 250%;
   height: 250%;
 }
@@ -312,9 +398,6 @@ main {
   .cards-wrapper {
     grid-template-columns: 1fr;
   }
-  .info {
-    justify-content: center;
-  }
 }
 
 @media screen and (max-width: 768px) {
@@ -335,16 +418,6 @@ main {
 @media screen and (max-width: 465px) {
   .card {
     font-size: 14px;
-  }
-}
-
-@media screen and (max-width: 450px) {
-  .info {
-    display: block;
-    text-align: center;
-  }
-  .info h1 {
-    margin: 0;
   }
 }
 </style>

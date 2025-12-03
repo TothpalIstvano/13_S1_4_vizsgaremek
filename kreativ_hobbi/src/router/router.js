@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import Aruhaz from '../views/Aruhaz.vue'
 import Belepes from '../views/Belepes.vue'
 import Blog from '../views/Blog.vue'
+import SingleBlog from '../views/SingleBlog.vue'
 import Fizetes from '../views/Fizetes.vue'
 import Kosar from '../views/Kosar.vue'
 import Mintakeszito from '../views/Mintakeszito.vue'
@@ -40,6 +41,12 @@ const router = createRouter({
       path: '/blog',
       name: 'Blog',
       component: Blog,
+    },
+    {
+      path: '/blog/:id',
+      name: 'SingleBlog',
+      component: SingleBlog,
+      props: true
     },
     {
       path: '/kosar/fizetes',
