@@ -55,6 +55,8 @@
 
 <script>
 import api from '@/services/api.js'
+// Import your fallback image at the top
+import fallbackImage from '@/assets/Public/b-pl1.jpg'
 
 export default {
   name: 'SingleBlog',
@@ -80,18 +82,22 @@ export default {
         this.post = response.data;
       } catch (error) {
         console.error('Error fetching blog post:', error);
+        console.error('Error details:', error.response?.data);
+        
         if (error.response && error.response.status === 404) {
           this.error = 'A blog bejegyzés nem található.';
         } else {
           this.error = 'Hiba történt a bejegyzés betöltése közben.';
+          console.error('Full error:', error);
         }
       } finally {
         this.loading = false;
       }
     },
     getImageUrl(imagePath) {
+      // If no image or invalid path, use default
       if (!imagePath || typeof imagePath !== 'string') {
-        return require('@/assets/Public/b-pl1.jpg');
+        return fallbackImage; // Use the imported image
       }
       
       if (imagePath.startsWith('http')) {
@@ -101,7 +107,8 @@ export default {
       return `http://localhost:8000/storage/${imagePath}`;
     },
     handleImageError(event) {
-      event.target.src = require('@/assets/Public/b-pl1.jpg');
+      // Set fallback image
+      event.target.src = fallbackImage;
     },
     formatDate(dateString) {
       if (!dateString) return 'Ismeretlen dátum';

@@ -51,6 +51,8 @@
 <script>
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import api from '@/services/api.js'
+// Import your fallback image at the top
+import fallbackImage from '@/assets/Public/b-pl1.jpg'
 
 export default {
   name: 'Blog',
@@ -63,7 +65,6 @@ export default {
   },
   methods: {
     async navigateToBlog(postId) {
-      // Navigate to single blog post
       this.$router.push(`/blog/${postId}`);
     },
     async fetchBlogPosts() {
@@ -71,22 +72,13 @@ export default {
         this.loading = true;
         this.error = null;
         
-        // For GET requests, we don't need CSRF token, but we'll get it just in case
-        await api.get('/sanctum/csrf-cookie');
-        
         // Fetch blog posts
         const response = await api.get('/api/blog');
         this.posts = response.data;
         
-        // Fallback to dummy data if no posts returned
-        if (this.posts.length === 0) {
-          this.posts = this.getDummyPosts();
-        }
       } catch (error) {
         console.error('Error fetching blog posts:', error);
         this.error = 'Hiba történt a blog bejegyzések betöltése közben.';
-        
-        // Use dummy data as fallback
         this.posts = this.getDummyPosts();
       } finally {
         this.loading = false;
@@ -95,7 +87,7 @@ export default {
     getImageUrl(imagePath) {
       // If no image or invalid path, use default
       if (!imagePath || typeof imagePath !== 'string') {
-        return require('@/assets/Public/b-pl1.jpg');
+        return fallbackImage; // Use the imported image
       }
       
       // If it's already a full URL, return as is
@@ -107,8 +99,8 @@ export default {
       return `http://localhost:8000/storage/${imagePath}`;
     },
     handleImageError(event) {
-      // Set fallback image
-      event.target.src = require('@/assets/Public/b-pl1.jpg');
+      // Set fallback image - use the imported image directly
+      event.target.src = fallbackImage;
     },
     formatDate(dateString) {
       if (!dateString) return 'Ismeretlen dátum';
@@ -130,22 +122,6 @@ export default {
           excerpt: "Learn about some of the most common HTML tags…",
           created_at: "9 Oct 2017",
           tags: ["HTML", "CSS", "JavaScript", "Vue"],
-          main_image: null
-        },
-        {
-          id: 3,
-          title: "Links, images and about file paths",
-          excerpt: "Learn how to use links and images along with file paths…",
-          created_at: "14 Oct 2017",
-          tags: ["HTML"],
-          main_image: null
-        },
-        {
-          id: 4,
-          title: "Your favourite lorem ipsum",
-          excerpt: "Learn how to use links and images along with file paths…",
-          created_at: "14 Oct 2017",
-          tags: ["HTML", "CSS"],
           main_image: null
         }
       ];
@@ -388,21 +364,15 @@ main {
   transform: scale(1);
 }
 
-@media screen and (max-width: 1285px) {
+@media screen and (max-width: 1800px) {
+  .card {
+    width: 400px;
+  }
+}
+
+@media screen and (max-width: 1200px) {
   .cards-wrapper {
     grid-template-columns: 1fr 1fr;
-  }
-}
-
-@media screen and (max-width: 900px) {
-  .cards-wrapper {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media screen and (max-width: 768px) {
-  .card {
-    font-size: 15px;
   }
 }
 
@@ -410,14 +380,8 @@ main {
   .cards-wrapper {
     padding: 64px 32px;
   }
-  .card {
-    max-width: calc(100vw - 64px);
-  }
-}
-
-@media screen and (max-width: 465px) {
-  .card {
-    font-size: 14px;
+  .cards-wrapper {
+    grid-template-columns: 1fr;
   }
 }
 </style>

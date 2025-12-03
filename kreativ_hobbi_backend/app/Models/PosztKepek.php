@@ -16,6 +16,7 @@ class PosztKepek extends Model
     protected $fillable = [
         'poszt_id',
         'kep_id',
+        // 'sorrend', // Add this later if you create the column
     ];
 
     public function poszt()
