@@ -38,8 +38,8 @@ import { RouterLink } from 'vue-router'
 
 <style scoped>
 .footer {
-  background: #7a402d;
-  color: #fff;
+  background: var(--navbar-bg);
+  color: var(--vt-c-white);
   padding: 30px ;
   font-size: 1rem;
   margin-top: 10%;
@@ -59,10 +59,10 @@ import { RouterLink } from 'vue-router'
 }
 .footer-section h3 {
   margin-bottom: 0.5rem;
-  color: #ff8a65;
+  color: var(--router-link-color);
 }
 .footer-section a {
-  color: #fff3e0;
+  color: var(--text);
   text-decoration: none;
 }
 .footer-section a:hover {
@@ -72,7 +72,7 @@ import { RouterLink } from 'vue-router'
   text-align: center;
   margin-top: 20px;
   font-size: 0.95rem;
-  color: #ff8a65;
+  color: var(--router-link-color);
 }
 .footer-section .footer-links {
   display: flex;
