@@ -45,8 +45,8 @@ class Posztok extends Model
 
     public function kepek()
     {
-        return $this->belongsToMany(Kepek::class, 'posztKepek', 'poszt_id', 'kep_id')
-            ->withPivot('sorrend')
-            ->orderBy('sorrend');
+        return $this->belongsToMany(Kepek::class, 'posztKepek', 'poszt_id', 'kep_id');
+        /*->withPivot('sorrend')
+        ->orderBy('sorrend');*/
     }
 }

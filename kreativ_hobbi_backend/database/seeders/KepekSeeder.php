@@ -14,9 +14,62 @@ class KepekSeeder extends Seeder
      */
     public function run(): void
     {
-        // Create a pool of 50 profile pictures to be used by users.
-        Kepek::factory(400)->create();
+        // Add your images
+        $yourImages = [
+            [
+                'url_Link' => 'blog/post1-main.jpg',
+                'alt_Szoveg' => 'My first blog post main image',
+                'leiras' => 'Description of the main image'
+            ],
+            [
+                'url_Link' => 'blog/post1-image1.jpg',
+                'alt_Szoveg' => 'Additional image for first post',
+                'leiras' => 'Description of additional image'
+            ],
+            [
+                'url_Link' => 'blog/post1-image2.jpg',
+                'alt_Szoveg' => 'My first blog post main image',
+                'leiras' => 'Description of the main image'
+            ],
+            [
+                'url_Link' => 'blog/post2-main.jpg',
+                'alt_Szoveg' => 'Additional image for first post',
+                'leiras' => 'Description of additional image'
+            ],
+            [
+                'url_Link' => 'blog/post2-image1.jpg',
+                'alt_Szoveg' => 'My first blog post main image',
+                'leiras' => 'Description of the main image'
+            ],
+            [
+                'url_Link' => 'blog/post2-image2.jpg',
+                'alt_Szoveg' => 'Additional image for first post',
+                'leiras' => 'Description of additional image'
+            ],
+            [
+                'url_Link' => 'blog/post3-main.jpg',
+                'alt_Szoveg' => 'My first blog post main image',
+                'leiras' => 'Description of the main image'
+            ],
+            [
+                'url_Link' => 'blog/post4-main.jpg',
+                'alt_Szoveg' => 'Additional image for first post',
+                'leiras' => 'Description of additional image'
+            ],
+            [
+                'url_Link' => 'blog/post4-image1.jpg',
+                'alt_Szoveg' => 'My first blog post main image',
+                'leiras' => 'Description of the main image'
+            ]
+        ];
 
-        $this->command->info('Kep table seeded with 50 images!');
+        foreach ($yourImages as $image) {
+            Kepek::create($image);
+        }
+
+
+        Kepek::factory(100)->create();
+
+        $this->command->info('Kep table seeded with 20 images!');
     }
 }
