@@ -1,13 +1,30 @@
+<script>
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+
+export default {
+  name: 'HybridCard',
+  methods: {
+    navigateToBlog() {
+      // Handle navigation to blog
+      this.$router.push('/');
+    }
+  },
+  components: {
+    FontAwesomeIcon
+  }
+}
+</script>
+
 <template>
-  <div class="page-container">
+<main>
     <section class="cards-wrapper">
       <div class="card-grid-space">
         <div class="card">
           <div class="card-img-holder">
-            <img src="@/components/icons/Cart.png" alt="HTML Syntax">
+            <img src="..\assets\Public\b-pl1.jpg" alt="HTML Syntax">
           </div>
           <h3 class="blog-title">HTML Syntax</h3>
-          <span class="blog-time">6 Oct 2017</span>
+          <span class="blog-time"> <font-awesome-icon icon="fa-solid fa-calendar" class="naptar"/> 6 Oct 2017</span>
           <p class="description">
             The syntax of a language is how it works. How to actually write it. Learn HTML syntax…
           </p>
@@ -26,15 +43,18 @@
       <div class="card-grid-space">
         <div class="card">
           <div class="card-img-holder">
-            <img src="https://images1-focus-opensocial.googleusercontent.com/gadgets/proxy?container=focus&resize_w=1500&url=https://codetheweb.blog/assets/img/posts/basic-types-of-html-tags/cover.jpg" alt="HTML Tags">
+            <img src="..\assets\Public\b-pl2.jpg" alt="HTML Tags">
           </div>
           <h3 class="blog-title">Basic types of HTML tags</h3>
-          <span class="blog-time">9 Oct 2017</span>
+          <span class="blog-time"> <font-awesome-icon icon="fa-solid fa-calendar" class="naptar"/> 9 Oct 2017</span>
           <p class="description">
             Learn about some of the most common HTML tags…
           </p>
           <div class="tags">
             <div class="tag">HTML</div>
+            <div class="tag">CSS</div>
+            <div class="tag">JavaScript</div>
+            <div class="tag">Vue</div>
           </div>
           <div class="options">
             <span>
@@ -48,10 +68,10 @@
       <div class="card-grid-space">
         <div class="card">
           <div class="card-img-holder">
-            <img src="https://images1-focus-opensocial.googleusercontent.com/gadgets/proxy?container=focus&resize_w=1500&url=https://codetheweb.blog/assets/img/posts/links-images-about-file-paths/cover.jpg" alt="Links and Images">
+            <img src="..\assets\Public\b-pl3.jpg" alt="Links and Images">
           </div>
           <h3 class="blog-title">Links, images and about file paths</h3>
-          <span class="blog-time">14 Oct 2017</span>
+          <span class="blog-time"> <font-awesome-icon icon="fa-solid fa-calendar" class="naptar"/> 14 Oct 2017</span>
           <p class="description">
             Learn how to use links and images along with file paths…
           </p>
@@ -66,44 +86,49 @@
           </div>
         </div>
       </div>
-    </section>
-  </div>
-</template>
 
-<script>
-export default {
-  name: 'HybridCard',
-  methods: {
-    navigateToBlog() {
-      // Handle navigation to blog
-      this.$router.push('/');
-    }
-  }
-}
-</script>
+      <div class="card-grid-space">
+        <div class="card">
+          <div class="card-img-holder">
+            <img src="..\assets\Public\b-pl4.jpg" alt="Links and Images">
+          </div>
+          <h3 class="blog-title">Your favourite lorem ipsum</h3>
+          <span class="blog-time"> <font-awesome-icon icon="fa-solid fa-calendar" class="naptar"/> 14 Oct 2017</span>
+          <p class="description">
+            Learn how to use links and images along with file paths…
+          </p>
+          <div class="tags">
+            <div class="tag">HTML</div>
+            <div class="tag">CSS</div>
+          </div>
+          <div class="options">
+            <span>
+              Read Full Blog
+            </span>
+            <button class="btn" @click="navigateToBlog">Blog</button>
+          </div>
+        </div>
+      </div>
+    </section>
+</main>
+</template>
 
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600&display=swap');
 @import url('https://fonts.googleapis.com/css?family=Heebo:400,700|Open+Sans:400,700');
 
-:root {
-  --color: #3c3163;
-  --transition-time: 0.5s;
+main {
+  min-height: 100vh;
+  padding: 32px 0;
 }
 
-.page-container {
-  background: #fafafa;
-  min-height: 100vh;
-  padding: 2rem 0;
-}
-/* Cards Grid */
 .cards-wrapper {
   display: grid;
   justify-content: center;
   align-items: center;
   grid-template-columns: 1fr 1fr 1fr;
-  grid-gap: 4rem;
-  padding: 4rem;
+  grid-gap: 64px;
+  padding: 64px;
   margin: 0 auto;
   width: max-content;
 }
@@ -112,26 +137,27 @@ export default {
   position: relative;
 }
 
-/* Hybrid Card Styles */
 .card {
-  width: 25rem;
+  width: 480px;
   height: auto;
-  background: #fff;
-  border-radius: 1.5rem;
-  padding: 1.5rem;
+  background: var(--b-kartya);
+  color: var(--b-text-light);
+  border-radius: 8px;
+  padding: 24px;
   overflow: hidden;
   position: relative;
   font-family: 'Rubik', sans-serif;
   box-sizing: border-box;
-  box-shadow: 0 0 5em -1em rgba(0,0,0,0.1);
-  transition: all, var(--transition-time);
+  box-shadow: 0 0 80px -16px rgba(0,0,0,0.1);
+  transition: all, var(--b-transition-time);
   /* border: 10px solid #f0f0f0; */
 }
 
 .card:hover {
   transform: translateY(-5px);
   box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-  /*border-color: var(--color);*/
+  color: var(--b-text-dark);
+  /*border-color: #e0dddd;*/
 }
 
 
@@ -140,69 +166,71 @@ export default {
   height: auto;
   position: relative;
   overflow: hidden;
-  border-radius: 1.5rem;
-  margin-bottom: 1rem;
+  border-radius: 4px 60px 8px 60px;
+  margin-bottom: 16px;
 }
 
 .card-img-holder img {
   width: 100%;
   height: auto;
-  max-height: 15rem;
+  max-height: 240px;
   object-fit: cover;
-  transition: all, var(--transition-time);
+  transition: all, var(--b-transition-time);
+  transform: scale(1.05); /* azért kell hogy rendesen nézzen ki a bal alsó border radiusa */
 }
 
 .card:hover .card-img-holder img {
-  transform: scale(1.05);
+  transform: scale(1.10);
 }
 
 .blog-title {
-  color: #22215B;
-  padding: 1rem 0 0.5rem 0;
-  font-size: 1.5rem;
+  padding: 16px 0 8px 0;
+  font-size: 24px;
   margin: 0;
-  transition: all, var(--transition-time);
+  transition: all, var(--b-transition-time);
 }
 
 .card:hover .blog-title {
-  color: var(--color);
+  color: var(--b-text-dark);
 }
 
 .description {
-  padding: 1rem 0;
-  color: #22215B80;
-  font-size: 1rem;
+  padding: 16px 0;
+  font-size: 16px;
   margin: 0;
   line-height: 1.6;
 }
 
+.card:hover .description {
+  color: var(--b-text-dark);  
+}
+
 .blog-time {
-  font-size: .8rem;
-  color: #22215B;
+  font-size: 12px;
   display: block;
-  opacity: 0.7;
+  opacity: 0.9;
 }
 
 .tags {
   display: flex;
-  margin: 1rem 0;
+  margin: 16px 0;
 }
 
-.tags .tag {
-  font-size: 0.75em;
-  background: rgba(60, 49, 99, 0.1);
-  color: var(--color);
+.tag {
+  font-size: 12px;
+  background: var(--b-tag);
+  color: var(--b-text-light);
   border-radius: 0.3rem;
   padding: 0.3em 0.8em;
   margin-right: 0.5em;
   line-height: 1.5em;
-  transition: all, var(--transition-time);
+  transition: all, var(--b-transition-time);
   font-weight: 500;
 }
 
-.card:hover .tags .tag {
-    background: var(--color); /* Change color on hover */
-    color: rgb(255, 0, 0); /* Change text color on hover */
+.card:hover .tag {
+    background: var(--b-tag-hover);
+    color: var(--b-text-dark);
     transform: translateY(-2px);
 }
 
@@ -210,37 +238,37 @@ export default {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 1rem;
-  margin-top: 1rem;
-  padding-top: 1rem;
-  border-top: 1px solid #f0f0f0;
+  font-size: 16px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--b-text-light);
 }
 
 .options span {
   font-weight: 600;
-  color: #22215B;
-  transition: all, var(--transition-time);
+  transition: all, var(--b-transition-time);
 }
 
-.card:hover .options span {
-  color: var(--color);
+.card:hover .options {
+  color: var(--b-text-dark);
+  border-top: 1px solid var(--b-text-dark);
 }
 
 .btn {
-  font-size: 1rem;
-  padding: .5rem 1.5rem;
-  border-radius: .5rem;
+  font-size: 16px;
+  padding: 8px 24px;
+  border-radius: 8px;
   font-weight: 400;
-  background: #EEF7FE;
-  color: #22215B;
+  background: var(--b-gomb);
+  color: var(--b-text-light);
   cursor: pointer;
   border: none;
-  transition: all, var(--transition-time);
+  transition: all, var(--b-transition-time);
 }
 
 .btn:hover {
-  background: var(--color);
-  color: white;
+  background: var(--b-gomb-hover);
+  color: var(--b-text-dark);
   transform: translateY(-2px);
 }
 
@@ -254,18 +282,18 @@ export default {
   left: -50%;
   top: -50%;
   z-index: -1;
-  transition: all, var(--transition-time);
+  transition: all, var(--b-transition-time);
   transition-timing-function: ease-in-out;
 }
 
 .card:before {
-  background: rgba(60, 49, 99, 0.05);
+  /*background: rgba(60, 49, 99, 0.05);*/
   width: 250%;
   height: 250%;
 }
 
 .card:after {
-  background: rgba(255,255,255,0.5);
+  background: #ffffff80;
   width: 200%;
   height: 200%;
 }
@@ -274,7 +302,6 @@ export default {
   transform: scale(1);
 }
 
-/* MEDIA QUERIES */
 @media screen and (max-width: 1285px) {
   .cards-wrapper {
     grid-template-columns: 1fr 1fr;
@@ -298,10 +325,10 @@ export default {
 
 @media screen and (max-width: 500px) {
   .cards-wrapper {
-    padding: 4rem 2rem;
+    padding: 64px 32px;
   }
   .card {
-    max-width: calc(100vw - 4rem);
+    max-width: calc(100vw - 64px);
   }
 }
 
