@@ -16,3 +16,4 @@ Route::get('/teszt', function () {
 // Blog routes
 Route::get('/blog', [BlogController::class, 'index']);
 Route::get('/blog/{id}', [BlogController::class, 'show']);
+
