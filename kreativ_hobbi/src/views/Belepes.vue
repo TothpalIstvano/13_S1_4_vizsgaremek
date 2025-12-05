@@ -1,46 +1,46 @@
 <template>
   <div class="main">
     <!-- Sign Up Container -->
-    <div class="container a-container" id="a-container" :class="{ 'is-txl': isSignUpMode }">
-      <form class="form" id="a-form" @submit.prevent="handleSignUp">
-        <h2 class="form_title title">Create Account</h2>
+    <div class="container a-container" :class="{ 'is-txl': isSignUpMode }">
+      <form class="form" @submit.prevent="handleSignUp">
+        <h2 class="title">Create Account</h2>
         <input class="form__input" type="text" placeholder="Name" v-model="signUpForm.name" required>
         <input class="form__input" type="email" placeholder="Email" v-model="signUpForm.email" required>
         <input class="form__input" type="password" placeholder="Password" v-model="signUpForm.password" required>
         <label class='form__checkbox'>
-        <input type='checkbox' name='terms' v-model="signUpForm.terms" required/> I agree to the Terms of Service and Privacy Policy
+        <input type='checkbox' name='terms' v-model="signUpForm.terms" required/> I agree to the Terms of Service 
         </label>
         <label class='form__checkbox'>
-          <input type="checkbox" name="checkbox" v-model="signUpForm.newsletter" /> Subscribe to Newsletter
+          <input type="checkbox" name="checkbox" v-model="signUpForm.privacy" /> I agree to the Privacy Policy
         </label>
-        <button class="form__button button submit" type="submit">SIGN UP</button>
+        <button class="button" type="submit">SIGN UP</button>
       </form>
     </div>
 
     <!-- Sign In Container -->
-    <div class="container b-container" id="b-container" :class="{ 'is-txl is-z200': isSignUpMode }">
-      <form class="form" id="b-form" @submit.prevent="handleSignIn">
-        <h2 class="form_title title">Sign in to Website</h2>
+    <div class="container b-container" :class="{ 'is-txl is-z200': isSignUpMode }">
+      <form class="form" @submit.prevent="handleSignIn" method="post" action="/login" redirect="/">
+        <h2 class="title">Sign in to Website</h2>
         <input class="form__input" type="email" placeholder="Email" v-model="signInForm.email" required>
         <input class="form__input" type="password" placeholder="Password" v-model="signInForm.password" required>
         <a class="form__link" href="#">Forgot your password?</a>
-        <button class="form__button button submit" type="submit">SIGN IN</button>
+        <button class="button" type="submit">SIGN IN</button>
       </form>
     </div>
 
     <!-- Switch Panel -->
-    <div class="switch" id="switch-cnt" :class="{ 'is-txr': isSignUpMode }">
+    <div class="switch" :class="{ 'is-txr': isSignUpMode }">
       <div class="switch__circle" :style="{ transform: isSignUpMode ? 'translateX(0%)' : 'translateX(60%)' }"></div>
       <div class="switch__circle switch__circle--t" :style="{ transform: isSignUpMode ? 'translateX(0%)' : 'translateX(-60%)' }"></div>
-      <div class="switch__container" id="switch-c1" :class="{ 'is-hidden': isSignUpMode }">
-        <h2 class="switch__title title">Welcome Back !</h2>
-        <p class="switch__description description">To keep connected with us please login with your personal info</p>
-        <button class="switch__button button switch-btn" @click="toggleForm">SIGN IN</button>
+      <div class="switch__container" :class="{ 'is-hidden': isSignUpMode }">
+        <h2 class="title">Welcome Back !</h2>
+        <p class=" description">To keep connected with us please login with your personal info</p>
+        <button class="switch__button button" @click="toggleForm">SIGN IN</button>
       </div>
-      <div class="switch__container" id="switch-c2" :class="{ 'is-hidden': !isSignUpMode }">
-        <h2 class="switch__title title">Hello Friend !</h2>
-        <p class="switch__description description">Enter your personal details and start journey with us</p>
-        <button class="switch__button button switch-btn" @click="toggleForm">SIGN UP</button>
+      <div class="switch__container" :class="{ 'is-hidden': !isSignUpMode }">
+        <h2 class="title">Hello Friend !</h2>
+        <p class=" description">Enter your personal details and start journey with us</p>
+        <button class="switch__button button" @click="toggleForm">SIGN UP</button>
       </div>
     </div>
   </div>
@@ -49,43 +49,29 @@
 <script setup>
 import { ref } from 'vue'
 
-// Define emits
-const emit = defineEmits(['sign-up', 'sign-in'])
-
-// Reactive state
+//#region reactive elemek
 const isSignUpMode = ref(true)
-
 
 const signUpForm = ref({
   name: '',
   email: '',
   password: '',
   terms: false,
-  newsletter: false,
+  privacy: false,
 })
 
 const signInForm = ref({
   email: '',
   password: '',
 })
-// Methods
+
 const toggleForm = () => {
-  isSignUpMode.value = !isSignUpMode.value
+    isSignUpMode.value = !isSignUpMode.value
 }
+//#endregion
 
-const handleSignUp = () => {
-  // Handle sign up logic here
-  console.log('Sign up with:', signUpForm.value)
-  // Emit event or call API
-  emit('sign-up', signUpForm.value)
-}
 
-const handleSignIn = () => {
-  // Handle sign in logic here
-  console.log('Sign in with:', signInForm.value)
-  // Emit event or call API
-  emit('sign-in', signInForm.value)
-}
+
 </script>
 
 <style scoped>
@@ -118,7 +104,7 @@ body {
     min-height: 600px;
     height: 600px;
     padding: 25px;
-    background-color: #ff0404;
+    background-color: #ecf0f3;
     box-shadow:
         10px 10px 10px #d1d9e6,
         -10px -10px 10px #f9f9f9;
@@ -244,7 +230,7 @@ body {
     color: #181818;
     font-size: 15px;
     margin-top: 25px;
-    border-bottom: 1px solid #a0a5a8;
+    border-bottom: 1px solid #8b0404;
     line-height: 2;
     text-decoration: none;
 }
@@ -278,6 +264,7 @@ body {
         -8px -8px 16px #f9f9f9;
     border: none;
     outline: none;
+    cursor: pointer;
 }
 
 /**/
@@ -317,8 +304,8 @@ body {
     border-radius: 50%;
     background-color: #ecf0f3;
     box-shadow:
-        inset 8px 8px 12px #d1d9e6,
-        inset -8px -8px 12px #f9f9f9;
+        inset 8px 8px 12px #8b040442,
+        inset -8px -8px 12px #8b040442;
     bottom: -60%;
     left: -60%;
     transition: 1.25s;
@@ -357,7 +344,9 @@ body {
 }
 
 .switch__button:active,
-.switch__button:focus {
+.switch__button:focus,
+.button:active,
+.button:focus {
     box-shadow:
         2px 2px 6px #d1d9e6,
         -2px -2px 6px #f9f9f9;
