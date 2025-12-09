@@ -27,7 +27,13 @@ class PosztokSeeder extends Seeder
             [
                 'cim' => 'Second Blog Post',
                 'kivonat' => 'Maecenas ultricies tincidunt mi quis ullamcorper. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.',
-                'tartalom' => '<p>Sed rhoncus quis dolor id efficitur. Donec malesuada interdum libero, vel elementum nibh molestie non. Vestibulum convallis nibh velit, in suscipit sapien dictum nec. Praesent dignissim orci in purus maximus, nec varius magna efficitur. Aenean massa justo, molestie ut auctor in, tempus ac turpis. Aliquam et ligula vel neque tempor mollis vitae consectetur eros. Phasellus commodo arcu vel ex consectetur malesuada. Mauris ultrices sem metus, a porta ante tincidunt eget.</p>',
+                'tartalom' => '<p>Sed rhoncus quis dolor id efficitur. Donec malesuada interdum libero, vel elementum nibh molestie non. Vestibulum convallis nibh velit, in suscipit sapien dictum nec. Praesent dignissim orci in purus maximus, nec varius magna efficitur. Aenean massa justo, molestie ut auctor in, tempus ac turpis. Aliquam et ligula vel neque tempor mollis vitae consectetur eros. Phasellus commodo arcu vel ex consectetur malesuada. Mauris ultrices sem metus, a porta ante tincidunt eget.
+                <ul>
+                    <li>Coffee</li>
+                    <li>Tea</li>
+                    <li>Milk</li>
+                </ul>
+                </p>',
                 'szerzo_id' => 1,
                 'fo_kep_id' => 4,
                 'letrehozas_datuma' => now()->subDays(3),

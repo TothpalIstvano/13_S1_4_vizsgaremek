@@ -9,23 +9,23 @@ class BlogController extends Controller
 {
     public function index()
     {
-        $posts = Posztok::with(['foKep', 'cimkek'])
+        $posztok = Posztok::with(['foKep', 'cimkek'])
             ->where('statusz', 'közzétett')
             ->orderBy('letrehozas_datuma', 'desc')
             ->get()
             ->map(function ($post) {
                 return [
                     'id' => $post->id,
-                    'title' => $post->cim,
-                    'excerpt' => $post->kivonat,
-                    'created_at' => $post->letrehozas_datuma ? $post->letrehozas_datuma->format('d M Y') : 'N/A',
-                    'main_image' => $post->foKep ? $post->foKep->url_Link : null,
-                    'tags' => $post->cimkek->pluck('nev')->toArray(),
-                    'author' => $post->szerzo ? $post->szerzo->felhasz_nev : 'Ismeretlen',
+                    'cim' => $post->cim,
+                    'kivonat' => $post->kivonat,
+                    'letrehozas_datuma' => $post->letrehozas_datuma ? $post->letrehozas_datuma->format('d M Y') : 'N/A',
+                    'fo_kep' => $post->foKep ? $post->foKep->url_Link : null,
+                    'cimkek' => $post->cimkek->pluck('nev')->toArray(),
+                    'szerző' => $post->szerzo ? $post->szerzo->felhasz_nev : 'Ismeretlen',
                 ];
             });
 
-        return response()->json($posts);
+        return response()->json($posztok);
     }
 
     public function show($id)
@@ -37,21 +37,21 @@ class BlogController extends Controller
 
         return response()->json([
             'id' => $post->id,
-            'title' => $post->cim,
-            'content' => $post->tartalom,
-            'excerpt' => $post->kivonat,
-            'created_at' => $post->letrehozas_datuma ? $post->letrehozas_datuma->format('d M Y') : 'N/A',
-            'main_image' => $post->foKep ? $post->foKep->url_Link : null,
-            'images' => $post->kepek->map(function ($image) {
+            'cim' => $post->cim,
+            'tartalom' => $post->tartalom,
+            'kivonat' => $post->kivonat,
+            'letrehozas_datuma' => $post->letrehozas_datuma ? $post->letrehozas_datuma->format('d M Y') : 'N/A',
+            'fo_kep' => $post->foKep ? $post->foKep->url_Link : null,
+            'kepek' => $post->kepek->map(function ($image) {
                 return [
                     'url' => $image->url_Link,
                     'alt' => $image->alt_Szoveg,
-                    'description' => $image->leiras,
+                    'leiras' => $image->leiras,
                 ];
             })->toArray(),
-            'tags' => $post->cimkek->pluck('nev')->toArray(),
-            'author' => $post->szerzo ? $post->szerzo->felhasz_nev : 'Ismeretlen',
-            'author_id' => $post->szerzo_id,
+            'cimkek' => $post->cimkek->pluck('nev')->toArray(),
+            'szerzo' => $post->szerzo ? $post->szerzo->felhasz_nev : 'Ismeretlen',
+            'szerzo_id' => $post->szerzo_id,
         ]);
     }
 }

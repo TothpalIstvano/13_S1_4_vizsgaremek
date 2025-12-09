@@ -70,14 +70,17 @@
 
 /*Blog*/
 :root {
-  --b-kartya: #a08283; /*vagy #906767 vagy a #551515 és az #ffffff mixéből valami*/
-  --b-tag: #c71a40a4;
-  --b-tag-hover: #c78b7c;
-  --b-gomb: #4d0303;
-  --b-gomb-hover: #b46a6a;
-  --b-text-dark: #000000;
-  --b-text-light: #e0dddd;
-  --b-transition-time: 0.5s;
+  /*--b-kartya: #a08283; vagy #906767 vagy a #551515 és az #ffffff mixéből valami*/
+  --b-kartya: linear-gradient(135deg, #864340 0%, #a08283 100%);
+  --b-tag: #7e6456e6; /* vagy #c71a40a4 */
+  --b-tag-hover: #884340e6; /* vagy #c78b7c */
+  --b-gomb: #551515;
+  --b-gomb-hover: #944e4e;
+  --b-text-dark: #2C1810;
+  --b-text-light: #F8F4F0;
+  --b-transition-time: 0.3s;
+  --b-card-shadow: 0 4px 20px rgba(136, 67, 64, 0.15);
+  --b-card-shadow-hover: 0 8px 30px rgba(136, 67, 64, 0.25);
 }
 
 /*Index blog kártyák*/
