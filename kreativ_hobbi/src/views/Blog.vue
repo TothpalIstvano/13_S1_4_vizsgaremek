@@ -4,7 +4,12 @@
     <section class="cards-wrapper">
       <!-- Loading state -->
       <div v-if="loading" class="loading">
-        <p>Blog bejegyzések betöltése...</p>
+        <p>Blogbejegyzések betöltése...</p>
+        <div class="three-body">
+          <div class="three-body__dot"></div>
+          <div class="three-body__dot"></div>
+          <div class="three-body__dot"></div>
+        </div>
       </div>
       
       <!-- Error state -->
@@ -13,25 +18,26 @@
       </div>
       
       <!-- Blog posts -->
-      <div class="card-grid-space" v-for="post in posts" :key="post.id">
+      <div class="card-grid-space" v-for="post in posztok" :key="post.id">
         <div class="card">
           <div class="card-img-holder">
             <img 
-              :src="getImageUrl(post.main_image)" 
-              :alt="post.title"
+              :src="getImageUrl(post.fo_kep)" 
+              :alt="post.cim"
               @error="handleImageError"
             />
           </div>
-          <h3 class="blog-title">{{ post.title }}</h3>
+          <h3 class="blog-title">{{ post.cim }}</h3>
           <span class="blog-time"> 
             <font-awesome-icon icon="fa-solid fa-calendar" class="naptar"/> 
-            {{ formatDate(post.created_at) }}
+            <i class="fa fa-calendar" aria-hidden="true"></i>
+            {{ formatDate(post.letrehozas_datuma) }}
           </span>
           <p class="description">
-            {{ post.excerpt || post.content || 'Nincs leírás...' }}
+            {{ post.kivonat || post.tartalom || 'Nincs leírás...' }}
           </p>
           <div class="tags">
-            <div class="tag" v-for="tag in post.tags" :key="tag">{{ tag }}</div>
+            <div class="tag" v-for="tag in post.cimkek" :key="tag">{{ tag }}</div>
           </div>
           <div class="options">
             <span>Teljes bejegyzés olvasása</span>
@@ -41,7 +47,7 @@
       </div>
       
       <!-- No posts message -->
-      <div v-if="!loading && posts.length === 0" class="no-posts">
+      <div v-if="!loading && posztok.length === 0" class="no-posts">
         <p>Még nincsenek blog bejegyzések.</p>
       </div>
     </section>
@@ -50,7 +56,13 @@
 
 <script>
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { faCalendar } from '@fortawesome/free-solid-svg-icons'
+
+library.add(faCalendar)
+
 import api from '@/services/api.js'
+
 // Import your fallback image at the top
 import fallbackImage from '@/assets/Public/b-pl1.jpg'
 
@@ -58,7 +70,7 @@ export default {
   name: 'Blog',
   data() {
     return {
-      posts: [],
+      posztok: [],
       loading: true,
       error: null
     }
@@ -74,12 +86,12 @@ export default {
         
         // Fetch blog posts
         const response = await api.get('/api/blog');
-        this.posts = response.data;
+        this.posztok = response.data;
         
       } catch (error) {
         console.error('Error fetching blog posts:', error);
         this.error = 'Hiba történt a blog bejegyzések betöltése közben.';
-        this.posts = this.getDummyPosts();
+        this.posztok = this.getDummyPosts();
       } finally {
         this.loading = false;
       }
@@ -201,7 +213,7 @@ main {
   height: 240px;
   position: relative;
   overflow: hidden;
-  border-radius: 6px 60px 6px 60px;
+  border-radius: 6px 40px 6px 40px;
   margin-bottom: 16px;
 }
 
@@ -307,32 +319,116 @@ main {
 
 .btn:hover {
   background: var(--b-gomb-hover);
-  color: var(--b-text-dark);
   transform: translateY(-2px);
 }
 
-/* Loading and error states */
-.loading, .error, .no-posts {
-  grid-column: 1 / -1;
+.loading {
   text-align: center;
-  padding: 40px;
-  font-size: 18px;
-  color: var(--b-text-light);
+  align-items: center;
+  margin: 0;
 }
 
-.error {
-  color: #ff6b6b;
+.three-body {
+ --uib-size: 35px;
+ --uib-speed: 0.8s;
+ --uib-color: #580303;
+ position: relative;
+ display: inline-block;
+ height: var(--uib-size);
+ width: var(--uib-size);
+ animation: spin78236 calc(var(--uib-speed) * 2.5) infinite linear;
 }
 
-/* Animation for loading */
-.loading p {
-  animation: pulse 1.5s infinite;
+.three-body__dot {
+ position: absolute;
+ height: 100%;
+ width: 30%;
 }
 
-@keyframes pulse {
-  0% { opacity: 0.5; }
-  50% { opacity: 1; }
-  100% { opacity: 0.5; }
+.three-body__dot:after {
+ content: '';
+ position: absolute;
+ height: 0%;
+ width: 100%;
+ padding-bottom: 100%;
+ background-color: var(--uib-color);
+ border-radius: 50%;
+}
+
+.three-body__dot:nth-child(1) {
+ bottom: 5%;
+ left: 0;
+ transform: rotate(60deg);
+ transform-origin: 50% 85%;
+}
+
+.three-body__dot:nth-child(1)::after {
+ bottom: 0;
+ left: 0;
+ animation: wobble1 var(--uib-speed) infinite ease-in-out;
+ animation-delay: calc(var(--uib-speed) * -0.3);
+}
+
+.three-body__dot:nth-child(2) {
+ bottom: 5%;
+ right: 0;
+ transform: rotate(-60deg);
+ transform-origin: 50% 85%;
+}
+
+.three-body__dot:nth-child(2)::after {
+ bottom: 0;
+ left: 0;
+ animation: wobble1 var(--uib-speed) infinite
+    calc(var(--uib-speed) * -0.15) ease-in-out;
+}
+
+.three-body__dot:nth-child(3) {
+ bottom: -5%;
+ left: 0;
+ transform: translateX(116.666%);
+}
+
+.three-body__dot:nth-child(3)::after {
+ top: 0;
+ left: 0;
+ animation: wobble2 var(--uib-speed) infinite ease-in-out;
+}
+
+@keyframes spin78236 {
+ 0% {
+  transform: rotate(0deg);
+ }
+
+ 100% {
+  transform: rotate(360deg);
+ }
+}
+
+@keyframes wobble1 {
+ 0%,
+  100% {
+  transform: translateY(0%) scale(1);
+  opacity: 1;
+ }
+
+ 50% {
+  transform: translateY(-66%) scale(0.65);
+  opacity: 0.8;
+ }
+}
+
+@keyframes wobble2 {
+ 0%,
+  100% {
+  transform: translateY(0%) scale(1);
+  opacity: 1;
+ }
+
+ 50% {
+  transform: translateY(66%) scale(0.65);
+  opacity: 0.8;
+ }
 }
 
 /* Card hover effects */
@@ -366,22 +462,62 @@ main {
 
 @media screen and (max-width: 1800px) {
   .card {
+    width: 420px;
+  }
+}
+
+@media screen and (max-width: 1500px) {
+  .card {
     width: 400px;
   }
 }
 
-@media screen and (max-width: 1200px) {
+@media screen and (max-width: 1400px) {
   .cards-wrapper {
     grid-template-columns: 1fr 1fr;
   }
+  .card {
+    width: 520px;
+  }
 }
 
-@media screen and (max-width: 500px) {
-  .cards-wrapper {
-    padding: 64px 32px;
+@media screen and (max-width: 1200px) {
+  .card {
+    width: 460px;
   }
+}
+
+@media screen and (max-width: 1050px) {
+  .card {
+    width: 400px;
+  }
+}
+
+@media screen and (max-width: 950px) {
+  .card {
+    width: 380px;
+  }
+}
+
+@media screen and (max-width: 890px) {
   .cards-wrapper {
     grid-template-columns: 1fr;
+    padding: 26px;
+  }
+  .card {
+    width: 520px;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .card {
+    width: 400px;
+  }
+}
+
+@media screen and (max-width: 450px) {
+  .card {
+    width: 300px;
   }
 }
 </style>
