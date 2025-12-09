@@ -3,10 +3,15 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BlogController;
+use App\Models\Felhasznalok;
 
-Route::get('/user', function (Request $request) {
+Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
-})->middleware('auth:sanctum');
+});
+
+Route::get('api/teszt', function () {
+    return Felhasznalok::all();
+});
 
 // Test route
 Route::get('/teszt', function () {

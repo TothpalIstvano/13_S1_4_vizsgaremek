@@ -13,7 +13,7 @@ import Index from '@/views/index.vue'
 import Adatvedelem from "@/views/Adatvedelem.vue";
 import Adatfelhasznalas from "@/views/Adatfelhasznalas.vue";
 import Teszt from "@/views/Teszt.vue";
-
+import NotFound from "@/views/NotFound.vue";
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -88,7 +88,19 @@ const router = createRouter({
       name: 'Teszt',
       component: Teszt
     },
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'NotFound',
+      component: NotFound
+    },
   ],
+})
+
+router.beforeEach((to, from, next) => {
+  if (to.name === 'NotFound') {
+    console.warn(`Navigation to non-existent route: ${to.fullPath}`)
+  }
+  next()
 })
 
 export default router

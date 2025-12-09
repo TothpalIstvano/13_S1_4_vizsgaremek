@@ -4,9 +4,9 @@
     <div class="container a-container" :class="{ 'is-txl': isSignUpMode }">
       <form class="form" @submit.prevent="handleSignUp">
         <h2 class="title">Create Account</h2>
-        <input class="form__input" type="text" placeholder="Name" v-model="signUpForm.name" required>
-        <input class="form__input" type="email" placeholder="Email" v-model="signUpForm.email" required>
-        <input class="form__input" type="password" placeholder="Password" v-model="signUpForm.password" required>
+        <input class="form__input" autocomplete="username" type="text" placeholder="Felhasználóneve" v-model="signUpForm.name" required>
+        <input class="form__input" autocomplete="email" type="email" placeholder="Email" v-model="signUpForm.email" required>
+        <input class="form__input" autocomplete="new-password" type="password" placeholder="Jelszó" v-model="signUpForm.password" required>
         <label class='form__checkbox'>
         <input type='checkbox' name='terms' v-model="signUpForm.terms" required/> I agree to the Terms of Service 
         </label>
@@ -21,8 +21,8 @@
     <div class="container b-container" :class="{ 'is-txl is-z200': isSignUpMode }">
       <form class="form" @submit.prevent="handleSignIn" method="post" action="/login" redirect="/">
         <h2 class="title">Sign in to Website</h2>
-        <input class="form__input" type="email" placeholder="Email" v-model="signInForm.email" required>
-        <input class="form__input" type="password" placeholder="Password" v-model="signInForm.password" required>
+        <input class="form__input" autocomplete="email" type="email" placeholder="Email" v-model="signInForm.email" required>
+        <input class="form__input" autocomplete="current-password" type="password" placeholder="Jelszó" v-model="signInForm.password" required>
         <a class="form__link" href="#">Forgot your password?</a>
         <button class="button" type="submit">SIGN IN</button>
       </form>
@@ -48,9 +48,12 @@
 
 <script setup>
 import { ref } from 'vue'
+import axios from 'axios'
 
-//#region reactive elemek
+//#region reactive elements
 const isSignUpMode = ref(true)
+const loading = ref(false)
+const loginError = ref('')
 
 const signUpForm = ref({
   name: '',
@@ -66,8 +69,65 @@ const signInForm = ref({
 })
 
 const toggleForm = () => {
-    isSignUpMode.value = !isSignUpMode.value
+  isSignUpMode.value = !isSignUpMode.value
+  loginError.value = ''
 }
+
+const handleSignIn = async () => {
+  loading.value = true
+  loginError.value = ''
+  
+  try {
+    // Frontend validation
+    if (!signInForm.value.email || !signInForm.value.password) {
+      throw new Error('Please fill in all fields')
+    }
+    
+    if (!signInForm.value.email.includes('@')) {
+      throw new Error('Please enter a valid email')
+    }
+    
+    if (signInForm.value.password.length < 3) {
+      throw new Error('Password must be at least 3 characters')
+    }
+    
+    // API call to login
+    const response = await axios.post('/login', {
+      email: signInForm.value.email,
+      password: signInForm.value.password
+    })
+    
+    // Store token and user data
+    localStorage.setItem('auth_token', response.data.token)
+    localStorage.setItem('user', JSON.stringify(response.data.user))
+    
+    // Redirect to dashboard or home
+    window.location.href = '/Profil' // or use router.push if you have Vue Router
+    
+  } catch (error) {
+    loginError.value = error.response?.data?.message || error.message || 'Login failed. Please try again.'
+  } finally {
+    loading.value = false
+  }
+}
+
+const handleSignUp = async () => {
+  // You can implement signup logic here similarly
+  console.log('Sign up form submitted:', signUpForm.value)
+}
+
+// Check if user is already logged in
+const checkAuth = () => {
+  const token = localStorage.getItem('auth_token')
+  if (token) {
+    // User is logged in, redirect to dashboard
+    window.location.href = '/Profil'
+  }
+}
+
+// Call checkAuth when component mounts
+checkAuth()
+
 //#endregion
 
 
@@ -83,16 +143,11 @@ const toggleForm = () => {
 }
 
 /* Generic */
-body {
-    width: 100%;
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-family: 'Montserrat', sans-serif;
-    font-size: 12px;
-    background-color: #ecf0f3;
-    color: #a0a5a8;
+.error-message {
+  color: #e74c3c;
+  margin-top: 10px;
+  font-size: 14px;
+  text-align: center;
 }
 
 /**/
