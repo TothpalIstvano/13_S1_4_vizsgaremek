@@ -13,7 +13,7 @@ body {
     padding: 2rem;
 }
 h1 {
-    color: #dc3545;
+    color: #9e3641;
     font-size: 4rem;
     margin-bottom: 1rem;
 }
@@ -24,7 +24,7 @@ p {
 }
 .button {
     padding: 0.75rem 1.5rem;
-    background-color: #007bff;
+    background-color: #9c6341;
     color: white;
     border: none;
     border-radius: 4px;

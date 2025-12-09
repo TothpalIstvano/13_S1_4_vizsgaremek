@@ -1391,7 +1391,13 @@ main {
   background-color: var(--mk-szovegdoboz-masod);
   color: white;
   padding: 30px 20px 20px;
-  transition: all 0.3s ease;
+  height: 240px;
+  transition: height 0.6s ease;
+}
+
+.blog-info:hover {
+  height: 100%;
+  align-content: space-evenly;
 }
 
 .blog-info ol {
@@ -1403,10 +1409,6 @@ main {
   margin-bottom: 10px;
 }
 
-.blog-info:hover {
-  transform: translateY(-30px);
-  box-shadow: 0 6px 20px var(--mk-arnyekszin);
-}
 
 .blog-info-kontener {
   position: relative;
@@ -1421,6 +1423,7 @@ main {
   height: auto;
   display: block;
   transition: transform 0.3s ease;
+  object-fit: cover;
 }
 
 .blog-info-kontener:hover img {
@@ -1920,7 +1923,7 @@ input[type="file"] {
 }
 /*#endregion*/
 
-@media (max-width: 1100px) {
+@media (max-width: 1250px) {
   .ket-oszlop {
     grid-template-columns: 1fr;
   }
@@ -1931,6 +1934,7 @@ input[type="file"] {
   
   .pixelesContainer {
     grid-template-columns: 1fr;
+    max-width: 100%;
   }
   
   .oldalsav {
