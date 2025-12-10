@@ -10,6 +10,9 @@ const logoKalapacs = logo_kalapacs
 const logoReszelo = logo_reszelo
 const xbeValtas = ref(false);
 const navbarRef = ref(null)
+const userPath = typeof window !== 'undefined' ? '/belepes' : '/profil';
+const isLoggedIn = typeof window !== 'undefined' ? 'Bejelentkezés' : localStorage.getItem('username') ;
+
 
 function open() {
   if (window.innerWidth > 1200) {
@@ -131,11 +134,11 @@ onUnmounted(() => {
             height="50"
         /></RouterLink>
 
-        <RouterLink 
+        <RouterLink
           class="menu_link" 
-          to="/belepes"
           :class="{ hamburgerElem: !latszik }"
-        >Belépés</RouterLink>
+          :to="userPath"
+        >{{isLoggedIn}}</RouterLink>
 
       </nav>
     </header>
