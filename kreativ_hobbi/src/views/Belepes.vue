@@ -92,13 +92,17 @@ const handleSignIn = async () => {
     }
     
     // API call to login
+    await axios.get('/sanctum/csrf-cookie') // Get CSRF cookie if needed
+
     const response = await axios.post('/login', {
       email: signInForm.value.email,
       password: signInForm.value.password
     })
     
     // Store token and user data
+    console.log(response.data.token);
     localStorage.setItem('auth_token', response.data.token)
+
     localStorage.setItem('user', JSON.stringify(response.data.user))
     
     // Redirect to dashboard or home
@@ -118,10 +122,12 @@ const handleSignUp = async () => {
 
 // Check if user is already logged in
 const checkAuth = () => {
-  const token = localStorage.getItem('auth_token')
+  const token = localStorage.getItem('user')
   if (token) {
     // User is logged in, redirect to dashboard
     window.location.href = '/Profil'
+  }
+  else{
   }
 }
 
