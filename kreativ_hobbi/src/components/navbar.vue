@@ -1,5 +1,5 @@
 <script setup>
-import { RouterLink, RouterView, useRouter } from 'vue-router'
+import { RouterLink, useRouter } from 'vue-router'
 import logo_kalapacs from '@/components/icons/logo_kalapacs.png'
 import logo_reszelo from '@/components/icons/logo_reszelo.png'
 import { ref, onMounted, onUnmounted } from 'vue';
@@ -10,8 +10,12 @@ const logoKalapacs = logo_kalapacs
 const logoReszelo = logo_reszelo
 const xbeValtas = ref(false);
 const navbarRef = ref(null)
-const userPath = typeof window !== 'undefined' ? '/belepes' : '/profil';
-const isLoggedIn = typeof window !== 'undefined' ? 'Bejelentkezés' : localStorage.getItem('username') ;
+const userPath = getUserPath();
+const isLoggedIn = typeof window !== 'undefined' && !localStorage.getItem('user') && router.currentRoute.value.path ? 'Bejelentkezés' : localStorage.getItem('user') ;
+
+function getUserPath() {
+  return localStorage.getItem('user') ? '/profil' : '/belepes';
+}
 
 
 function open() {
@@ -44,6 +48,7 @@ function handleClickOutside(event) {
 onMounted(() => {
   window.addEventListener('resize', handleResize);
   document.addEventListener('mousedown', handleClickOutside);
+
 });
 onUnmounted(() => {
   window.removeEventListener('resize', handleResize);

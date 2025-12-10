@@ -1,6 +1,7 @@
 <script setup>
-import { ref, reactive, computed } from 'vue';
+import { ref, reactive} from 'vue';
 import { RouterLink } from 'vue-router';
+
 
 const user = reactive({
   name: 'Eszter Tóth',
@@ -43,18 +44,30 @@ const posts = ref([
   }
 ]);
 
-const isFollowing = ref(false);
+const showLogout = ref(false);
 
-function toggleFollow() {
-  isFollowing.value = !isFollowing.value;
-  // placeholder: integrate API/localStorage here
-}
 
 function formatDate(d) {
   return new Date(d).toLocaleDateString();
 }
 function kijelentkezes() {
-  
+  showLogout.value = ref(true);
+}
+function confirmLogout() {
+  showLogout.value = false;
+  try {
+    // if you have a backend logout route, call it (uncomment)
+    // await axios.post('/logout');
+  } catch (e) {
+    // ignore API errors for now
+  } finally {
+    localStorage.removeItem('user');
+    showLogout.value = false;
+    window.location.href = '/belepes'; // or router.push('/belepes')
+  }
+}
+function cancelLogout() {
+  showLogout.value = ref(false);
 }
 </script>
 
@@ -78,7 +91,16 @@ function kijelentkezes() {
           <div class="profile-actions">
             <button class="btn edit"><RouterLink to="/profil/szerkesztes">Szerkesztés</RouterLink></button>
             <button type="button" class="btn logout" @click="kijelentkezes">Kijelentkezés</button>
-            <!--button class="btn follow" @click="toggleFollow">{{ isFollowing ? 'Követve' : 'Követés' }}</button-->
+            <div v-if="showLogout" class="modal-backdrop" @click.self="cancelLogout">
+              <div class="modal">
+                <h3>Kijelentkezés</h3>
+                <p>Biztos ki szeretnél jelentkezni?</p>
+                <div class="modal-actions">
+                  <button class="btn confirm" @click="confirmLogout">Igen, kijelentkezés</button>
+                  <button class="btn cancel" @click="cancelLogout">Mégse</button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -129,7 +151,6 @@ function kijelentkezes() {
       </div>
     </section>
   </main>
-  <iframe src="https://chromedino.com/color/" frameborder="0" scrolling="no" width="100%" height="100%" loading="lazy" style="position: absolute; width: 100%; height: 100%; z-index: 999;"></iframe>
 </template>
 
 <style scoped> 
