@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Posztok;
+use App\Models\Kommentek;
 use Illuminate\Http\Request;
 
 class BlogController extends Controller
@@ -52,6 +53,7 @@ class BlogController extends Controller
             'cimkek' => $post->cimkek->pluck('nev')->toArray(),
             'szerzo' => $post->szerzo ? $post->szerzo->felhasz_nev : 'Ismeretlen',
             'szerzo_id' => $post->szerzo_id,
+            'kommentek_szama' => $post->kommentek()->count(),
         ]);
     }
 }
