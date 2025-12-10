@@ -21,10 +21,11 @@ class KommentekFactory extends Factory
     public function definition(): array
     {
         return [
-            "komment"=> $this->faker->sentence(2),
-            "poszt_id"=> Posztok::pluck('id')->random(),
-            "kommentelo"=> Felhasznalok::pluck('id')->random(),
-            "elozetes_komment_id"=> null,
+            "komment" => $this->faker->sentence(2),
+            "poszt_id" => Posztok::pluck('id')->random(),
+            "kommentelo" => Felhasznalok::pluck('id')->random(),
+            "elozetes_komment_id" => null,
+            'letrehozas_datuma' => $this->faker->dateTime(),
         ];
     }
 }

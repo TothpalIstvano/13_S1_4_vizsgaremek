@@ -4,26 +4,41 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Posztok;
+use App\Models\Felhasznalok;
 use Laravel\Sanctum\HasApiTokens;
 
 class Kommentek extends Model
 {
     use HasFactory;
     protected $table = "kommentek";
-    protected $primarykey = "id";
+    protected $primaryKey = "id";
     protected $fillable = [
         'komment',
         'poszt_id',
         'kommentelo',
-        'elozetes_komment_id'
+        'elozetes_komment_id',
+        'letrehozas_datuma',
     ];
-    public function elozoKommentek(){
-        return $this->belongsTo(Kommentek::class);
+
+    protected $casts = [
+        'letrehozas_datuma' => 'datetime'
+    ];
+
+    public function elozoKommentek()
+    {
+        return $this->belongsTo(Kommentek::class, 'elozetes_komment_id');
     }
-    public function kommentIro(){
-        return $this->belongsTo(Felhasznalok::class);
+    public function gyermekKommentek()
+    {
+        return $this->hasMany(Kommentek::class, 'elozetes_komment_id');
     }
-    public function poszt(){
-        return $this->belongsTo(Posztok::class);
+    public function kommentIro()
+    {
+        return $this->belongsTo(Felhasznalok::class, 'kommentelo');
+    }
+    public function poszt()
+    {
+        return $this->belongsTo(Posztok::class, 'poszt_id');
     }
 }
