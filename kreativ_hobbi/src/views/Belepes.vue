@@ -74,9 +74,10 @@ const toggleForm = () => {
 }
 
 const handleSignIn = async () => {
+
   loading.value = true
   loginError.value = ''
-  
+
   try {
     // Frontend validation
     if (!signInForm.value.email || !signInForm.value.password) {
@@ -96,7 +97,8 @@ const handleSignIn = async () => {
 
     const response = await axios.post('/login', {
       email: signInForm.value.email,
-      password: signInForm.value.password
+      password: signInForm.value.password,
+      withCredentials: true
     })
     
     // Store token and user data
@@ -122,8 +124,8 @@ const handleSignUp = async () => {
 
 // Check if user is already logged in
 const checkAuth = () => {
-  const token = localStorage.getItem('user')
-  if (token) {
+  const user = localStorage.getItem('user')
+  if (user) {
     // User is logged in, redirect to dashboard
     window.location.href = '/Profil'
   }

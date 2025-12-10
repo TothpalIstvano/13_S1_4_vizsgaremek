@@ -1,4 +1,5 @@
 <script setup>
+import axios from 'axios';
 import { ref, reactive} from 'vue';
 import { RouterLink } from 'vue-router';
 
@@ -61,6 +62,7 @@ function confirmLogout() {
   } catch (e) {
     // ignore API errors for now
   } finally {
+    axios.post('/logout', {}, { withCredentials: true });
     localStorage.removeItem('user');
     showLogout.value = false;
     window.location.href = '/belepes'; // or router.push('/belepes')
