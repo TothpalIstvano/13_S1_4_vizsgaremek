@@ -48,7 +48,8 @@
 
 <script setup>
 import { ref } from 'vue'
-import axios from 'axios'
+import axios from 'axios' 
+import router from '@/router/router'
 
 //#region reactive elements
 const isSignUpMode = ref(true)
@@ -98,17 +99,21 @@ const handleSignIn = async () => {
     const response = await axios.post('/login', {
       email: signInForm.value.email,
       password: signInForm.value.password,
+    },{
       withCredentials: true
     })
-    
-    // Store token and user data
-    console.log(response.data.token);
-    localStorage.setItem('auth_token', response.data.token)
+    console.log('Login response:', response);
 
-    localStorage.setItem('user', JSON.stringify(response.data.user))
-    
+    if (response.status === 204) {
+      router.push('/Profil') // Redirect to profile page on successful login
+      // Dispatch a custom event
+      window.dispatchEvent(new Event('user-logged-in'));
+
+    }
+    else {
+      throw new Error('Login failed. Please check your credentials.')
+    }
     // Redirect to dashboard or home
-    window.location.href = '/Profil' // or use router.push if you have Vue Router
     
   } catch (error) {
     loginError.value = error.response?.data?.message || error.message || 'Login failed. Please try again.'
@@ -121,24 +126,6 @@ const handleSignUp = async () => {
   // You can implement signup logic here similarly
   console.log('Sign up form submitted:', signUpForm.value)
 }
-
-// Check if user is already logged in
-const checkAuth = () => {
-  const user = localStorage.getItem('user')
-  if (user) {
-    // User is logged in, redirect to dashboard
-    window.location.href = '/Profil'
-  }
-  else{
-  }
-}
-
-// Call checkAuth when component mounts
-checkAuth()
-
-//#endregion
-
-
 
 </script>
 
