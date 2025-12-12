@@ -28,7 +28,10 @@ class FelhasznalokSeeder extends Seeder
             'felhasz_nev' => 'Teszt Felhasználó',
             'email' => 'test@example.com',
             'jelszo'=> 'alma',
+            'profilKep_id'=> Kepek::all()->first()->id,
             'statusz' => 'aktív',
+            'letrehozas_Datuma' => '2023-01-01',
+            'utolso_Belepes' => now(),
         ]);
 
         // Create 20 random users

@@ -1,21 +1,53 @@
 <script setup>
 import axios from 'axios';
-import { ref, reactive} from 'vue';
+import { ref, reactive, onMounted} from 'vue';
 import { RouterLink } from 'vue-router';
 
+const userData = ref(null);
+
+
+async function fetchUserData() {
+  try {
+    const response = await axios.get('/api/user');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching user data:', error);
+    return null;
+  }
+}
+
+onMounted(async () => {
+  userData.value = await fetchUserData();
+  if (userData.value) {
+    console.log('Fetched user data:', userData.value);
+    user.name = userData.value.felhasz_nev;
+    user.username = userData.value.felhasz_nev;
+    user.bio = userData.value.bio || 'Kreatív hobbi rajongó';
+    user.avatar = userData.value.profilKep || 'https://www.gravatar.com/avatar/?d=mp&s=200';
+    user.cover = 'https://images.unsplash.com/photo-1503264116251-35a269479413?w=1600&h=400&fit=crop';
+    user.stats = {
+      posts: userData.value.posts_count || 12,
+      followers: userData.value.followers_count || 842,
+      following: userData.value.following_count || 134
+    }
+    user.joined = userData.value.letrehozas_Datuma || '2022-09-15';
+  } else {
+    console.log('No user data available.');
+  }
+});
 
 const user = reactive({
-  name: 'Eszter Tóth',
-  username: 'eszter.t',
-  bio: 'Kézműves, mintatervező és hobbikészítő. Szeretem a kötést, horgolást és a semmittevést közben.',
-  avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=400&fit=crop',
-  cover: 'https://images.unsplash.com/photo-1503264116251-35a269479413?w=1600&h=400&fit=crop',
+  name: '',
+  username: '',
+  bio: '',
+  avatar: '',
+  cover: '',
   stats: {
-    posts: 12,
-    followers: 842,
-    following: 134
+    posts: 0,
+    followers: 0,
+    following: 0
   },
-  joined: '2022-09-15'
+  joined: ''
 });
 
 const posts = ref([
@@ -54,23 +86,33 @@ function formatDate(d) {
 function kijelentkezes() {
   showLogout.value = ref(true);
 }
-function confirmLogout() {
+async function confirmLogout() {
   showLogout.value = false;
   try {
     // if you have a backend logout route, call it (uncomment)
-    // await axios.post('/logout');
+    await axios.post('/logout', { withCredentials: true });
   } catch (e) {
     // ignore API errors for now
   } finally {
-    axios.post('/logout', {}, { withCredentials: true });
+    
     localStorage.removeItem('user');
     showLogout.value = false;
-    window.location.href = '/belepes'; // or router.push('/belepes')
+    setTimeout(() => window.location.href = '/belepes', 10); // or router.push('/belepes')
+    
   }
 }
 function cancelLogout() {
   showLogout.value = ref(false);
 }
+
+onMounted(() => {
+  console.log('Profile component mounted.');
+  fetchUserData().then(data => {
+    if (data) {
+      console.log('User data on mount:', data);
+    }
+  });
+});
 </script>
 
 <template>

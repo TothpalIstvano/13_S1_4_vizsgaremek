@@ -2,7 +2,8 @@
 import { RouterLink, useRouter } from 'vue-router'
 import logo_kalapacs from '@/components/icons/logo_kalapacs.png'
 import logo_reszelo from '@/components/icons/logo_reszelo.png'
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted, computed } from 'vue';
+import axios from 'axios';
 
 const router = useRouter();
 const latszik = ref(false);
@@ -10,12 +11,8 @@ const logoKalapacs = logo_kalapacs
 const logoReszelo = logo_reszelo
 const xbeValtas = ref(false);
 const navbarRef = ref(null)
-const userPath = getUserPath();
-const isLoggedIn = typeof window !== 'undefined' && !localStorage.getItem('user') && router.currentRoute.value.path ? 'Bejelentkezés' : localStorage.getItem('user') ;
-
-function getUserPath() {
-  return localStorage.getItem('user') ? '/profil' : '/belepes';
-}
+const userPath = ref('/Belepes');
+const isLoggedIn = ref('Bejelentkezés');
 
 
 function open() {
@@ -45,14 +42,37 @@ function handleClickOutside(event) {
   }
 }
 
+async function checkUser() {
+  try {
+    const response = await axios.get('/api/user', { withCredentials: true });
+
+    console.log("Navbar user:", response.data);
+
+    if (response.data) {
+      userPath.value = '/Profil';
+      isLoggedIn.value = response.data.felhasz_nev ?? 'Profil';
+    } else {
+      userPath.value = '/Belepes';
+      isLoggedIn.value = 'Bejelentkezés';
+    }
+  } catch (error) {
+    console.error('Error checking user:', error);
+    userPath.value = '/Belepes';
+    isLoggedIn.value = 'Bejelentkezés';
+
+  }
+}
+
 onMounted(() => {
   window.addEventListener('resize', handleResize);
-  document.addEventListener('mousedown', handleClickOutside);
+  document.addEventListener('mousedown', handleClickOutside); 
+  window.addEventListener('user-logged-in', checkUser);
 
 });
 onUnmounted(() => {
   window.removeEventListener('resize', handleResize);
   document.removeEventListener('mousedown', handleClickOutside);
+  window.removeEventListener('user-logged-in', checkUser);
 });
 
 </script>
