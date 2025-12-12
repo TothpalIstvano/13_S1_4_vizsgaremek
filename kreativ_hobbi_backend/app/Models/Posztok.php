@@ -49,4 +49,8 @@ class Posztok extends Model
         /*->withPivot('sorrend')
         ->orderBy('sorrend');*/
     }
+    public function kommentek()
+    {
+        return $this->hasMany(Kommentek::class, 'poszt_id')->whereNull('elozetes_komment_id');
+    }
 }

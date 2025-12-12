@@ -14,6 +14,11 @@ class KepekSeeder extends Seeder
      */
     public function run(): void
     {
+        Kepek::create([
+            'url_Link' => 'https://www.gravatar.com/avatar/?d=mp&s=200',
+            'alt_Szoveg' => 'Default profile picture',
+            'leiras' => 'This is the default profile picture for users without a custom image.'
+        ]);
         // Add your images
         $yourImages = [
             [

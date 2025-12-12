@@ -3,28 +3,28 @@
     <!-- Sign Up Container -->
     <div class="container a-container" :class="{ 'is-txl': isSignUpMode }">
       <form class="form" @submit.prevent="handleSignUp">
-        <h2 class="title">Create Account</h2>
-        <input class="form__input" autocomplete="username" type="text" placeholder="Felhasználóneve" v-model="signUpForm.name" required>
+        <h2 class="title">Fiók készítése</h2>
+        <input class="form__input" autocomplete="username" type="text" placeholder="Felhasználónév" v-model="signUpForm.name" required>
         <input class="form__input" autocomplete="email" type="email" placeholder="Email" v-model="signUpForm.email" required>
         <input class="form__input" autocomplete="new-password" type="password" placeholder="Jelszó" v-model="signUpForm.password" required>
         <label class='form__checkbox'>
-        <input type='checkbox' name='terms' v-model="signUpForm.terms" required/> I agree to the Terms of Service 
+        <input type='checkbox' name='terms' v-model="signUpForm.terms" required/> Elolvastam és elfogadom a Felhasználási feltételeket
         </label>
         <label class='form__checkbox'>
-          <input type="checkbox" name="checkbox" v-model="signUpForm.privacy" /> I agree to the Privacy Policy
+          <input type="checkbox" name="checkbox" v-model="signUpForm.privacy" /> Elolvastam és elfogadom a Adatvédelmi irányelveket
         </label>
-        <button class="button" type="submit">SIGN UP</button>
+        <button class="button" type="submit">Fiók létrehozása</button>
       </form>
     </div>
 
     <!-- Sign In Container -->
     <div class="container b-container" :class="{ 'is-txl is-z200': isSignUpMode }">
       <form class="form" @submit.prevent="handleSignIn" method="post" action="/login" redirect="/">
-        <h2 class="title">Sign in to Website</h2>
+        <h2 class="title">Lépj be a fiókodba</h2>
         <input class="form__input" autocomplete="email" type="email" placeholder="Email" v-model="signInForm.email" required>
         <input class="form__input" autocomplete="current-password" type="password" placeholder="Jelszó" v-model="signInForm.password" required>
-        <a class="form__link" href="#">Forgot your password?</a>
-        <button class="button" type="submit">SIGN IN</button>
+        <a class="form__link" href="#">Elfelejtetted a jelszavad?</a>
+        <button class="button" type="submit">Bejelentkezés</button>
       </form>
     </div>
 
@@ -33,14 +33,14 @@
       <div class="switch__circle" :style="{ transform: isSignUpMode ? 'translateX(0%)' : 'translateX(60%)' }"></div>
       <div class="switch__circle switch__circle--t" :style="{ transform: isSignUpMode ? 'translateX(0%)' : 'translateX(-60%)' }"></div>
       <div class="switch__container" :class="{ 'is-hidden': isSignUpMode }">
-        <h2 class="title">Welcome Back !</h2>
-        <p class=" description">To keep connected with us please login with your personal info</p>
-        <button class="switch__button button" @click="toggleForm">SIGN IN</button>
+        <h2 class="title">Üdvözöljük vissza!</h2>
+        <p class=" description">A kapcsolat fenntartásához kérjük, jelentkezzen be személyes adataival</p>
+        <button class="switch__button button" @click="toggleForm">Bejelentkezés</button>
       </div>
       <div class="switch__container" :class="{ 'is-hidden': !isSignUpMode }">
-        <h2 class="title">Hello Friend !</h2>
-        <p class=" description">Enter your personal details and start journey with us</p>
-        <button class="switch__button button" @click="toggleForm">SIGN UP</button>
+        <h2 class="title">Helló Barátom!</h2>
+        <p class=" description">Add meg személyes adataidat, és kezdd el az utazást velünk</p>
+        <button class="switch__button button" @click="toggleForm">Regisztráció</button>
       </div>
     </div>
   </div>
@@ -48,7 +48,8 @@
 
 <script setup>
 import { ref } from 'vue'
-import axios from 'axios'
+import axios from 'axios' 
+import router from '@/router/router'
 
 //#region reactive elements
 const isSignUpMode = ref(true)
@@ -74,9 +75,10 @@ const toggleForm = () => {
 }
 
 const handleSignIn = async () => {
+
   loading.value = true
   loginError.value = ''
-  
+
   try {
     // Frontend validation
     if (!signInForm.value.email || !signInForm.value.password) {
@@ -92,17 +94,26 @@ const handleSignIn = async () => {
     }
     
     // API call to login
+    await axios.get('/sanctum/csrf-cookie') // Get CSRF cookie if needed
+
     const response = await axios.post('/login', {
       email: signInForm.value.email,
-      password: signInForm.value.password
+      password: signInForm.value.password,
+    },{
+      withCredentials: true
     })
-    
-    // Store token and user data
-    localStorage.setItem('auth_token', response.data.token)
-    localStorage.setItem('user', JSON.stringify(response.data.user))
-    
+    console.log('Login response:', response);
+
+    if (response.status === 204) {
+      router.push('/Profil') // Redirect to profile page on successful login
+      // Dispatch a custom event
+      window.dispatchEvent(new Event('user-logged-in'));
+
+    }
+    else {
+      throw new Error('Login failed. Please check your credentials.')
+    }
     // Redirect to dashboard or home
-    window.location.href = '/Profil' // or use router.push if you have Vue Router
     
   } catch (error) {
     loginError.value = error.response?.data?.message || error.message || 'Login failed. Please try again.'
@@ -115,22 +126,6 @@ const handleSignUp = async () => {
   // You can implement signup logic here similarly
   console.log('Sign up form submitted:', signUpForm.value)
 }
-
-// Check if user is already logged in
-const checkAuth = () => {
-  const token = localStorage.getItem('auth_token')
-  if (token) {
-    // User is logged in, redirect to dashboard
-    window.location.href = '/Profil'
-  }
-}
-
-// Call checkAuth when component mounts
-checkAuth()
-
-//#endregion
-
-
 
 </script>
 

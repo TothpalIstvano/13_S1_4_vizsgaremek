@@ -54,9 +54,50 @@
           </div>
         </div>
 
-        <div class="kommnentek">
-          <h1>Kommentek</h1>
-        </div>
+        <div class="kommentek-section">
+  <h2>Hozzászólások ({{ comments.length }})</h2>
+  
+  <!-- Add Comment Form -->
+  <div class="add-comment">
+    <textarea 
+      v-model="newComment" 
+      placeholder="Írj egy hozzászólást..."
+      rows="3"
+    ></textarea>
+    <button 
+      @click="addComment" 
+      :disabled="!newComment.trim()"
+      class="comment-submit-btn"
+    >
+      <font-awesome-icon icon="fa-solid fa-paper-plane" /> Küldés
+    </button>
+  </div>
+
+  <!-- Comments List -->
+  <div class="comments-list">
+    <div v-if="loadingComments" class="loading-comments">
+      Kommentek betöltése...
+    </div>
+    
+    <div v-else-if="comments.length === 0" class="no-comments">
+      <p>Még nincsenek hozzászólások. Legyél te az első!</p>
+    </div>
+    
+    <div v-else>
+      <div 
+        v-for="comment in comments" 
+        :key="comment.id" 
+        class="comment-item"
+      >
+        <CommentItem 
+          :comment="comment" 
+          @reply="handleReply"
+          @delete="handleDelete"
+        />
+      </div>
+    </div>
+  </div>
+</div>
       </article>
     </div>
   </main>
@@ -65,11 +106,13 @@
 <script>
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faCalendar, faUser } from '@fortawesome/free-solid-svg-icons'
+import { faCalendar, faUser, faPaperPlane } from '@fortawesome/free-solid-svg-icons'
 
-library.add(faCalendar, faUser)
+library.add(faCalendar, faUser, faPaperPlane)
 
 import api from '@/services/api.js'
+import CommentItem from '@/components/CommentItem.vue'
+
 // Import your fallback image at the top
 import fallbackImage from '@/assets/Public/b-pl1.jpg'
 
@@ -79,7 +122,11 @@ export default {
     return {
       post: {},
       loading: true,
-      error: null
+      error: null,
+      comments: [],
+    newComment: '',
+    loadingComments: false,
+    replyTo: null,
     }
   },
   methods: {
@@ -109,6 +156,97 @@ export default {
         this.loading = false;
       }
     },
+      async fetchComments() {
+    try {
+      this.loadingComments = true;
+      const postId = this.$route.params.id;
+      const response = await api.get(`/api/blog/${postId}/comments`);
+      this.comments = response.data;
+    } catch (error) {
+      console.error('Error fetching comments:', error);
+    } finally {
+      this.loadingComments = false;
+    }
+  },
+
+  async addComment() {
+    if (!this.newComment.trim()) return;
+    
+    try {
+      const postId = this.$route.params.id;
+      const response = await api.post(`/api/blog/${postId}/comments`, {
+        komment: this.newComment,
+        elozo_komment_id: this.replyTo
+      });
+      
+      // Add new comment to the list
+      if (this.replyTo) {
+        // Find parent comment and add reply
+        this.addReplyToParent(this.replyTo, response.data.comment);
+      } else {
+        // Add as top-level comment
+        this.comments.unshift(response.data.comment);
+      }
+      
+      this.newComment = '';
+      this.replyTo = null;
+    } catch (error) {
+      console.error('Error adding comment:', error);
+      alert('Hiba történt a hozzászólás küldése közben.');
+    }
+  },
+
+  addReplyToParent(parentId, reply) {
+    const findAndAdd = (comments) => {
+      for (let comment of comments) {
+        if (comment.id === parentId) {
+          if (!comment.gyermekKommentek) {
+            comment.gyermekKommentek = [];
+          }
+          comment.gyermekKommentek.push(reply);
+          return true;
+        }
+        if (comment.gyermekKommentek && comment.gyermekKommentek.length > 0) {
+          if (findAndAdd(comment.gyermekKommentek)) return true;
+        }
+      }
+      return false;
+    };
+    
+    findAndAdd(this.comments);
+  },
+
+  handleReply(commentId) {
+    this.replyTo = commentId;
+    // Scroll to comment form and focus
+    document.querySelector('.add-comment textarea').focus();
+  },
+
+  async handleDelete(commentId) {
+    if (!confirm('Biztosan törölni szeretnéd ezt a hozzászólást?')) return;
+    
+    try {
+      await api.delete(`/api/comments/${commentId}`);
+      this.removeComment(commentId);
+    } catch (error) {
+      console.error('Error deleting comment:', error);
+      alert('Hiba történt a hozzászólás törlése közben.');
+    }
+  },
+
+  removeComment(commentId) {
+    const removeFromArray = (comments) => {
+      return comments.filter(comment => {
+        if (comment.id === commentId) return false;
+        if (comment.gyermekKommentek && comment.gyermekKommentek.length > 0) {
+          comment.gyermekKommentek = removeFromArray(comment.gyermekKommentek);
+        }
+        return true;
+      });
+    };
+    
+    this.comments = removeFromArray(this.comments);
+  },
     getImageUrl(imagePath) {
       // If no image or invalid path, use default
       if (!imagePath || typeof imagePath !== 'string') {
@@ -135,6 +273,7 @@ export default {
   },
   mounted() {
     this.fetchPost();
+    this.fetchComments();
   },
   watch: {
     '$route.params.id': {
@@ -145,7 +284,8 @@ export default {
     }
   },
   components: {
-    FontAwesomeIcon
+    FontAwesomeIcon,
+    CommentItem
   }
 }
 </script>
@@ -440,9 +580,75 @@ export default {
   color: #ff6b6b;
 }
 
-.kommnentek {
+.kommentek-section {
   margin-top: 60px;
+  padding-top: 40px;
   border-top: 1px solid var(--b-text-light);
+}
+
+.kommentek-section h2 {
+  font-size: 28px;
+  margin-bottom: 30px;
+  color: var(--mk-text-dark);
+}
+
+.add-comment {
+  margin-bottom: 40px;
+}
+
+.add-comment textarea {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid var(--b-border-light);
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 16px;
+  resize: vertical;
+  min-height: 100px;
+  margin-bottom: 12px;
+  transition: border-color 0.3s ease;
+}
+
+.add-comment textarea:focus {
+  outline: none;
+  border-color: var(--b-tag);
+}
+
+.comment-submit-btn {
+  background: var(--b-tag);
+  color: var(--b-text-light);
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 500;
+  transition: all var(--b-transition-time);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.comment-submit-btn:hover:not(:disabled) {
+  background: var(--b-tag-hover);
+  transform: translateY(-2px);
+}
+
+.comment-submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.loading-comments,
+.no-comments {
+  text-align: center;
+  padding: 40px;
+  color: var(--b-text-light);
+}
+
+.no-comments p {
+  font-size: 18px;
+  font-style: italic;
 }
 
 @media screen and (max-width: 768px) {
