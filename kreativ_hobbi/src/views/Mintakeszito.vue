@@ -924,7 +924,7 @@ function formBetoltes() {
     <!-- Pixelesített kép -->
     <div v-else class="pixelation-main-container">
       <div class="pixelesContainer">
-        <h1>Minta Változtató</h1>
+        <h1>Minta változtató</h1>
         
         <div v-if="!aktualisKep" class="feltoltes">
           <p>Nincs kép betöltve. Kérjük, menj vissza és tölts fel egy képet.</p>
@@ -1062,7 +1062,8 @@ function formBetoltes() {
               </div>
             </div>
             <div v-else>
-              <img src="../assets/public/loading.gif" alt="Kép betöltése folyamatban">
+              <!--<img src="../assets/public/loading.gif" alt="Kép betöltése folyamatban">-->
+              <p>Kép betöltése folyamatban</p>
             </div>
           </div>
 

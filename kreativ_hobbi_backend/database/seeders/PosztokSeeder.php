@@ -20,7 +20,7 @@ class PosztokSeeder extends Seeder
                 'tartalom' => '<h2>Full HTML content here</h2><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris pulvinar euismod velit sit amet finibus. Morbi lobortis dui quam, non tincidunt metus viverra a. Proin faucibus enim quis cursus tempor. Suspendisse dignissim tempor magna. Integer dictum massa non dui luctus congue. Aenean placerat purus magna, vel porttitor libero iaculis at. Mauris vehicula quam neque, non varius mauris euismod sed. In accumsan sodales mi, gravida laoreet dolor tempor dapibus.</p>
                 ',
                 'szerzo_id' => 1, // Your user ID
-                'fo_kep_id' => 1, // ID of your main image from kepek table
+                'fo_kep_id' => 2, // ID of your main image from kepek table
                 'letrehozas_datuma' => now(),
                 'statusz' => 'közzétett'
             ],
@@ -35,7 +35,7 @@ class PosztokSeeder extends Seeder
                 </ul>
                 </p>',
                 'szerzo_id' => 1,
-                'fo_kep_id' => 4,
+                'fo_kep_id' => 5,
                 'letrehozas_datuma' => now()->subDays(3),
                 'statusz' => 'közzétett'
             ],
