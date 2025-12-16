@@ -291,6 +291,12 @@ export default {
 </script>
 
 <style scoped>
+main {
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
 .single-blog {
   max-width: 1200px;
   margin: 0 auto;
@@ -469,8 +475,9 @@ export default {
 .loading {
   text-align: center;
   align-items: center;
-  margin: 0;
-  padding-top: 60px;
+  position: absolute;
+  padding-top: 100px;
+  margin: 0; 
 }
 
 .three-body {

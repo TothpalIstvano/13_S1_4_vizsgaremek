@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive, onMounted, nextTick, computed } from "vue"
+import { ref, reactive, onMounted, nextTick, computed, watch } from "vue"
 
 // Adat bekérés változók
 const resz = ref(1)
@@ -702,9 +702,6 @@ if (aktualisKep.value) {
         })
     }
 }
-
-// Watch for when pixelation view becomes active and process image
-import { watch } from 'vue'
 
 watch(pixelesKep, (newVal) => {
   if (newVal && aktualisKep.value && betoltottKep.value) {

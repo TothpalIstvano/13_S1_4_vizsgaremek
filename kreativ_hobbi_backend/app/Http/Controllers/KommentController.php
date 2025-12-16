@@ -13,20 +13,20 @@ class KommentController extends Controller
     {
         try {
             // Simple test first - return hardcoded data
-            return response()->json([
+            /*return response()->json([
                 ['id' => 1, 'komment' => 'Test comment 1', 'felhasznalo' => ['felhasz_nev' => 'Test User']],
                 ['id' => 2, 'komment' => 'Test comment 2', 'felhasznalo' => ['felhasz_nev' => 'Another User']]
-            ]);
+            ]);*/
 
             // If that works, uncomment below:
-            /*
+
             $post = Posztok::find($id);
 
             if (!$post) {
                 return response()->json(['error' => 'Post not found'], 404);
             }
 
-            $comments = Kommentek::with('felhasznalo:id,felhasz_nev')
+            $comments = Kommentek::with(['kommentIro:id,felhasz_nev', 'gyermekKommentek.kommentIro:id,felhasz_nev'])
                 ->where('poszt_id', $id)
                 ->whereNull('elozetes_komment_id')
                 ->orderBy('letrehozas_datuma', 'desc')
@@ -36,15 +36,25 @@ class KommentController extends Controller
                         'id' => $comment->id,
                         'komment' => $comment->komment,
                         'letrehozas_datuma' => $comment->letrehozas_datuma,
-                        'felhasznalo' => $comment->felhasznalo ? [
-                            'felhasz_nev' => $comment->felhasznalo->felhasz_nev,
+                        'felhasznalo' => $comment->kommentIro ? [
+                            'felhasz_nev' => $comment->kommentIro->felhasz_nev,
                         ] : null,
-                        'gyermekKommentek' => []
+                        'gyermekKommentek' => $comment->gyermekKommentek->map(function ($reply) {
+                            return [
+                                'id' => $reply->id,
+                                'komment' => $reply->komment,
+                                'letrehozas_datuma' => $reply->letrehozas_datuma,
+                                'felhasznalo' => $reply->kommentIro ? [
+                                    'felhasz_nev' => $reply->kommentIro->felhasz_nev,
+                                ] : null,
+                                'gyermekKommentek' => [] // No deeper nesting for now
+                            ];
+                        })
                     ];
                 });
 
             return response()->json($comments);
-            */
+
 
         } catch (\Exception $e) {
             Log::error('Error in KommentController@index: ' . $e->getMessage());
@@ -57,22 +67,30 @@ class KommentController extends Controller
         try {
             $request->validate([
                 'komment' => 'required|string|min:3|max:1000',
+                'elozo_komment_id' => 'nullable|exists:kommentek,id',
             ]);
 
-            // For now, create without auth
             $comment = Kommentek::create([
                 'komment' => $request->komment,
                 'poszt_id' => $postId,
-                'kommentelo' => 1, // Default user
+                'kommentelo' => 1, // TODO: Replace with authenticated user ID
+                'elozetes_komment_id' => $request->elozo_komment_id,
                 'letrehozas_datuma' => now(),
             ]);
+
+            // Load the user relationship
+            $comment->load('kommentIro:id,felhasz_nev');
 
             return response()->json([
                 'message' => 'Comment added!',
                 'comment' => [
                     'id' => $comment->id,
                     'komment' => $comment->komment,
-                    'felhasznalo' => ['felhasz_nev' => 'You']
+                    'letrehozas_datuma' => $comment->letrehozas_datuma,
+                    'felhasznalo' => $comment->kommentIro ? [
+                        'felhasz_nev' => $comment->kommentIro->felhasz_nev,
+                    ] : null,
+                    'gyermekKommentek' => []
                 ]
             ], 201);
 

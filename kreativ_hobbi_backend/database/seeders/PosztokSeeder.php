@@ -12,15 +12,14 @@ class PosztokSeeder extends Seeder
      */
     public function run(): void
     {
-        // Your custom posts
         $yourPosts = [
             [
                 'cim' => 'My First Blog Post',
                 'kivonat' => 'A brief excerpt of my first post...',
                 'tartalom' => '<h2>Full HTML content here</h2><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris pulvinar euismod velit sit amet finibus. Morbi lobortis dui quam, non tincidunt metus viverra a. Proin faucibus enim quis cursus tempor. Suspendisse dignissim tempor magna. Integer dictum massa non dui luctus congue. Aenean placerat purus magna, vel porttitor libero iaculis at. Mauris vehicula quam neque, non varius mauris euismod sed. In accumsan sodales mi, gravida laoreet dolor tempor dapibus.</p>
                 ',
-                'szerzo_id' => 1, // Your user ID
-                'fo_kep_id' => 2, // ID of your main image from kepek table
+                'szerzo_id' => 1,
+                'fo_kep_id' => 2,
                 'letrehozas_datuma' => now(),
                 'statusz' => 'közzétett'
             ],
@@ -47,16 +46,14 @@ class PosztokSeeder extends Seeder
                 'fo_kep_id' => 8,
                 'letrehozas_datuma' => now()->subDays(5),
                 'statusz' => 'közzétett'
-            ],
-            // Add more posts...
+            ]
         ];
 
         foreach ($yourPosts as $post) {
             Posztok::create($post);
         }
 
-        // Optional: Keep some fake data
-        Posztok::factory(5)->create(); // Reduced from 30
+        Posztok::factory(5)->create();
         $this->command->info('Posztok table seeded successfully!');
     }
 }

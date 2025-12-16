@@ -127,7 +127,7 @@ export default {
 
 .comment-date {
   font-size: 12px;
-  color: var(--b-text-light, #6c757d);
+  color: var(--b-text-dark);
 }
 
 .delete-btn {
