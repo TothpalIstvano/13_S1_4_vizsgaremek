@@ -24,15 +24,6 @@ class Felhasznalok extends Authenticatable
         'felhasz_nev',
         'email',
         'jelszo',
-        'profilKep_id',
-        'statusz',
-        'letrehozas_Datuma',
-        'utolso_Belepes',
-    ];
-
-    protected $hidden = [
-        'jelszo',
-        'remember_token',
     ];
 
     protected $casts = [
