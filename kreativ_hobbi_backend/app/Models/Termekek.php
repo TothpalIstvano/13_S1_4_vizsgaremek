@@ -11,13 +11,14 @@ class Termekek extends Model
     protected $table = "termekek";
     protected $PrimaryKey = "id";
     public $timestamps = true;
-    protected $fillable = ['nev', 'leiras', 'ar', 'darab', 'kategoria_id', 'fo_kep_id'];
+    protected $fillable = ['nev', 'leiras', 'ar', 'darab', 'meter', 'kategoria_id', 'fo_kep_id'];
 
     public function kategoria()
     {
         return $this->belongsTo(Kategoriak::class);
     }
-    public function kepek(){
+    public function kepek()
+    {
         return $this->belongsTo(Kepek::class);
     }
 }

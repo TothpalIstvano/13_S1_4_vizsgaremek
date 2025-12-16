@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive, onMounted, nextTick, computed } from "vue"
+import { ref, reactive, onMounted, nextTick, computed, watch } from "vue"
 
 // Adat bekérés változók
 const resz = ref(1)
@@ -703,9 +703,6 @@ if (aktualisKep.value) {
     }
 }
 
-// Watch for when pixelation view becomes active and process image
-import { watch } from 'vue'
-
 watch(pixelesKep, (newVal) => {
   if (newVal && aktualisKep.value && betoltottKep.value) {
     nextTick(() => {
@@ -924,7 +921,7 @@ function formBetoltes() {
     <!-- Pixelesített kép -->
     <div v-else class="pixelation-main-container">
       <div class="pixelesContainer">
-        <h1>Minta Változtató</h1>
+        <h1>Minta változtató</h1>
         
         <div v-if="!aktualisKep" class="feltoltes">
           <p>Nincs kép betöltve. Kérjük, menj vissza és tölts fel egy képet.</p>
@@ -1062,7 +1059,8 @@ function formBetoltes() {
               </div>
             </div>
             <div v-else>
-              <img src="../assets/public/loading.gif" alt="Kép betöltése folyamatban">
+              <!--<img src="../assets/public/loading.gif" alt="Kép betöltése folyamatban">-->
+              <p>Kép betöltése folyamatban</p>
             </div>
           </div>
 
@@ -1391,7 +1389,13 @@ main {
   background-color: var(--mk-szovegdoboz-masod);
   color: white;
   padding: 30px 20px 20px;
-  transition: all 0.3s ease;
+  height: 240px;
+  transition: height 0.6s ease;
+}
+
+.blog-info:hover {
+  height: 100%;
+  align-content: space-evenly;
 }
 
 .blog-info ol {
@@ -1403,10 +1407,6 @@ main {
   margin-bottom: 10px;
 }
 
-.blog-info:hover {
-  transform: translateY(-30px);
-  box-shadow: 0 6px 20px var(--mk-arnyekszin);
-}
 
 .blog-info-kontener {
   position: relative;
@@ -1421,6 +1421,7 @@ main {
   height: auto;
   display: block;
   transition: transform 0.3s ease;
+  object-fit: cover;
 }
 
 .blog-info-kontener:hover img {
@@ -1920,7 +1921,7 @@ input[type="file"] {
 }
 /*#endregion*/
 
-@media (max-width: 1100px) {
+@media (max-width: 1250px) {
   .ket-oszlop {
     grid-template-columns: 1fr;
   }
@@ -1931,6 +1932,7 @@ input[type="file"] {
   
   .pixelesContainer {
     grid-template-columns: 1fr;
+    max-width: 100%;
   }
   
   .oldalsav {

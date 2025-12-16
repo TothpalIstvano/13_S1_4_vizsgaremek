@@ -18,12 +18,13 @@ class TermekekFactory extends Factory
     public function definition(): array
     {
         return [
-            "nev"=> $this->faker->words(rand(1,3), true),
-            "leiras"=> $this->faker->sentence(),
-            "ar"=> rand(1000, 5000),
-            "darab"=> $this->faker->numberBetween(201, 300),
-            "kategoria_id"=> Kategoriak::pluck('id')->random(),
-            'fo_kep_id'=> $this->faker->numberBetween(60, 91),
+            "nev" => $this->faker->words(rand(1, 3), true),
+            "leiras" => $this->faker->sentence(),
+            "ar" => rand(1000, 5000),
+            "darab" => $this->faker->numberBetween(201, 300),
+            "meter" => rand(min: 1000, max: 5000),
+            "kategoria_id" => Kategoriak::pluck('id')->random(),
+            'fo_kep_id' => $this->faker->numberBetween(60, 91),
         ];
     }
 }
