@@ -4,16 +4,18 @@
     <div class="container a-container" :class="{ 'is-txl': isSignUpMode }">
       <form class="form" @submit.prevent="handleSignUp">
         <h2 class="title">Fiók készítése</h2>
-        <input class="form__input" autocomplete="username" type="text" placeholder="Felhasználónév" v-model="signUpForm.name" required>
-        <input class="form__input" autocomplete="email" type="email" placeholder="Email" v-model="signUpForm.email" required>
-        <input class="form__input" autocomplete="new-password" type="password" placeholder="Jelszó" v-model="signUpForm.password" required>
+        <input class="form__input" autocomplete="username" name="username" type="text" placeholder="Felhasználónév" v-model="signUpForm.name" required>
+        <input class="form__input" autocomplete="email" type="email" name="email" placeholder="Email" v-model="signUpForm.email" required>
+        <input class="form__input" autocomplete="new-password" name="password" type="password" placeholder="Jelszó" v-model="signUpForm.password" minlength="8" pattern="/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/" required>
+        <input class="form__input" autocomplete="new-password" name="password_confirmation" type="password" placeholder="Jelszó megerositése" v-model="signUpForm.password_confirmation" minlength="8" required>
+        <label for="password_confirmation" v-if="signUpForm.password !== signUpForm.password_confirmation && signUpForm.password !== '' && signUpForm.password_confirmation !== ''" class="error-message">A két jelszó nem egyezik!</label>
         <label class='form__checkbox'>
         <input type='checkbox' name='terms' v-model="signUpForm.terms" required/> Elolvastam és elfogadom a Felhasználási feltételeket
         </label>
         <label class='form__checkbox'>
-          <input type="checkbox" name="checkbox" v-model="signUpForm.privacy" /> Elolvastam és elfogadom a Adatvédelmi irányelveket
+          <input type="checkbox" required name="checkbox" v-model="signUpForm.privacy" /> Elolvastam és elfogadom a Adatvédelmi irányelveket
         </label>
-        <button class="button" type="submit">Fiók létrehozása</button>
+        <button class="button" type="submit" :disabled="signUpForm.password !== signUpForm.password_confirmation && signUpForm.password !== '' && signUpForm.password_confirmation !== ''">Fiók létrehozása</button>
       </form>
     </div>
 
@@ -21,8 +23,9 @@
     <div class="container b-container" :class="{ 'is-txl is-z200': isSignUpMode }">
       <form class="form" @submit.prevent="handleSignIn" method="post" action="/login" redirect="/">
         <h2 class="title">Lépj be a fiókodba</h2>
-        <input class="form__input" autocomplete="email" type="email" placeholder="Email" v-model="signInForm.email" required>
-        <input class="form__input" autocomplete="current-password" type="password" placeholder="Jelszó" v-model="signInForm.password" required>
+        <label v-if="loginError !== ''" class="error-message">{{ loginError }}</label>
+        <input class="form__input" name="email" autocomplete="email" type="email" placeholder="Email" v-model="signInForm.email" required>
+        <input class="form__input" name="password" autocomplete="current-password" minlength="8" type="password" placeholder="Jelszó" v-model="signInForm.password" required>
         <a class="form__link" href="#">Elfelejtetted a jelszavad?</a>
         <button class="button" type="submit">Bejelentkezés</button>
       </form>
@@ -77,7 +80,7 @@ const toggleForm = () => {
 const handleSignIn = async () => {
 
   loading.value = true
-  loginError.value = ''
+  loginError.value = ref('')
 
   try {
     // Frontend validation
@@ -89,8 +92,8 @@ const handleSignIn = async () => {
       throw new Error('Please enter a valid email')
     }
     
-    if (signInForm.value.password.length < 3) {
-      throw new Error('Password must be at least 3 characters')
+    if (signInForm.value.password.length < 8) {
+      throw new Error('Password must be at least 8 characters')
     }
     
     // API call to login
@@ -123,8 +126,47 @@ const handleSignIn = async () => {
 }
 
 const handleSignUp = async () => {
-  // You can implement signup logic here similarly
-  console.log('Sign up form submitted:', signUpForm.value)
+
+  loading.value = true
+  loginError.value = ''
+
+  try {
+    if (!signUpForm.value.name || !signUpForm.value.email || !signUpForm.value.password) {
+      throw new Error('Please fill in all fields')
+    }
+
+    if (!signUpForm.value.email.includes('@')) {
+      throw new Error('Please enter a valid email')
+    }
+
+    if (signUpForm.value.password.length < 3) {
+      throw new Error('Password must be at least 3 characters')
+    }
+
+    // API call to register
+    await axios.get('/sanctum/csrf-cookie') // Get CSRF cookie if needed
+
+    const response = await axios.post('/register', {
+      felhasz_nev: signUpForm.value.name,
+      email: signUpForm.value.email,
+      password: signUpForm.value.password,
+    }, {
+      withCredentials: true
+    })
+
+    console.log('Registration response:', response);
+
+    if (response.status === 201) {
+      router.push('/Belepes') // Redirect to login page on successful registration
+    } else {
+      throw new Error('Registration failed. Please try again.')
+    }
+    }
+  catch (error) {
+    loginError.value = error.response?.data?.message || error.message || 'Registration failed. Please try again.'
+  } finally {
+    loading.value = false
+  }
 }
 
 </script>
@@ -140,10 +182,25 @@ const handleSignUp = async () => {
 /* Generic */
 .error-message {
   color: #e74c3c;
-  margin-top: 10px;
   font-size: 14px;
-  text-align: center;
+  width: 350px;
+  margin: 8px 0;
+  padding-left: 10px;
+  font-size: 13px;
+  letter-spacing: .15px;
+  font-family: 'Montserrat', sans-serif;
+  animation: alertPopup .5s ease-out;
 }
+
+@keyframes alertPopup {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
 
 /**/
 .main {
