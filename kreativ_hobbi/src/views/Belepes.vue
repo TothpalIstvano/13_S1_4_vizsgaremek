@@ -6,7 +6,7 @@
         <h2 class="title">Fiók készítése</h2>
         <input class="form__input" autocomplete="username" name="username" type="text" placeholder="Felhasználónév" v-model="signUpForm.name" required>
         <input class="form__input" autocomplete="email" type="email" name="email" placeholder="Email" v-model="signUpForm.email" required>
-        <input class="form__input" autocomplete="new-password" name="password" type="password" placeholder="Jelszó" v-model="signUpForm.password" minlength="8" pattern="/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/" required>
+        <input class="form__input" autocomplete="new-password" name="password" type="password" placeholder="Jelszó" v-model="signUpForm.password" minlength="8" required>
         <input class="form__input" autocomplete="new-password" name="password_confirmation" type="password" placeholder="Jelszó megerositése" v-model="signUpForm.password_confirmation" minlength="8" required>
         <label for="password_confirmation" v-if="signUpForm.password !== signUpForm.password_confirmation && signUpForm.password !== '' && signUpForm.password_confirmation !== ''" class="error-message">A két jelszó nem egyezik!</label>
         <label class='form__checkbox'>
@@ -63,6 +63,7 @@ const signUpForm = ref({
   name: '',
   email: '',
   password: '',
+  password_confirmation: '',
   terms: false,
   privacy: false,
 })
@@ -146,10 +147,13 @@ const handleSignUp = async () => {
     // API call to register
     await axios.get('/sanctum/csrf-cookie') // Get CSRF cookie if needed
 
+    console.log(signUpForm.value.password)
+
     const response = await axios.post('/register', {
       felhasz_nev: signUpForm.value.name,
       email: signUpForm.value.email,
       password: signUpForm.value.password,
+      password_confirmation: signUpForm.value.password_confirmation,
     }, {
       withCredentials: true
     })
@@ -161,9 +165,24 @@ const handleSignUp = async () => {
     } else {
       throw new Error('Registration failed. Please try again.')
     }
+    // backend returns noContent() (204) after registering and logging in the user
+    if (response.status === 204 || response.status === 201) {
+      // user is logged in server-side, go to profile
+      router.push('/Profil')
+      window.dispatchEvent(new Event('user-logged-in'));
+    } else {
+      throw new Error('Registration failed. Please try again.')
+    }
     }
   catch (error) {
     loginError.value = error.response?.data?.message || error.message || 'Registration failed. Please try again.'
+    if (error.response?.status === 422 && error.response.data?.errors) {
+      // join validation errors into a single message
+      const errs = Object.values(error.response.data.errors).flat().join(' ')
+      loginError.value = errs || error.response.data.message || error.message
+    } else {
+      loginError.value = error.response?.data?.message || error.message || 'Registration failed. Please try again.'
+    }
   } finally {
     loading.value = false
   }
