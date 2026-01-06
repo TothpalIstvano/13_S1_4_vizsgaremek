@@ -19,7 +19,6 @@ async function fetchUserData() {
 onMounted(async () => {
   userData.value = await fetchUserData();
   if (userData.value) {
-    console.log('Fetched user data:', userData.value);
     user.name = userData.value.felhasz_nev;
     user.username = userData.value.felhasz_nev;
     user.bio = userData.value.bio || 'Kreatív hobbi rajongó';
@@ -107,11 +106,7 @@ function cancelLogout() {
 
 onMounted(() => {
   console.log('Profile component mounted.');
-  fetchUserData().then(data => {
-    if (data) {
-      console.log('User data on mount:', data);
-    }
-  });
+  fetchUserData();
 });
 </script>
 

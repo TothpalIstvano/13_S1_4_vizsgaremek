@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('termekKepek', function (Blueprint $table) {
             $table->unsignedInteger('termek_id')->nullable(false);
             $table->unsignedInteger('kep_id')->nullable(false);
-            $table->integer('rendezes')->default(0);
+            $table->integer('rendezes')->default(1);
             $table->primary(['termek_id', 'kep_id']);
             $table->foreign('termek_id')->references('id')->on('termekek')->onDelete('cascade');
             $table->foreign('kep_id')->references('id')->on('kepek')->onDelete('cascade');
