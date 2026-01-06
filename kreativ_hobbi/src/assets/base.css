@@ -81,6 +81,8 @@
   --b-transition-time: 0.3s;
   --b-card-shadow: 0 4px 20px rgba(136, 67, 64, 0.15);
   --b-card-shadow-hover: 0 8px 30px rgba(136, 67, 64, 0.25);
+  --b-komment-fo: #f1e0cf;
+  --b-hatter: #c9a785;
 }
 
 /*Index blog kártyák*/

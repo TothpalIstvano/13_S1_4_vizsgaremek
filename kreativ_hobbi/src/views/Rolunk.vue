@@ -29,7 +29,7 @@ export default {
         </div>
         <div class="szovegek">
           <p class="szoveg-stilus cimszoveg">
-            About Me
+            About Us
           </p>
           <p class="szoveg-stilus also-cimszoveg">
             Lorem ipsum dolor sit amet, consectetur adipiscing elit.
@@ -365,7 +365,7 @@ hr {
 
 hr::after {
   background-color: var(--bg);
-  content: "(ﾉ◕ヮ◕)ﾉ*:･ﾟ✧";
+  /*content: "(ﾉ◕ヮ◕)ﾉ*:･ﾟ✧";*/
   padding: 0 4px;
   position: relative;
   top: -13px;
