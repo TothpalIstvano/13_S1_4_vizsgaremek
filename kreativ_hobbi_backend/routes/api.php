@@ -10,13 +10,16 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::get('api/teszt', function () {
-    return Felhasznalok::all();
+Route::middleware('auth:sanctum')->get('/user/profilKep', function (Request $request) {
+    try{
+        return response()->file(storage_path('profilkepek/kep_'.$request->user()->profilKep_id));
+    } catch(Exception $e) {
+        return response()->file(storage_path('profilkepek/default.jpg'))->setStatusCode(404);
+    }
 });
 
-// Test route
 Route::get('/teszt', function () {
-    return response()->json(['message' => 'API működik!']);
+    return Felhasznalok::all();
 });
 
 // Blog routes

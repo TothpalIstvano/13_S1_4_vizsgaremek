@@ -16,6 +16,15 @@ async function fetchUserData() {
   }
 }
 
+async function fetchUserPicture() {
+  try {
+    const response = await axios.get('/api/user/profilKep');
+    return URL.createObjectURL(response.data);
+  } catch (error) {
+    console.error('Error fetching user picture:', error);
+  }
+}
+
 onMounted(async () => {
   userData.value = await fetchUserData();
   if (userData.value) {
@@ -30,7 +39,9 @@ onMounted(async () => {
       following: userData.value.following_count || 134
     }
     user.joined = userData.value.letrehozas_Datuma || '2022-09-15';
-  } else {
+    user.avatar = await fetchUserPicture() || user.avatar;
+  } 
+  else {
     console.log('No user data available.');
   }
 });
@@ -91,13 +102,10 @@ async function confirmLogout() {
     // if you have a backend logout route, call it (uncomment)
     await axios.post('/logout', { withCredentials: true });
   } catch (e) {
-    // ignore API errors for now
+    console.error('Error during logout:', e);
   } finally {
-    
-    localStorage.removeItem('user');
     showLogout.value = false;
     setTimeout(() => window.location.href = '/belepes', 10); // or router.push('/belepes')
-    
   }
 }
 function cancelLogout() {
