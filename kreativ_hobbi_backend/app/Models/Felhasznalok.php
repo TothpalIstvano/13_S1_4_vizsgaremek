@@ -34,8 +34,6 @@ class Felhasznalok extends Authenticatable
 
     public function profilKep()
     {
-        // 'profilKep_id' is the foreign key in the 'felhasznalok' table
-        // 'id' is the primary key in the 'kepek' table
         return $this->belongsTo(Kepek::class, 'profilKep_id', 'id');
     }
 

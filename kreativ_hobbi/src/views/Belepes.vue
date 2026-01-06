@@ -160,22 +160,17 @@ const handleSignUp = async () => {
 
     console.log('Registration response:', response);
 
-    if (response.status === 201) {
-      router.push('/Belepes') // Redirect to login page on successful registration
-    } else {
-      throw new Error('Registration failed. Please try again.')
-    }
     // backend returns noContent() (204) after registering and logging in the user
     if (response.status === 204 || response.status === 201) {
       // user is logged in server-side, go to profile
       router.push('/Profil')
+      
       window.dispatchEvent(new Event('user-logged-in'));
     } else {
       throw new Error('Registration failed. Please try again.')
     }
     }
   catch (error) {
-    loginError.value = error.response?.data?.message || error.message || 'Registration failed. Please try again.'
     if (error.response?.status === 422 && error.response.data?.errors) {
       // join validation errors into a single message
       const errs = Object.values(error.response.data.errors).flat().join(' ')
