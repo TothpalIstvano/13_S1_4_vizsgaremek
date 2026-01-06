@@ -10,14 +10,6 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::middleware('auth:sanctum')->get('/user/profilKep', function (Request $request) {
-    try{
-        return response()->file(storage_path('profilkepek/kep_'.$request->user()->profilKep_id));
-    } catch(Exception $e) {
-        return response()->file(storage_path('profilkepek/default.jpg'))->setStatusCode(404);
-    }
-});
-
 Route::get('/teszt', function () {
     return Felhasznalok::all();
 });

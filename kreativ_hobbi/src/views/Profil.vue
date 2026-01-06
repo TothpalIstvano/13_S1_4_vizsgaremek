@@ -16,22 +16,13 @@ async function fetchUserData() {
   }
 }
 
-async function fetchUserPicture() {
-  try {
-    const response = await axios.get('/api/user/profilKep');
-    return URL.createObjectURL(response.data);
-  } catch (error) {
-    console.error('Error fetching user picture:', error);
-  }
-}
-
 onMounted(async () => {
   userData.value = await fetchUserData();
   if (userData.value) {
     user.name = userData.value.felhasz_nev;
     user.username = userData.value.felhasz_nev;
     user.bio = userData.value.bio || 'Kreatív hobbi rajongó';
-    user.avatar = userData.value.profilKep || 'https://www.gravatar.com/avatar/?d=mp&s=200';
+    user.avatar = `http://localhost:8000/storage/profilkepek/kep_${userData.value.profilKep_id}.jpg` || 'http://localhost:8000/storage/profilkepek/default.jpg';
     user.cover = 'https://images.unsplash.com/photo-1503264116251-35a269479413?w=1600&h=400&fit=crop';
     user.stats = {
       posts: userData.value.posts_count || 12,
