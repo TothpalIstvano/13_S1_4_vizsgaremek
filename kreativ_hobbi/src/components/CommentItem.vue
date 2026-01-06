@@ -1,7 +1,5 @@
 <template>
   <div class="comment-item" :class="{ 'is-reply': isReply }">
-    <div class="comment-glow"></div>
-    
     <div class="comment-header">
       <div class="comment-author">
         <div class="avatar-container">
@@ -46,7 +44,6 @@
     
     <!-- Replies -->
     <div v-if="comment.gyermekKommentek && comment.gyermekKommentek.length > 0" class="replies">
-      <div class="reply-connector"></div>
       <CommentItem 
         v-for="reply in comment.gyermekKommentek" 
         :key="reply.id" 
@@ -105,41 +102,17 @@ export default {
 <style scoped>
 
 .comment-item {
-  background: #ffffff;
   border-radius: 16px;
-  padding: 1.5rem;
-  margin-bottom: 1.25rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  padding: 24px;
+  margin-bottom: 20px;
   position: relative;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 1px solid #e5e7eb;
   overflow: hidden;
 }
 
-.comment-item:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-}
-
-.comment-glow {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, var(--b-komment-fo) 0%, #e6d7cb 50%, var(--b-komment-fo) 100%);
-  opacity: 0;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.comment-item:hover .comment-glow {
-  opacity: 1;
-}
-
 .comment-item.is-reply {
-  margin-left: 2.5rem;
-  margin-top: 1.25rem;
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  margin-left: 40px;
+  margin-top: 20px;
+  background: var(--b-komment-hatter);
   border-left: 4px solid var(--b-komment-fo);
   position: relative;
 }
@@ -147,18 +120,18 @@ export default {
 .comment-item.is-reply::before {
   content: '';
   position: absolute;
-  left: -2.5rem;
+  left: -40px;
   top: 50%;
-  width: 2.5rem;
+  width: 40px;
   height: 2px;
-  background: #e5e7eb;
+  background: var(--b-komment-hatter);
 }
 
 .comment-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 1rem;
+  margin-bottom: 16px;
 }
 
 .comment-author {
@@ -168,14 +141,14 @@ export default {
 .avatar-container {
   display: flex;
   align-items: center;
-  gap: 0.875rem;
+  gap: 14px;
 }
 
 .avatar {
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%);
+  background: var(--b-text-light);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -184,8 +157,8 @@ export default {
 }
 
 .user-icon {
-  font-size: 1.75rem;
-  color: var(--b-komment-fo);
+  font-size: 12px;
+  color: var(--b-text-dark);
 }
 
 .author-info {
@@ -196,16 +169,16 @@ export default {
 .author-name {
   font-weight: 600;
   color: var(--b-text-dark);
-  font-size: 1rem;
-  margin-bottom: 0.25rem;
+  font-size: 16px;
+  margin-bottom: 4px;
 }
 
 .comment-date {
-  font-size: 0.75rem;
+  font-size: 12px;
   color: var(--b-text-light);
   display: flex;
   align-items: center;
-  gap: 0.375rem;
+  gap: 6px;
 }
 
 .comment-date::before {
@@ -217,16 +190,16 @@ export default {
   background: none;
   border: none;
   cursor: pointer;
-  padding: 0.5rem;
+  padding: 8px;
   border-radius: 8px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  color: var(--b-text-light);
+  color: rgb(104, 3, 3);
+  background-color: #ffd8d8;
 }
 
 .delete-btn:hover {
   background: #fef2f2;
   color: #be0606;
-  transform: scale(1.05);
 }
 
 .delete-icon {
@@ -238,14 +211,14 @@ export default {
 }
 
 .comment-content {
-  margin-bottom: 1.25rem;
+  margin-bottom: 20px;
 }
 
 .content-text {
   line-height: 1.7;
   color: var(--b-text-dark);
-  font-size: 0.95rem;
-  padding: 0.75rem;
+  font-size: 15px;
+  padding: 12px;
   background: #f9fafb;
   border-radius: 12px;
   border-left: 3px solid var(--b-komment-fo);
@@ -265,28 +238,28 @@ export default {
 
 .comment-actions {
   display: flex;
-  gap: 1rem;
+  gap: 16px;
 }
 
 .reply-btn {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  color: var(--b-komment-fo);
+  gap: 8px;
+  background: var(--b-gomb);
+  color: var(--b-text-light);
   border: 1px solid #ede9fe;
-  padding: 0.625rem 1.25rem;
+  padding: 10px 20px;
   border-radius: 12px;
   cursor: pointer;
-  font-size: 0.875rem;
+  font-size: 14px;
   font-weight: 500;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .reply-btn:hover {
-  background: linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%);
+  background: var(--b-gomb-hover);
   transform: translateY(-1px);
-  box-shadow: 0 4px 6px -1px rgba(124, 58, 237, 0.1);
+  box-shadow: 0 4px 6px -1px rgba(237, 58, 58, 0.1);
 }
 
 .reply-icon {
@@ -298,27 +271,8 @@ export default {
 }
 
 .replies {
-  margin-top: 1.5rem;
+  margin-top: 24px;
   position: relative;
-}
-
-.reply-connector {
-  position: absolute;
-  left: -1.5rem;
-  top: 0;
-  bottom: 0;
-  width: 2px;
-  background: linear-gradient(to bottom, transparent, #ede9fe, transparent);
-}
-
-.replies::before {
-  content: '';
-  position: absolute;
-  left: -1.5rem;
-  top: 0;
-  width: 2px;
-  height: 100%;
-  background: linear-gradient(to bottom, transparent, #ede9fe, transparent);
 }
 
 /* Animation for new comments */
@@ -340,11 +294,11 @@ export default {
 /* Responsive */
 @media (max-width: 640px) {
   .comment-item {
-    padding: 1.25rem;
+    padding: 20px;
   }
   
   .comment-item.is-reply {
-    margin-left: 1.5rem;
+    margin-left: 24px;
   }
   
   .avatar {
@@ -353,12 +307,12 @@ export default {
   }
   
   .user-icon {
-    font-size: 1.5rem;
+    font-size: 24px;
   }
   
   .content-text {
-    padding: 0.625rem;
-    font-size: 0.9rem;
+    padding: 10px;
+    font-size: 14px;
   }
 }
 </style>

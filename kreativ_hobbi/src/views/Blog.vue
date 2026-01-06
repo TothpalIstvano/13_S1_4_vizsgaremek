@@ -42,7 +42,6 @@
           <div class="card-content">
             <div class="card-header">
               <h3 class="blog-title">{{ post.cim }}</h3>
-              <div class="title-underline"></div>
             </div>
             
             <div class="meta-info">
@@ -69,9 +68,7 @@
               <div class="like-container">
                 <button class="like-btn">
                   <div class="heart-icon">
-                    <div class="icon-wrapper">
                       <font-awesome-icon icon="fa-solid fa-heart"/> 
-                    </div>
                   </div>
                   <span class="like-count">2,050</span>
                 </button>
@@ -80,9 +77,7 @@
               <button class="view-btn" @click="navigateToBlog(post.id)">
                 <span>Megtekintés</span>
                 <div class="arrow-icon">
-                  <div class="icon-wrapper">
-                      <font-awesome-icon icon="fa-solid fa-arrow-right"/> 
-                    </div>
+                      <font-awesome-icon icon="fa-solid fa-arrow-right"/>
                 </div>
               </button>
             </div>
@@ -209,10 +204,10 @@ main {
 }
 
 .title {
-  display: inline-block;
   font-weight: 700;
   font-size: 45px;
   color: var(--mk-text-dark);
+  display: inline-block;
   background-image: linear-gradient(90deg, #a08283, #4d0303);
   background-repeat: no-repeat;
   background-position: 0 100%;
@@ -223,7 +218,7 @@ main {
 .content-wrapper {
   max-width: 1800px;
   margin: 0 auto;
-  padding: 0 2rem;
+  padding: 0 32px;
 }
 
 .cards-wrapper {
@@ -239,7 +234,7 @@ main {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(480px, 1fr));
   gap: 64px;
-  padding: 3rem 0;
+  padding: 48px 0;
 }
 
 .card-grid-space {
@@ -263,12 +258,13 @@ main {
   border-radius: 20px;
   overflow: hidden;
   position: relative;
-  transition: var(--transition);
-  box-shadow: var(--shadow-md);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 0 3px rgba(237, 58, 58, 0.1);
   height: 100%;
   display: flex;
   flex-direction: column;
   border: 1px solid #e5e7eb;
+  text-align: left;
 }
 
 .card-glow {
@@ -277,9 +273,9 @@ main {
   left: 0;
   right: 0;
   height: 1px;
-  background: linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%);
+  background: linear-gradient(135deg, #ed3a3a 0%, #fa8b8b 100%);
   opacity: 0;
-  transition: var(--transition);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .card:hover {
@@ -336,14 +332,14 @@ main {
 }
 
 .card-content {
-  padding: 1.75rem;
+  padding: 28px;
   flex-grow: 1;
   display: flex;
   flex-direction: column;
 }
 
 .card-header {
-  margin-bottom: 1rem;
+  margin-bottom: 16px;
 }
 
 .blog-title {
@@ -351,32 +347,29 @@ main {
   font-size: 24px;
   margin: 0;
   transition: all, var(--b-transition-time);
+  display: inline-block;
+  background-image: linear-gradient(90deg, #a08283, #4d0303);
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 100% 4px;
 }
 
 .card:hover .blog-title {
   color: var(--b-text-dark);
 }
 
-.title-underline {
-  width: 40px;
-  height: 3px;
-  background: linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%);
-  border-radius: 2px;
-  margin-top: 0.5rem;
-}
-
 .meta-info {
-  margin-bottom: 1rem;
+  margin-bottom: 16px;
 }
 
 .blog-time {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  font-size: 0.875rem;
-  color: #6b7280;
-  background: #f9fafb;
-  padding: 0.375rem 0.75rem;
+  gap: 8px;
+  font-size: 14px;
+  color: #494d55;
+  background: #eedada;
+  padding: 6px 12px;
   border-radius: 20px;
   font-weight: 500;
 }
@@ -421,21 +414,21 @@ main {
   box-shadow: inset 0px 0px 10px 1px rgba(80, 33, 0, 0.5);
   display: inline-flex;
   align-items: center;
-  gap: 0.25rem;
-  transition: var(--transition);
+  gap: 4px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border: 1px solid #e5e7eb;
 }
 
 .tag:hover {
-  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  background: var(--b-tag-hover);
   color: white;
   transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
 }
 
 .tag-hash {
   opacity: 0.7;
-  font-size: 0.875em;
+  font-size: 14px;
 }
 
 .card-footer {
@@ -443,8 +436,8 @@ main {
   justify-content: space-between;
   align-items: center;
   margin-top: auto;
-  padding-top: 1.25rem;
-  border-top: 1px solid #e5e7eb;
+  padding-top: 20px;
+  border-top: 1px solid #d8c7c7;
 }
 
 .like-container {
@@ -454,18 +447,19 @@ main {
 .like-btn {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 8px;
   background: none;
   border: none;
-  color: #6b7280;
+  color: #494d55;
   cursor: pointer;
-  padding: 0.5rem;
+  padding: 8px;
   border-radius: 10px;
-  transition: var(--transition);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background-color: whitesmoke;
 }
 
 .like-btn:hover {
-  background: #fef2f2;
+  background: #fce6e6;
   color: #ef4444;
 }
 
@@ -475,41 +469,38 @@ main {
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.heart-icon svg {
-  transition: var(--transition);
-}
-
-.like-btn:hover .heart-icon svg {
+.like-btn:hover .heart-icon {
   fill: #ef4444;
   transform: scale(1.1);
 }
 
 .like-count {
   font-weight: 500;
-  font-size: 0.875rem;
+  font-size: 14px;
 }
 
 .view-btn {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  background: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%);
+  gap: 8px;
+  background: var(--b-gomb);
   color: white;
   border: none;
-  padding: 0.75rem 1.5rem;
+  padding: 12px 24px;
   border-radius: 12px;
   font-weight: 500;
   cursor: pointer;
-  transition: var(--transition);
-  box-shadow: 0 4px 6px -1px rgba(124, 58, 237, 0.2);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 6px -1px rgba(237, 58, 58, 0.2);
 }
 
 .view-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 15px -3px rgba(124, 58, 237, 0.3);
-  background: linear-gradient(135deg, #6d28d9 0%, #7c3aed 100%);
+  box-shadow: 0 10px 15px -3px rgba(237, 58, 58, 0.3);
+  background: var(--b-gomb-hover);
 }
 
 .arrow-icon {
@@ -534,22 +525,22 @@ main {
 }
 
 .loading-text {
-  font-size: 1.125rem;
-  color: #6b7280;
-  margin-bottom: 2rem;
+  font-size: 18px;
+  color: #363636;
+  margin-bottom: 32px;
   font-weight: 500;
 }
 
 .spinner-wrapper {
   display: flex;
   justify-content: center;
-  gap: 1rem;
+  gap: 16px;
 }
 
 .pulse-dot {
   width: 12px;
   height: 12px;
-  background: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%);
+  background: linear-gradient(135deg, #6d2020 0%, #520606 100%);
   border-radius: 50%;
   animation: pulse 1.4s infinite ease-in-out;
 }
@@ -581,33 +572,33 @@ main {
 .error-card {
   background: white;
   border-radius: 20px;
-  padding: 3rem;
+  padding: 48px;
   text-align: center;
-  box-shadow: var(--shadow-lg);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
   border: 1px solid #e5e7eb;
 }
 
 .error-icon {
-  font-size: 3rem;
-  margin-bottom: 1.5rem;
+  font-size: 48px;
+  margin-bottom: 24px;
 }
 
 .error-message {
-  font-size: 1.125rem;
+  font-size: 18px;
   color: var(--text-dark);
-  margin-bottom: 2rem;
+  margin-bottom: 32px;
   line-height: 1.6;
 }
 
 .retry-btn {
-  background: linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%);
+  background: linear-gradient(135deg, #5f1010 0%, #aa2323 100%);
   color: white;
   border: none;
-  padding: 0.875rem 2rem;
+  padding: 14px 32px;
   border-radius: 12px;
   font-weight: 500;
   cursor: pointer;
-  transition: var(--transition);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 4px 6px -1px rgba(124, 58, 237, 0.2);
 }
 
@@ -623,7 +614,7 @@ main {
 
 .empty-state {
   text-align: center;
-  padding: 4rem 2rem;
+  padding: 64px 32px;
   background: white;
   border-radius: 20px;
   box-shadow: var(--shadow-lg);
@@ -631,22 +622,22 @@ main {
 }
 
 .empty-icon {
-  font-size: 4rem;
-  margin-bottom: 1.5rem;
+  font-size: 64px;
+  margin-bottom: 24px;
   opacity: 0.8;
 }
 
 .empty-title {
   font-family: 'Poppins', sans-serif;
-  font-size: 1.75rem;
+  font-size: 28px;
   color: var(--text-dark);
-  margin-bottom: 0.75rem;
+  margin-bottom: 12px;
   font-weight: 600;
 }
 
 .empty-subtitle {
   color: #6b7280;
-  font-size: 1.125rem;
+  font-size: 18px;
   max-width: 400px;
   margin: 0 auto;
 }
@@ -684,27 +675,27 @@ main {
 @media (max-width: 1200px) {
   .cards-wrapper {
     grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-    gap: 2rem;
+    gap: 32px;
   }
 }
 
 @media (max-width: 768px) {
   .blog-header {
-    padding: 3rem 1.5rem 2rem;
+    padding: 48px 24px 32px;
   }
   
   .title {
-    font-size: 2.5rem;
+    font-size: 40px;
   }
   
   .content-wrapper {
-    padding: 0 1.5rem;
+    padding: 0 24px;
   }
   
   .cards-wrapper {
     grid-template-columns: 1fr;
-    gap: 1.5rem;
-    padding: 2rem 0;
+    gap: 24px;
+    padding: 32px 0;
   }
   
   .card {
@@ -714,24 +705,24 @@ main {
 
 @media (max-width: 480px) {
   .blog-header {
-    padding: 2rem 1rem 1.5rem;
+    padding: 32px 16px 24px;
   }
   
   .title {
-    font-size: 2rem;
+    font-size: 32px;
   }
   
   .content-wrapper {
-    padding: 0 1rem;
+    padding: 0 16px;
   }
   
   .card-content {
-    padding: 1.25rem;
+    padding: 20px;
   }
   
   .card-footer {
     flex-direction: column;
-    gap: 1rem;
+    gap: 16px;
     align-items: stretch;
   }
   
