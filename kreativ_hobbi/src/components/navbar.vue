@@ -47,11 +47,18 @@ async function checkUser() {
     const response = await axios.get('/api/user', { withCredentials: true });
 
     console.log("Navbar user:", response.data);
+    const baseUrl = import.meta.env.VITE_API_URL;
+    const hasProfileImage = response.data.profilKep_id;
 
-    if (response.data) {
+    if (response.data && hasProfileImage) {
       userPath.value = '/Profil';
-      isLoggedIn.value = response.data.felhasz_nev ?? 'Profil';
-    } else {
+      isLoggedIn.value = `${baseUrl}/storage/profilkepek/kep_${hasProfileImage}.jpg`;
+    } 
+    else if (response.data) {
+      userPath.value = '/Profil';
+      isLoggedIn.value = `${baseUrl}/storage/profilkepek/default.jpg`;
+    } 
+    else {
       userPath.value = '/Belepes';
       isLoggedIn.value = 'Bejelentkezés';
     }
@@ -64,15 +71,14 @@ async function checkUser() {
 }
 
 onMounted(() => {
+  window.addEventListener('user-logged-in', checkUser);
   window.addEventListener('resize', handleResize);
   document.addEventListener('mousedown', handleClickOutside); 
-  window.addEventListener('user-logged-in', checkUser);
-
 });
-onUnmounted(() => {
+onUnmounted(() => { 
+  window.removeEventListener('user-logged-in', checkUser);
   window.removeEventListener('resize', handleResize);
   document.removeEventListener('mousedown', handleClickOutside);
-  window.removeEventListener('user-logged-in', checkUser);
 });
 
 </script>
@@ -163,7 +169,7 @@ onUnmounted(() => {
           class="menu_link" 
           :class="{ hamburgerElem: !latszik }"
           :to="userPath"
-        >{{isLoggedIn}}</RouterLink>
+        ><p v-if="isLoggedIn === 'Bejelentkezés'">{{ isLoggedIn }}</p> <img id="profilkep" v-else :src="isLoggedIn" /></RouterLink>
 
       </nav>
     </header>
@@ -284,6 +290,15 @@ onUnmounted(() => {
 }
 #felsoGap{
   height: 90px;
+}
+
+#profilkep{
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  position: relative;
+  top: 5px;
 }
 /*#endregion*/
 
