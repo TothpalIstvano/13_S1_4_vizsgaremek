@@ -16,13 +16,32 @@ async function fetchUserData() {
   }
 }
 
+// --- ÚJ: Default kép definíciója ---
+const baseUrl = import.meta.env.VITE_API_URL;
+const defaultAvatar = `${import.meta.env.VITE_API_URL}/storage/profilkepek/default.jpg`;
+
+// --- ÚJ: Függvény a hibás képek cseréjére ---
+function setAvatarDefault(event) {
+  // Ha a kép betöltése sikertelen (pl. 404), akkor beállítjuk a default-ot
+  event.target.src = defaultAvatar;
+}
+
 onMounted(async () => {
   userData.value = await fetchUserData();
   if (userData.value) {
     user.name = userData.value.felhasz_nev;
     user.username = userData.value.felhasz_nev;
     user.bio = userData.value.bio || 'Kreatív hobbi rajongó';
-    user.avatar = `http://localhost:8000/storage/profilkepek/kep_${userData.value.profilKep_id}.jpg` || 'http://localhost:8000/storage/profilkepek/default.jpg';
+
+    const hasProfileImage = userData.value.profilKep_id; // Ellenőrizzük, van-e ID
+    if (hasProfileImage) {
+      // Itt szándékosan rossz a mappa neve a tesztelésedhez (profilkepedddk)
+      user.avatar = `${baseUrl}/storage/profilkepek/kep_${hasProfileImage}.jpg`;
+    }
+    else {
+      user.avatar = defaultAvatar; // Alapértelmezett kép
+    }
+    
     user.cover = 'https://images.unsplash.com/photo-1503264116251-35a269479413?w=1600&h=400&fit=crop';
     user.stats = {
       posts: userData.value.posts_count || 12,
@@ -30,7 +49,6 @@ onMounted(async () => {
       following: userData.value.following_count || 134
     }
     user.joined = userData.value.letrehozas_Datuma || '2022-09-15';
-    user.avatar = await fetchUserPicture() || user.avatar;
   } 
   else {
     console.log('No user data available.');
@@ -85,7 +103,7 @@ function formatDate(d) {
   return new Date(d).toLocaleDateString();
 }
 function kijelentkezes() {
-  showLogout.value = ref(true);
+  showLogout.value = true;
 }
 async function confirmLogout() {
   showLogout.value = false;
@@ -100,13 +118,8 @@ async function confirmLogout() {
   }
 }
 function cancelLogout() {
-  showLogout.value = ref(false);
+  showLogout.value = false;
 }
-
-onMounted(() => {
-  console.log('Profile component mounted.');
-  fetchUserData();
-});
 </script>
 
 <template>
@@ -115,7 +128,7 @@ onMounted(() => {
       <div class="cover-overlay"></div>
       <div class="cover-inner">
         <div class="profile-card">
-          <img class="avatar" :src="user.avatar" alt="avatar" />
+          <img class="avatar" :src="user.avatar" @error="setAvatarDefault" alt="avatar" />
           <div class="profile-info">
             <h2 class="name">{{ user.name }}</h2>
             <p class="username">@{{ user.username }}</p>
@@ -129,21 +142,22 @@ onMounted(() => {
           <div class="profile-actions">
             <button class="btn edit"><RouterLink to="/profil/szerkesztes">Szerkesztés</RouterLink></button>
             <button type="button" class="btn logout" @click="kijelentkezes">Kijelentkezés</button>
-            <div v-if="showLogout" class="modal-backdrop" @click.self="cancelLogout">
-              <div class="modal">
-                <h3>Kijelentkezés</h3>
-                <p>Biztos ki szeretnél jelentkezni?</p>
-                <div class="modal-actions">
-                  <button class="btn confirm" @click="confirmLogout">Igen, kijelentkezés</button>
-                  <button class="btn cancel" @click="cancelLogout">Mégse</button>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>
     </section>
-
+    <div class="profile-actions">
+        <div v-if="showLogout" class="modal-backdrop" @click.self="cancelLogout">
+          <div class="modal">
+            <h3>Kijelentkezés</h3>
+            <p>Biztos ki szeretnél jelentkezni?</p>
+            <div class="modal-actions">
+              <button class="btn confirm" @click="confirmLogout">Igen, kijelentkezés</button>
+              <button class="btn cancel" @click="cancelLogout">Mégse</button>
+            </div>
+          </div>
+        </div>
+      </div>
     <section class="content">
       <div class="content-grid">
         <aside class="left-col">
@@ -286,6 +300,33 @@ onMounted(() => {
 .btn.edit { background: #eef2ff; }
 .btn.logout { background: #fee2e2; color: #991b1b; }
 .btn.follow { background: #111827; color: #fff; }
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+.modal {
+  background: #fff;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 8px 28px rgba(12,12,12,0.15);
+  max-width: 400px;
+  width: 100%;
+}
+.modal h3 { margin-top: 0; }
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 18px;
+}
+.btn.confirm { background: #dc2626; color: #fff; }
+.btn.cancel { background: #e5e7eb; color: #374151; }
 
 /* content layout */
 .content {
