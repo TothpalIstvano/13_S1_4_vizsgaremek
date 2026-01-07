@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive, onMounted, nextTick, computed, watch } from "vue"
+import { ref, reactive, onMounted, onUnmounted, nextTick, computed, watch } from "vue"
 
 // Adat bekérés változók
 const resz = ref(1)
@@ -761,6 +761,39 @@ function formBetoltes() {
     pixelesKep.value = formState.pixelesKep || false
   }
 }
+
+// Add this to your script setup section
+const showAlert = ref(false);
+const isMobile = ref(false);
+
+// Function to check screen width
+function checkScreenWidth() {
+  isMobile.value = window.innerWidth < 550;
+  if (isMobile.value) {
+    showSuccessAlert();
+  }
+}
+
+// Add this function to show the alert
+function showSuccessAlert() {
+  showAlert.value = true;
+  // Auto-hide after 5 seconds
+  /*setTimeout(() => {
+    showAlert.value = false;
+  }, 5000);*/
+}
+
+// Check on mount and add resize listener
+onMounted(() => {
+  checkScreenWidth();
+  window.addEventListener('resize', checkScreenWidth);
+});
+
+// Clean up the event listener when component unmounts
+onUnmounted(() => {
+  window.removeEventListener('resize', checkScreenWidth);
+});
+
 </script>
 
 <template>
@@ -929,98 +962,83 @@ function formBetoltes() {
 
         <div v-else class="modositoContainer">
           <div class="modositas">
-            <div class="valtoztatok">
-              <p>Pixel mérete: {{ pixelMeret }}px</p>
-              <div class="valtoztatok-input custom-slider-wrapper">
-                <label class="custom-slider">
-                  <input 
-                    type="range" 
-                    id="pixelMeretSlider"
-                    min="5" 
-                    max="40" 
-                    step="1" 
-                    :value="pixelMeret"
-                    @input="pixelMeret = $event.target.value; mintaFrissites()"
-                  >
-                <!-- Custom slider 1 
-                  <output 
-                    for="pixelMeretSlider" 
-                    class="top" 
-                    :style="{'--min': 5, '--max': 40, '--val': pixelMeret, '--c': '#547980'}"
-                  ></output>-->
-                </label>
-                <input 
-                  type="number" 
-                  min="5" 
-                  max="40" 
-                  v-model.number="pixelMeret"
-                  class="szam-input"
-                  @input="mintaFrissites"
-                />
-              </div>
-            </div>
+              <div class="valtoztatok">
+  <p>Pixel mérete: {{ pixelMeret }}px</p>
+  <div class="valtoztatok-input custom-slider-wrapper">
+    <label class="custom-slider">
+      <input 
+        type="range" 
+        id="pixelMeretSlider"
+        min="5" 
+        max="40" 
+        step="1" 
+        :value="pixelMeret"
+        :style="`--value: ${(pixelMeret - 5) / (40 - 5) * 100}%`"
+        @input="pixelMeret = $event.target.value; mintaFrissites()"
+      >
+    </label>
+    <input 
+      type="number" 
+      min="5" 
+      max="40" 
+      v-model.number="pixelMeret"
+      class="szam-input"
+      @input="mintaFrussites"
+    />
+  </div>
+</div>
 
-            <div class="valtoztatok">
-              <p>Rács vastagsága: {{ racsLathatosag }}%</p>
-              <div class="valtoztatok-input custom-slider-wrapper">
-                <label class="custom-slider">
-                  <input 
-                    type="range" 
-                    id="racsLathatosagSlider"
-                    min="0" 
-                    max="60" 
-                    step="1" 
-                    :value="racsLathatosag"
-                    @input="racsLathatosag = $event.target.value; mintaFrissites()"
-                  >
-                <!-- Custom slider 2 
-                  <output 
-                    for="racsLathatosagSlider" 
-                    class="top" 
-                    :style="{'--min': 0, '--max': 60, '--val': racsLathatosag, '--c': '#547980'}"
-                  ></output>-->
-                </label>
-                <input 
-                  type="number" 
-                  min="0" 
-                  max="60" 
-                  v-model.number="racsLathatosag"
-                  class="szam-input"
-                  @input="mintaFrissites"
-                />
-              </div>
-            </div>
+<div class="valtoztatok">
+  <p>Rács vastagsága: {{ racsLathatosag }}%</p>
+  <div class="valtoztatok-input custom-slider-wrapper">
+    <label class="custom-slider">
+      <input 
+        type="range" 
+        id="racsLathatosagSlider"
+        min="0" 
+        max="60" 
+        step="1" 
+        :value="racsLathatosag"
+        :style="`--value: ${racsLathatosag / 60 * 100}%`"
+        @input="racsLathatosag = $event.target.value; mintaFrissites()"
+      >
+    </label>
+    <input 
+      type="number" 
+      min="0" 
+      max="60" 
+      v-model.number="racsLathatosag"
+      class="szam-input"
+      @input="mintaFrissites"
+    />
+  </div>
+</div>
 
-            <div class="valtoztatok">
-              <p>Színek száma: {{ szinSzam }}</p>
-              <div class="valtoztatok-input custom-slider-wrapper">
-                <label class="custom-slider">
-                  <input 
-                    type="range" 
-                    id="szinSzamSlider"
-                    min="2" 
-                    max="20" 
-                    step="1" 
-                    :value="szinSzam"
-                    @input="szinSzam = $event.target.value; mintaFrissites()"
-                  >
-                <!-- Custom slider 3 
-                  <output 
-                    for="szinSzamSlider" 
-                    class="top" 
-                    :style="{'--min': 2, '--max': 20, '--val': szinSzam, '--c': '#547980'}"
-                  ></output>-->
-                </label>
-                <input 
-                  type="number" 
-                  min="2" 
-                  max="20"
-                  v-model.number="szinSzam"
-                  class="szam-input"
-                  @input="mintaFrissites"
-                />
-              </div>
-            </div>
+<div class="valtoztatok">
+  <p>Színek száma: {{ szinSzam }}</p>
+  <div class="valtoztatok-input custom-slider-wrapper">
+    <label class="custom-slider">
+      <input 
+        type="range" 
+        id="szinSzamSlider"
+        min="2" 
+        max="20" 
+        step="1" 
+        :value="szinSzam"
+        :style="`--value: ${(szinSzam - 2) / (20 - 2) * 100}%`"
+        @input="szinSzam = $event.target.value; mintaFrissites()"
+      >
+    </label>
+    <input 
+      type="number" 
+      min="2" 
+      max="20"
+      v-model.number="szinSzam"
+      class="szam-input"
+      @input="mintaFrissites"
+    />
+  </div>
+</div>
 
 
             <div class="valtoztatok">
@@ -1139,6 +1157,13 @@ function formBetoltes() {
         </div>
 
     </div>
+<!-- Alert overlay with centered alert box -->
+<div class="alert-overlay" :class="{ active: showAlert }">
+  <div class="alert success">
+    <span class="closebtn" @click="showAlert = false">&times;</span>  
+    <strong>Success!</strong> Indicates a successful or positive action.
+  </div>
+</div>
   </main>
 </template>
 
@@ -1948,13 +1973,7 @@ input[type="file"] {
 }
 /*#endregion*/
 
-/* Custom slider styles from CodePen 
-@property --val {
-  syntax: '<integer>';
-  inherits: true;
-  initial-value: 0; 
-}
-
+/* Custom slider styles with hollow/filled dot and colored track */
 .custom-slider-wrapper {
   display: flex;
   align-items: center;
@@ -1963,123 +1982,121 @@ input[type="file"] {
 }
 
 .custom-slider {
-  --c: #547980; /* slider color 
-  --g: round(.3em,1px);  /* the gap 
-  --l: round(.2em,1px);  /* line thickness
-  --s: round(1.3em,1px); /* thumb size
-  --t: round(.8em,1px);  /* tooltip tail size 
-  --r: round(.8em,1px);  /* tooltip radius 
-  
-  timeline-scope: --thumb-view;
   position: relative; 
-  font-size: 18px; /* Reduced from 24px for better fit 
+  font-size: 18px;
   flex: 1;
   min-width: 200px;
 }
 
 .custom-slider input {
   width: 100%;
-  height: var(--s);
-  --_c: color-mix(in srgb, var(--c), #000 var(--p,0%));
+  height: 6px;
   appearance: none;
   background: none;
   cursor: pointer;
-  overflow: hidden;
   font-size: inherit;
   margin: 0;
+  outline: none;
 }
 
-.custom-slider input:focus-visible,
-.custom-slider input:hover{
-  --p: 25%;
+/* Track styling for Chrome/Safari */
+.custom-slider input[type="range"]::-webkit-slider-runnable-track {
+  height: 6px;
+  background: linear-gradient(to right, #c0895c 0%, #c0895c var(--value, 50%), #ddd var(--value, 50%), #ddd 100%);
+  border-radius: 3px;
 }
 
-.custom-slider input:active,
-.custom-slider input:focus-visible{
-  --_b: var(--s);
-}
-
-/* chromium 
-.custom-slider input[type="range" i]::-webkit-slider-thumb{
-  height: var(--s);
-  aspect-ratio: 1;
+/* Thumb styling for Chrome/Safari - Hollow when resting */
+.custom-slider input[type="range"]::-webkit-slider-thumb {
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
-  box-shadow: 0 0 0 var(--_b,var(--l)) inset var(--_c);
-  border-image: linear-gradient(90deg,var(--_c) 50%,#ababab 0) 0 1/calc(50% - var(--l)/2) 100vw/0 calc(100vw + var(--g));
+  border: 7px solid #c0895c;
+  background: transparent;
+  cursor: pointer;
   -webkit-appearance: none;
   appearance: none;
-  transition: .3s;
-  anchor-name: --thumb;
-  view-timeline: --thumb-view inline;
+  margin-top: -7px; /* Center the thumb on the track */
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.custom-slider output {
-  position-anchor: --thumb;
-  position: absolute;
-  position-area: top;
-  justify-self: unsafe anchor-center;
-  color: #fff;
-  font-weight: bold;
-  font-family: sans-serif;
-  text-align: center;
-  padding-block: .5em;
-  width: 4em;
-  border-bottom: var(--t) solid #0000;
-  border-radius: var(--r)/var(--r) var(--r) calc(var(--r) + var(--t)) calc(var(--r) + var(--t));
-  --_m: 100%/var(--t) var(--t) no-repeat;
-  --_g: 100%,#0000 99%,#000 102%;
-  mask:
-    linear-gradient(#000 0 0) padding-box,
-    radial-gradient(100% 100% at 100% var(--_g)) calc(50% + var(--t)/2) var(--_m),
-    radial-gradient(100% 100% at 0    var(--_g)) calc(50% - var(--t)/2) var(--_m);
-  animation: range linear both;
-  animation-timeline: --thumb-view;
-  animation-range: entry 100% exit 0%;
-  transform: translateY(-100%) translateX(-50%);
+/* Thumb hover state - changes border color */
+.custom-slider input[type="range"]:hover::-webkit-slider-thumb {
+  border-color: #a67c52;
+  transform: scale(1.1);
+}
+
+/* Thumb active/pressed state - filled with different color */
+.custom-slider input[type="range"]:active::-webkit-slider-thumb {
+  background: #8b6239;
+  border-color: #8b6239;
+  transform: scale(1.05);
+  box-shadow: 0 0 8px rgba(139, 98, 57, 0.4);
+}
+
+/* Focus state for accessibility */
+.custom-slider input[type="range"]:focus::-webkit-slider-thumb {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(192, 137, 92, 0.3);
+}
+
+
+
+
+/* Alert overlay */
+.alert-overlay {
+  position: fixed;
   top: 0;
-  left: 50%;
-  z-index: 10;
-}
-
-.custom-slider output.bottom {
-  position-area: bottom;
-  border-top: var(--t) solid #0000;
-  border-bottom: none;
-  border-radius: var(--r)/calc(var(--r) + var(--t)) calc(var(--r) + var(--t)) var(--r) var(--r);
-  --_m: 0%/var(--t) var(--t) no-repeat;
-  --_g: 0%,#0000 99%,#000 102%;
-}
-
-.custom-slider output:before {
-  content: counter(num);
-  counter-reset: num var(--val);
-}
-
-@keyframes range {
-  0%   {background: #8A9B0F;--val:var(--max)}
-  100% {background: #CC333F;--val:var(--min)}
-}
-
-@supports not (anchor-name: ---) {
-  .custom-slider output {
-    display: none;
-  }
-}
-
-/* Adjust the valtoztatok-input to accommodate custom slider 
-.valtoztatok-input {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+  left: 0;
   width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s, visibility 0.3s;
 }
 
-/* Remove old csuszka styles since we're using custom slider 
-.csuszka {
-  flex: 1;
-  accent-color: #dad7d7;
-  /* Keep as fallback for browsers that don't support custom slider 
-}*/
+.alert-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.alert {
+  padding: 20px 30px;
+  background-color: #04AA6D;
+  color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-20px);
+  transition: transform 0.3s, opacity 0.6s;
+  max-width: 500px;
+  width: 90%;
+  position: relative;
+}
+
+.alert-overlay.active .alert {
+  transform: translateY(0);
+}
+
+.closebtn {
+  margin-left: 15px;
+  color: white;
+  font-weight: bold;
+  float: right;
+  font-size: 22px;
+  line-height: 20px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.closebtn:hover {
+  color: black;
+}
 
 @media (max-width: 1250px) {
   .ket-oszlop {
@@ -2097,6 +2114,17 @@ input[type="file"] {
   
   .oldalsav {
     grid-column: 1;
+    margin-top: 20px;
+  }
+}
+
+@media (max-width: 1100px) {
+  .pixelation-main-container {
+    flex-direction: column;
+  }
+  
+  .oldalsav {
+    width: 100%;
     margin-top: 20px;
   }
 }
@@ -2164,14 +2192,4 @@ input[type="file"] {
   }
 }
 
-@media (max-width: 1100px) {
-  .pixelation-main-container {
-    flex-direction: column;
-  }
-  
-  .oldalsav {
-    width: 100%;
-    margin-top: 20px;
-  }
-}
 </style>
