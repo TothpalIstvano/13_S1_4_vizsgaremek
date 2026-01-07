@@ -12,7 +12,6 @@ const aktualisKep = ref(null)
 const betoltottKep = ref(false)
 
 const tipusok = ["Horgolás", "Kötés", "Hímzés"]
-//const fonalak = [" 'A' fonal csoport", " 'B' fonal csoport", " 'C' fonal csoport", " 'D' fonal csoport", " 'E' fonal csoport"]
 const fonalak = [
   {
     fonalTipus: "A fonal csoport",
@@ -932,15 +931,24 @@ function formBetoltes() {
           <div class="modositas">
             <div class="valtoztatok">
               <p>Pixel mérete: {{ pixelMeret }}px</p>
-              <div class="valtoztatok-input">
-                <input 
-                  type="range" 
-                  min="5" 
-                  max="40" 
-                  v-model.number="pixelMeret" 
-                  class="csuszka"
-                  @input="mintaFrissites"
-                />
+              <div class="valtoztatok-input custom-slider-wrapper">
+                <label class="custom-slider">
+                  <input 
+                    type="range" 
+                    id="pixelMeretSlider"
+                    min="5" 
+                    max="40" 
+                    step="1" 
+                    :value="pixelMeret"
+                    @input="pixelMeret = $event.target.value; mintaFrissites()"
+                  >
+                <!-- Custom slider 1 
+                  <output 
+                    for="pixelMeretSlider" 
+                    class="top" 
+                    :style="{'--min': 5, '--max': 40, '--val': pixelMeret, '--c': '#547980'}"
+                  ></output>-->
+                </label>
                 <input 
                   type="number" 
                   min="5" 
@@ -954,15 +962,24 @@ function formBetoltes() {
 
             <div class="valtoztatok">
               <p>Rács vastagsága: {{ racsLathatosag }}%</p>
-              <div class="valtoztatok-input">
-                <input 
-                  type="range" 
-                  min="0" 
-                  max="60" 
-                  v-model.number="racsLathatosag" 
-                  class="csuszka"
-                  @input="mintaFrissites"
-                />
+              <div class="valtoztatok-input custom-slider-wrapper">
+                <label class="custom-slider">
+                  <input 
+                    type="range" 
+                    id="racsLathatosagSlider"
+                    min="0" 
+                    max="60" 
+                    step="1" 
+                    :value="racsLathatosag"
+                    @input="racsLathatosag = $event.target.value; mintaFrissites()"
+                  >
+                <!-- Custom slider 2 
+                  <output 
+                    for="racsLathatosagSlider" 
+                    class="top" 
+                    :style="{'--min': 0, '--max': 60, '--val': racsLathatosag, '--c': '#547980'}"
+                  ></output>-->
+                </label>
                 <input 
                   type="number" 
                   min="0" 
@@ -976,15 +993,24 @@ function formBetoltes() {
 
             <div class="valtoztatok">
               <p>Színek száma: {{ szinSzam }}</p>
-              <div class="valtoztatok-input">
-                <input 
-                  type="range" 
-                  min="2" 
-                  max="20" 
-                  v-model.number="szinSzam" 
-                  class="csuszka"
-                  @input="mintaFrissites"
-                />
+              <div class="valtoztatok-input custom-slider-wrapper">
+                <label class="custom-slider">
+                  <input 
+                    type="range" 
+                    id="szinSzamSlider"
+                    min="2" 
+                    max="20" 
+                    step="1" 
+                    :value="szinSzam"
+                    @input="szinSzam = $event.target.value; mintaFrissites()"
+                  >
+                <!-- Custom slider 3 
+                  <output 
+                    for="szinSzamSlider" 
+                    class="top" 
+                    :style="{'--min': 2, '--max': 20, '--val': szinSzam, '--c': '#547980'}"
+                  ></output>-->
+                </label>
                 <input 
                   type="number" 
                   min="2" 
@@ -995,6 +1021,7 @@ function formBetoltes() {
                 />
               </div>
             </div>
+
 
             <div class="valtoztatok">
               <p>Színek változtatása: </p>
@@ -1920,6 +1947,139 @@ input[type="file"] {
   font-size: 0.9em;
 }
 /*#endregion*/
+
+/* Custom slider styles from CodePen 
+@property --val {
+  syntax: '<integer>';
+  inherits: true;
+  initial-value: 0; 
+}
+
+.custom-slider-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.custom-slider {
+  --c: #547980; /* slider color 
+  --g: round(.3em,1px);  /* the gap 
+  --l: round(.2em,1px);  /* line thickness
+  --s: round(1.3em,1px); /* thumb size
+  --t: round(.8em,1px);  /* tooltip tail size 
+  --r: round(.8em,1px);  /* tooltip radius 
+  
+  timeline-scope: --thumb-view;
+  position: relative; 
+  font-size: 18px; /* Reduced from 24px for better fit 
+  flex: 1;
+  min-width: 200px;
+}
+
+.custom-slider input {
+  width: 100%;
+  height: var(--s);
+  --_c: color-mix(in srgb, var(--c), #000 var(--p,0%));
+  appearance: none;
+  background: none;
+  cursor: pointer;
+  overflow: hidden;
+  font-size: inherit;
+  margin: 0;
+}
+
+.custom-slider input:focus-visible,
+.custom-slider input:hover{
+  --p: 25%;
+}
+
+.custom-slider input:active,
+.custom-slider input:focus-visible{
+  --_b: var(--s);
+}
+
+/* chromium 
+.custom-slider input[type="range" i]::-webkit-slider-thumb{
+  height: var(--s);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  box-shadow: 0 0 0 var(--_b,var(--l)) inset var(--_c);
+  border-image: linear-gradient(90deg,var(--_c) 50%,#ababab 0) 0 1/calc(50% - var(--l)/2) 100vw/0 calc(100vw + var(--g));
+  -webkit-appearance: none;
+  appearance: none;
+  transition: .3s;
+  anchor-name: --thumb;
+  view-timeline: --thumb-view inline;
+}
+
+.custom-slider output {
+  position-anchor: --thumb;
+  position: absolute;
+  position-area: top;
+  justify-self: unsafe anchor-center;
+  color: #fff;
+  font-weight: bold;
+  font-family: sans-serif;
+  text-align: center;
+  padding-block: .5em;
+  width: 4em;
+  border-bottom: var(--t) solid #0000;
+  border-radius: var(--r)/var(--r) var(--r) calc(var(--r) + var(--t)) calc(var(--r) + var(--t));
+  --_m: 100%/var(--t) var(--t) no-repeat;
+  --_g: 100%,#0000 99%,#000 102%;
+  mask:
+    linear-gradient(#000 0 0) padding-box,
+    radial-gradient(100% 100% at 100% var(--_g)) calc(50% + var(--t)/2) var(--_m),
+    radial-gradient(100% 100% at 0    var(--_g)) calc(50% - var(--t)/2) var(--_m);
+  animation: range linear both;
+  animation-timeline: --thumb-view;
+  animation-range: entry 100% exit 0%;
+  transform: translateY(-100%) translateX(-50%);
+  top: 0;
+  left: 50%;
+  z-index: 10;
+}
+
+.custom-slider output.bottom {
+  position-area: bottom;
+  border-top: var(--t) solid #0000;
+  border-bottom: none;
+  border-radius: var(--r)/calc(var(--r) + var(--t)) calc(var(--r) + var(--t)) var(--r) var(--r);
+  --_m: 0%/var(--t) var(--t) no-repeat;
+  --_g: 0%,#0000 99%,#000 102%;
+}
+
+.custom-slider output:before {
+  content: counter(num);
+  counter-reset: num var(--val);
+}
+
+@keyframes range {
+  0%   {background: #8A9B0F;--val:var(--max)}
+  100% {background: #CC333F;--val:var(--min)}
+}
+
+@supports not (anchor-name: ---) {
+  .custom-slider output {
+    display: none;
+  }
+}
+
+/* Adjust the valtoztatok-input to accommodate custom slider 
+.valtoztatok-input {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+/* Remove old csuszka styles since we're using custom slider 
+.csuszka {
+  flex: 1;
+  accent-color: #dad7d7;
+  /* Keep as fallback for browsers that don't support custom slider 
+}*/
 
 @media (max-width: 1250px) {
   .ket-oszlop {

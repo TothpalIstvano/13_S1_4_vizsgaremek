@@ -56,46 +56,49 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faUserCircle, faReply, faTrash } from '@fortawesome/free-solid-svg-icons'
+import { computed } from 'vue'
 
 library.add(faUserCircle, faReply, faTrash)
 
-export default {
-  name: 'CommentItem',
-  props: {
-    comment: {
-      type: Object,
-      required: true
-    },
-    isReply: {
-      type: Boolean,
-      default: false
-    }
+const props = defineProps({
+  comment: {
+    type: Object,
+    required: true
   },
-  computed: {
-    canDelete() {
-      return true;
-    }
-  },
-  methods: {
-    formatDate(dateString) {
-      if (!dateString) return '';
-      const date = new Date(dateString);
-      return date.toLocaleDateString('hu-HU', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-      });
-    }
-  },
-  components: {
-    FontAwesomeIcon
+  isReply: {
+    type: Boolean,
+    default: false
   }
+})
+
+const emit = defineEmits(['reply', 'delete'])
+
+const canDelete = computed(() => {
+  return true
+})
+
+const formatDate = (dateString) => {
+  if (!dateString) return ''
+  const date = new Date(dateString)
+  return date.toLocaleDateString('hu-HU', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  })
+}
+
+const handleReply = () => {
+  emit('reply', props.comment.id)
+}
+
+const handleDelete = () => {
+  emit('delete', props.comment.id)
 }
 </script>
 

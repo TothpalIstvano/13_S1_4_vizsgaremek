@@ -71,7 +71,7 @@
 /*Blog*/
 :root {
   /*--b-kartya: #a08283; vagy #906767 vagy a #551515 és az #ffffff mixéből valami*/
-  --b-kartya: linear-gradient(135deg, #864340 0%, #a08283 100%);
+  --b-kartya: linear-gradient(135deg, #965552 0%, #a78081 100%);
   --b-tag: #6b5143e6; /* vagy #c71a40a4 */
   --b-tag-hover: #884340e6; /* vagy #c78b7c */
   --b-gomb: #551515;

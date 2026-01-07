@@ -1,195 +1,193 @@
 <template>
-<main>
-  <h1 class="title">Blog</h1>
-<div class="content-wrapper">
-    <section class="cards-wrapper">
-      <!-- Loading state -->
-      <div v-if="loading" class="loading-container">
-        <div class="loading-content">
-          <p class="loading-text">Blogbejegyzések betöltése...</p>
-          <div class="spinner-wrapper">
-            <div class="pulse-dot"></div>
-            <div class="pulse-dot"></div>
-            <div class="pulse-dot"></div>
+  <main>
+    <h1 class="title">Blog</h1>
+    <div class="content-wrapper">
+      <section class="cards-wrapper">
+        <!-- Loading state -->
+        <div v-if="loading" class="loading-container">
+          <div class="loading-content">
+            <p class="loading-text">Blogbejegyzések betöltése...</p>
+            <div class="spinner-wrapper">
+              <div class="pulse-dot"></div>
+              <div class="pulse-dot"></div>
+              <div class="pulse-dot"></div>
+            </div>
           </div>
         </div>
-      </div>
       
-      <!-- Error state -->
-      <div v-if="error" class="error-container">
-        <div class="error-card">
-          <div class="error-icon">⚠️</div>
-          <p class="error-message">{{ error }}</p>
-          <button class="retry-btn" @click="fetchBlogPosts">Újra próbálom</button>
-        </div>
-      </div>
-      
-      <!-- Blog posts -->
-      <div class="card-grid-space" v-for="post in posztok" :key="post.id">
-        <div class="card">
-          <div class="card-glow"></div>
-          <div class="card-img-holder">
-            <div class="image-overlay"></div>
-            <img 
-              :src="getImageUrl(post.fo_kep)" 
-              :alt="post.cim"
-              @error="handleImageError"
-              loading="lazy"
-            />
-            <div class="card-corner"></div>
+        <!-- Error state -->
+        <div v-if="error" class="error-container">
+          <div class="error-card">
+            <div class="error-icon">⚠️</div>
+            <p class="error-message">{{ error }}</p>
+            <button class="retry-btn" @click="fetchBlogPosts">Újra próbálom</button>
           </div>
-          
-          <div class="card-content">
-            <div class="card-header">
-              <h3 class="blog-title">{{ post.cim }}</h3>
+        </div>
+        
+        <!-- Blog posts -->
+        <div class="card-grid-space" v-for="post in posztok" :key="post.id">
+          <div class="card">
+            <div class="card-glow"></div>
+            <div class="card-img-holder">
+              <div class="image-overlay"></div>
+              <img 
+                :src="getImageUrl(post.fo_kep)" 
+                :alt="post.cim"
+                @error="handleImageError"
+                loading="lazy"
+              />
+              <div class="card-corner"></div>
             </div>
             
-            <div class="meta-info">
-              <span class="blog-time"> 
-                <div class="icon-wrapper">
-                  <font-awesome-icon icon="fa-solid fa-calendar"/> 
-                </div>
-                {{ formatDate(post.letrehozas_datuma) }}
-              </span>
-            </div>
-            
-            <p class="description">
-              {{ post.kivonat || post.tartalom?.substring(0, 150) || 'Nincs leírás...' }}
-              <span v-if="(post.kivonat || post.tartalom)?.length > 150">...</span>
-            </p>
-            
-            <div class="tags">
-              <div class="tag" v-for="tag in post.cimkek" :key="tag">
-                <span class="tag-hash">#</span>{{ tag }}
-              </div>
-            </div>
-            
-            <div class="card-footer">
-              <div class="like-container">
-                <button class="like-btn">
-                  <div class="heart-icon">
-                      <font-awesome-icon icon="fa-solid fa-heart"/> 
-                  </div>
-                  <span class="like-count">2,050</span>
-                </button>
+            <div class="card-content">
+              <div class="card-header">
+                <h3 class="blog-title">{{ post.cim }}</h3>
               </div>
               
-              <button class="view-btn" @click="navigateToBlog(post.id)">
-                <span>Megtekintés</span>
-                <div class="arrow-icon">
-                      <font-awesome-icon icon="fa-solid fa-arrow-right"/>
+              <div class="meta-info">
+                <span class="blog-time"> 
+                  <div class="icon-wrapper">
+                    <font-awesome-icon icon="fa-solid fa-calendar"/> 
+                  </div>
+                  {{ formatDate(post.letrehozas_datuma) }}
+                </span>
+              </div>
+              
+              <p class="description">
+                {{ post.kivonat || post.tartalom?.substring(0, 150) || 'Nincs leírás...' }}
+                <span v-if="(post.kivonat || post.tartalom)?.length > 150">...</span>
+              </p>
+              
+              <div class="tags">
+                <div class="tag" v-for="tag in post.cimkek" :key="tag">
+                  <span class="tag-hash">#</span>{{ tag }}
                 </div>
-              </button>
+              </div>
+              
+              <div class="card-footer">
+                <div class="like-container">
+                  <button class="like-btn">
+                    <div class="heart-icon">
+                        <font-awesome-icon icon="fa-solid fa-heart"/> 
+                    </div>
+                    <span class="like-count">2,050</span>
+                  </button>
+                </div>
+                
+                <button class="view-btn" @click="navigateToBlog(post.id)">
+                  <span>Megtekintés</span>
+                  <div class="arrow-icon">
+                        <font-awesome-icon icon="fa-solid fa-arrow-right"/>
+                  </div>
+                </button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
       
-      <!-- No posts message -->
-      <div v-if="!loading && posztok.length === 0" class="no-posts-container">
-        <div class="empty-state">
-          <div class="empty-icon">📝</div>
-          <h3 class="empty-title">Még nincsenek blog bejegyzések</h3>
-          <p class="empty-subtitle">Legyél te az első, aki megoszt valamit!</p>
+        <!-- No posts message -->
+        <div v-if="!loading && posztok.length === 0" class="no-posts-container">
+          <div class="empty-state">
+            <div class="empty-icon">📝</div>
+            <h3 class="empty-title">Még nincsenek blog bejegyzések</h3>
+            <p class="empty-subtitle">Legyél te az első, aki megoszt valamit!</p>
+          </div>
         </div>
-      </div>
-    </section>
-  </div>
-</main>
+      </section>
+    </div>
+  </main>
 </template>
 
-<script>
+<script setup>
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import api from '@/services/api.js'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faCalendar, faHeart, faArrowRight, faH } from '@fortawesome/free-solid-svg-icons'
+import { faCalendar, faHeart, faArrowRight } from '@fortawesome/free-solid-svg-icons'
 
 library.add(faCalendar, faHeart, faArrowRight)
-
-import api from '@/services/api.js'
 
 // Import your fallback image at the top
 import fallbackImage from '@/assets/Public/b-pl1.jpg'
 
-export default {
-  name: 'Blog',
-  data() {
-    return {
-      posztok: [],
-      loading: true,
-      error: null
-    }
-  },
-  methods: {
-    async navigateToBlog(postId) {
-      this.$router.push(`/blog/${postId}`);
-    },
-    async fetchBlogPosts() {
-      try {
-        this.loading = true;
-        this.error = null;
-        
-        // Fetch blog posts
-        const response = await api.get('/api/blog');
-        this.posztok = response.data;
-        
-      } catch (error) {
-        console.error('Error fetching blog posts:', error);
-        this.error = 'Hiba történt a blog bejegyzések betöltése közben.';
-        this.posztok = this.getDummyPosts();
-      } finally {
-        this.loading = false;
-      }
-    },
-    getImageUrl(imagePath) {
-      // If no image or invalid path, use default
-      if (!imagePath || typeof imagePath !== 'string') {
-        return fallbackImage; // Use the imported image
-      }
-      
-      // If it's already a full URL, return as is
-      if (imagePath.startsWith('http')) {
-        return imagePath;
-      }
-      
-      // Otherwise, assume it's a relative path from storage
-      return `http://localhost:8000/storage/${imagePath}`;
-    },
-    handleImageError(event) {
-      // Set fallback image - use the imported image directly
-      event.target.src = fallbackImage;
-    },
-    formatDate(dateString) {
-      if (!dateString) return 'Ismeretlen dátum';
-      return dateString;
-    },
-    getDummyPosts() {
-      return [
-        {
-          id: 1,
-          title: "HTML Syntax",
-          excerpt: "The syntax of a language is how it works. How to actually write it. Learn HTML syntax…",
-          created_at: "6 Oct 2017",
-          tags: ["HTML"],
-          main_image: null
-        },
-        {
-          id: 2,
-          title: "Basic types of HTML tags",
-          excerpt: "Learn about some of the most common HTML tags…",
-          created_at: "9 Oct 2017",
-          tags: ["HTML", "CSS", "JavaScript", "Vue"],
-          main_image: null
-        }
-      ];
-    }
-  },
-  mounted() {
-    this.fetchBlogPosts();
-  },
-  components: {
-    FontAwesomeIcon
+const router = useRouter()
+const posztok = ref([])
+const loading = ref(true)
+const error = ref(null)
+
+
+const navigateToBlog = (postId) => {
+  router.push(`/blog/${postId}`)
+}
+
+const fetchBlogPosts = async () => {
+  try {
+    loading.value = true
+    error.value = null
+    
+    // Fetch blog posts
+    const response = await api.get('/api/blog')
+    posztok.value = response.data
+    
+  } catch (err) {
+    console.error('Error fetching blog posts:', err)
+    error.value = 'Hiba történt a blog bejegyzések betöltése közben.'
+    posztok.value = getDummyPosts()
+  } finally {
+    loading.value = false
   }
 }
+
+const getImageUrl = (imagePath) => {
+  // If no image or invalid path, use default
+  if (!imagePath || typeof imagePath !== 'string') {
+    return fallbackImage // Use the imported image
+  }
+  
+  // If it's already a full URL, return as is
+  if (imagePath.startsWith('http')) {
+    return imagePath
+  }
+  
+  // Otherwise, assume it's a relative path from storage
+  return `http://localhost:8000/storage/${imagePath}`
+}
+
+const handleImageError = (event) => {
+  // Set fallback image - use the imported image directly
+  event.target.src = fallbackImage
+}
+
+const formatDate = (dateString) => {
+  if (!dateString) return 'Ismeretlen dátum'
+  return dateString
+}
+
+const getDummyPosts = () => {
+  return [
+    {
+      id: 1,
+      title: "HTML Syntax",
+      excerpt: "The syntax of a language is how it works. How to actually write it. Learn HTML syntax…",
+      created_at: "6 Oct 2017",
+      tags: ["HTML"],
+      main_image: null
+    },
+    {
+      id: 2,
+      title: "Basic types of HTML tags",
+      excerpt: "Learn about some of the most common HTML tags…",
+      created_at: "9 Oct 2017",
+      tags: ["HTML", "CSS", "JavaScript", "Vue"],
+      main_image: null
+    }
+  ]
+}
+
+onMounted(() => {
+  fetchBlogPosts()
+})
 </script>
 
 <style scoped>
@@ -336,6 +334,7 @@ main {
   flex-grow: 1;
   display: flex;
   flex-direction: column;
+  border-top: 3px solid rgb(109, 0, 0);
 }
 
 .card-header {
@@ -348,10 +347,10 @@ main {
   margin: 0;
   transition: all, var(--b-transition-time);
   display: inline-block;
-  background-image: linear-gradient(90deg, #a08283, #4d0303);
+  background-image: linear-gradient(90deg, #b39999, #cacaca);
   background-repeat: no-repeat;
   background-position: 0 100%;
-  background-size: 100% 4px;
+  background-size: 100% 3px;
 }
 
 .card:hover .blog-title {
@@ -423,7 +422,7 @@ main {
   background: var(--b-tag-hover);
   color: white;
   transform: translateY(-2px);
-  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+  box-shadow: 0 0 0 3px rgba(237, 58, 58, 0.1);
 }
 
 .tag-hash {
@@ -474,7 +473,6 @@ main {
 
 .like-btn:hover .heart-icon {
   fill: #ef4444;
-  transform: scale(1.1);
 }
 
 .like-count {
