@@ -194,206 +194,200 @@
   </main>
 </template>
 
-<script>
+<script setup>
+import { ref, onMounted, watch, computed } from 'vue'
+import { useRoute } from 'vue-router'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faCalendar, faUser, faPaperPlane, faClock, faExpand, faReply } from '@fortawesome/free-solid-svg-icons'
-
-library.add(faCalendar, faUser, faPaperPlane, faClock, faExpand, faReply)
-
 import api from '@/services/api.js'
 import CommentItem from '@/components/CommentItem.vue'
 import fallbackImage from '@/assets/Public/b-pl1.jpg'
 
-export default {
-  name: 'SingleBlog',
-  data() {
-    return {
-      post: {},
-      loading: true,
-      error: null,
-      comments: [],
-      newComment: '',
-      loadingComments: false,
-      replyTo: null,
+library.add(faCalendar, faUser, faPaperPlane, faClock, faExpand, faReply)
+
+const route = useRoute()
+
+// Reactive state
+const post = ref({})
+const loading = ref(true)
+const error = ref(null)
+const comments = ref([])
+const newComment = ref('')
+const loadingComments = ref(false)
+const replyTo = ref(null)
+
+// Computed
+const postId = computed(() => route.params.id)
+
+// Methods
+const fetchPost = async () => {
+  try {
+    loading.value = true
+    error.value = null
+    
+    await api.get('/sanctum/csrf-cookie')
+    
+    const response = await api.get(`/api/blog/${postId.value}`)
+    post.value = response.data
+  } catch (err) {
+    console.error('Error fetching blog post:', err)
+    
+    if (err.response?.status === 404) {
+      error.value = 'A blog bejegyzés nem található.'
+    } else {
+      error.value = 'Hiba történt a bejegyzés betöltése közben.'
     }
-  },
-  methods: {
-    async fetchPost() {
-      try {
-        this.loading = true;
-        this.error = null;
-        
-        await api.get('/sanctum/csrf-cookie');
-        
-        const postId = this.$route.params.id;
-        const response = await api.get(`/api/blog/${postId}`);
-        this.post = response.data;
-      } catch (error) {
-        console.error('Error fetching blog post:', error);
-        
-        if (error.response?.status === 404) {
-          this.error = 'A blog bejegyzés nem található.';
-        } else {
-          this.error = 'Hiba történt a bejegyzés betöltése közben.';
-        }
-      } finally {
-        this.loading = false;
-      }
-    },
-    
-    calculateReadTime(content) {
-      if (!content) return '?';
-      const words = content.split(/\s+/).length;
-      const minutes = Math.ceil(words / 200);
-      return minutes || '1';
-    },
-    
-    async fetchComments() {
-      try {
-        this.loadingComments = true;
-        const postId = this.$route.params.id;
-        const response = await api.get(`/api/blog/${postId}/comments`);
-        this.comments = response.data;
-      } catch (error) {
-        console.error('Error fetching comments:', error);
-      } finally {
-        this.loadingComments = false;
-      }
-    },
-    
-    async addComment() {
-      if (!this.newComment.trim()) return;
-      
-      try {
-        this.loadingComments = true;
-        const postId = this.$route.params.id;
-        const response = await api.post(`/api/blog/${postId}/comments`, {
-          komment: this.newComment,
-          elozo_komment_id: this.replyTo
-        });
-        
-        if (this.replyTo) {
-          this.addReplyToParent(this.replyTo, response.data.comment);
-        } else {
-          this.comments.unshift(response.data.comment);
-        }
-        
-        this.newComment = '';
-        this.replyTo = null;
-      } catch (error) {
-        console.error('Error adding comment:', error);
-        alert('Hiba történt a hozzászólás küldése közben.');
-      } finally {
-        this.loadingComments = false;
-      }
-    },
-    
-    addReplyToParent(parentId, reply) {
-      const findAndAdd = (comments) => {
-        for (let comment of comments) {
-          if (comment.id === parentId) {
-            if (!comment.gyermekKommentek) {
-              comment.gyermekKommentek = [];
-            }
-            comment.gyermekKommentek.push(reply);
-            return true;
-          }
-          if (comment.gyermekKommentek && comment.gyermekKommentek.length > 0) {
-            if (findAndAdd(comment.gyermekKommentek)) return true;
-          }
-        }
-        return false;
-      };
-      
-      findAndAdd(this.comments);
-    },
-    
-    handleReply(commentId) {
-      this.replyTo = commentId;
-      const textarea = document.querySelector('.comment-textarea');
-      if (textarea) {
-        textarea.focus();
-        textarea.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-    },
-    
-    async handleDelete(commentId) {
-      if (!confirm('Biztosan törölni szeretnéd ezt a hozzászólást?')) return;
-      
-      try {
-        await api.delete(`/api/comments/${commentId}`);
-        this.removeComment(commentId);
-      } catch (error) {
-        console.error('Error deleting comment:', error);
-        alert('Hiba történt a hozzászólás törlése közben.');
-      }
-    },
-    
-    removeComment(commentId) {
-      const removeFromArray = (comments) => {
-        return comments.filter(comment => {
-          if (comment.id === commentId) return false;
-          if (comment.gyermekKommentek && comment.gyermekKommentek.length > 0) {
-            comment.gyermekKommentek = removeFromArray(comment.gyermekKommentek);
-          }
-          return true;
-        });
-      };
-      
-      this.comments = removeFromArray(this.comments);
-    },
-    
-    viewImage(imageUrl) {
-      window.open(this.getImageUrl(imageUrl), '_blank');
-    },
-    
-    getImageUrl(imagePath) {
-      if (!imagePath || typeof imagePath !== 'string') {
-        return fallbackImage;
-      }
-      
-      if (imagePath.startsWith('http')) {
-        return imagePath;
-      }
-      
-      return `http://localhost:8000/storage/${imagePath}`;
-    },
-    
-    handleImageError(event) {
-      event.target.src = fallbackImage;
-    },
-    
-    formatDate(dateString) {
-      if (!dateString) return 'Ismeretlen dátum';
-      return dateString;
-    },
-    
-    formatContent(content) {
-      return content;
-    }
-  },
-  
-  mounted() {
-    this.fetchPost();
-    this.fetchComments();
-  },
-  
-  watch: {
-    '$route.params.id': {
-      handler() {
-        this.fetchPost();
-        this.fetchComments();
-      },
-      immediate: false
-    }
-  },
-  
-  components: {
-    FontAwesomeIcon,
-    CommentItem
+  } finally {
+    loading.value = false
   }
 }
+
+const calculateReadTime = (content) => {
+  if (!content) return '?'
+  const words = content.split(/\s+/).length
+  const minutes = Math.ceil(words / 200)
+  return minutes || '1'
+}
+
+const fetchComments = async () => {
+  try {
+    loadingComments.value = true
+    const response = await api.get(`/api/blog/${postId.value}/comments`)
+    comments.value = response.data
+  } catch (err) {
+    console.error('Error fetching comments:', err)
+  } finally {
+    loadingComments.value = false
+  }
+}
+
+const addComment = async () => {
+  if (!newComment.value.trim()) return
+  
+  try {
+    loadingComments.value = true
+    const response = await api.post(`/api/blog/${postId.value}/comments`, {
+      komment: newComment.value,
+      elozo_komment_id: replyTo.value
+    })
+    
+    if (replyTo.value) {
+      addReplyToParent(replyTo.value, response.data.comment)
+    } else {
+      comments.value.unshift(response.data.comment)
+    }
+    
+    newComment.value = ''
+    replyTo.value = null
+  } catch (err) {
+    console.error('Error adding comment:', err)
+    alert('Hiba történt a hozzászólás küldése közben.')
+  } finally {
+    loadingComments.value = false
+  }
+}
+
+const addReplyToParent = (parentId, reply) => {
+  const findAndAdd = (commentList) => {
+    for (let comment of commentList) {
+      if (comment.id === parentId) {
+        if (!comment.gyermekKommentek) {
+          comment.gyermekKommentek = []
+        }
+        comment.gyermekKommentek.push(reply)
+        return true
+      }
+      if (comment.gyermekKommentek && comment.gyermekKommentek.length > 0) {
+        if (findAndAdd(comment.gyermekKommentek)) return true
+      }
+    }
+    return false
+  }
+  
+  findAndAdd(comments.value)
+}
+
+const handleReply = (commentId) => {
+  replyTo.value = commentId
+  const textarea = document.querySelector('.comment-textarea')
+  if (textarea) {
+    textarea.focus()
+    textarea.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  }
+}
+
+const handleDelete = async (commentId) => {
+  if (!confirm('Biztosan törölni szeretnéd ezt a hozzászólást?')) return
+  
+  try {
+    await api.delete(`/api/comments/${commentId}`)
+    removeComment(commentId)
+  } catch (err) {
+    console.error('Error deleting comment:', err)
+    alert('Hiba történt a hozzászólás törlése közben.')
+  }
+}
+
+const removeComment = (commentId) => {
+  const removeFromArray = (commentList) => {
+    return commentList.filter(comment => {
+      if (comment.id === commentId) return false
+      if (comment.gyermekKommentek && comment.gyermekKommentek.length > 0) {
+        comment.gyermekKommentek = removeFromArray(comment.gyermekKommentek)
+      }
+      return true
+    })
+  }
+  
+  comments.value = removeFromArray(comments.value)
+}
+
+const viewImage = (imageUrl) => {
+  window.open(getImageUrl(imageUrl), '_blank')
+}
+
+const getImageUrl = (imagePath) => {
+  if (!imagePath || typeof imagePath !== 'string') {
+    return fallbackImage
+  }
+  
+  if (imagePath.startsWith('http')) {
+    return imagePath
+  }
+  
+  return `http://localhost:8000/storage/${imagePath}`
+}
+
+const handleImageError = (event) => {
+  event.target.src = fallbackImage
+}
+
+const formatDate = (dateString) => {
+  if (!dateString) return 'Ismeretlen dátum'
+  return dateString
+}
+
+const formatContent = (content) => {
+  return content
+}
+
+// Lifecycle
+onMounted(() => {
+  fetchPost()
+  fetchComments()
+})
+
+// Watchers
+watch(
+  () => route.params.id,
+  () => {
+    if (route.params.id) {
+      fetchPost()
+      fetchComments()
+    }
+  }
+)
 </script>
 
 <style scoped>
@@ -620,10 +614,6 @@ export default {
   object-fit: cover;
   display: block;
   transition: transform 0.8s ease;
-}
-
-.featured-image:hover {
-  transform: scale(1.02);
 }
 
 .image-overlay {
