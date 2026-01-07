@@ -2,16 +2,15 @@
 
 namespace Database\Factories;
 
-use App;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Models\Szinek;
 use App\Models\Termekek;
 
 
-/**
+/*
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\termekSzinek>
  */
-class termekSzinekFactory extends Factory
+class TermekSzinekFactory extends Factory
 {
     /**
      * Define the model's default state.
