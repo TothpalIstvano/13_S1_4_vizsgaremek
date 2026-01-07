@@ -28,7 +28,6 @@ axios.interceptors.response.use(
             // Token expired or invalid, redirect to login
             localStorage.removeItem('auth_token');
             localStorage.removeItem('user');
-            window.location.href = '/login';
         }
         return Promise.reject(error);
     }
