@@ -133,7 +133,7 @@
           <div class="add-comment">
             <div class="form-header">
               <div class="form-avatar">
-                <font-awesome-icon icon="fa-solid fa-user-circle" />
+                <font-awesome-icon icon="fa-solid fa-user-circle" id="user-icon"/>
               </div>
               <h4 class="form-title">Hozzászólás írása</h4>
             </div>
@@ -205,12 +205,12 @@ import {
 import { useRoute } from 'vue-router'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faCalendar, faUser, faPaperPlane, faClock, faExpand, faReply } from '@fortawesome/free-solid-svg-icons'
+import { faCalendar, faUser, faPaperPlane, faClock, faExpand, faReply, faUserCircle } from '@fortawesome/free-solid-svg-icons'
 import api from '@/services/api.js'
 import CommentItem from '@/components/CommentItem.vue'
 import fallbackImage from '@/assets/Public/b-pl1.jpg'
 
-library.add(faCalendar, faUser, faPaperPlane, faClock, faExpand, faReply)
+library.add(faCalendar, faUser, faPaperPlane, faClock, faExpand, faReply, faUserCircle)
 
 const route = useRoute()
 
@@ -954,6 +954,10 @@ onBeforeUnmount(() => {
   justify-content: center;
   color: var(--b-tag);
   font-size: 24px;
+}
+
+#user-icon {
+  font-size: 42px;
 }
 
 .form-title {

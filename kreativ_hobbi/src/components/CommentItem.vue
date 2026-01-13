@@ -160,7 +160,7 @@ const handleDelete = () => {
 }
 
 .user-icon {
-  font-size: 12px;
+  font-size: 34px;
   color: var(--b-text-dark);
 }
 

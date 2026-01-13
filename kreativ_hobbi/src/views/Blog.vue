@@ -35,21 +35,15 @@
           <div class="card">
             <div class="card-glow"></div>
             <div class="card-img-holder">
-              <div class="image-overlay"></div>
               <img 
                 :src="getImageUrl(post.fo_kep)" 
                 :alt="post.cim"
                 @error="handleImageError"
                 loading="lazy"
               />
-              <div class="card-corner"></div>
             </div>
             
             <div class="card-content">
-              <div class="card-header">
-                <h3 class="blog-title">{{ post.cim }}</h3>
-              </div>
-              
               <div class="meta-info">
                 <span class="blog-time"> 
                   <div class="icon-wrapper">
@@ -58,6 +52,12 @@
                   {{ formatDate(post.letrehozas_datuma) }}
                 </span>
               </div>
+
+              <div class="card-header">
+                <h3 class="blog-title">{{ post.cim }}</h3>
+              </div>
+              
+              
               
               <p class="description">
                 {{ post.kivonat || post.tartalom?.substring(0, 150) || 'Nincs leírás...' }}
@@ -308,6 +308,7 @@ main {
   transition: all, var(--b-transition-time);*/
   background: var(--b-kartya);
   border-radius: 20px;
+  padding: 20px;
   overflow: hidden;
   position: relative;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -325,7 +326,6 @@ main {
   left: 0;
   right: 0;
   height: 1px;
-  background: linear-gradient(135deg, #ed3a3a 0%, #fa8b8b 100%);
   opacity: 0;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -372,23 +372,11 @@ main {
   transform: scale(1.10);
 }
 
-.card-corner {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 60px;
-  height: 60px;
-  background: linear-gradient(135deg, #630101 0%, #aa0404 100%);
-  clip-path: polygon(0 0, 100% 0, 100% 100%);
-  z-index: 2;
-}
-
 .card-content {
   padding: 28px;
   flex-grow: 1;
   display: flex;
   flex-direction: column;
-  border-top: 3px solid rgb(109, 0, 0);
 }
 
 .card-header {
