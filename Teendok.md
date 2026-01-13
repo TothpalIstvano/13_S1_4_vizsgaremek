@@ -2,17 +2,17 @@
 
 * \[x] Navbar alapok
 * \[x] Navbar
-* \[ ] Regsiztráció / Belépés
-* \[ ] Profil
+* \[x] Regsiztráció / Belépés
+* \[x] Profil
 * \[x] Nav animációk
 * \[x] Carousel
-* \[ ] Képek
-* \[ ] Szövegek
+* \[x] Képek
+* \[x] Szövegek
 * \[x] Blog kártyák
 * \[x] Footer
 * \[ ] Térkép javítása
 * \[ ] Itemek
-* \[ ] További animációk és ikonok
+* \[x] További animációk és ikonok
 * \[ ] Az oldal kódjának tisztázás
 * \[ ] Az oldal tesztelése
 * \[ ] Az oldal dokumenálása
