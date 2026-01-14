@@ -7,6 +7,7 @@
         <input class="form__input" autocomplete="username" name="username" type="text" placeholder="Felhasználónév" v-model="signUpForm.name" required>
         <input class="form__input" autocomplete="email" type="email" name="email" placeholder="Email" v-model="signUpForm.email" required>
         <input class="form__input" autocomplete="new-password" name="password" type="password" placeholder="Jelszó" v-model="signUpForm.password" minlength="8" required>
+        <label for="password" v-for="error in errors" :key="value"  class="error-message">{{ error }}</label>
         <input class="form__input" autocomplete="new-password" name="password_confirmation" type="password" placeholder="Jelszó megerositése" v-model="signUpForm.password_confirmation" minlength="8" required>
         <label for="password_confirmation" v-if="signUpForm.password !== signUpForm.password_confirmation && signUpForm.password !== '' && signUpForm.password_confirmation !== ''" class="error-message">A két jelszó nem egyezik!</label>
         <label class='form__checkbox'>
@@ -50,7 +51,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import axios from 'axios' 
 import router from '@/router/router'
 
@@ -58,6 +59,7 @@ import router from '@/router/router'
 const isSignUpMode = ref(true)
 const loading = ref(false)
 const loginError = ref('')
+const errors = ref([])
 
 const signUpForm = ref({
   name: '',
@@ -77,6 +79,12 @@ const toggleForm = () => {
   isSignUpMode.value = !isSignUpMode.value
   loginError.value = ''
 }
+
+watch(signUpForm.password, () => {
+  if (signUpForm.password !== signUpForm.password_confirmation) {
+    errors.value.push(['A két jelszó nem egyezik!'])
+  }
+})
 
 const handleSignIn = async () => {
 

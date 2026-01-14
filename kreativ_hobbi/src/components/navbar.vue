@@ -71,7 +71,9 @@ async function checkUser() {
 }
 
 onMounted(() => {
-  checkUser();
+  if (logged) {
+    checkUser();
+  }
   window.addEventListener('user-logged-in', checkUser);
   window.addEventListener('resize', handleResize);
   document.addEventListener('mousedown', handleClickOutside); 
