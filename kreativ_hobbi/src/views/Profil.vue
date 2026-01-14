@@ -1,6 +1,6 @@
 <script setup>
 import axios from 'axios';
-import { ref, reactive, onMounted} from 'vue';
+import { ref, reactive, onMounted, provide} from 'vue';
 import { RouterLink } from 'vue-router';
 
 const userData = ref(null);
