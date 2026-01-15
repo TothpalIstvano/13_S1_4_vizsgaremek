@@ -1,6 +1,6 @@
 <script setup>
 import axios from 'axios';
-import { ref, reactive, onMounted, provide} from 'vue';
+import { ref, reactive, onMounted} from 'vue';
 import { RouterLink } from 'vue-router';
 
 const userData = ref(null);
@@ -16,9 +16,19 @@ async function fetchUserData() {
   }
 }
 
+async function fetchUserBlogPosts() {
+  try {
+    const response = await axios.get('/api/user/posts');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching user blog posts:', error);
+    return [];
+  }
+}
+
 // --- ÚJ: Default kép definíciója ---
-const baseUrl = import.meta.env.VITE_API_URL;
-const defaultAvatar = `${import.meta.env.VITE_API_URL}/storage/profilkepek/default.jpg`;
+const baseUrl = `${import.meta.env.VITE_API_URL}/storage`;
+const defaultAvatar = `${baseUrl}/profilkepek/default.jpg`;
 
 // --- ÚJ: Függvény a hibás képek cseréjére ---
 function setAvatarDefault(event) {
@@ -26,17 +36,37 @@ function setAvatarDefault(event) {
   event.target.src = defaultAvatar;
 }
 
+const user = reactive({
+  name: '',
+  username: '',
+  bio: '',
+  avatar: '',
+  cover: '',
+  stats: {
+    posts: 0,
+    followers: 0,
+    following: 0
+  },
+  joined: ''
+});
+
+const posts = ref([]);
+
 onMounted(async () => {
   userData.value = await fetchUserData();
   if (userData.value) {
     user.name = userData.value.felhasz_nev;
     user.username = userData.value.felhasz_nev;
     user.bio = userData.value.bio || 'Kreatív hobbi rajongó';
-
+    
+    posts.value = await fetchUserBlogPosts();
+    console.log('Fetched posts:', posts.value);
+    
+    // --- ÚJ: Profilkep betöltés ---
     const hasProfileImage = userData.value.profilKep_id; // Ellenőrizzük, van-e ID
     if (hasProfileImage) {
       // Itt szándékosan rossz a mappa neve a tesztelésedhez (profilkepedddk)
-      user.avatar = `${baseUrl}/storage/profilkepek/kep_${hasProfileImage}.jpg`;
+      user.avatar = `${baseUrl}/profilkepek/kep_${hasProfileImage}.jpg`;
     }
     else {
       user.avatar = defaultAvatar; // Alapértelmezett kép
@@ -55,46 +85,7 @@ onMounted(async () => {
   }
 });
 
-const user = reactive({
-  name: '',
-  username: '',
-  bio: '',
-  avatar: '',
-  cover: '',
-  stats: {
-    posts: 0,
-    followers: 0,
-    following: 0
-  },
-  joined: ''
-});
 
-const posts = ref([
-  {
-    id: 1,
-    title: 'Személyre szabott minta ötletek',
-    date: '2025-08-04',
-    excerpt: 'Tippek és trükkök hogyan készíts egyedi mintákat fotóid alapján.',
-    cover: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=1200&h=700&fit=crop',
-    tags: ['mintakészítés', 'kötés']
-  },
-  {
-    id: 2,
-    title: 'Kötés kezdőknek — az első pulóver',
-    date: '2024-11-12',
-    excerpt: 'Egyszerű lépések, amikkel az első pulóvered elkészülhet.',
-    cover: 'https://images.unsplash.com/photo-1520975681918-6c94d0b7b5f2?w=1200&h=700&fit=crop',
-    tags: ['kötés', 'oktató']
-  },
-  {
-    id: 3,
-    title: 'Horgolt táskák szezonja',
-    date: '2025-03-20',
-    excerpt: 'Formák, fonalak és praktikus zsebek — a legjobb táskaötletek.',
-    cover: 'https://images.unsplash.com/photo-1496307042754-b4aa456c4a2d?w=1200&h=700&fit=crop',
-    tags: ['horgolás', 'inspiráció']
-  }
-]);
 
 const showLogout = ref(false);
 
@@ -177,22 +168,42 @@ function cancelLogout() {
 
         <section class="main-col">
           <header class="section-header">
-            <h2>Legújabb cikkek</h2>
-            <p class="sub">A profilhoz tartozó blogbejegyzések és minták</p>
+            <h2>A profilhoz tartozó cikkek</h2>
+
+            <RouterLink to="/blog/uj" class="btn create-post">
+              + Új bejegyzés
+            </RouterLink>
           </header>
 
+          <div v-if="posts.length === 0" class="empty-posts">
+            <h3>Még nincs egyetlen bejegyzésed sem</h3>
+            <p>
+              Itt fognak megjelenni a saját cikkeid.  
+              Kezdd el az első bejegyzésed létrehozásával.
+            </p>
+
+            <RouterLink to="/blog/uj" class="btn create-post">
+              + Új bejegyzés létrehozása
+            </RouterLink>
+          </div>
+
+
           <div class="posts">
-            <article v-for="p in posts" :key="p.id" class="post-card">
-              <div class="post-cover" :style="{ backgroundImage: 'url(' + p.cover + ')' }"></div>
+            <article v-for="p in posts" :key="p" class="post-card">
+              <div class="post-cover">
+                <img 
+                  :src=" baseUrl + '/' + p.fo_kep.url_Link "
+                  :alt="p.fo_kep.alt_szoveg" />
+              </div>
               <div class="post-body">
-                <h3 class="post-title">{{ p.title }}</h3>
+                <h3 class="post-title">{{ p.cim }}</h3>
                 <div class="post-meta">
-                  <span>{{ formatDate(p.date) }}</span>
+                  <span>{{ formatDate(p.created_at) }}</span>
                   <span class="tags">
-                    <small v-for="t in p.tags" :key="t" class="tag">#{{ t }}</small>
+                    <small v-for="cimke in p.cimkek" :key="cimke.id" class="tag">#{{ cimke.nev }}</small>
                   </span>
                 </div>
-                <p class="post-excerpt">{{ p.excerpt }}</p>
+                <p class="post-excerpt">{{ p.kivonat }}</p>
                 <div class="post-actions">
                   <RouterLink :to="`/blog/${p.id}`" class="read">Olvasás</RouterLink>
                 </div>
@@ -301,6 +312,16 @@ function cancelLogout() {
 .btn.logout { background: #fee2e2; color: #991b1b; }
 .btn.follow { background: #111827; color: #fff; }
 
+.btn.create-post {
+  display: inline-block;
+  background: #111827;
+  color: #ffffff;
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
 .modal-backdrop {
   position: fixed;
   inset: 0;
@@ -375,9 +396,16 @@ function cancelLogout() {
   width: 240px;
   min-width: 240px;
   height: 140px;
+  /*
   background-size: cover;
   background-position: center;
   flex-shrink: 0;
+  */
+}
+.post-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 .post-body {
   padding: 14px;
@@ -405,4 +433,36 @@ function cancelLogout() {
   .profile-card { flex-direction: column; align-items: flex-start; transform: translateY(40px); }
   .profile-actions { flex-direction: row; width: 100%; justify-content: space-between; }
 }
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.empty-posts {
+  background: #ffffff;
+  border: 2px dashed #c7d2fe;
+  border-radius: 14px;
+  padding: 40px 20px;
+  text-align: center;
+  margin-top: 20px;
+  box-shadow: 0 6px 20px rgba(12,12,12,0.05);
+}
+
+.empty-posts h3 {
+  margin: 0 0 8px 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.empty-posts p {
+  margin: 0 0 18px 0;
+  color: #4b5563;
+  max-width: 420px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 </style>
