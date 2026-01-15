@@ -10,7 +10,8 @@ use Laravel\Sanctum\HasApiTokens;
 
 class FelhasznaloAdatok extends Model
 {
-   use HasFactory;
+    use HasFactory;
+    use HasApiTokens;
     protected $table = 'felhasznaloAdatok';
 
     protected $fillable = [

@@ -10,9 +10,14 @@
 * \[x] Szövegek
 * \[x] Blog kártyák
 * \[x] Footer
+* \[ ] Jelszó(regisztráció)
+* \[ ] Webshop 
+* \[ ] különböző roleok hozzá adása
+* \[ ] Admin site
+* \[ ] Posztok és további backend helyekből kivenni a létrehozás dátuma nevű felesleges taget, mivel a created_at egyszerűbb és alap 
+* \[ ] Elfeljtette a jelszót + email 
 * \[ ] Térkép javítása
-* \[ ] Itemek
-* \[x] További animációk és ikonok
+
 * \[ ] Az oldal kódjának tisztázás
 * \[ ] Az oldal tesztelése
 * \[ ] Az oldal dokumenálása

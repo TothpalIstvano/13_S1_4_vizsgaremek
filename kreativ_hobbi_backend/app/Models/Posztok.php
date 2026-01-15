@@ -11,6 +11,7 @@ use Laravel\Sanctum\HasApiTokens;
 class Posztok extends Model
 {
     use HasFactory;
+    use HasApiTokens;
 
     protected $table = 'posztok';
     protected $primaryKey = 'id';

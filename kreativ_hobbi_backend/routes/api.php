@@ -5,6 +5,9 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\KommentController;
 use App\Models\Felhasznalok;
+use App\Models\Posztok;
+use App\Models\Kepek;
+
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
@@ -17,6 +20,19 @@ Route::get('/user/check', function () {
         return response()->json(['loggedIn' => false], 200);
     }
 });
+
+Route::get('/user/posts', function () {
+    if (Auth::check()) {
+        $user = auth()->user();
+        $posts = Posztok::with('cimkek:id,nev', 'foKep:id,url_Link,alt_szoveg')
+            ->where('szerzo_id', $user->id)
+            ->get();
+        return response()->json(data: $posts);
+    } else {
+        return response()->json(['error' => 'Unauthorized'], 401);
+    }
+});
+
 
 Route::get('/teszt', function () {
     return Felhasznalok::all();
