@@ -170,7 +170,7 @@ function cancelLogout() {
           <header class="section-header">
             <h2>A profilhoz tartozó cikkek</h2>
 
-            <RouterLink to="/blog/uj" class="btn create-post">
+            <RouterLink to="/newpost" class="btn create-post">
               + Új bejegyzés
             </RouterLink>
           </header>
@@ -182,7 +182,7 @@ function cancelLogout() {
               Kezdd el az első bejegyzésed létrehozásával.
             </p>
 
-            <RouterLink to="/blog/uj" class="btn create-post">
+            <RouterLink to="/newpost" class="btn create-post">
               + Új bejegyzés létrehozása
             </RouterLink>
           </div>
@@ -198,7 +198,7 @@ function cancelLogout() {
               <div class="post-body">
                 <h3 class="post-title">{{ p.cim }}</h3>
                 <div class="post-meta">
-                  <span>{{ formatDate(p.created_at) }}</span>
+                  <span>{{ formatDate(p.letrehozas_datuma) }}</span>
                   <span class="tags">
                     <small v-for="cimke in p.cimkek" :key="cimke.id" class="tag">#{{ cimke.nev }}</small>
                   </span>

@@ -14,6 +14,7 @@ import Adatvedelem from "@/views/Adatvedelem.vue";
 import Adatfelhasznalas from "@/views/Adatfelhasznalas.vue";
 import Teszt from "@/views/Teszt.vue";
 import NotFound from "@/views/NotFound.vue";
+import NewPost from '@/components/NewPost.vue'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -47,6 +48,11 @@ const router = createRouter({
       name: 'SingleBlog',
       component: SingleBlog,
       props: true
+    },
+    {
+      path: '/newpost',
+      name: 'NewPost',
+      component: NewPost,
     },
     {
       path: '/kosar/fizetes',
