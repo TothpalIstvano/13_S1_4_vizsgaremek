@@ -1,13 +1,15 @@
 <template>
   <div class="main">
     <!-- Sign Up Container -->
-    <div class="container a-container" :class="{ 'is-txl': isSignUpMode }">
+    <div class="container a-container" :class="{ 'is-txl': isSignInMode }">
       <form class="form" @submit.prevent="handleSignUp">
         <h2 class="title">Fiók készítése</h2>
         <input class="form__input" autocomplete="username" name="username" type="text" placeholder="Felhasználónév" v-model="signUpForm.name" required>
         <input class="form__input" autocomplete="email" type="email" name="email" placeholder="Email" v-model="signUpForm.email" required>
         <input class="form__input" autocomplete="new-password" name="password" type="password" placeholder="Jelszó" v-model="signUpForm.password" minlength="8" required>
-        <label for="password" v-for="(error, idx) in errors" :key="idx" class="error-message">{{ error }}</label>
+        <transition-group name="error">
+        <label for="password" v-if="!isSignInMode && !passwordValid" v-for="error in errors" :key="error" :style="{}" class="error-message">{{ error }}</label>
+        </transition-group>
         <input class="form__input" autocomplete="new-password" name="password_confirmation" type="password" placeholder="Jelszó megerositése" v-model="signUpForm.password_confirmation" minlength="8" required>
         <label for="password_confirmation" v-if="signUpForm.password && signUpForm.password_confirmation && signUpForm.password !== signUpForm.password_confirmation" class="error-message">A két jelszó nem egyezik!</label>
         <label class='form__checkbox'>
@@ -21,7 +23,7 @@
     </div>
 
     <!-- Sign In Container -->
-    <div class="container b-container" :class="{ 'is-txl is-z200': isSignUpMode }">
+    <div class="container b-container" :class="{ 'is-txl is-z200': isSignInMode }">
       <form class="form" @submit.prevent="handleSignIn" method="post" action="/login" redirect="/">
         <h2 class="title">Lépj be a fiókodba</h2>
         <label v-if="loginError !== ''" class="error-message">{{ loginError }}</label>
@@ -33,30 +35,36 @@
     </div>
 
     <!-- Switch Panel -->
-    <div class="switch" :class="{ 'is-txr': isSignUpMode }">
-      <div class="switch__circle" :style="{ transform: isSignUpMode ? 'translateX(0%)' : 'translateX(60%)' }"></div>
-      <div class="switch__circle switch__circle--t" :style="{ transform: isSignUpMode ? 'translateX(0%)' : 'translateX(-60%)' }"></div>
-      <div class="switch__container" :class="{ 'is-hidden': isSignUpMode }">
+    <div class="switch" :class="{ 'is-txr': isSignInMode }">
+      <div class="switch__circle" :style="{ transform: isSignInMode ? 'translateX(0%)' : 'translateX(60%)' }"></div>
+      <div class="switch__circle switch__circle--t" :style="{ transform: isSignInMode ? 'translateX(0%)' : 'translateX(-60%)' }"></div>
+      <div class="switch__container" :class="{ 'is-hidden': isSignInMode }">
         <h2 class="title">Üdvözöljük vissza!</h2>
         <p class=" description">A kapcsolat fenntartásához kérjük, jelentkezzen be személyes adataival</p>
         <button class="switch__button button" @click="toggleForm">Bejelentkezés</button>
       </div>
-      <div class="switch__container" :class="{ 'is-hidden': !isSignUpMode }">
+      <div class="switch__container" :class="{ 'is-hidden': !isSignInMode }">
         <h2 class="title">Helló Barátom!</h2>
         <p class=" description">Add meg személyes adataidat, és kezdd el az utazást velünk</p>
-        <button class="switch__button button" @click="toggleForm">Regisztráció</button>
+        <button class="switch__button button" @click="toggleForm" >Regisztráció</button>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { inject, ref, watch } from 'vue'
 import axios from 'axios' 
 import router from '@/router/router'
 
 //#region reactive elements
-const isSignUpMode = ref(true)
+const loggedIn = inject('loggedIn');
+
+if (loggedIn && loggedIn.value) {
+  router.push('/profil'); // initially not logged in
+}
+
+const isSignInMode = ref(true)
 const loading = ref(false)
 const loginError = ref('')
 const errors = ref([])
@@ -77,7 +85,8 @@ const signInForm = ref({
 })
 
 const toggleForm = () => {
-  isSignUpMode.value = !isSignUpMode.value
+  document.documentElement.style.setProperty('--errorColor', isSignInMode.value ? 'green' : 'grey');
+  isSignInMode.value = !isSignInMode.value
   loginError.value = ''
 }
 
@@ -89,6 +98,9 @@ const validatePassword = (password) => {
   }
   if (!/[A-Z]/.test(password)|| !/[a-z]/.test(password)) {
     error.push('*Tartalmaznia kell kis és nagybetűt.')
+  }
+  if (!/[0-9]/.test(password)) {
+    error.push('*Tartalmaznia kell számot.')
   }
   if (!/[^a-zA-Z0-9\s]/.test(password)) {
     error.push('*Tartalmaznia kell speciális karaktert.')
@@ -104,7 +116,6 @@ watch(
   (newPassword) => {
     errors.value = validatePassword(newPassword)
     passwordValid.value = errors.value.length === 0
-    console.log(errors.value)
   }
 )
 
@@ -225,22 +236,35 @@ const handleSignUp = async () => {
 
 /* Generic */
 .error-message {
-  color: #e74c3c;
+  color:#e74c3c;
   font-size: 12px;
   width: 350px;
-  margin: 8px 0;
+  margin: 6px 0;
   padding-left: 10px;
   font-size: 13px;
   letter-spacing: .15px;
   font-family: 'Montserrat', sans-serif;
-  animation: alertPopup .5s ease-out;
   text-align: left;
-  opacity: 0;
-}
-.error-message.fade-out {
-    animation: alertFadeOut .5s ease-in forwards;
 }
 
+.error-enter-active {
+  animation: alertPopup 0.5s ease-out forwards;
+}
+
+/* LEAVE */
+.error-leave-active {
+  animation: alertFadeOut 0.6s ease-in-out forwards;
+}
+
+/* Prevent jump when leaving */
+.error-leave-to {
+  opacity: 0;
+}
+/*
+.success-fade.error-leave-active {
+  color: green;
+}
+*/
 @keyframes alertPopup {
     0% {
         opacity: 0;
@@ -253,22 +277,23 @@ const handleSignUp = async () => {
 @keyframes alertFadeOut {
     0% {
         opacity: 1;
-        color: green;
+    }
+    60% {
+       color: var(--errorColor);
     }
     100% {
         opacity: 0;
-        
     }
 }
 
 /**/
 .main {
-    margin: 5% auto 0; 
+    margin: 6.5% auto 0; 
     position: relative;
     width: 1000px;
     min-width: 1000px;
     min-height: 600px;
-    height: 600px;
+    height: 650px;
     padding: 25px;
     background-color: #ecf0f3;
     box-shadow:
