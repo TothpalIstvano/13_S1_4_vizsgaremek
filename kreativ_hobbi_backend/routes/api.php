@@ -6,7 +6,6 @@ use App\Http\Controllers\BlogController;
 use App\Http\Controllers\KommentController;
 use App\Models\Felhasznalok;
 use App\Models\Posztok;
-use App\Models\Kepek;
 
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {

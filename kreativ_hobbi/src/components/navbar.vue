@@ -2,7 +2,7 @@
 import { RouterLink, useRouter } from 'vue-router'
 import logo_kalapacs from '@/components/icons/logo_kalapacs.png'
 import logo_reszelo from '@/components/icons/logo_reszelo.png'
-import { ref, onMounted, onUnmounted, computed, inject, watch } from 'vue';
+import { ref, onMounted, onUnmounted, inject } from 'vue';
 import axios from 'axios';
 
 const router = useRouter();
@@ -53,6 +53,7 @@ async function checkUser() {
     if (response.data && hasProfileImage) {
       userPath.value = '/Profil';
       isLoggedIn.value = `${baseUrl}/storage/profilkepek/kep_${hasProfileImage}.jpg`;
+      
     } 
     else if (response.data) {
       userPath.value = '/Profil';
@@ -66,14 +67,13 @@ async function checkUser() {
     console.error('Error checking user:', error);
     userPath.value = '/Belepes';
     isLoggedIn.value = 'Bejelentkezés';
-
   }
 }
 
 onMounted(() => {
-  if (logged) {
+  //if (logged.value) {
     checkUser();
-  }
+  //}
   window.addEventListener('user-logged-in', checkUser);
   window.addEventListener('resize', handleResize);
   document.addEventListener('mousedown', handleClickOutside); 
