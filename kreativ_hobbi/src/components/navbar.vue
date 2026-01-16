@@ -2,7 +2,7 @@
 import { RouterLink, useRouter } from 'vue-router'
 import logo_kalapacs from '@/components/icons/logo_kalapacs.png'
 import logo_reszelo from '@/components/icons/logo_reszelo.png'
-import { ref, onMounted, onUnmounted, computed } from 'vue';
+import { ref, onMounted, onUnmounted, computed, inject, watch } from 'vue';
 import axios from 'axios';
 
 const router = useRouter();
@@ -13,7 +13,7 @@ const xbeValtas = ref(false);
 const navbarRef = ref(null)
 const userPath = ref('/Belepes');
 const isLoggedIn = ref('Bejelentkezés');
-
+const logged = inject('loggedIn');
 
 function open() {
   if (window.innerWidth > 1200) {
@@ -71,6 +71,9 @@ async function checkUser() {
 }
 
 onMounted(() => {
+  if (logged) {
+    checkUser();
+  }
   window.addEventListener('user-logged-in', checkUser);
   window.addEventListener('resize', handleResize);
   document.addEventListener('mousedown', handleClickOutside); 

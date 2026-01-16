@@ -27,7 +27,7 @@ class FelhasznalokSeeder extends Seeder
         Felhasznalok::factory()->create([
             'felhasz_nev' => 'Teszt Felhasználó',
             'email' => 'test@example.com',
-            'jelszo'=> 'alma12345678',
+            'jelszo'=> 'Alma12345678.',
             'profilKep_id'=> 2,
             'statusz' => 'aktív',
             'letrehozas_Datuma' => '2023-01-01',

@@ -2,17 +2,22 @@
 
 * \[x] Navbar alapok
 * \[x] Navbar
-* \[ ] Regsiztráció / Belépés
-* \[ ] Profil
+* \[x] Regsiztráció / Belépés
+* \[x] Profil
 * \[x] Nav animációk
 * \[x] Carousel
-* \[ ] Képek
-* \[ ] Szövegek
+* \[x] Képek
+* \[x] Szövegek
 * \[x] Blog kártyák
 * \[x] Footer
+* \[ ] Jelszó(regisztráció)
+* \[ ] Webshop 
+* \[ ] különböző roleok hozzá adása
+* \[ ] Admin site
+* \[ ] Posztok és további backend helyekből kivenni a létrehozás dátuma nevű felesleges taget, mivel a created_at egyszerűbb és alap 
+* \[ ] Elfeljtette a jelszót + email 
 * \[ ] Térkép javítása
-* \[ ] Itemek
-* \[ ] További animációk és ikonok
+
 * \[ ] Az oldal kódjának tisztázás
 * \[ ] Az oldal tesztelése
 * \[ ] Az oldal dokumenálása

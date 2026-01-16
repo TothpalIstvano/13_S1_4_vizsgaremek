@@ -7,15 +7,16 @@
         <input class="form__input" autocomplete="username" name="username" type="text" placeholder="Felhasználónév" v-model="signUpForm.name" required>
         <input class="form__input" autocomplete="email" type="email" name="email" placeholder="Email" v-model="signUpForm.email" required>
         <input class="form__input" autocomplete="new-password" name="password" type="password" placeholder="Jelszó" v-model="signUpForm.password" minlength="8" required>
+        <label for="password" v-for="(error, idx) in errors" :key="idx" class="error-message">{{ error }}</label>
         <input class="form__input" autocomplete="new-password" name="password_confirmation" type="password" placeholder="Jelszó megerositése" v-model="signUpForm.password_confirmation" minlength="8" required>
-        <label for="password_confirmation" v-if="signUpForm.password !== signUpForm.password_confirmation && signUpForm.password !== '' && signUpForm.password_confirmation !== ''" class="error-message">A két jelszó nem egyezik!</label>
+        <label for="password_confirmation" v-if="signUpForm.password && signUpForm.password_confirmation && signUpForm.password !== signUpForm.password_confirmation" class="error-message">A két jelszó nem egyezik!</label>
         <label class='form__checkbox'>
         <input type='checkbox' name='terms' v-model="signUpForm.terms" required/> Elolvastam és elfogadom a Felhasználási feltételeket
         </label>
         <label class='form__checkbox'>
           <input type="checkbox" required name="checkbox" v-model="signUpForm.privacy" /> Elolvastam és elfogadom a Adatvédelmi irányelveket
         </label>
-        <button class="button" type="submit" :disabled="signUpForm.password !== signUpForm.password_confirmation && signUpForm.password !== '' && signUpForm.password_confirmation !== ''">Fiók létrehozása</button>
+        <button class="button" type="submit" :disabled="!passwordValid">Fiók létrehozása</button>
       </form>
     </div>
 
@@ -50,7 +51,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import axios from 'axios' 
 import router from '@/router/router'
 
@@ -58,6 +59,8 @@ import router from '@/router/router'
 const isSignUpMode = ref(true)
 const loading = ref(false)
 const loginError = ref('')
+const errors = ref([])
+const passwordValid = ref(false)
 
 const signUpForm = ref({
   name: '',
@@ -77,6 +80,33 @@ const toggleForm = () => {
   isSignUpMode.value = !isSignUpMode.value
   loginError.value = ''
 }
+
+const validatePassword = (password) => {
+  const error = []
+
+  if (password.length < 8) {
+    error.push('*A jelszónak legalább 8 karakter hosszúnak kell lennie.')
+  }
+  if (!/[A-Z]/.test(password)|| !/[a-z]/.test(password)) {
+    error.push('*Tartalmaznia kell kis és nagybetűt.')
+  }
+  if (!/[^a-zA-Z0-9\s]/.test(password)) {
+    error.push('*Tartalmaznia kell speciális karaktert.')
+  }
+  if (/\s/.test(password)) {
+    error.push('*A jelszó nem tartalmazhat szóközt.')
+  }
+  return error
+}
+
+watch(
+  () => signUpForm.value.password,
+  (newPassword) => {
+    errors.value = validatePassword(newPassword)
+    passwordValid.value = errors.value.length === 0
+    console.log(errors.value)
+  }
+)
 
 const handleSignIn = async () => {
 
@@ -196,7 +226,7 @@ const handleSignUp = async () => {
 /* Generic */
 .error-message {
   color: #e74c3c;
-  font-size: 14px;
+  font-size: 12px;
   width: 350px;
   margin: 8px 0;
   padding-left: 10px;
@@ -204,6 +234,11 @@ const handleSignUp = async () => {
   letter-spacing: .15px;
   font-family: 'Montserrat', sans-serif;
   animation: alertPopup .5s ease-out;
+  text-align: left;
+  opacity: 0;
+}
+.error-message.fade-out {
+    animation: alertFadeOut .5s ease-in forwards;
 }
 
 @keyframes alertPopup {
@@ -215,6 +250,16 @@ const handleSignUp = async () => {
     }
 }
 
+@keyframes alertFadeOut {
+    0% {
+        opacity: 1;
+        color: green;
+    }
+    100% {
+        opacity: 0;
+        
+    }
+}
 
 /**/
 .main {
