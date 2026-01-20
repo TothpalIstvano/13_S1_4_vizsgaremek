@@ -98,7 +98,6 @@
           </div>
         </div>
         
-        <!-- Additional images gallery -->
         <div class="image-gallery" v-if="post.kepek && post.kepek.length > 0">
           <div class="section-header">
             <h3 class="section-title">További képek</h3>
@@ -107,17 +106,12 @@
           <div class="gallery-grid">
             <div class="gallery-item" v-for="(image, index) in post.kepek" :key="index">
               <div class="gallery-item-inner">
-                <img 
+                <Image 
                   :src="getImageUrl(image.url)" 
-                  :alt="image.alt || post.cim" 
-                  @error="handleImageError"
-                  loading="lazy"
+                  :alt="image.alt || post.cim"
+                  preview
+                  imageClass="gallery-image"
                 />
-                <div class="gallery-overlay">
-                  <button class="gallery-view-btn" @click="viewImage(image.url)">
-                    <font-awesome-icon icon="fa-solid fa-expand" />
-                  </button>
-                </div>
               </div>
             </div>
           </div>
@@ -205,12 +199,14 @@ import {
 import { useRoute } from 'vue-router'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faCalendar, faUser, faPaperPlane, faClock, faExpand, faReply, faUserCircle } from '@fortawesome/free-solid-svg-icons'
+import { faCalendar, faUser, faPaperPlane, faClock, faReply, faUserCircle } from '@fortawesome/free-solid-svg-icons'
 import api from '@/services/api.js'
 import CommentItem from '@/components/CommentItem.vue'
 import fallbackImage from '@/assets/Public/b-pl1.jpg'
+import Image from 'primevue/image';
 
-library.add(faCalendar, faUser, faPaperPlane, faClock, faExpand, faReply, faUserCircle)
+
+library.add(faCalendar, faUser, faPaperPlane, faClock, faReply, faUserCircle)
 
 const route = useRoute()
 
@@ -420,6 +416,42 @@ onBeforeUnmount(() => {
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap');
 
+.gallery-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+:deep(.p-image-preview-container) {
+  cursor: pointer;
+}
+
+:deep(.p-image-preview-indicator) {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+:deep(.p-image-preview-icon) {
+  font-size: 1.5rem;
+}
+
+.gallery-item-inner {
+  position: relative;
+  height: 200px;
+  width: 100%;
+}
+
+:deep(.p-image) {
+  width: 100%;
+  height: 100%;
+}
+
+:deep(.p-image img) {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 .loading-container,
 .error-container,
 .blog-content {
@@ -539,6 +571,7 @@ onBeforeUnmount(() => {
   padding: 14px 24px;
   border-radius: 12px;
   font-weight: 500;
+  font-size: 18px;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
@@ -882,48 +915,6 @@ onBeforeUnmount(() => {
   display: block;
 }
 
-.gallery-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.3);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.gallery-item:hover .gallery-overlay {
-  opacity: 1;
-}
-
-.gallery-view-btn {
-  background: white;
-  border: none;
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  color: var(--b-tag);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  transform: scale(0.8);
-}
-
-.gallery-item:hover .gallery-view-btn {
-  transform: scale(1);
-}
-
-.gallery-view-btn:hover {
-  background: var(--b-tag);
-  color: white;
-}
-
 .kommentek-section {
   margin-top: 64px;
   border-top: 2px groove rgb(255, 198, 198);
@@ -1042,6 +1033,7 @@ onBeforeUnmount(() => {
   padding: 14px 32px;
   border-radius: 12px;
   font-weight: 500;
+  font-size: 16px;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;

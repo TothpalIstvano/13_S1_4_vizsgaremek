@@ -532,6 +532,7 @@ main {
   padding: 12px 24px;
   border-radius: 12px;
   font-weight: 500;
+  font-size: 16px;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 4px 6px -1px rgba(237, 58, 58, 0.2);
