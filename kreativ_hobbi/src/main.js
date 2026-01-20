@@ -3,6 +3,15 @@ import './assets/main.css'
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 
+// PrimeVue dolgok
+import PrimeVue from 'primevue/config'
+import 'primevue/resources/themes/aura-light-green/theme.css'
+import 'primevue/resources/primevue.min.css' // Core CSS
+import 'primeicons/primeicons.css' // Icons
+import 'quill/dist/quill.core.css'
+import 'quill/dist/quill.snow.css'
+import Image from 'primevue/image';
+
 import App from './App.vue'
 import router from './router/router'
 import axios from 'axios';
@@ -38,5 +47,18 @@ const app = createApp(App)
 
 app.use(createPinia())
 app.use(router)
+app.use(PrimeVue)
+
+//kihagyható de hátha hasznos
+import Button from 'primevue/button';
+import InputText from 'primevue/inputtext';
+import MultiSelect from 'primevue/multiselect';
+import Editor from 'primevue/editor';
+
+app.component('Button', Button);
+app.component('InputText', InputText);
+app.component('MultiSelect', MultiSelect);
+app.component('Editor', Editor);
+app.component('Image', Image);
 
 app.mount('#app')

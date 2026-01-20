@@ -45,3 +45,9 @@ Route::get('/blog/{id}', [BlogController::class, 'show']);
 Route::get('/blog/{id}/comments', [KommentController::class, 'index']);
 Route::post('/blog/{id}/comments', [KommentController::class, 'store']);
 Route::delete('/comments/{id}', [KommentController::class, 'destroy']);
+
+// Címkék az új poszthoz
+Route::get('/cimkek', function () {
+    $cimkek = \App\Models\Cimkek::select('id', 'nev')->get();
+    return response()->json($cimkek);
+});

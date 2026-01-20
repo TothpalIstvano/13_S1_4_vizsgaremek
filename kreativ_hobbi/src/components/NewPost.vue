@@ -1,129 +1,558 @@
 <template>
-<main>
-    <h1 class="title">Új poszt hozzáadása</h1>
+<main class="new-post-page">
+    <div class="page-header">
+        <h1 class="title">Új poszt hozzáadása</h1>
+        <p class="subtitle">Töltsd ki az alábbi mezőket egy új blogposzt létrehozásához</p>
+    </div>
+    
+    <div v-if="notification.show" 
+         :class="['notification', notification.type]"
+         @click="notification.show = false">
+        <i :class="notificationIcon" class="notification-icon"></i>
+        <span class="notification-message">{{ notification.message }}</span>
+    </div>
+    
     <div class="container">
-        <form action="/">
-            <label for="fname">Poszt címe</label>
-            <input type="text" id="fname" name="firstname" placeholder="Your name..">
+        <form @submit.prevent="submitForm" class="post-form">
+            <div class="form-section">
+                <label for="postTitle" class="form-label">
+                    <!--<i class="pi pi-pencil form-label-icon"></i>-->
+                    Poszt címe
+                    <span class="required-indicator">*</span>
+                </label>
+                <InputText 
+                    id="postTitle" 
+                    v-model="post.title" 
+                    placeholder="Add meg a poszt címét..." 
+                    class="w-full mb-6" 
+                    :class="{ 'p-invalid': post.title === '' && formTouched }"
+                />
+                <small class="form-hint">Adj egy rövid, informatív címet a posztodnak</small>
+            </div>
 
-            <label for="country">Címkék</label>
-            <select id="country" name="country">
-            <option value="australia">Australia</option>
-            <option value="canada">Canada</option>
-            <option value="usa">USA</option>
-            </select>
-            <!-- e helyett meg nyilván ez: https://v3.primevue.org/multiselect/-->
+            <div class="form-section">
+                <label for="postCimkek" class="form-label">
+                    <!--<i class="pi pi-tags form-label-icon"></i>-->
+                    Címkék
+                    <span class="required-indicator">*</span>
+                </label>
+                <MultiSelect
+                    id="postCimkek"
+                    v-model="selectedTags" 
+                    :options="tagOptions" 
+                    optionLabel="name" 
+                    placeholder="Válassz címkéket (több is választható)" 
+                    display="chip" 
+                    filter
+                    class="w-full mb-6"
+                />
+                <small class="form-hint">Válassz témához kapcsolódó címkéket a jobb kereshetőségért</small>
+            </div>
 
-            <!-- nem mükszik
-            <MultiSelect v-model="selectedCountries" :options="countries" optionLabel="name" filter placeholder="Select Countries" display="chip" class="w-full md:w-80">
-            <template #option="slotProps">
-                <div class="flex items-center">
-                    <img :alt="slotProps.option.name" src="https://primefaces.org/cdn/primevue/images/flag/flag_placeholder.png" :class="`flag flag-${slotProps.option.code.toLowerCase()} mr-2`" style="width: 18px" />
-                    <div>{{ slotProps.option.name }}</div>
-                </div>
-            </template>
-            <template #dropdownicon>
-                <i class="pi pi-map" />
-            </template>
-            <template #filtericon>
-                <i class="pi pi-map-marker" />
-            </template>
-            <template #header>
-                <div class="font-medium px-3 py-2">Available Countries</div>
-            </template>
-            <template #footer>
-                <div class="p-3 flex justify-between">
-                    <Button label="Add New" severity="secondary" variant="text" size="small" icon="pi pi-plus" />
-                    <Button label="Remove All" severity="danger" variant="text" size="small" icon="pi pi-times" />
-                </div>
-            </template>
-        </MultiSelect>-->
+            <div class="form-section">
+                <label class="form-label">
+                    <!--<i class="pi pi-file-edit form-label-icon"></i>-->
+                    Tartalom
+                    <span class="required-indicator">*</span>
+                </label>
+                <Editor 
+                    v-model="post.content" 
+                    editorStyle="height: 400px"
+                    class="mb-6 editor-container"
+                    :pt="{
+                        toolbar: { class: 'editor-toolbar' },
+                        content: { style: { 'min-height': '250px', 'font-family': 'inherit' } }
+                    }"
+                />
+                <small class="form-hint">Használhatsz formázást, képeket és linkeket a tartalomban</small>
+            </div>
 
-            <label for="subject">Subject</label>
-            <!-- kéne: https://v3.primevue.org/editor/-->
-            <textarea id="subject" name="subject" placeholder="Write something.." style="height:200px"></textarea>
-
-            <input type="submit" value="Submit">
+            <div class="form-actions">
+                <Button
+                    type="submit" 
+                    label="Poszt mentése" 
+                    icon="pi pi-check" 
+                    class="submit-button"
+                    :disabled="!isFormValid"
+                    :class="{ 'p-button-success': isFormValid }">
+                </Button>
+                <Button
+                    type="button" 
+                    label="Visszaállítás" 
+                    icon="pi pi-refresh" 
+                    class="p-button-outlined reset-button"
+                    @click="resetForm"
+                    severity="secondary"> 
+                </Button>
+            </div>
         </form>        
     </div>
 </main>
 </template>
-<script setup>
-import { ref } from "vue";
-import MultiSelect from 'primevue/multiselect';
 
-const selectedCountries = ref();
-const countries = ref([
-    { name: 'Australia', code: 'AU' },
-    { name: 'Brazil', code: 'BR' },
-    { name: 'China', code: 'CN' },
-    { name: 'Egypt', code: 'EG' },
-    { name: 'France', code: 'FR' },
-    { name: 'Germany', code: 'DE' },
-    { name: 'India', code: 'IN' },
-    { name: 'Japan', code: 'JP' },
-    { name: 'Spain', code: 'ES' },
-    { name: 'United States', code: 'US' }
-]);
+<script setup>
+import { ref, computed, onMounted } from "vue";
+import MultiSelect from 'primevue/multiselect';
+import Editor from 'primevue/editor';
+import InputText from 'primevue/inputtext';
+import Button from 'primevue/button';
+import axios from 'axios'; // Make sure to import axios
+
+const post = ref({
+    title: '',
+    content: ''
+});
+
+const formTouched = ref(false);
+
+const selectedTags = ref([]);
+const tagOptions = ref([]); // Initialize as empty array
+
+const isFormValid = computed(() => {
+    return post.value.title.trim() !== '' && post.value.content.trim() !== '';
+});
+
+const notification = ref({
+    show: false,
+    message: '',
+    type: 'info'
+});
+
+const notificationIcon = computed(() => {
+    const icons = {
+        success: 'pi pi-check-circle',
+        error: 'pi pi-times-circle',
+        warn: 'pi pi-exclamation-triangle',
+        info: 'pi pi-info-circle'
+    };
+    return icons[notification.value.type] || 'pi pi-info-circle';
+});
+
+const showNotification = (type, message, duration = 3500) => {
+    notification.value = {
+        show: true,
+        message,
+        type
+    };
+    
+    setTimeout(() => {
+        notification.value.show = false;
+    }, duration);
+};
+
+const fetchTagsFromDatabase = async () => {
+    try {
+        const response = await axios.get('/api/cimkek');
+        
+        // Transform the data to match your MultiSelect format
+        tagOptions.value = response.data.map(tag => ({
+            id: tag.id,
+            name: tag.nev,
+            code: tag.nev.toLowerCase().replace(/\s+/g, '_'),
+            color: getRandomColor() // Optional: add random color or keep default
+        }));
+    } catch (error) {
+        console.error('Error fetching tags:', error);
+        showNotification('error', 'Nem sikerült betölteni a címkéket');
+    }
+};
+
+// Optional: Helper function to generate random colors for tags
+const getRandomColor = () => {
+    const colors = [
+        '#42b883', '#f7df1e', '#61dafb', '#4d8af0', 
+        '#264de4', '#e34c26', '#009688', '#ff6b6b',
+        '#9c27b0', '#3f51b5', '#03a9f4', '#4caf50',
+        '#ff9800', '#795548', '#607d8b', '#e91e63',
+        '#00bcd4', '#8bc34a', '#ffc107', '#673ab7'
+    ];
+    return colors[Math.floor(Math.random() * colors.length)];
+};
+
+const submitForm = async () => {
+    formTouched.value = true;
+    
+    if (!isFormValid.value) {
+        showNotification('warn', 'Kérjük töltsd ki a kötelező mezőket!');
+        return;
+    }
+    
+    const formData = {
+        title: post.value.title,
+        content: post.value.content,
+        tags: selectedTags.value.map(tag => tag.id) // Send only tag IDs to backend
+    };
+    
+    try {
+        console.log('Submitting post:', formData);
+        
+        // TODO: Replace with your actual API endpoint for creating posts
+        // const response = await axios.post('/api/posts', formData);
+        
+        showNotification('success', 'Poszt sikeresen mentve!');
+        
+        post.value = { title: '', content: '' };
+        selectedTags.value = [];
+        formTouched.value = false;
+        
+    } catch (error) {
+        console.error('Error submitting post:', error);
+        showNotification('error', 'Nem sikerült menteni a posztot');
+    }
+};
+
+const resetForm = () => {
+    post.value = { title: '', content: '' };
+    selectedTags.value = [];
+    formTouched.value = false;
+    showNotification('info', 'Űrlap visszaállítva');
+};
+
+onMounted(() => {
+    fetchTagsFromDatabase();
+});
 </script>
+
 <style scoped>
 *, *::before, *::after {
   box-sizing: border-box;
 }
 
-main {
-  text-align: center;
-  margin: 0 auto;
-  padding: 0;
+:deep() {
+    /* PrimeVue component customizations */
+    .p-inputtext {
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 14px 16px;
+        font-size: 16px;
+        transition: all 0.3s ease;
+        background-color: white;
+        width: 30%;
+    }
+    
+    .p-inputtext:focus {
+        border-color: #4d8af0;
+        box-shadow: 0 0 0 3px rgba(77, 138, 240, 0.1);
+        outline: none;
+    }
+    
+    .p-inputtext.p-invalid {
+        border-color: #f87171;
+    }
+    
+    .p-multiselect {
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+        width: 40%;
+    }
+    
+    .p-multiselect:not(.p-disabled):hover {
+        border-color: #cbd5e0;
+    }
+    
+    .p-multiselect:not(.p-disabled).p-focus {
+        border-color: #4d8af0;
+        box-shadow: 0 0 0 3px rgba(77, 138, 240, 0.1);
+    }
+    
+    .p-multiselect-panel {
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+    
+    .p-multiselect-chip .p-chip {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 20px;
+        padding: 6px 12px;
+        font-weight: 500;
+    }
+    
+    .p-button {
+        padding: 14px 28px;
+        font-size: 16px;
+        font-weight: 600;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+        border: none;
+    }
+    
+    .p-button:not(:disabled):hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .p-button-success {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    }
+    
+    .p-button-success:not(:disabled):hover {
+        background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    }
+    
+    .p-button-outlined {
+        background: transparent;
+        border: 2px solid #cbd5e0;
+        color: #4a5568;
+    }
+    
+    .p-button-outlined:not(:disabled):hover {
+        background: #f7fafc;
+        border-color: #a0aec0;
+    }
+    
+    .editor-toolbar {
+        border: 2px solid #e2e8f0;
+        border-bottom: none;
+        border-radius: 10px 10px 0 0;
+        padding: 12px;
+        background: #f8fafc;
+    }
+    
+    .p-editor-container .p-editor-content {
+        border: 2px solid #e2e8f0;
+        border-top: none;
+        border-radius: 0 0 10px 10px;
+        min-height: 250px;
+    }
+}
+
+.new-post-page {
+    min-height: 100vh;
+    /*background: rgb(223, 220, 220);*/
+    padding: 10px 20px;
+    text-align: center;
+}
+
+.page-header {
+    margin-bottom: 40px;
+    text-align: center;
 }
 
 .title {
-  font-weight: 700;
-  font-size: 45px;
-  color: var(--mk-text-dark);
-  display: inline-block;
-  background-image: linear-gradient(90deg, #a08283, #4d0303);
-  background-repeat: no-repeat;
-  background-position: 0 100%;
-  background-size: 100% 4px;
-  padding-bottom: 6px;
+    font-weight: 800;
+    font-size: 48px;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: black;
+    margin-bottom: 12px;
+}
+
+.subtitle {
+    font-size: 18px;
+    color: #718096;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+.notification {
+    position: fixed;
+    top: 30px;
+    right: 30px;
+    padding: 20px 25px;
+    border-radius: 12px;
+    color: white;
+    font-weight: 600;
+    z-index: 1000;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    animation: slideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    cursor: pointer;
+    max-width: 400px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.notification.success {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.95) 0%, rgba(5, 150, 105, 0.95) 100%);
+    border-left: 5px solid #059669;
+}
+
+.notification.error {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.95) 0%, rgba(220, 38, 38, 0.95) 100%);
+    border-left: 5px solid #dc2626;
+}
+
+.notification.warn {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.95) 0%, rgba(217, 119, 6, 0.95) 100%);
+    border-left: 5px solid #d97706;
+}
+
+.notification.info {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.95) 0%, rgba(29, 78, 216, 0.95) 100%);
+    border-left: 5px solid #1d4ed8;
+}
+
+.notification-icon {
+    font-size: 20px;
+}
+
+.notification-message {
+    flex: 1;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%) translateY(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0) translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    to {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
 }
 
 .container {
-  border-radius: 5px;
-  background-color: #f2f2f2;
-  padding: 35px;
-  text-align: left;
-  max-width: 1400px;
-  margin: 0 auto;
-  /*position: relative;*/
+    border-radius: 20px;
+    background: white;
+    padding: 50px;
+    text-align: left;
+    max-width: 80%;
+    margin: 0 auto;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(226, 232, 240, 0.6);
 }
 
-input[type=text], select, textarea {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-sizing: border-box;
-  margin-top: 6px;
-  margin-bottom: 16px;
-  resize: vertical;
+.post-form {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
 }
 
-input[type=submit] {
-  background-color: #04AA6D;
-  color: white;
-  padding: 12px 20px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-display: block;
-  margin-left: auto;
-  margin-right: 0;
-  /*float: right;*/
+.form-section {
+    position: relative;
 }
 
-input[type=submit]:hover {
-  background-color: #45a049;
+.form-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    font-size: 22px;
+    color: #2d3748;
+    margin-bottom: 12px;
+    letter-spacing: -0.3px;
+}
+
+.form-label-icon {
+    color: #4d8af0;
+    font-size: 20px;
+}
+
+.required-indicator {
+    color: #f87171;
+}
+
+.form-hint {
+    display: block;
+    margin-top: 8px;
+    color: #718096;
+    font-size: 14px;
+    font-style: italic;
+}
+
+.form-actions {
+    display: flex;
+    gap: 16px;
+    justify-content: flex-end;
+    margin-top: 40px;
+    padding-top: 30px;
+    border-top: 2px solid #f1f5f9;
+}
+
+.submit-button {
+    min-width: 180px;
+}
+
+.reset-button {
+    min-width: 140px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+    .container {
+        padding: 40px 30px;
+        max-width: 90%;
+    }
+    
+    .title {
+        font-size: 42px;
+    }
+}
+
+@media (max-width: 768px) {
+    .new-post-page {
+        padding: 20px 15px;
+    }
+    
+    .container {
+        padding: 30px 20px;
+        border-radius: 15px;
+    }
+    
+    .title {
+        font-size: 36px;
+    }
+    
+    .subtitle {
+        font-size: 16px;
+        padding: 0 15px;
+    }
+    
+    .notification {
+        left: 15px;
+        right: 15px;
+        max-width: none;
+        top: 15px;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .submit-button, .reset-button {
+        width: 100%;
+    }
+    
+    :deep() {
+        .p-button {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+}
+
+@media (max-width: 480px) {
+    .title {
+        font-size: 32px;
+    }
+    
+    .container {
+        padding: 25px 15px;
+    }
+    
+    .form-label {
+        font-size: 16px;
+    }
+    
+    :deep() {
+        .p-inputtext {
+            padding: 12px 14px;
+            font-size: 15px;
+        }
+    }
 }
 </style>

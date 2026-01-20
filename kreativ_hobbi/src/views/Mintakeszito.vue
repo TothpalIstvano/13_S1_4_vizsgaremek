@@ -840,6 +840,7 @@ onUnmounted(() => {
     </div>
 
     <!-- Adatok bekérése -->
+     <!-- ide ilyet: https://v3.primevue.org/stepper/-->
     <div v-if="!pixelesKep">
       <div id="adatok">
         <div class="progress-container">
@@ -963,100 +964,97 @@ onUnmounted(() => {
         <div v-else class="modositoContainer">
           <div class="modositas">
               <div class="valtoztatok">
-  <p>Pixel mérete: {{ pixelMeret }}px</p>
-  <div class="valtoztatok-input custom-slider-wrapper">
-    <label class="custom-slider">
-      <input 
-        type="range" 
-        id="pixelMeretSlider"
-        min="5" 
-        max="40" 
-        step="1" 
-        :value="pixelMeret"
-        :style="`--value: ${(pixelMeret - 5) / (40 - 5) * 100}%`"
-        @input="pixelMeret = $event.target.value; mintaFrissites()"
-      >
-    </label>
-    <input 
-      type="number" 
-      min="5" 
-      max="40" 
-      v-model.number="pixelMeret"
-      class="szam-input"
-      @input="mintaFrussites"
-    />
-  </div>
-</div>
-
-<div class="valtoztatok">
-  <p>Rács vastagsága: {{ racsLathatosag }}%</p>
-  <div class="valtoztatok-input custom-slider-wrapper">
-    <label class="custom-slider">
-      <input 
-        type="range" 
-        id="racsLathatosagSlider"
-        min="0" 
-        max="60" 
-        step="1" 
-        :value="racsLathatosag"
-        :style="`--value: ${racsLathatosag / 60 * 100}%`"
-        @input="racsLathatosag = $event.target.value; mintaFrissites()"
-      >
-    </label>
-    <input 
-      type="number" 
-      min="0" 
-      max="60" 
-      v-model.number="racsLathatosag"
-      class="szam-input"
-      @input="mintaFrissites"
-    />
-  </div>
-</div>
-
-<div class="valtoztatok">
-  <p>Színek száma: {{ szinSzam }}</p>
-  <div class="valtoztatok-input custom-slider-wrapper">
-    <label class="custom-slider">
-      <input 
-        type="range" 
-        id="szinSzamSlider"
-        min="2" 
-        max="20" 
-        step="1" 
-        :value="szinSzam"
-        :style="`--value: ${(szinSzam - 2) / (20 - 2) * 100}%`"
-        @input="szinSzam = $event.target.value; mintaFrissites()"
-      >
-    </label>
-    <input 
-      type="number" 
-      min="2" 
-      max="20"
-      v-model.number="szinSzam"
-      class="szam-input"
-      @input="mintaFrissites"
-    />
-  </div>
-</div>
-
-
-            <div class="valtoztatok">
-              <p>Színek változtatása: </p>
-              <div class="szin-paletta">
-                <div
-                  v-for="(szin, index) in szinPaletta"
-                  :key="szin.id"
-                  class="szin-negyzet"
-                  :style="{ backgroundColor: szin.jelenlegi }"
-                  @click="szinValasztas(index)"
-                  :title="'Kattints a szín módosításához'"
-                >
-                  <div class="szin-sorszam">{{ index + 1 }}</div>
+                <p>Pixel mérete: {{ pixelMeret }}px</p>
+                <div class="valtoztatok-input custom-slider-wrapper">
+                  <label class="custom-slider">
+                    <input 
+                      type="range" 
+                      id="pixelMeretSlider"
+                      min="5" 
+                      max="40" 
+                      step="1" 
+                      :value="pixelMeret"
+                      :style="`--value: ${(pixelMeret - 5) / (40 - 5) * 100}%`"
+                      @input="pixelMeret = $event.target.value; mintaFrissites()"
+                    >
+                  </label>
+                  <input 
+                    type="number" 
+                    min="5" 
+                    max="40" 
+                    v-model.number="pixelMeret"
+                    class="szam-input"
+                    @input="mintaFrussites"
+                  />
                 </div>
               </div>
-            </div>
 
+              <div class="valtoztatok">
+                <p>Rács vastagsága: {{ racsLathatosag }}%</p>
+                <div class="valtoztatok-input custom-slider-wrapper">
+                  <label class="custom-slider">
+                    <input 
+                      type="range" 
+                      id="racsLathatosagSlider"
+                      min="0" 
+                      max="60" 
+                      step="1" 
+                      :value="racsLathatosag"
+                      :style="`--value: ${racsLathatosag / 60 * 100}%`"
+                      @input="racsLathatosag = $event.target.value; mintaFrissites()"
+                    >
+                  </label>
+                  <input 
+                    type="number" 
+                    min="0" 
+                    max="60" 
+                    v-model.number="racsLathatosag"
+                    class="szam-input"
+                    @input="mintaFrissites"
+                  />
+                </div>
+              </div>
+
+              <div class="valtoztatok">
+                <p>Színek száma: {{ szinSzam }}</p>
+                <div class="valtoztatok-input custom-slider-wrapper">
+                  <label class="custom-slider">
+                    <input 
+                      type="range" 
+                      id="szinSzamSlider"
+                      min="2" 
+                      max="20" 
+                      step="1" 
+                      :value="szinSzam"
+                      :style="`--value: ${(szinSzam - 2) / (20 - 2) * 100}%`"
+                      @input="szinSzam = $event.target.value; mintaFrissites()"
+                    >
+                  </label>
+                  <input 
+                    type="number" 
+                    min="2" 
+                    max="20"
+                    v-model.number="szinSzam"
+                    class="szam-input"
+                    @input="mintaFrissites"
+                  />
+                </div>
+              </div>
+              <div class="valtoztatok">
+                <p>Színek változtatása: </p>
+                <div class="szin-paletta">
+                  <div
+                    v-for="(szin, index) in szinPaletta"
+                    :key="szin.id"
+                    class="szin-negyzet"
+                    :style="{ backgroundColor: szin.jelenlegi }"
+                    @click="szinValasztas(index)"
+                    :title="'Kattints a szín módosításához'"
+                  >
+                    <div class="szin-sorszam">{{ index + 1 }}</div>
+                  </div>
+                </div>
+              </div>
           </div>
 
           <!--Canvas -->
@@ -1157,13 +1155,13 @@ onUnmounted(() => {
         </div>
 
     </div>
-<!-- Alert overlay with centered alert box -->
-<div class="alert-overlay" :class="{ active: showAlert }">
-  <div class="alert success">
-    <span class="closebtn" @click="showAlert = false">&times;</span>  
-    <strong>A jobb láthatóság érdekében fordítsa el az eszközét.</strong> 
-  </div>
-</div>
+    <!-- Alert overlay with centered alert box -->
+    <div class="alert-overlay" :class="{ active: showAlert }">
+      <div class="alert success">
+        <span class="closebtn" @click="showAlert = false">&times;</span>  
+        <strong>A jobb láthatóság érdekében fordítsa el az eszközét.</strong> 
+      </div>
+    </div>
   </main>
 </template>
 
@@ -1388,17 +1386,19 @@ main {
 #adatok {
   /*max-width: 900px;
   margin: 0 auto;
-  padding: 32px;
+  padding: 32px;*/
   background-color: var(--mk-hatterszin);
   border-radius: 8px;
-  box-shadow: 0 2px 15px var(--mk-arnyekszin);*/
-    background: linear-gradient(145deg, #ffffff, #fff8f3);
+  box-shadow: 0 2px 15px var(--mk-arnyekszin);
+  /*background: linear-gradient(145deg, #ffffff, #fff8f3);*/
   border-radius: 20px;
   padding: 40px;
   box-shadow: 
     0 15px 40px rgba(139, 67, 64, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.8);
   border: 1px solid rgba(139, 67, 64, 0.08);
+  width: 80%;
+  margin: 0 auto;
 }
 
 .radioStilus {
@@ -1641,7 +1641,7 @@ input[type="file"] {
 }
 
 .progress-step {
-  /*width: 40px;
+  width: 40px;
   height: 40px;
   border-radius: 50%;
   background-color: var(--mk-arnyekszin);
@@ -1650,11 +1650,11 @@ input[type="file"] {
   justify-content: center;
   font-weight: 600;
   color: #999;
-  position: relative;*/
-  position: absolute;
+  position: relative;
+ position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  width: 40px;
+   /*width: 40px;
   height: 40px;
   background: white;
   border: 3px solid rgba(139, 67, 64, 0.2);
@@ -1665,7 +1665,7 @@ input[type="file"] {
   font-weight: 700;
   color: rgba(139, 67, 64, 0.5);
   box-shadow: 0 4px 12px rgba(139, 67, 64, 0.1);
-  transition: all 0.3s ease;
+  transition: all 0.3s ease;*/
 }
 
 .progress-step.active {
@@ -1876,6 +1876,7 @@ input[type="file"] {
   border-radius: 5px;
   cursor: pointer;
   font-weight: bold;
+  font-size: 15px;
   background-color: #853939d7;
   color: white;
   transition: background-color 0.3s;
