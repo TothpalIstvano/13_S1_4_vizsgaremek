@@ -12,7 +12,7 @@ import Rolunk from '../views/Rolunk.vue'
 import Index from '@/views/index.vue'
 import Adatvedelem from "@/views/Adatvedelem.vue";
 import Adatfelhasznalas from "@/views/Adatfelhasznalas.vue";
-import Teszt from "@/views/Teszt.vue";
+import Dino from "@/views/Dino.vue";
 import NotFound from "@/views/NotFound.vue";
 import NewPost from '@/components/NewPost.vue'
 const router = createRouter({
@@ -90,9 +90,9 @@ const router = createRouter({
       component: Adatfelhasznalas
     },
     {
-      path: '/teszt',
-      name: 'Teszt',
-      component: Teszt
+      path: '/dino',
+      name: 'Dino',
+      component: Dino
     },
     {
       path: '/:pathMatch(.*)*',
