@@ -10,7 +10,7 @@
 * \[x] Szövegek
 * \[x] Blog kártyák
 * \[x] Footer
-* \[ ] Jelszó(regisztráció)
+* \[x] Jelszó(regisztráció)
 * \[ ] Webshop 
 * \[ ] különböző roleok hozzá adása
 * \[ ] Admin site
