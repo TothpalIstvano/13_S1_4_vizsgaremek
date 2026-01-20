@@ -10,7 +10,6 @@ import 'primevue/resources/primevue.min.css' // Core CSS
 import 'primeicons/primeicons.css' // Icons
 import 'quill/dist/quill.core.css'
 import 'quill/dist/quill.snow.css'
-import Image from 'primevue/image';
 
 import App from './App.vue'
 import router from './router/router'
@@ -49,11 +48,12 @@ app.use(createPinia())
 app.use(router)
 app.use(PrimeVue)
 
-//kihagyható de hátha hasznos
+//hogy minden szépen/jól működjön
 import Button from 'primevue/button';
 import InputText from 'primevue/inputtext';
 import MultiSelect from 'primevue/multiselect';
 import Editor from 'primevue/editor';
+import Image from 'primevue/image';
 
 app.component('Button', Button);
 app.component('InputText', InputText);

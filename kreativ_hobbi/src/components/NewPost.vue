@@ -41,12 +41,26 @@
                     v-model="selectedTags" 
                     :options="tagOptions" 
                     optionLabel="name" 
-                    placeholder="Válassz címkéket (több is választható)" 
+                    placeholder="Válassz címkét (több is választható)" 
                     display="chip" 
                     filter
                     class="w-full mb-6"
                 />
                 <small class="form-hint">Válassz témához kapcsolódó címkéket a jobb kereshetőségért</small>
+            </div>
+
+            <div class="form-section">
+                <label for="postSubtext" class="form-label">
+                    <!--<i class="pi pi-pencil form-label-icon"></i>-->
+                    Poszt rövid leírása
+                </label>
+                <InputText 
+                    id="postSubtext"
+                    placeholder="Add meg a poszt leírását..." 
+                    class="w-full mb-6" 
+                    :class="{ 'p-invalid': post.title === '' && formTouched }"
+                />
+                <small class="form-hint">Adj egy rövid, tömör leírást a posztod tartalmáról (ennek hiányában a poszt első pár mondata kerül a helyére)</small>
             </div>
 
             <div class="form-section">
@@ -65,6 +79,50 @@
                     }"
                 />
                 <small class="form-hint">Használhatsz formázást, képeket és linkeket a tartalomban</small>
+            </div>
+
+            <div class="form-section">
+                <label class="form-label">
+                    Képek feltöltése
+                </label>
+                <!--<FileUpload name="demo[]" url="/api/upload" @upload="onAdvancedUpload($event)" :multiple="true" accept="image/*" :maxFileSize="1000000" showUploadButton="false">
+                    <template #empty>
+                        <span>Húzd ide/Illeszd be a fájlaidat a feltöltéshez.</span>
+                    </template>
+                </FileUpload>-->
+                <FileUpload 
+                    ref="fileUploadRef"
+                    name="demo[]" 
+                    url="/api/upload" 
+                    @upload="onAdvancedUpload($event)" 
+                    @select="onFileSelect($event)"
+                    @before-send="onBeforeSend($event)"
+                    :multiple="true" 
+                    accept="image/*" 
+                    :maxFileSize="5000000" 
+                    :showUploadButton="false"
+                    :showCancelButton="true"
+                    :auto="true"
+                    :chooseLabel="'Fájlok kiválasztása'"
+                    :cancelLabel="'Mégse'"
+                    :pt="{
+                        root: { class: 'custom-fileupload' },
+                        chooseButton: { 
+                            class: 'custom-choose-button'
+                        },
+                        cancelButton: {
+                            class: 'custom-cancel-button'
+                        }
+                    }"
+                >
+                    <template #empty>
+                        <div class="drag-drop-area">
+                            <i class="pi pi-cloud-upload" style="font-size: 3rem; color: #667eea; margin-bottom: 1rem;"></i>
+                            <p>Húzd ide a fájlaidat vagy kattints a feltöltéshez</p>
+                        </div>
+                    </template>
+                </FileUpload>
+                <small class="form-hint">Támogatott formátumok: JPG, PNG, GIF. Maximális fájlméret: 5MB.</small>
             </div>
 
             <div class="form-actions">
@@ -96,7 +154,8 @@ import MultiSelect from 'primevue/multiselect';
 import Editor from 'primevue/editor';
 import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
-import axios from 'axios'; // Make sure to import axios
+import axios from 'axios';
+import FileUpload from 'primevue/fileupload';
 
 const post = ref({
     title: '',
@@ -148,25 +207,12 @@ const fetchTagsFromDatabase = async () => {
         tagOptions.value = response.data.map(tag => ({
             id: tag.id,
             name: tag.nev,
-            code: tag.nev.toLowerCase().replace(/\s+/g, '_'),
-            color: getRandomColor() // Optional: add random color or keep default
+            code: tag.nev.toLowerCase().replace(/\s+/g, '_')
         }));
     } catch (error) {
         console.error('Error fetching tags:', error);
         showNotification('error', 'Nem sikerült betölteni a címkéket');
     }
-};
-
-// Optional: Helper function to generate random colors for tags
-const getRandomColor = () => {
-    const colors = [
-        '#42b883', '#f7df1e', '#61dafb', '#4d8af0', 
-        '#264de4', '#e34c26', '#009688', '#ff6b6b',
-        '#9c27b0', '#3f51b5', '#03a9f4', '#4caf50',
-        '#ff9800', '#795548', '#607d8b', '#e91e63',
-        '#00bcd4', '#8bc34a', '#ffc107', '#673ab7'
-    ];
-    return colors[Math.floor(Math.random() * colors.length)];
 };
 
 const submitForm = async () => {
@@ -227,7 +273,6 @@ onMounted(() => {
         font-size: 16px;
         transition: all 0.3s ease;
         background-color: white;
-        width: 30%;
     }
     
     .p-inputtext:focus {
@@ -317,6 +362,74 @@ onMounted(() => {
         border-radius: 0 0 10px 10px;
         min-height: 250px;
     }
+}
+
+.drag-drop-area {
+    border: 2px dashed #cbd5e0;
+    border-radius: 10px;
+    padding: 40px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background-color: #f8fafc;
+    margin-bottom: 1rem;
+}
+
+.drag-drop-area:hover {
+    border-color: #4d8af0;
+    background-color: #f0f7ff;
+}
+
+.drag-drop-area p {
+    color: #718096;
+    font-size: 16px;
+    margin: 0;
+}
+
+
+:deep(.custom-choose-button) {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    border: none !important;
+    color: white !important;
+    border-radius: 10px !important;
+    padding: 12px 24px !important;
+    font-weight: 600 !important;
+    transition: all 0.3s ease !important;
+}
+
+:deep(.custom-choose-button:hover) {
+    background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1) !important;
+}
+
+:deep(.p-fileupload-content .p-fileupload-files .p-fileupload-row) {
+    background: #f8fafc;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    padding: 12px;
+    border: 1px solid #e2e8f0;
+}
+
+:deep(.p-fileupload-content .p-button) {
+    background: #f89595 !important;
+    border: none !important;
+    border-radius: 6px !important;
+    padding: 6px 12px !important;
+    font-size: 14px !important;
+}
+
+:deep(.p-fileupload-content .p-button:hover) {
+    background: #ef4444 !important;
+    color: white;
+}
+
+#postTitle {
+    width: 30%;
+}
+
+#postSubtext {
+    width: 50%;
 }
 
 .new-post-page {
