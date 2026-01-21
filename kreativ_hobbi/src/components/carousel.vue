@@ -162,10 +162,9 @@ watch(currentIndex, () => {
     margin: 0 5px;
     cursor: pointer;
     text-align: center;
-    padding-top: 15px;
+    padding: 15px;
     border-top: 3px solid;
     margin-top: 3px;
-    color: gray;
     transform: translateY(-180%);
     transition: all 0.6s ease-in-out;
 }

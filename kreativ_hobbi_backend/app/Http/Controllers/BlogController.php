@@ -56,4 +56,13 @@ class BlogController extends Controller
             'kommentek_szama' => $post->kommentek()->count(),
         ]);
     }
+
+    public function main()
+    {
+        $posts = Posztok::with('cimkek:id,nev', 'foKep:id,url_Link,alt_szoveg')->where('statusz', 'közzétett')
+            ->orderBy('created_at', 'desc')
+            ->take(3)
+            ->get();
+        return response()->json(data: $posts);
+    }
 }
