@@ -16,7 +16,7 @@ class FelhasznaloAdatok extends Model
 
     protected $fillable = [
         'felhasznalo_id',
-        'statusz',
+        'szerepkor',
         'vezeteknev',
         'keresztnev',
         'varos',
