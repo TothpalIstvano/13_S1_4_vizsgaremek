@@ -15,7 +15,7 @@ class FelhasznaloAdatokSeeder extends Seeder
         FelhasznaloAdatok::factory()->create(
             [
                 'felhasznalo_id' => 1,
-                'statusz' => 'admin',
+                'szerepkor' => 'admin',
                 'vezeteknev' => 'Test',
                 'keresztnev' => 'Felhasznalo',
                 'varos' => 1,
