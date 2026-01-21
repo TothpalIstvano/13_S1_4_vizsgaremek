@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('felhasznaloAdatok', function (Blueprint $table) {
             $table->unsignedInteger('felhasznalo_id')->primary();
+            $table->enum('statusz', ['admin', 'moderator', 'sima', 'felfüggesztett'])->default('sima');
             $table->string('vezeteknev', 100);
             $table->string('keresztnev', 100);
             $table->unsignedInteger('varos')->nullable();
@@ -20,7 +21,7 @@ return new class extends Migration
             $table->integer('hazszam');
             $table->string('emeletAjto', 10);
             $table->string('telefonszam', 20);
-            $table->string('kartyaszam');
+            $table->string('kartyaszam')->nullable();
             $table->foreign('felhasznalo_id')->references('id')->on('felhasznalok')->onDelete('cascade');
             $table->foreign('varos')->references('id')->on('varosok')->onDelete('set null');
         });

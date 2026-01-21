@@ -16,6 +16,7 @@ class FelhasznaloAdatok extends Model
 
     protected $fillable = [
         'felhasznalo_id',
+        'statusz',
         'vezeteknev',
         'keresztnev',
         'varos',
@@ -27,6 +28,11 @@ class FelhasznaloAdatok extends Model
     ];
 
     public $timestamps = false;    
+
+    public function setKartyaszamAttribute($value)
+    {
+        $this->attributes['kartyaszam'] = bcrypt($value);
+    }
 
     public function felhasznalo()
     {
