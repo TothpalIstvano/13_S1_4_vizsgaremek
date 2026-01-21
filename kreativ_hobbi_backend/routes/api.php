@@ -4,14 +4,16 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\KommentController;
-use App\Models\Felhasznalok;
 use App\Models\Posztok;
 
+//User related API routes:
 
+// Get authenticated user
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+// Check if user is logged in
 Route::get('/user/check', function () {
     if (Auth::check()) {
         return response()->json(['loggedIn' => true, 'user' => auth()->user()], 200);
@@ -20,6 +22,7 @@ Route::get('/user/check', function () {
     }
 });
 
+// Get posts of authenticated user
 Route::get('/user/posts', function () {
     if (Auth::check()) {
         $user = auth()->user();
@@ -32,10 +35,10 @@ Route::get('/user/posts', function () {
     }
 });
 
+// API routes for blog and comments:
 
-Route::get('/teszt', function () {
-    return Felhasznalok::all();
-});
+//Blog posts on main page:
+Route::get('/blog/main', [BlogController::class, 'main']);
 
 // Blog routes
 Route::get('/blog', [BlogController::class, 'index']);
