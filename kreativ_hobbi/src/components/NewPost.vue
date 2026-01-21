@@ -56,7 +56,8 @@
                 </label>
                 <InputText 
                     id="postSubtext"
-                    placeholder="Add meg a poszt leírását..." 
+                    placeholder="Add meg a poszt leírását..."
+                    v-model="post.kivonat"
                     class="w-full mb-6" 
                     :class="{ 'p-invalid': post.title === '' && formTouched }"
                 />
@@ -81,15 +82,16 @@
                 <small class="form-hint">Használhatsz formázást és linkeket a tartalomban</small>
             </div>
 
+            <!--
             <div class="form-section">
                 <label class="form-label">
                     Képek feltöltése
                 </label>
-                <!--<FileUpload name="demo[]" url="/api/upload" @upload="onAdvancedUpload($event)" :multiple="true" accept="image/*" :maxFileSize="1000000" showUploadButton="false">
+                --<FileUpload name="demo[]" url="/api/upload" @upload="onAdvancedUpload($event)" :multiple="true" accept="image/*" :maxFileSize="1000000" showUploadButton="false">
                     <template #empty>
                         <span>Húzd ide/Illeszd be a fájlaidat a feltöltéshez.</span>
                     </template>
-                </FileUpload>-->
+                </FileUpload>--
                 <FileUpload 
                     ref="fileUploadRef"
                     name="demo[]" 
@@ -123,7 +125,7 @@
                     </template>
                 </FileUpload>
                 <small class="form-hint">Támogatott formátumok: JPG, PNG, GIF. Maximális fájlméret: 5MB.</small>
-            </div>
+            </div>-->
 
             <div class="form-actions">
                 <Button
@@ -131,7 +133,7 @@
                     label="Mentés piszkozatként" 
                     icon="pi pi-pencil" 
                     class="draft-button"
-                    @click="vissza"
+                    @click="vissza">
                 </Button>
                 <Button
                     type="submit" 
@@ -157,22 +159,25 @@
 
 <script setup>
 import { ref, computed, onMounted } from "vue";
+import { useRouter } from 'vue-router';
 import MultiSelect from 'primevue/multiselect';
 import Editor from 'primevue/editor';
 import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
 import axios from 'axios';
-import FileUpload from 'primevue/fileupload';
+
+const router = useRouter();
 
 const post = ref({
     title: '',
-    content: ''
+    content: '',
+    kivonat: ''
 });
 
 const formTouched = ref(false);
 
 const selectedTags = ref([]);
-const tagOptions = ref([]); // Initialize as empty array
+const tagOptions = ref([]);
 
 const isFormValid = computed(() => {
     return post.value.title.trim() !== '' && post.value.content.trim() !== '';
@@ -210,7 +215,6 @@ const fetchTagsFromDatabase = async () => {
     try {
         const response = await axios.get('/api/cimkek');
         
-        // Transform the data to match your MultiSelect format
         tagOptions.value = response.data.map(tag => ({
             id: tag.id,
             name: tag.nev,
@@ -233,32 +237,70 @@ const submitForm = async () => {
     const formData = {
         title: post.value.title,
         content: post.value.content,
-        tags: selectedTags.value.map(tag => tag.id) // Send only tag IDs to backend
+        kivonat: post.value.kivonat || null,
+        tags: selectedTags.value.map(tag => tag.id)
     };
     
+    console.log('Form data to send:', formData);
+    
     try {
-        console.log('Submitting post:', formData);
+        // Send the post data to the backend
+        const response = await axios.post('/api/posts', formData, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            }
+        });
         
-        // TODO: Replace with your actual API endpoint for creating posts
-        // const response = await axios.post('/api/posts', formData);
+        console.log('Response:', response.data);
         
-        showNotification('success', 'Poszt sikeresen mentve!');
+        showNotification('success', 'Poszt sikeresen létrehozva!');
         
-        post.value = { title: '', content: '' };
+        // Reset form
+        post.value = { title: '', content: '', kivonat: '' };
         selectedTags.value = [];
         formTouched.value = false;
         
+        // Redirect to profile page after 2 seconds
+        setTimeout(() => {
+            router.push('/profil');
+        }, 2000);
+        
     } catch (error) {
         console.error('Error submitting post:', error);
-        showNotification('error', 'Nem sikerült menteni a posztot');
+        
+        let errorMessage = 'Nem sikerült menteni a posztot';
+        
+        if (error.response) {
+            console.error('Response error:', error.response.data);
+            errorMessage = error.response.data.message || 
+                          error.response.data.error || 
+                          'Szerver hiba történt';
+            
+            // If there are validation errors, show them
+            if (error.response.data.messages) {
+                const messages = Object.values(error.response.data.messages).flat();
+                errorMessage = messages.join(', ');
+            }
+        } else if (error.request) {
+            console.error('Request error:', error.request);
+            errorMessage = 'Nem sikerült kapcsolódni a szerverhez';
+        }
+        
+        showNotification('error', errorMessage);
     }
 };
 
 const resetForm = () => {
-    post.value = { title: '', content: '' };
+    post.value = { title: '', content: '', kivonat: '' };
     selectedTags.value = [];
     formTouched.value = false;
     showNotification('info', 'Űrlap visszaállítva');
+};
+
+const vissza = () => {
+    // Save as draft functionality (optional)
+    showNotification('info', 'Piszkozat mentve (feature fejlesztés alatt)');
 };
 
 onMounted(() => {
