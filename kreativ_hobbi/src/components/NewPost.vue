@@ -78,7 +78,7 @@
                         content: { style: { 'min-height': '250px', 'font-family': 'inherit' } }
                     }"
                 />
-                <small class="form-hint">Használhatsz formázást, képeket és linkeket a tartalomban</small>
+                <small class="form-hint">Használhatsz formázást és linkeket a tartalomban</small>
             </div>
 
             <div class="form-section">
@@ -127,8 +127,15 @@
 
             <div class="form-actions">
                 <Button
+                    type="button" 
+                    label="Mentés piszkozatként" 
+                    icon="pi pi-pencil" 
+                    class="draft-button"
+                    @click="vissza"
+                </Button>
+                <Button
                     type="submit" 
-                    label="Poszt mentése" 
+                    label="Poszt feltöltése" 
                     icon="pi pi-check" 
                     class="submit-button"
                     :disabled="!isFormValid"
@@ -388,7 +395,7 @@ onMounted(() => {
 
 
 :deep(.custom-choose-button) {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    background-color: #4d8af0 !important;
     border: none !important;
     color: white !important;
     border-radius: 10px !important;
@@ -398,10 +405,19 @@ onMounted(() => {
 }
 
 :deep(.custom-choose-button:hover) {
-    background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%) !important;
+    background-color: #764ba2 !important;
     transform: translateY(-2px) !important;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1) !important;
 }
+
+:deep(.custom-cancel-button) {
+    background-color: #ef4444;
+}
+
+:deep(.custom-cancel-button:disabled) {
+    background-color: #ef4444;
+}
+
 
 :deep(.p-fileupload-content .p-fileupload-files .p-fileupload-row) {
     background: #f8fafc;
@@ -591,6 +607,10 @@ onMounted(() => {
 
 .reset-button {
     min-width: 140px;
+}
+
+.draft-button {
+    background-color: #667eea;
 }
 
 /* Responsive adjustments */

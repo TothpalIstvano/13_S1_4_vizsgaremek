@@ -26,7 +26,7 @@ class PosztokFactory extends Factory
             'szerzo_id' => Felhasznalok::pluck('id')->random(),
             'fo_kep_id' => $this->faker->unique()->numberBetween(30, 61),
             'letrehozas_datuma' => $this->faker->dateTime(),
-            'statusz' => $this->faker->randomElement(['piszkozat', 'közzétett', 'archivált']),
+            'statusz' => $this->faker->randomElement(['piszkozat', 'közzétett', 'archivált', 'törölt']),
         ];
     }
 }
