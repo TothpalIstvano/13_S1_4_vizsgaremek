@@ -1,13 +1,20 @@
 <script setup>
+//imports
 import Carousel from '@/components/carousel.vue';
-import { ref, onMounted, onUnmounted,nextTick } from 'vue';
+import { ref, onMounted, onUnmounted, nextTick, watch } from 'vue';
 
+//variables
 const featureTitleRef = ref(null);
 const isInView = ref(false);
 let io = null;
+const baseURL = import.meta.env.VITE_API_URL;
+const blogPosts = ref([]);
 
+onMounted(async () => {
+  blogPosts.value = await fetchBlogPosts();
+});
 
-onMounted(() => {
+onMounted( () => {
   io = new IntersectionObserver(
     ([entry]) => {
       // play animation when at least 50% visible; change threshold as needed
@@ -24,30 +31,25 @@ onUnmounted(() => {
   if (io) io.disconnect();
 });
 
-// Sample blog data
-const blogPosts = [
-  {
-    title: "Horgolt táskák trendjei 2024-ben",
-    date: "2024-05-10",
-    author: "John Doe",
-    description: "Fedezd fel a legújabb horgolt táska trendeket és stílusokat ebben az évben.",
-    tag:["Horgolás", "Hímzés",  "Kötés"]
-  },
-  {
-    title: "Kötés kezdőknek: Az első lépések",
-    date: "2024-04-22",
-    author: "Jane Smith",
-    description: "Ismerd meg a kötés alapjait és kezdj el alkotni még ma!",
-    tag:["Horgolás", "Hímzés",  "Kötés"]
-  },
-  {
-    title: "Hímzés minták inspirációi",
-    date: "2024-03-15",
-    author: "Bob Johnson",
-    description: "Meríts ihletet a legszebb hímzés mintákból és alkoss valami egyedit.",
-    tag: "Hímzés"
+watch(blogPosts, async () => {
+  setTimeout(() => {
+    BlogCardequalizer();
+  }, 550);
+});
+// blog data
+async function fetchBlogPosts() {
+  try {
+    const response = await fetch(`${baseURL}/api/blog/main`);
+    if (!response.ok) {
+      throw new Error('Hiba a blogposztok lekérése során');
+    }
+    const data = await response.json();
+    console.log('Fetched blog posts:', data);
+    return data;
+  } catch (error) {
+    console.error('Error fetching blog posts:', error);
   }
-];
+}
 
 function BlogCardequalizer() {
   let maxHeight = 0;
@@ -68,15 +70,14 @@ function BlogCardequalizer() {
     };
 };
 
-onMounted(() => {
-  // Wait for all images and other resources to load
-  window.addEventListener('load', () => {
-    // Use nextTick to ensure the DOM is fully updated
-    nextTick(() => {
-      BlogCardequalizer();
-    });
-  });
-});
+function formatDate(dateString) {
+const datePart = dateString.split('T')[0]; 
+const [year, month, day] = datePart.split('-'); // ["2026", "01", "21"]
+const formattedDate = `${day} ${month} ${year}`;
+console.log(formattedDate);
+
+return formattedDate;
+}
 
 </script>
 
@@ -175,24 +176,24 @@ onMounted(() => {
         <div class="blog-card-grid-space"v-for="n in blogPosts" :key="n">
           <div class="blog-card">
             <div class="blog-card-img-holder">
-              <img src="https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcRgRsQXzqdCz0aktVRQGM4CFdzOW1BRRw7GA0OldqTWcIh2qRCuQZJIrmMHYPNFV6iJ5f63CqYFxbEQysznAsKudp02KEBeahEC3BipCJcip1HLs8J_dlY0DB9DPBwTZjuB1LUgAQ&usqp=CAc" alt="HTML Syntax">
+              <img :src="baseURL + '/storage/' + n.fo_kep.url_Link" :alt="n.fo_kep.alt_szoveg"/>
             </div>
-            <h3 class="blog-title">{{ n.title }}</h3>
+            <h3 class="blog-title">{{ n.cim }}</h3>
             <div class="blog-meta">
-              <span class="blog-time">{{ n.date }}</span>
-              <span class="blog-author"><strong>{{ n.author }}</strong></span>
+              <span class="blog-time">{{formatDate(n.created_at) }}</span>
+              <span class="blog-author"><strong>{{ n.szerzo }}</strong></span>
             </div>
             <p class="blog-description">
-              {{ n.description }}
+              {{ n.kivonat }}
             </p>
             <div class="blog-tags">
-              <div class="blog-tag" >{{ n.tag[0] }}</div>
+              <div class="blog-tag" v-for="cimke in n.cimkek" :key="cimke.id">{{ cimke.nev }}</div>
             </div>
             <div class="blog-options">
               <span>
                 Read Full Blog
               </span>
-              <button class="btn" @click="$router.push('/blog')">Blog</button>
+              <button class="btn" @click="$router.push('/blog/' + n.id )">Blog</button>
             </div>
           </div>
         </div>
@@ -481,7 +482,9 @@ onMounted(() => {
 /* Hybrid Card Styles */
 .blog-card {
   width: 30rem;
-  height:auto;
+  height:100%;
+  display: flex;
+  flex-direction: column;
   background: #fff;
   border-radius: 1.5rem;
   padding: 1.5rem;
@@ -547,6 +550,7 @@ onMounted(() => {
   font-size: 1rem;
   margin: 0;
   line-height: 1.6;
+  flex-grow: 1;
 }
 
 .blog-time {
@@ -590,7 +594,7 @@ onMounted(() => {
   align-items: center;
   justify-content: space-between;
   font-size: 1rem;
-  margin-top: 1rem;
+  margin-top: auto;
   padding-top: 1rem;
   border-top: 1px solid #f0f0f0;
 }
