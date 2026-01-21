@@ -28,7 +28,21 @@ Route::get('/user/posts', function () {
         $user = auth()->user();
         $posts = Posztok::with('cimkek:id,nev', 'foKep:id,url_Link,alt_szoveg')
             ->where('szerzo_id', $user->id)
-            ->get();
+            ->get()
+            ->map(function ($post) {
+                // Transform the post to ensure fo_kep has default values if null
+                $postArray = $post->toArray();
+
+                // If fo_kep is null, set default values
+                if (!$post->foKep) {
+                    $postArray['fo_kep'] = [
+                        'url_Link' => 'profilkepek/default.jpg',
+                        'alt_szoveg' => $post->cim
+                    ];
+                }
+
+                return $postArray;
+            });
         return response()->json(data: $posts);
     } else {
         return response()->json(['error' => 'Unauthorized'], 401);
@@ -54,3 +68,51 @@ Route::get('/cimkek', function () {
     $cimkek = \App\Models\Cimkek::select('id', 'nev')->get();
     return response()->json($cimkek);
 });
+
+// Create new post ---
+Route::post('/posts', function (Request $request) {
+    if (!Auth::check()) {
+        return response()->json(['error' => 'Unauthorized'], 401);
+    }
+
+    // Debug: Log the incoming request
+    \Log::info('Post creation request:', $request->all());
+
+    $validated = $request->validate([
+        'title' => 'required|string|max:255',
+        'content' => 'required|string',
+        'kivonat' => 'nullable|string|max:255',
+        'tags' => 'nullable|array',
+    ]);
+
+    $user = Auth::user();
+
+    // Create the post
+    $post = new Posztok();
+    $post->cim = $validated['title'];
+    $post->tartalom = $validated['content'];
+    $post->kivonat = $validated['kivonat'] ?? substr(strip_tags($validated['content']), 0, 200);
+    $post->szerzo_id = $user->id;
+    $post->statusz = 'közzétett';
+
+    $saved = $post->save();
+
+    if (!$saved) {
+        return response()->json(['error' => 'Failed to save post'], 500);
+    }
+
+    // Attach tags if provided
+    if ($request->has('tags') && is_array($request->tags) && count($request->tags) > 0) {
+        try {
+            $post->cimkek()->attach($request->tags);
+            \Log::info('Tags attached:', $request->tags);
+        } catch (\Exception $e) {
+            \Log::error('Failed to attach tags: ' . $e->getMessage());
+        }
+    }
+
+    return response()->json([
+        'message' => 'Post created successfully',
+        'post' => $post->load('cimkek')
+    ], 201);
+})->middleware('auth:sanctum');
