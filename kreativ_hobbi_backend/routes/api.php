@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\KommentController;
+use App\Http\Controllers\ImageController;
 use App\Models\Posztok;
 
 //User related API routes:
@@ -49,6 +50,9 @@ Route::get('/user/posts', function () {
     }
 });
 
+// Image upload routes
+Route::post('/upload-images', [ImageController::class, 'upload'])->middleware('auth:sanctum');
+
 // API routes for blog and comments:
 
 //Blog posts on main page:
@@ -83,6 +87,10 @@ Route::post('/posts', function (Request $request) {
         'content' => 'required|string',
         'kivonat' => 'nullable|string|max:255',
         'tags' => 'nullable|array',
+        'images' => 'nullable|array',
+        'images.*.id' => 'nullable|integer|exists:kepek,id',
+        'images.*.alt' => 'nullable|string|max:255',
+        'images.*.description' => 'nullable|string|max:255',
     ]);
 
     $user = Auth::user();
@@ -108,6 +116,22 @@ Route::post('/posts', function (Request $request) {
             \Log::info('Tags attached:', $request->tags);
         } catch (\Exception $e) {
             \Log::error('Failed to attach tags: ' . $e->getMessage());
+        }
+    }
+
+    // Attach images if provided
+    if ($request->has('images') && is_array($request->images) && count($request->images) > 0) {
+        try {
+            $imageIds = array_column($request->images, 'id');
+            $post->kepek()->attach($imageIds);
+
+            // Set the first image as main image if available
+            if (!empty($imageIds)) {
+                $post->fo_kep_id = $imageIds[0];
+                $post->save();
+            }
+        } catch (\Exception $e) {
+            \Log::error('Failed to attach images: ' . $e->getMessage());
         }
     }
 
