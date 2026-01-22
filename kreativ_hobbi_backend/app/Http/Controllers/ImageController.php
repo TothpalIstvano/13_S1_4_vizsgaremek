@@ -1,0 +1,66 @@
+<?php
+namespace App\Http\Controllers;
+use App\Models\Kepek;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
+
+class ImageController extends Controller
+{
+    public function upload(Request $request)
+    {
+        try {
+            // Validate the request
+            $validator = Validator::make($request->all(), [
+                'images.*' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:5120', // 5MB max
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'error' => 'Validation failed',
+                    'messages' => $validator->errors()
+                ], 422);
+            }
+
+            $uploadedImages = [];
+
+            // Get all uploaded files
+            $files = $request->file('images');
+            $alts = $request->input('alt', []);
+            $descriptions = $request->input('description', []);
+
+            foreach ($files as $index => $file) {
+                // Store the file in storage/app/public/blog_images
+                $path = $file->store('blog_images', 'public');
+
+                // Create database record
+                $image = Kepek::create([
+                    'url_Link' => $path,
+                    'alt_Szoveg' => $alts[$index] ?? $file->getClientOriginalName(),
+                    'leiras' => $descriptions[$index] ?? 'Blog image uploaded by ' . Auth::user()->felhasz_nev
+                ]);
+
+                $uploadedImages[] = [
+                    'id' => $image->id,
+                    'url' => Storage::url($path),
+                    'alt' => $image->alt_Szoveg,
+                    'description' => $image->leiras,
+                    'path' => $path
+                ];
+            }
+
+            return response()->json([
+                'message' => 'Images uploaded successfully',
+                'images' => $uploadedImages
+            ], 201);
+
+        } catch (\Exception $e) {
+            \Log::error('Image upload error: ' . $e->getMessage());
+            return response()->json([
+                'error' => 'Failed to upload images',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+}

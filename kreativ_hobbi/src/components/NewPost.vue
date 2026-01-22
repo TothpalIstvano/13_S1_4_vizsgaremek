@@ -82,50 +82,56 @@
                 <small class="form-hint">Használhatsz formázást és linkeket a tartalomban</small>
             </div>
 
-            <!--
-            <div class="form-section">
-                <label class="form-label">
-                    Képek feltöltése
-                </label>
-                --<FileUpload name="demo[]" url="/api/upload" @upload="onAdvancedUpload($event)" :multiple="true" accept="image/*" :maxFileSize="1000000" showUploadButton="false">
-                    <template #empty>
-                        <span>Húzd ide/Illeszd be a fájlaidat a feltöltéshez.</span>
-                    </template>
-                </FileUpload>--
-                <FileUpload 
-                    ref="fileUploadRef"
-                    name="demo[]" 
-                    url="/api/upload" 
-                    @upload="onAdvancedUpload($event)" 
-                    @select="onFileSelect($event)"
-                    @before-send="onBeforeSend($event)"
-                    :multiple="true" 
-                    accept="image/*" 
-                    :maxFileSize="5000000" 
-                    :showUploadButton="false"
-                    :showCancelButton="true"
-                    :auto="true"
-                    :chooseLabel="'Fájlok kiválasztása'"
-                    :cancelLabel="'Mégse'"
-                    :pt="{
-                        root: { class: 'custom-fileupload' },
-                        chooseButton: { 
-                            class: 'custom-choose-button'
-                        },
-                        cancelButton: {
-                            class: 'custom-cancel-button'
-                        }
-                    }"
-                >
-                    <template #empty>
-                        <div class="drag-drop-area">
-                            <i class="pi pi-cloud-upload" style="font-size: 3rem; color: #667eea; margin-bottom: 1rem;"></i>
-                            <p>Húzd ide a fájlaidat vagy kattints a feltöltéshez</p>
-                        </div>
-                    </template>
-                </FileUpload>
-                <small class="form-hint">Támogatott formátumok: JPG, PNG, GIF. Maximális fájlméret: 5MB.</small>
-            </div>-->
+              <div class="form-section">
+    <label class="form-label">
+      Képek feltöltése
+    </label>
+    <FileUpload
+      ref="fileUploadRef"
+      name="images[]"
+      @select="onFileSelect($event)"
+      @upload="onImageUpload($event)"
+      :multiple="true"
+      accept="image/*"
+      :maxFileSize="5000000"
+      :showUploadButton="true"
+      :showCancelButton="true"
+      :auto="false"
+      chooseLabel="Képek kiválasztása"
+      uploadLabel="Képek feltöltése"
+      cancelLabel="Mégse"
+      class="mb-6"
+    >
+      <template #empty>
+        <div class="drag-drop-area">
+          <i class="pi pi-cloud-upload" style="font-size: 3rem; color: #667eea; margin-bottom: 1rem;"></i>
+          <p>Húzd ide a képeidet vagy kattints a feltöltéshez</p>
+        </div>
+      </template>
+    </FileUpload>
+    <div v-if="uploadedImages.length > 0" class="image-preview-container">
+      <div v-for="(image, index) in uploadedImages" :key="index" class="image-preview">
+        <img :src="image.preview" class="preview-image" />
+        <Button 
+          type="button" 
+          icon="pi pi-times" 
+          class="p-button-rounded p-button-danger image-remove-btn"
+          @click="removeImage(index)">
+        </Button>
+        <InputText 
+          v-model="image.alt" 
+          placeholder="Alternatív szöveg" 
+          class="image-alt-input"
+        />
+        <InputText 
+          v-model="image.description" 
+          placeholder="Leírás" 
+          class="image-description-input"
+        />
+      </div>
+    </div>
+    <small class="form-hint">Támogatott formátumok: JPG, PNG, GIF. Maximális fájlméret: 5MB.</small>
+  </div>
 
             <div class="form-actions">
                 <Button
@@ -162,9 +168,10 @@ import { ref, computed, onMounted } from "vue";
 import { useRouter } from 'vue-router';
 import MultiSelect from 'primevue/multiselect';
 import Editor from 'primevue/editor';
-import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
 import axios from 'axios';
+import FileUpload from 'primevue/fileupload';
+import InputText from 'primevue/inputtext';
 
 const router = useRouter();
 
@@ -178,6 +185,9 @@ const formTouched = ref(false);
 
 const selectedTags = ref([]);
 const tagOptions = ref([]);
+
+const uploadedImages = ref([]);
+const fileUploadRef = ref(null);
 
 const isFormValid = computed(() => {
     return post.value.title.trim() !== '' && post.value.content.trim() !== '';
@@ -226,6 +236,72 @@ const fetchTagsFromDatabase = async () => {
     }
 };
 
+const onFileSelect = (event) => {
+  // Create preview URLs for selected files
+  const files = event.files;
+  files.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      uploadedImages.value.push({
+        file: file,
+        preview: e.target.result,
+        alt: '',
+        description: '',
+        serverId: null
+      });
+    };
+    reader.readAsDataURL(file);
+  });
+};
+
+const onImageUpload = async (event) => {
+  try {
+    // Create FormData object
+    const formData = new FormData();
+    
+    // Append each file and its metadata
+    uploadedImages.value.forEach((image, index) => {
+      formData.append(`images[${index}]`, image.file);  // The actual file
+      formData.append(`alt[${index}]`, image.alt || '');  // Alt text
+      formData.append(`description[${index}]`, image.description || '');  // Description
+    });
+
+    // Make the request - axios will automatically set the correct Content-Type header
+    const response = await axios.post('/api/upload-images', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',  // This is actually optional - axios sets it automatically for FormData
+      }
+    });
+
+    // Update uploaded images with server IDs
+    response.data.images.forEach((serverImage, index) => {
+      if (uploadedImages.value[index]) {
+        uploadedImages.value[index].serverId = serverImage.id;
+        uploadedImages.value[index].url = serverImage.url;  // Store the URL for preview
+      }
+    });
+
+    showNotification('success', 'Képek sikeresen feltöltve!');
+    
+    // Clear the file upload component's internal state
+    if (fileUploadRef.value) {
+      fileUploadRef.value.clear();
+    }
+  } catch (error) {
+    console.error('Image upload error:', error);
+    let errorMessage = 'Nem sikerült feltölteni a képeket';
+    if (error.response?.data?.message) {
+      errorMessage = error.response.data.message;
+    }
+    showNotification('error', errorMessage);
+  }
+};
+
+const removeImage = (index) => {
+  uploadedImages.value.splice(index, 1);
+};
+
+
 const submitForm = async () => {
     formTouched.value = true;
     
@@ -238,7 +314,12 @@ const submitForm = async () => {
         title: post.value.title,
         content: post.value.content,
         kivonat: post.value.kivonat || null,
-        tags: selectedTags.value.map(tag => tag.id)
+        tags: selectedTags.value.map(tag => tag.id),
+            images: uploadedImages.value.map(img => ({
+      id: img.serverId,
+      alt: img.alt,
+      description: img.description
+    }))
     };
     
     console.log('Form data to send:', formData);
@@ -311,6 +392,41 @@ onMounted(() => {
 <style scoped>
 *, *::before, *::after {
   box-sizing: border-box;
+}
+
+.image-preview-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 15px;
+  margin-top: 20px;
+}
+.image-preview {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.preview-image {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  display: block;
+}
+.image-remove-btn {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  z-index: 10;
+}
+.image-alt-input, .image-description-input {
+  width: 100%;
+  margin-top: 5px;
+  font-size: 14px;
+}
+:deep(.p-fileupload) {
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 15px;
 }
 
 :deep() {
