@@ -87,28 +87,25 @@
       Képek feltöltése
     </label>
     <FileUpload
-      ref="fileUploadRef"
-      name="images[]"
-      @select="onFileSelect($event)"
-      @upload="onImageUpload($event)"
-      :multiple="true"
-      accept="image/*"
-      :maxFileSize="5000000"
-      :showUploadButton="true"
-      :showCancelButton="true"
-      :auto="false"
-      chooseLabel="Képek kiválasztása"
-      uploadLabel="Képek feltöltése"
-      cancelLabel="Mégse"
-      class="mb-6"
-    >
-      <template #empty>
+    ref="fileUploadRef"
+    name="images[]"
+    @select="onFileSelect"
+    :multiple="true"
+    accept="image/*"
+    :maxFileSize="5000000"
+    :auto="false"
+    :showUploadButton="false"  <!-- Remove separate upload button -->
+    :showCancelButton="false"
+    chooseLabel="Képek kiválasztása"
+    class="mb-6"
+>
+    <template #empty>
         <div class="drag-drop-area">
-          <i class="pi pi-cloud-upload" style="font-size: 3rem; color: #667eea; margin-bottom: 1rem;"></i>
-          <p>Húzd ide a képeidet vagy kattints a feltöltéshez</p>
+            <i class="pi pi-cloud-upload" style="font-size: 3rem; color: #667eea; margin-bottom: 1rem;"></i>
+            <p>Húzd ide a képeidet vagy kattints a feltöltéshez</p>
         </div>
-      </template>
-    </FileUpload>
+    </template>
+</FileUpload>
     <div v-if="uploadedImages.length > 0" class="image-preview-container">
       <div v-for="(image, index) in uploadedImages" :key="index" class="image-preview">
         <img :src="image.preview" class="preview-image" />
@@ -237,21 +234,25 @@ const fetchTagsFromDatabase = async () => {
 };
 
 const onFileSelect = (event) => {
-  // Create preview URLs for selected files
-  const files = event.files;
-  files.forEach(file => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      uploadedImages.value.push({
-        file: file,
-        preview: e.target.result,
-        alt: '',
-        description: '',
-        serverId: null
-      });
-    };
-    reader.readAsDataURL(file);
-  });
+    const files = event.files;
+    files.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            uploadedImages.value.push({
+                file: file,
+                preview: e.target.result,
+                alt: '',
+                description: '',
+                serverId: null  // Will be set after upload
+            });
+        };
+        reader.readAsDataURL(file);
+    });
+    
+    // Clear the file upload component's selection
+    if (fileUploadRef.value) {
+        fileUploadRef.value.clear();
+    }
 };
 
 const onImageUpload = async (event) => {
@@ -310,37 +311,81 @@ const submitForm = async () => {
         return;
     }
     
-    const formData = {
-        title: post.value.title,
-        content: post.value.content,
-        kivonat: post.value.kivonat || null,
-        tags: selectedTags.value.map(tag => tag.id),
-            images: uploadedImages.value.map(img => ({
-      id: img.serverId,
-      alt: img.alt,
-      description: img.description
-    }))
-    };
-    
-    console.log('Form data to send:', formData);
-    
     try {
-        // Send the post data to the backend
-        const response = await axios.post('/api/posts', formData, {
+        let uploadedImageIds = [];
+        
+        // First, upload images if there are any
+        if (uploadedImages.value.length > 0) {
+            console.log('Uploading images:', uploadedImages.value.length);
+            
+            const formData = new FormData();
+            
+            uploadedImages.value.forEach((image, index) => {
+                if (image.file) {
+                    console.log(`Image ${index}:`, {
+                        file: image.file,
+                        name: image.file.name,
+                        alt: image.alt,
+                        description: image.description
+                    });
+                    
+                    // New image file
+                    formData.append(`images[${index}]`, image.file);
+                    formData.append(`alt[${index}]`, image.alt || '');
+                    formData.append(`description[${index}]`, image.description || '');
+                }
+            });
+            
+            // Only upload if there are actual files
+            if (formData.has('images[0]')) {
+                console.log('Sending image upload request...');
+                const uploadResponse = await axios.post('/api/upload-images', formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    }
+                });
+                
+                console.log('Upload response:', uploadResponse.data);
+                
+                // Get the uploaded image IDs
+                uploadedImageIds = uploadResponse.data.images.map(img => img.id);
+                console.log('Uploaded image IDs:', uploadedImageIds);
+            }
+        }
+        
+        // Prepare post data
+        const postData = {
+            title: post.value.title,
+            content: post.value.content,
+            kivonat: post.value.kivonat || null,
+            tags: selectedTags.value.map(tag => tag.id),
+            images: uploadedImageIds.map(id => ({ id: id })) // Send array of objects with id property
+        };
+                
+        console.log('Sending post data:', postData);
+        
+        // Create the post with attached images
+        const response = await axios.post('/api/posts', postData, {
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json'
             }
         });
         
-        console.log('Response:', response.data);
+        console.log('Post created successfully:', response.data);
         
         showNotification('success', 'Poszt sikeresen létrehozva!');
         
         // Reset form
         post.value = { title: '', content: '', kivonat: '' };
         selectedTags.value = [];
+        uploadedImages.value = [];
         formTouched.value = false;
+        
+        // Clear file upload component
+        if (fileUploadRef.value) {
+            fileUploadRef.value.clear();
+        }
         
         // Redirect to profile page after 2 seconds
         setTimeout(() => {
@@ -348,7 +393,7 @@ const submitForm = async () => {
         }, 2000);
         
     } catch (error) {
-        console.error('Error submitting post:', error);
+        console.error('Error creating post:', error);
         
         let errorMessage = 'Nem sikerült menteni a posztot';
         
@@ -358,7 +403,6 @@ const submitForm = async () => {
                           error.response.data.error || 
                           'Szerver hiba történt';
             
-            // If there are validation errors, show them
             if (error.response.data.messages) {
                 const messages = Object.values(error.response.data.messages).flat();
                 errorMessage = messages.join(', ');
