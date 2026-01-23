@@ -31,12 +31,12 @@ class Posztok extends Model
 
     public function szerzo()
     {
-        return $this->belongsTo(Felhasznalok::class, 'szerzo_id');
+        return $this->belongsTo(Felhasznalok::class, 'szerzo_id', 'id');
     }
 
     public function foKep()
     {
-        return $this->belongsTo(Kepek::class, 'fo_kep_id');
+        return $this->belongsTo(Kepek::class, 'fo_kep_id', 'id');
     }
 
     public function cimkek()

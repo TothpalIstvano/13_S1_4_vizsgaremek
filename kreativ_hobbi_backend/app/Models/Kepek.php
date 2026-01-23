@@ -35,7 +35,7 @@ class Kepek extends Model
     public function felhasznalok()
     {
         // 'profilKep_id' is the foreign key in the 'felhasznalok' table
-        return $this->hasMany(Felhasznalok::class, 'profilKep_id');
+        return $this->hasMany(Felhasznalok::class, 'profilKep_id', 'id');
 
     }
 }

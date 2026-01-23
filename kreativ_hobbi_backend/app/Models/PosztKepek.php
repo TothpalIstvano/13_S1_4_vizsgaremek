@@ -21,11 +21,11 @@ class PosztKepek extends Model
 
     public function poszt()
     {
-        return $this->belongsTo(Posztok::class, 'poszt_id');
+        return $this->belongsTo(Posztok::class, 'poszt_id', 'id');
     }
 
     public function kep()
     {
-        return $this->belongsTo(Kepek::class, 'kep_id');
+        return $this->belongsTo(Kepek::class, 'kep_id', 'id');
     }
 }

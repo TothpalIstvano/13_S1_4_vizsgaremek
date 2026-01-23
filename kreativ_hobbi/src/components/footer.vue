@@ -31,7 +31,7 @@ import { RouterLink } from 'vue-router'
       </div>
     </div>
     <div class="footer-bottom">
-      &copy; 2025 Hobbitár. Minden jog fenntartva.
+      &copy; 2025-2026 Hobbitár. Minden jog fenntartva.
     </div>
   </footer>
 </template>
@@ -42,7 +42,7 @@ import { RouterLink } from 'vue-router'
   color: var(--vt-c-white);
   padding: 30px ;
   font-size: 1rem;
-  margin-top: 10%;
+  margin-top: 3%;
 }
 .footer-content {
   display: flex;

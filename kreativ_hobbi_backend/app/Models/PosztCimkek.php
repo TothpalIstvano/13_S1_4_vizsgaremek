@@ -19,11 +19,11 @@ class PosztCimkek extends Model
 
     public function poszt()
     {
-        return $this->belongsToMany(Posztok::class, 'poszt_id');
+        return $this->belongsToMany(Posztok::class, 'poszt_id', 'id');
     }
     public function cimke()
     {
-        return $this->belongsToMany(Cimkek::class, 'cimke_id');
+        return $this->belongsToMany(Cimkek::class, 'cimke_id', 'id');
     }
 
 }

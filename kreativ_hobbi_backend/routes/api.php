@@ -6,6 +6,8 @@ use App\Http\Controllers\BlogController;
 use App\Http\Controllers\KommentController;
 use App\Http\Controllers\ImageController;
 use App\Models\Posztok;
+use App\Models\Termekek;
+use App\Models\Cimkek;
 
 //User related API routes:
 
@@ -37,7 +39,7 @@ Route::get('/user/posts', function () {
                 // If fo_kep is null, set default values
                 if (!$post->foKep) {
                     $postArray['fo_kep'] = [
-                        'url_Link' => 'profilkepek/default.jpg',
+                        'url_Link' => 'profilKepek/default.jpg',
                         'alt_szoveg' => $post->cim
                     ];
                 }
@@ -69,7 +71,7 @@ Route::delete('/comments/{id}', [KommentController::class, 'destroy']);
 
 // Címkék az új poszthoz
 Route::get('/cimkek', function () {
-    $cimkek = \App\Models\Cimkek::select('id', 'nev')->get();
+    $cimkek = Cimkek::select('id', 'nev')->get();
     return response()->json($cimkek);
 });
 
@@ -140,3 +142,8 @@ Route::post('/posts', function (Request $request) {
         'post' => $post->load('cimkek')
     ], 201);
 })->middleware('auth:sanctum');
+
+Route::get('/termekek', function () {
+    $termekek = Termekek::all()->load('kategoria', 'kepek', 'termekSzinek', 'termekSzinek.szinek','termekCimkek');
+    return response()->json($termekek);
+});
