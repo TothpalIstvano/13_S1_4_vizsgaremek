@@ -11,9 +11,8 @@ class ImageController extends Controller
     public function upload(Request $request)
     {
         try {
-            // Validate the request
             $validator = Validator::make($request->all(), [
-                'images.*' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:5120', // 5MB max
+                'images.*' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
             ]);
 
             if ($validator->fails()) {
@@ -24,15 +23,16 @@ class ImageController extends Controller
             }
 
             $uploadedImages = [];
-
-            // Get all uploaded files
             $files = $request->file('images');
             $alts = $request->input('alt', []);
             $descriptions = $request->input('description', []);
 
             foreach ($files as $index => $file) {
-                // Store the file in storage/app/public/blog_images
-                $path = $file->store('blog_images', 'public');
+                // Generate unique filename
+                $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+
+                // Store in public storage
+                $path = $file->storeAs('blog', $filename, 'public');
 
                 // Create database record
                 $image = Kepek::create([
@@ -43,7 +43,7 @@ class ImageController extends Controller
 
                 $uploadedImages[] = [
                     'id' => $image->id,
-                    'url' => Storage::url($path),
+                    'url' => asset('storage/' . $path), // Use asset() helper for full URL
                     'alt' => $image->alt_Szoveg,
                     'description' => $image->leiras,
                     'path' => $path

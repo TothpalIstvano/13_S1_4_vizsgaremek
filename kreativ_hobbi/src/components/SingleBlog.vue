@@ -354,10 +354,18 @@ const getImageUrl = (imagePath) => {
     return fallbackImage
   }
   
+  // If it's already a full URL, return it
   if (imagePath.startsWith('http')) {
     return imagePath
   }
   
+  // Check if it's a relative path (from storage)
+  if (imagePath.startsWith('blog/')) {
+    // For Laravel storage path
+    return `http://localhost:8000/storage/${imagePath}`
+  }
+  
+  // Try to construct the URL
   return `http://localhost:8000/storage/${imagePath}`
 }
 
