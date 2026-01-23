@@ -14,12 +14,12 @@ class Kategoriak extends Model
     protected $fillable = ['nev', 'fo_kategoria_id'];
     public function foKategoria()
     {
-        return $this->belongsTo(Kategoriak::class, 'fo_kategoria_id');
+        return $this->belongsTo(Kategoriak::class, 'fo_kategoria_id', 'id');
     }
     
     public function alkategoriak()
     {
-        return $this->hasMany(Kategoriak::class, 'fo_kategoria_id');
+        return $this->hasMany(Kategoriak::class, 'fo_kategoria_id', 'id');
     }
 
 }

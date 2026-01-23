@@ -52,12 +52,12 @@ async function checkUser() {
 
     if (response.data && hasProfileImage) {
       userPath.value = '/Profil';
-      isLoggedIn.value = `${baseUrl}/storage/profilkepek/kep_${hasProfileImage}.jpg`;
+      isLoggedIn.value = `${baseUrl}/storage/profilKepek/kep_${hasProfileImage}.jpg`;
       
     } 
     else if (response.data) {
       userPath.value = '/Profil';
-      isLoggedIn.value = `${baseUrl}/storage/profilkepek/default.jpg`;
+      isLoggedIn.value = `${baseUrl}/storage/profilKepek/default.jpg`;
     } 
     else {
       userPath.value = '/Belepes';

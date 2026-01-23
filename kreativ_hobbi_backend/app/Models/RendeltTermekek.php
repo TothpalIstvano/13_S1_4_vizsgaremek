@@ -19,12 +19,12 @@ class RendeltTermekek extends Model
     protected $PrimaryKey = "id";
     
     public function rendeles(){
-        return $this->belongsTo(Rendelesek::class);
+        return $this->belongsTo(Rendelesek::class, 'rendelesek_id', 'id');
     }
     public function termekek(){
-        return $this->belongsTo(Termekek::class);
+        return $this->belongsTo(Termekek::class, 'termekek_id', 'id');
     }
     public function szin(){
-        return $this->belongsTo(termekSzinek::class);
+        return $this->belongsTo(termekSzinek::class, 'szin_id', 'id');
     }
 }

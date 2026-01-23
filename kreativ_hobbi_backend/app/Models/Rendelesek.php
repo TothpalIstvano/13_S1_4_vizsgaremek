@@ -15,6 +15,6 @@ class Rendelesek extends Model
 
     public function felhasznalo()
     {
-        return $this->belongsTo(Felhasznalok::class, 'felhasznalo_id');
+        return $this->belongsTo(Felhasznalok::class, 'felhasznalo_id', 'id');
     }
 }

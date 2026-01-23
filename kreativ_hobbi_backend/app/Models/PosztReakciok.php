@@ -15,9 +15,9 @@ class PosztReakciok extends Model
     protected $PrimaryKey = ["poszt_id", "felhasznalo_id"];
     public $incrementing = false;
     public function poszt(){
-        return $this->belongsTo(Posztok::class,"poszt_id");
+        return $this->belongsTo(Posztok::class,"poszt_id", "id");
     }
     public function felhasznalo(){
-        return $this->belongsTo(Felhasznalok::class,"felhasznalo_id");
+        return $this->belongsTo(Felhasznalok::class,"felhasznalo_id", "id");
     }
 }

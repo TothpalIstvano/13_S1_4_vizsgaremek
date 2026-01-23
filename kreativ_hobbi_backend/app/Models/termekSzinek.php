@@ -15,10 +15,10 @@ class termekSzinek extends Model
 
     public function termek()
     {
-        return $this->belongsTo(Termekek::class);
+        return $this->belongsTo(Termekek::class, 'termek_id', 'id');
     }
     public function termekSzinek()
     {
-        return $this->belongsTo(Szinek::class);
+        return $this->belongsTo(Szinek::class, 'szin_id', 'id');
     }
 }

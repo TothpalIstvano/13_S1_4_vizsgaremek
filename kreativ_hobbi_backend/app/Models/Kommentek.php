@@ -27,18 +27,18 @@ class Kommentek extends Model
 
     public function elozoKommentek()
     {
-        return $this->belongsTo(Kommentek::class, 'elozetes_komment_id');
+        return $this->belongsTo(Kommentek::class, 'elozetes_komment_id', 'id');
     }
     public function gyermekKommentek()
     {
-        return $this->hasMany(Kommentek::class, 'elozetes_komment_id');
+        return $this->hasMany(Kommentek::class, 'elozetes_komment_id', 'id');
     }
     public function kommentIro()
     {
-        return $this->belongsTo(Felhasznalok::class, 'kommentelo');
+        return $this->belongsTo(Felhasznalok::class, 'kommentelo', 'id');
     }
     public function poszt()
     {
-        return $this->belongsTo(Posztok::class, 'poszt_id');
+        return $this->belongsTo(Posztok::class, 'poszt_id', 'id');
     }
 }

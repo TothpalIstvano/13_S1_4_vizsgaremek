@@ -15,10 +15,10 @@ class TermekKepek extends Model
 
     public function termek()
     {
-        return $this->belongsTo(Termekek::class);
+        return $this->belongsTo(Termekek::class, 'termek_id', 'id');
     }
     public function kepek()
     {
-        return $this->belongsTo(Kepek::class);
+        return $this->belongsTo(Kepek::class, 'kep_id', 'id');
     }
 }

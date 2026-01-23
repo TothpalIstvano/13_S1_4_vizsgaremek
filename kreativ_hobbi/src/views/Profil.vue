@@ -28,7 +28,7 @@ async function fetchUserBlogPosts() {
 
 // --- ÚJ: Default kép definíciója ---
 const baseUrl = `${import.meta.env.VITE_API_URL}/storage`;
-const defaultAvatar = `${baseUrl}/profilkepek/default.jpg`;
+const defaultAvatar = `${baseUrl}/profilKepek/default.jpg`;
 
 // --- ÚJ: Függvény a hibás képek cseréjére ---
 function setAvatarDefault(event) {
@@ -66,7 +66,7 @@ onMounted(async () => {
     const hasProfileImage = userData.value.profilKep_id; // Ellenőrizzük, van-e ID
     if (hasProfileImage) {
       // Itt szándékosan rossz a mappa neve a tesztelésedhez (profilkepedddk)
-      user.avatar = `${baseUrl}/profilkepek/kep_${hasProfileImage}.jpg`;
+      user.avatar = `${baseUrl}/profilKepek/kep_${hasProfileImage}.jpg`;
     }
     else {
       user.avatar = defaultAvatar; // Alapértelmezett kép
