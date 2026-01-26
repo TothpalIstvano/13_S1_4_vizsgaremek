@@ -13,13 +13,22 @@ class Termekek extends Model
     public $timestamps = true;
     protected $fillable = ['nev', 'leiras', 'ar', 'darab', 'meter', 'kategoria_id', 'fo_kep_id'];
 
-    public function kategoria()
+    public function TermekKategoria()
     {
         return $this->belongsTo(Kategoriak::class, 'kategoria_id', 'id');
     }
-    public function kepek()
+    public function TermekKep()
     {
         return $this->belongsTo(Kepek::class, 'fo_kep_id', 'id');
     }
-    
+
+    public function TermekSzinek()
+    {
+        return $this->belongsToMany(Szinek::class,'termekSzinek', 'termek_id', 'szin_id');
+    }
+
+    public function TermekCimkek()
+    {
+        return $this->belongsToMany(Cimkek::class, 'termekCimkek', 'termek_id', 'cimke_id');
+    }
 }

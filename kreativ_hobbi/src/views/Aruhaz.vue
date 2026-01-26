@@ -1,15 +1,15 @@
 <template>
-  <div id="container">
-    <div id="eszkoztar">
+  <div id="shop">
+
+    <!-- TOP FILTER BAR -->
+    <div id="toolbar">
       <div class="dropdown" ref="dropdown">
-        <!-- Selected value -->
         <div class="dropdown__selected" @click="toggle">
           <FontAwesomeIcon :icon="selected.icon" />
           <span>{{ selected.label }}</span>
           <FontAwesomeIcon icon="chevron-down" class="chevron" />
         </div>
 
-        <!-- Options -->
         <ul v-if="open" class="dropdown__menu">
           <li
             v-for="option in options"
@@ -23,22 +23,35 @@
         </ul>
       </div>
     </div>
-    <div id="tartalom">
-      <div>
-        <div v-for="item in items" :key="item.id" class="item-container">
-          <div class="item">
-            <img :src="item.kep" :alt="item.name" class="item-image" />
-            <div class="item-info">
-              <h3>{{ item.nev }}</h3>
-              <p>Ár: {{ item.ar }}Ft</p>
-              <p>{{ item.leiras }}</p>
-              <p v-for="cimke in item.kategoria" :key="cimke.id" class="tag">#{{ cimke.nev }}"></p>
-              <button @click="addToCart(item)">Kosárba</button>
-            </div>
+
+    <!-- PRODUCT GRID -->
+    <div id="products">
+      <div v-for="item in items" :key="item.id" class="product-card">
+        <img :src="item.termek_kep.url_Link" :alt="item.termek_kep.alt_szoveg" class="product-image" />
+
+        <div class="product-body">
+          <h3 class="product-title">{{ item.nev }}</h3>
+          <p class="product-price">{{ item.ar }} Ft</p>
+
+          <p class="product-desc">{{ item.leiras }}</p>
+
+          <div class="tag-container">
+            <span
+              v-for="cimke in item.termek_cimkek"
+              :key="cimke.id"
+              class="item-tag"
+            >
+              {{ cimke.nev }}
+            </span>
           </div>
+
+          <button class="add-btn" @click="addToCart(item)">
+            Kosárba
+          </button>
         </div>
       </div>
     </div>
+
   </div>
 </template>
 
@@ -145,68 +158,151 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
-#container {
+#shop {
   min-height: 90vh;
+  padding: 24px;
+  background: #f6f7fb;
+}
+
+/* ===== TOP TOOLBAR ===== */
+#toolbar {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 24px;
-  border: 1px solid #ccc;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  margin: 10px;
-  background-color: #fff;
+  justify-content: flex-end;
+  margin-bottom: 24px;
 }
-#eszkoztar {
-  width: 40%;
-  height: 100%;
-  padding: 20px;
-}
+
+/* ===== DROPDOWN ===== */
 .dropdown {
   position: relative;
-  width: 320px;
-  font-size: 18px;
+  width: 260px;
+  font-size: 15px;
 }
 
 .dropdown__selected {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  gap: 10px;
   padding: 10px 14px;
-  border: 1px solid #ccc;
+  border: 1px solid #d0d0d0;
+  border-radius: 8px;
   cursor: pointer;
-  background: #fff;
+  background: white;
 }
 
 .dropdown__menu {
   position: absolute;
+  top: 100%;
   width: 100%;
-  border: 1px solid #ccc;
-  border-top: none;
-  background: #fff;
-  z-index: 10;
+  border: 1px solid #d0d0d0;
+  border-radius: 0 0 8px 8px;
+  background: white;
 }
 
 .dropdown__item {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   padding: 10px 14px;
   cursor: pointer;
 }
 
 .dropdown__item:hover {
-  background-color: #f2f2f2;
+  background: #f1f1f1;
 }
 
 .chevron {
   margin-left: auto;
 }
 
-#tartalom {
-  width: 80%;
-  height: 100%;
-  padding: 20px;
+/* ===== PRODUCT GRID ===== */
+#products {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
 }
+
+/* ===== PRODUCT CARD ===== */
+.product-card {
+  background: white;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.product-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 26px rgba(0,0,0,0.12);
+}
+
+.product-image {
+  width: 100%;
+  height: 190px;
+  object-fit: cover;
+}
+
+/* ===== PRODUCT BODY ===== */
+.product-body {
+  padding: 14px 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.product-title {
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.product-price {
+  font-weight: 700;
+  color: #2e7d32;
+}
+
+.product-desc {
+  font-size: 14px;
+  color: #555;
+  line-height: 1.3;
+  max-height: 3.8em;
+  overflow: hidden;
+}
+
+/* ===== TAGS ===== */
+.tag-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.item-tag {
+  background: #e3e8ff;
+  color: #2b3ea8;
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 999px;
+}
+
+.item-tag:hover {
+  background: #c7d4ff;
+}
+
+/* ===== BUTTON ===== */
+.add-btn {
+  margin-top: auto;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  background: #3f51b5;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.add-btn:hover {
+  background: #2f3fa3;
+}
+
 </style>
