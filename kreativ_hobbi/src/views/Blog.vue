@@ -68,12 +68,27 @@
               </div>
               
               <div class="card-footer">
-                <div class="like-container">
-                  <button class="like-btn" @click="likeok++;">
-                    <div class="heart-icon">
-                        <font-awesome-icon icon="fa-solid fa-heart"/> 
+                <div class="reaction-container">
+                  <button 
+                    class="reaction-btn thumbs-up-btn" 
+                    :class="{ 'active': post.userReaction === 'like' }"
+                    @click="handleReaction(post.id, 'like')"
+                  >
+                    <div class="thumb-icon">
+                      <font-awesome-icon icon="fa-solid fa-thumbs-up"/> 
                     </div>
-                    <span class="like-count">{{ likeok }}</span>
+                    <span class="reaction-count">{{ post.likes_count || 0 }}</span>
+                  </button>
+                  
+                  <button 
+                    class="reaction-btn thumbs-down-btn" 
+                    :class="{ 'active': post.userReaction === 'dislike' }"
+                    @click="handleReaction(post.id, 'dislike')"
+                  >
+                    <div class="thumb-icon">
+                      <font-awesome-icon icon="fa-solid fa-thumbs-down"/> 
+                    </div>
+                    <span class="reaction-count">{{ post.dislikes_count || 0 }}</span>
                   </button>
                 </div>
                 
@@ -107,9 +122,9 @@ import { useRouter } from 'vue-router'
 import api from '@/services/api.js'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faCalendar, faHeart, faArrowRight, faArrowCircleUp} from '@fortawesome/free-solid-svg-icons'
+import { faCalendar, faHeart, faArrowRight, faArrowCircleUp, faThumbsUp, faThumbsDown} from '@fortawesome/free-solid-svg-icons'
 
-library.add(faCalendar, faHeart, faArrowRight, faArrowCircleUp)
+library.add(faCalendar, faHeart, faArrowRight, faArrowCircleUp, faThumbsUp, faThumbsDown)
 
 // Import your fallback image at the top
 import fallbackImage from '@/assets/Public/b-pl1.jpg'
@@ -118,8 +133,6 @@ const router = useRouter()
 const posztok = ref([])
 const loading = ref(true)
 const error = ref(null)
-const likeok = ref(0)
-
 
 const navigateToBlog = (postId) => {
   router.push(`/blog/${postId}`)
@@ -130,9 +143,13 @@ const fetchBlogPosts = async () => {
     loading.value = true
     error.value = null
     
-    // Fetch blog posts
     const response = await api.get('/api/blog')
-    posztok.value = response.data
+    posztok.value = response.data /*.map(post => ({
+      ...post,
+      likes_count: post.likes.count || 0,
+      dislikes_count: post.dislikes.count || 0,
+      userReaction: post.user_reaction || null
+    }))*/
     
   } catch (err) {
     console.error('Error fetching blog posts:', err)
@@ -142,6 +159,41 @@ const fetchBlogPosts = async () => {
     loading.value = false
   }
 }
+
+/*const handleReaction = async (postId, reactionType) => {
+  try {
+    const postIndex = posztok.value.findIndex(post => post.id === postId)
+    if (postIndex === -1) return
+
+    const post = posztok.value[postIndex]
+    const currentReaction = post.userReaction
+    let newReaction = null
+    
+    // Toggle logic: if clicking the same reaction, remove it
+    if (currentReaction === reactionType) {
+      newReaction = null
+    } else {
+      newReaction = reactionType
+    }
+
+    // Send reaction to backend
+    const response = await api.post(`/api/blog/${postId}/reaction`, {
+      reaction: newReaction
+    })
+
+    // Update local state with backend response
+    if (response.data) {
+      posztok.value[postIndex] = {
+        ...post,
+        likes_count: response.data.likes_count || 0,
+        dislikes_count: response.data.dislikes_count || 0,
+        userReaction: response.data.user_reaction
+      }
+    }
+  } catch (error) {
+    console.error('Error updating reaction:', error)
+  }
+}*/
 
 const getImageUrl = (imagePath) => {
   // If no image or invalid path, use default
@@ -479,45 +531,70 @@ main {
   border-top: 1px solid #d8c7c7;
 }
 
-.like-container {
+.reaction-container {
+  display: flex;
+  gap: 8px;
   flex: 1;
 }
 
-.like-btn {
+.reaction-btn {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   background: none;
-  border: none;
+  border: 1px solid #e5e7eb;
   color: #494d55;
   cursor: pointer;
-  padding: 8px;
-  border-radius: 10px;
+  padding: 8px 12px;
+  border-radius: 8px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  background-color: whitesmoke;
+  background-color: #f8f9fa;
+  font-size: 14px;
 }
 
-.like-btn:hover {
-  background: #fce6e6;
-  color: #ef4444;
+.reaction-btn:hover {
+  transform: translateY(-2px);
 }
 
-.heart-icon {
-  width: 24px;
-  height: 24px;
+.thumbs-up-btn:hover {
+  background-color: #d1f7c4;
+  border-color: #22c55e;
+  color: #16a34a;
+}
+
+.thumbs-down-btn:hover {
+  background-color: #ffe4e6;
+  border-color: #f43f5e;
+  color: #dc2626;
+}
+
+.reaction-btn.active {
+  font-weight: 600;
+}
+
+.thumbs-up-btn.active {
+  background-color: #bbf7d0;
+  border-color: #16a34a;
+  color: #15803d;
+}
+
+.thumbs-down-btn.active {
+  background-color: #fecdd3;
+  border-color: #e11d48;
+  color: #be123c;
+}
+
+.thumb-icon {
+  width: 20px;
+  height: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.like-btn:hover .heart-icon {
-  fill: #ef4444;
-}
-
-.like-count {
+.reaction-count {
   font-weight: 500;
-  font-size: 14px;
+  min-width: 20px;
 }
 
 .view-btn {
