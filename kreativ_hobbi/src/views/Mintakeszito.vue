@@ -1,11 +1,7 @@
 <script setup>
 import { ref, reactive, onMounted, onUnmounted, nextTick, computed, watch } from "vue"
-/*import Stepper from 'primevue/stepper';
-import StepList from 'primevue/steplist';
-import StepPanels from 'primevue/steppanels';
-import StepItem from 'primevue/stepitem';
-import Step from 'primevue/step';
-import StepPanel from 'primevue/steppanel';*/
+import Stepper from "primevue/stepper";
+import StepperPanel from "primevue/stepperpanel";
 
 // Adat bekérés változók
 const resz = ref(1)
@@ -849,42 +845,94 @@ onUnmounted(() => {
      <!-- ide ilyet: https://v3.primevue.org/stepper/-->
     <div v-if="!pixelesKep">
 
+<!--
+<Stepper>
+    <StepperPanel header="Típus">
+              <div v-show="resz === 1" id="elsoResz" class="radioStilus">
+          <p class="cimek">Válassz típust a projektedhez:</p>
+          <div class="radioBelso">
+            <div v-for="option in tipusok" :key="option" class="radio-container">
+              <input
+                type="radio"
+                :id="option"
+                name="elsoLepes"
+                :value="option"
+                v-model="elsoLepes"
+              />
+              <label :for="option">{{ option }}</label>
+            </div>
+          </div>
+          
+          <button
+            :disabled="!elsoLepes"
+            @click="kovetkezoResz"
+            class="tovabbGomb"
+          >
+            Következő ⇒
+          </button>
+        </div>
+    </StepperPanel>
+    <StepperPanel header="Fonal">
+      <div v-show="resz === 2" id="masodikResz" class="radioStilus">
+          <p class="vissza">
+            A projekted: <strong>{{ elsoLepes }}</strong> 
+            <button @click="modositas(1)" class="visszaGomb">Vissza</button>
+          </p>
 
-          <!--<Stepper value="1" class="basis-[50rem]">
-            <StepList>
-                <Step value="1">Header I</Step>
-                <Step value="2">Header II</Step>
-                <Step value="3">Header III</Step>
-            </StepList>
-            <StepPanels>
-                <StepPanel v-slot="{ activateCallback }" value="1">
-                    <div class="flex flex-col h-48">
-                        <div class="border-2 border-dashed border-surface-200 dark:border-surface-700 rounded bg-surface-50 dark:bg-surface-950 flex-auto flex justify-center items-center font-medium">Content I</div>
-                    </div>
-                    <div class="flex pt-6 justify-end">
-                        <Button label="Next" icon="pi pi-arrow-right" @click="activateCallback('2')" />
-                    </div>
-                </StepPanel>
-                <StepPanel v-slot="{ activateCallback }" value="2">
-                    <div class="flex flex-col h-48">
-                        <div class="border-2 border-dashed border-surface-200 dark:border-surface-700 rounded bg-surface-50 dark:bg-surface-950 flex-auto flex justify-center items-center font-medium">Content II</div>
-                    </div>
-                    <div class="flex pt-6 justify-between">
-                        <Button label="Back" severity="secondary" icon="pi pi-arrow-left" @click="activateCallback('1')" />
-                        <Button label="Next" icon="pi pi-arrow-right" iconPos="right" @click="activateCallback('3')" />
-                    </div>
-                </StepPanel>
-                <StepPanel v-slot="{ activateCallback }" value="3">
-                    <div class="flex flex-col h-48">
-                        <div class="border-2 border-dashed border-surface-200 dark:border-surface-700 rounded bg-surface-50 dark:bg-surface-950 flex-auto flex justify-center items-center font-medium">Content III</div>
-                    </div>
-                    <div class="pt-6">
-                        <Button label="Back" severity="secondary" icon="pi pi-arrow-left" @click="activateCallback('2')" />
-                    </div>
-                </StepPanel>
-            </StepPanels>
-        </Stepper>-->
+          <p class="cimek">Válassz fonaltípust:</p>
+          <div class="radioBelso">
+            <div v-for="(option, index) in fonalak" :key="index" class="radio-container">
+              <input
+                type="radio"
+                :id="option.fonalTipus"
+                name="masodikLepes"
+                :value="option"
+                v-model="masodikLepes"
+              />
+              <label :for="option.fonalTipus">{{ option.fonalTipus }}</label>
+            </div>
+          </div>
+          
+          <button
+            :disabled="!masodikLepes"
+            @click="kovetkezoResz"
+            class="tovabbGomb"
+          >
+            Következő ⇒
+          </button>
+        </div>
+    </StepperPanel>
+    <StepperPanel header="Fájl">
+      <div v-show="resz === 3" id="harmadikResz">
+          <p class="vissza">
+            A projekted: <strong>{{ elsoLepes }}</strong> 
+            <button @click="modositas(1)" class="visszaGomb">Vissza</button>
+          </p>
+          <p class="vissza">
+            A fonaltípusod: <strong>{{masodikLepes?.fonalTipus || masodikLepes}}</strong> 
+            <button @click="modositas(2)" class="visszaGomb">Vissza</button>
+          </p>
 
+          <p class="cimek">Fájl feltöltése:</p>
+          <label for="file-upload" class="file-upload-label">
+            Kép kiválasztása
+          </label>
+          <input id="file-upload" type="file" @change="kepfeltoltes" accept="image/*" />
+          
+          <div v-if="file" class="file-preview-container">
+            <img :src="kepUrl" alt="Preview" class="file-preview" />
+            <p>{{ file.name }}</p>
+          </div>
+
+          <button
+            :disabled="!file"
+            @click="toMintavaltoztato" 
+            class="tovabbGomb">
+            Minta készítése ⇒
+          </button>
+        </div>
+    </StepperPanel>
+</Stepper>-->
 
       <div id="adatok">
         <div class="progress-container">

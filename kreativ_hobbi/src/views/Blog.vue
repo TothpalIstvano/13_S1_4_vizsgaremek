@@ -69,11 +69,11 @@
               
               <div class="card-footer">
                 <div class="like-container">
-                  <button class="like-btn">
+                  <button class="like-btn" @click="likeok++;">
                     <div class="heart-icon">
                         <font-awesome-icon icon="fa-solid fa-heart"/> 
                     </div>
-                    <span class="like-count">2,050</span>
+                    <span class="like-count">{{ likeok }}</span>
                   </button>
                 </div>
                 
@@ -118,6 +118,7 @@ const router = useRouter()
 const posztok = ref([])
 const loading = ref(true)
 const error = ref(null)
+const likeok = ref(0)
 
 
 const navigateToBlog = (postId) => {
