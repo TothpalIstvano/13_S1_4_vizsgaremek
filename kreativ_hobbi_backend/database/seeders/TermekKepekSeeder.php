@@ -18,7 +18,7 @@ class TermekKepekSeeder extends Seeder
         
         // 2. Szerezzük be a szükséges ID-ket
         $termekIds = Termekek::pluck('id');
-        $kepIds = Kepek::pluck('id');
+        $kepIds = Kepek::get('id')->whereBetween('id', [14,31])->pluck('id');
 
         if ($termekIds->isEmpty() || $kepIds->isEmpty()) {
             $this->command->error('A termék-kép kapcsolatok seederhez először futtasd a TermekekSeeder-t és a KepekSeeder-t!');

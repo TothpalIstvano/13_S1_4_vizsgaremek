@@ -6,6 +6,7 @@ namespace Database\Seeders;
 use App\Models\Kepek;
 
 use Illuminate\Database\Seeder;
+use Psy\Readline\Hoa\Console;
 
 class KepekSeeder extends Seeder
 {
@@ -14,64 +15,31 @@ class KepekSeeder extends Seeder
      */
     public function run(): void
     {
-        Kepek::create([
-            'url_Link' => 'https://www.gravatar.com/avatar/?d=mp&s=200',
-            'alt_Szoveg' => 'Default profile picture',
-            'leiras' => 'This is the default profile picture for users without a custom image.'
-        ]);
-        // Add your images
-        $yourImages = [
-            [
-                'url_Link' => 'blog/post1-main.jpg',
-                'alt_Szoveg' => 'My first blog post main image',
-                'leiras' => 'Description of the main image'
-            ],
-            [
-                'url_Link' => 'blog/post1-image1.jpg',
-                'alt_Szoveg' => 'Additional image for first post',
-                'leiras' => 'Description of additional image'
-            ],
-            [
-                'url_Link' => 'blog/post1-image2.jpg',
-                'alt_Szoveg' => 'My first blog post main image',
-                'leiras' => 'Description of the main image'
-            ],
-            [
-                'url_Link' => 'blog/post2-main.jpg',
-                'alt_Szoveg' => 'Additional image for first post',
-                'leiras' => 'Description of additional image'
-            ],
-            [
-                'url_Link' => 'blog/post2-image1.jpg',
-                'alt_Szoveg' => 'My first blog post main image',
-                'leiras' => 'Description of the main image'
-            ],
-            [
-                'url_Link' => 'blog/post2-image2.jpg',
-                'alt_Szoveg' => 'Additional image for first post',
-                'leiras' => 'Description of additional image'
-            ],
-            [
-                'url_Link' => 'blog/post3-main.jpg',
-                'alt_Szoveg' => 'My first blog post main image',
-                'leiras' => 'Description of the main image'
-            ],
-            [
-                'url_Link' => 'blog/post4-main.jpg',
-                'alt_Szoveg' => 'Additional image for first post',
-                'leiras' => 'Description of additional image'
-            ],
-            [
-                'url_Link' => 'blog/post4-image1.jpg',
-                'alt_Szoveg' => 'My first blog post main image',
-                'leiras' => 'Description of the main image'
-            ]
-        ];
+        $mappak = ['profilKepek','blog','termekKepek']; //kepek mappa nevei
+        $elnevezesek = ['kep','post','item']; //kepek mappa elnevezései
+        $maphosszok = [3,10,17]; //kepek mappa hosszai az adatbazisban induláskor
+        $baseUrl = 'https://localhost:8000/storage/'; // Laravel storage URL
 
-        foreach ($yourImages as $image) {
-            Kepek::create($image);
+        for ($index = 0; $index < count($mappak); $index++) {
+            for ($i = 1; $i <= $maphosszok[$index]; $i++) {
+                if ($i == 1) {
+                    $image = [
+                        'url_Link' => $baseUrl . $mappak[$index] . '/' . 'default' . '.jpg',
+                        'alt_Szoveg' => 'Image ' . $i . ' in ' . $mappak[$index],
+                        'leiras' => 'Description of image ' . $i . ' in ' . $mappak[$index]
+                    ];
+                }
+                else{
+                    $image = [
+                        'url_Link' => $baseUrl . $mappak[$index] . '/' . $elnevezesek[$index].'_'. $i . '.jpg',
+                        'alt_Szoveg' => 'Image ' . $i . ' in ' . $mappak[$index],
+                        'leiras' => 'Description of image ' . $i . ' in ' . $mappak[$index]
+                    ];
+                    
+                }
+                Kepek::create($image);
+            }
         }
-
 
         Kepek::factory(100)->create();
 
