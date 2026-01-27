@@ -12,6 +12,7 @@
 * \[x] Footer
 * \[x] Jelszó(regisztráció)
 * \[ ] Webshop 
+* \[ ] Táblák egységesítése ez alat azt értve hogy a táblákban lévő adatok megegyezenek 
 * \[ ] különböző roleok hozzá adása
 * \[ ] Admin site
 * \[ ] Posztok és további backend helyekből kivenni a létrehozás dátuma nevű felesleges taget, mivel a created_at egyszerűbb és alap 

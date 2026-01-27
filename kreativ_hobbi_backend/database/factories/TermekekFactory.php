@@ -24,7 +24,7 @@ class TermekekFactory extends Factory
             "darab" => $this->faker->numberBetween(201, 300),
             "meter" => rand(min: 1000, max: 5000),
             "kategoria_id" => Kategoriak::pluck('id')->random(),
-            'fo_kep_id' => $this->faker->numberBetween(60, 91),
+            'fo_kep_id' => $this->faker->numberBetween(14, 30),
         ];
     }
 }

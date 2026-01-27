@@ -24,7 +24,7 @@ class PosztokFactory extends Factory
             'kivonat' => $this->faker->sentence(),
             'tartalom' => $this->faker->text(),
             'szerzo_id' => Felhasznalok::pluck('id')->random(),
-            'fo_kep_id' => $this->faker->unique()->numberBetween(30, 61),
+            'fo_kep_id' => $this->faker->unique()->numberBetween(4, 13),
             'letrehozas_datuma' => $this->faker->dateTime(),
             'statusz' => $this->faker->randomElement(['piszkozat', 'közzétett', 'archivált', 'törölt']),
         ];

@@ -69,7 +69,7 @@ class KategoriakSeeder extends Seeder
                 'ar' => 2500,
                 'darab' => 150,
                 'kategoria_id' => $aFonalCategory->id,
-                'fo_kep_id' => $this->faker->numberBetween(60, 91),
+                'fo_kep_id' => $this->faker->numberBetween(14, 30),
             ]);
         }
 

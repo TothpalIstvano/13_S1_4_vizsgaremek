@@ -1,7 +1,7 @@
 <script setup>
 //imports
 import Carousel from '@/components/carousel.vue';
-import { ref, onMounted, onUnmounted, nextTick, watch } from 'vue';
+import { ref, onMounted, onUnmounted, watch } from 'vue';
 
 //variables
 const featureTitleRef = ref(null);
@@ -71,12 +71,11 @@ function BlogCardequalizer() {
 };
 
 function formatDate(dateString) {
-const datePart = dateString.split('T')[0]; 
-const [year, month, day] = datePart.split('-'); // ["2026", "01", "21"]
-const formattedDate = `${day} ${month} ${year}`;
-console.log(formattedDate);
+  const datePart = dateString.split('T')[0]; 
+  const [year, month, day] = datePart.split('-'); // ["2026", "01", "21"]
+  const formattedDate = `${day} ${month} ${year}`;
 
-return formattedDate;
+  return formattedDate;
 }
 
 </script>
@@ -176,7 +175,7 @@ return formattedDate;
         <div class="blog-card-grid-space"v-for="n in blogPosts" :key="n">
           <div class="blog-card">
             <div class="blog-card-img-holder">
-              <img :src="baseURL + '/storage/' + n.fo_kep.url_Link" :alt="n.fo_kep.alt_szoveg"/>
+              <img :src="n.fo_kep.url_Link" :alt="n.fo_kep.alt_szoveg"/>
             </div>
             <h3 class="blog-title">{{ n.cim }}</h3>
             <div class="blog-meta">

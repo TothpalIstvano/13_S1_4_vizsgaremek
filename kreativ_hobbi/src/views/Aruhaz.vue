@@ -162,7 +162,6 @@ onBeforeUnmount(() => {
 #shop {
   min-height: 90vh;
   padding: 24px;
-  background: #f6f7fb;
 }
 
 /* ===== TOP TOOLBAR ===== */
@@ -218,7 +217,7 @@ onBeforeUnmount(() => {
 /* ===== PRODUCT GRID ===== */
 #products {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
   gap: 24px;
 }
 

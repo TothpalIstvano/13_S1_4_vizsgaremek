@@ -19,7 +19,7 @@ class PosztKepekFactory extends Factory
     {
         return [
             'poszt_id' => Posztok::pluck('id')->unique()->random(),
-            'kep_id' => $this->faker->unique()->numberBetween(30, 61),
+            'kep_id' => $this->faker->unique()->numberBetween(4, 13),
         ];
     }
 }

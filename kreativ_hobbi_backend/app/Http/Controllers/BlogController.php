@@ -21,7 +21,7 @@ class BlogController extends Controller
                     'kivonat' => $post->kivonat,
                     'letrehozas_datuma' => $post->letrehozas_datuma ? $post->letrehozas_datuma->format('d M Y') : 'N/A',
                     // Use url() helper for full URL
-                    'fo_kep' => $post->foKep ? url('storage/' . $post->foKep->url_Link) : null,
+                    'fo_kep' => $post->foKep ? url($post->foKep->url_Link) : null,
                     'cimkek' => $post->cimkek->pluck('nev')->toArray(),
                     'szerző' => $post->szerzo ? $post->szerzo->felhasz_nev : 'Ismeretlen',
                 ];
@@ -51,10 +51,10 @@ class BlogController extends Controller
             'kivonat' => $post->kivonat,
             'letrehozas_datuma' => $post->letrehozas_datuma ? $post->letrehozas_datuma->format('d M Y') : 'N/A',
             // Try direct URL construction first
-            'fo_kep' => $post->foKep ? url('storage/' . $post->foKep->url_Link) : null,
+            'fo_kep' => $post->foKep ? url($post->foKep->url_Link) : null,
             'kepek' => $post->kepek->map(function ($image) {
                 return [
-                    'url' => url('storage/' . $image->url_Link),
+                    'url' => url($image->url_Link),
                     'alt' => $image->alt_Szoveg,
                     'leiras' => $image->leiras,
                 ];
@@ -64,29 +64,6 @@ class BlogController extends Controller
             'szerzo_id' => $post->szerzo_id,
             'kommentek_szama' => $post->kommentek()->count(),
         ]);
-    }
-
-    /**
-     * Helper method to handle both local and external URLs
-     */
-    private function getImageUrl($url)
-    {
-        if (!$url) {
-            return null;
-        }
-
-        // If it's already a full URL (http/https), return as is
-        if (str_starts_with($url, 'http://') || str_starts_with($url, 'https://')) {
-            return $url;
-        }
-
-        // If it's a local path, prepend storage path
-        if (str_starts_with($url, 'blog/')) {
-            return asset('storage/' . $url);
-        }
-
-        // Default fallback
-        return asset('storage/' . $url);
     }
 
     public function main()

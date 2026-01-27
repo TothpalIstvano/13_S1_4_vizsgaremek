@@ -42,6 +42,8 @@ function handleClickOutside(event) {
   }
 }
 
+
+//response limitálása
 async function checkUser() {
   try {
     const response = await axios.get('/api/user', { withCredentials: true });
@@ -51,6 +53,7 @@ async function checkUser() {
     const hasProfileImage = response.data.profilKep_id;
 
     if (response.data && hasProfileImage) {
+      console.log('Has profile image:', response.data);
       userPath.value = '/Profil';
       isLoggedIn.value = `${baseUrl}/storage/profilKepek/kep_${hasProfileImage}.jpg`;
       

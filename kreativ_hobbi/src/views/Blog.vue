@@ -33,7 +33,7 @@
             <div class="card-glow"></div>
             <div class="card-img-holder">
               <img 
-                :src="getImageUrl(post.fo_kep)" 
+                :src="post.fo_kep" 
                 :alt="post.cim"
                 @error="handleImageError"
                 loading="lazy"
@@ -144,7 +144,9 @@ const fetchBlogPosts = async () => {
     error.value = null
     
     const response = await api.get('/api/blog')
-    posztok.value = response.data /*.map(post => ({
+    posztok.value = response.data;
+    console.log(posztok.value)
+    /*.map(post => ({
       ...post,
       likes_count: post.likes.count || 0,
       dislikes_count: post.dislikes.count || 0,
@@ -194,22 +196,6 @@ const fetchBlogPosts = async () => {
     console.error('Error updating reaction:', error)
   }
 }*/
-
-const getImageUrl = (imagePath) => {
-
-  // If no image or invalid path, use default
-  if (!imagePath && typeof imagePath !== 'string') {
-    return fallbackImage // Use the imported image
-  }
-  
-  // If it's already a full URL, return as is
-  if (imagePath.startsWith('http')) {
-    return imagePath
-  }
-
-  // Otherwise, assume it's a relative path from storage
-  return `${imagePath}`
-}
 
 const handleImageError = (event) => {
   // Set fallback image - use the imported image directly
