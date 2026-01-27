@@ -196,8 +196,9 @@ const fetchBlogPosts = async () => {
 }*/
 
 const getImageUrl = (imagePath) => {
+
   // If no image or invalid path, use default
-  if (!imagePath || typeof imagePath !== 'string') {
+  if (!imagePath && typeof imagePath !== 'string') {
     return fallbackImage // Use the imported image
   }
   
@@ -205,9 +206,9 @@ const getImageUrl = (imagePath) => {
   if (imagePath.startsWith('http')) {
     return imagePath
   }
-  
+
   // Otherwise, assume it's a relative path from storage
-  return `http://localhost:8000/storage/${imagePath}`
+  return `${imagePath}`
 }
 
 const handleImageError = (event) => {

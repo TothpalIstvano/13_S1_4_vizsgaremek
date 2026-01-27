@@ -17,10 +17,10 @@ class KepekFactory extends Factory
     public function definition(): array
     {
         // Get a base URL from Faker
-        $baseUrl = fake()->imageUrl(400, 400, 'people');
+        $baseUrl = 'http://localhost:8000/storage/';
         return [
             // Append a unique random number to the URL to guarantee uniqueness
-            'url_Link' => $baseUrl . '?v=' . fake()->randomNumber(5),
+            'url_Link' => $baseUrl.fake()->unique()->word().'_'.fake()->randomNumber(2).'.jpg',
             'alt_Szoveg' => fake()->sentence(),
             'leiras' => fake()->sentence(),
         ];

@@ -23,7 +23,7 @@ class FelhasznalokFactory extends Factory
             'email' => fake()->unique()->safeEmail(),
             'jelszo' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
             // Get a random ID from the existing 'kepek' table
-            'profilKep_id' => $this->faker->numberBetween(1,31),
+            'profilKep_id' => $this->faker->numberBetween(1,3),
             // Randomly pick from the enum values
             'statusz' => fake()->randomElement(['aktív', 'inaktív']),
             // Set a creation date within the last year

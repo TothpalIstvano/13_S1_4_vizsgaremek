@@ -17,9 +17,14 @@ class Termekek extends Model
     {
         return $this->belongsTo(Kategoriak::class, 'kategoria_id', 'id');
     }
-    public function TermekKep()
+    public function TermekFoKep()
     {
         return $this->belongsTo(Kepek::class, 'fo_kep_id', 'id');
+    }
+
+    public function TermekKepek()
+    {
+        return $this->belongsToMany(Kepek::class,'termekKepek', 'termek_id', 'id');
     }
 
     public function TermekSzinek()

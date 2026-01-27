@@ -17,7 +17,7 @@ class PosztKepekSeeder extends Seeder
     {
         // 2. Szerezzük be a szükséges ID-ket
         $posztIds = Posztok::pluck('id');
-        $kepIds = Kepek::pluck('id');
+        $kepIds = Kepek::get('id')->whereBetween('id', [4, 13])->pluck('id');
 
         if ($posztIds->isEmpty() || $kepIds->isEmpty()) {
             $this->command->error('A poszt-kép kapcsolatok seederhez először futtasd a PosztokSeeder-t és a KepekSeeder-t!');
