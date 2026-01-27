@@ -20,7 +20,7 @@ class TermekKepekFactory extends Factory
     {
         return [
             "termek_id"=> Termekek::pluck('id')->random(),
-            'kep_id'=> $this->faker->numberBetween(60, 91),
+            'kep_id'=> $this->faker->numberBetween(14, 30),
             'rendezes'=> $this->faker->numberBetween(1,10),
         ];
     }

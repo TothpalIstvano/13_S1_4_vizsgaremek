@@ -70,10 +70,9 @@
         <div class="featured-image-container" v-if="post.fo_kep">
           <div class="image-wrapper">
             <img 
-              :src="getImageUrl(post.fo_kep)" 
+              :src="post.fo_kep" 
               :alt="post.cim" 
               @error="handleImageError" 
-              loading="lazy"
               class="featured-image"
             />
             <div class="image-overlay"></div>
@@ -107,7 +106,7 @@
             <div class="gallery-item" v-for="(image, index) in post.kepek" :key="index">
               <div class="gallery-item-inner">
                 <Image 
-                  :src="getImageUrl(image.url)" 
+                  :src="image.url" 
                   :alt="image.alt || post.cim"
                   preview
                   imageClass="gallery-image"
@@ -344,22 +343,6 @@ const removeComment = (commentId) => {
   
   comments.value = removeFromArray(comments.value)
 }
-
-const getImageUrl = (imagePath) => {
-  if (!imagePath || typeof imagePath !== 'string') {
-    return fallbackImage;
-  }
-  
-  if (imagePath.startsWith('http')) {
-    return imagePath;
-  }
-  
-  if (imagePath.startsWith('storage/')) {
-    return `http://localhost:8000/${imagePath}`;
-  }
-  
-  return `http://localhost:8000/storage/${imagePath}`;
-};
 
 const handleImageError = (event) => {
   event.target.src = fallbackImage

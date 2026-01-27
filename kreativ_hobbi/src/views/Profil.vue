@@ -192,7 +192,7 @@ function cancelLogout() {
             <article v-for="p in posts" :key="p" class="post-card">
               <div class="post-cover">
                 <img 
-                  :src=" baseUrl + '/' + p.fo_kep.url_Link "
+                  :src="p.fo_kep.url_Link "
                   :alt="p.fo_kep.alt_szoveg" />
               </div>
               <div class="post-body">

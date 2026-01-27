@@ -19,7 +19,7 @@ class KepekSeeder extends Seeder
         $mappak = ['profilKepek','blog','termekKepek']; //kepek mappa nevei
         $elnevezesek = ['kep','post','item']; //kepek mappa elnevezései
         $maphosszok = [3,10,17]; //kepek mappa hosszai az adatbazisban induláskor
-        $baseUrl = 'https://localhost:8000/storage/'; // Laravel storage URL
+        $baseUrl = 'http://127.0.0.1:8000/storage/'; // Laravel storage URL
 
         for ($index = 0; $index < count($mappak); $index++) {
             for ($i = 1; $i <= $maphosszok[$index]; $i++) {
@@ -40,9 +40,7 @@ class KepekSeeder extends Seeder
                 }
                 Kepek::create($image);
             }
-
         }
-
         Kepek::factory(100)->create();
 
         $this->command->info('Kep table seeded with 20 images!');
