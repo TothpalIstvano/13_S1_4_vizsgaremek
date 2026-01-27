@@ -15,6 +15,7 @@ class KepekSeeder extends Seeder
      */
     public function run(): void
     {
+
         $mappak = ['profilKepek','blog','termekKepek']; //kepek mappa nevei
         $elnevezesek = ['kep','post','item']; //kepek mappa elnevezései
         $maphosszok = [3,10,17]; //kepek mappa hosszai az adatbazisban induláskor
@@ -39,6 +40,7 @@ class KepekSeeder extends Seeder
                 }
                 Kepek::create($image);
             }
+
         }
 
         Kepek::factory(100)->create();

@@ -345,29 +345,21 @@ const removeComment = (commentId) => {
   comments.value = removeFromArray(comments.value)
 }
 
-const viewImage = (imageUrl) => {
-  window.open(getImageUrl(imageUrl), '_blank')
-}
-
 const getImageUrl = (imagePath) => {
   if (!imagePath || typeof imagePath !== 'string') {
-    return fallbackImage
+    return fallbackImage;
   }
   
-  // If it's already a full URL, return it
   if (imagePath.startsWith('http')) {
-    return imagePath
+    return imagePath;
   }
   
-  // Check if it's a relative path (from storage)
-  if (imagePath.startsWith('blog/')) {
-    // For Laravel storage path
-    return `http://localhost:8000/storage/${imagePath}`
+  if (imagePath.startsWith('storage/')) {
+    return `http://localhost:8000/${imagePath}`;
   }
   
-  // Try to construct the URL
-  return `http://localhost:8000/storage/${imagePath}`
-}
+  return `http://localhost:8000/storage/${imagePath}`;
+};
 
 const handleImageError = (event) => {
   event.target.src = fallbackImage
