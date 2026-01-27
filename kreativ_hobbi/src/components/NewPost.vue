@@ -94,7 +94,7 @@
     accept="image/*"
     :maxFileSize="5000000"
     :auto="false"
-    :showUploadButton="false"  <!-- Remove separate upload button -->
+    :showUploadButton="false"
     :showCancelButton="false"
     chooseLabel="Képek kiválasztása"
     class="mb-6"
