@@ -54,17 +54,15 @@ import InputText from 'primevue/inputtext';
 import MultiSelect from 'primevue/multiselect';
 import Editor from 'primevue/editor';
 import Image from 'primevue/image';
-/*import Steps from 'primevue/steps';
 import Stepper from 'primevue/stepper';
-import StepperPanel from 'primevue/stepperpanel';*/
+import StepperPanel from 'primevue/stepperpanel';
 
 app.component('Button', Button);
 app.component('InputText', InputText);
 app.component('MultiSelect', MultiSelect);
 app.component('Editor', Editor);
 app.component('Image', Image);
-/*app.component('Steps', Steps);
 app.component('Stepper', Stepper);
-app.component('StepperPanel', StepperPanel);*/
+app.component('StepperPanel', StepperPanel);
 
 app.mount('#app')

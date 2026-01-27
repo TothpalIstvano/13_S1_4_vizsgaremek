@@ -22,7 +22,7 @@ class KepekSeeder extends Seeder
         // Add your images
         $yourImages = [
             [
-                'url_Link' => 'blog/post1-main.jpg',
+                'url_Link' => 'blog/default.jpeg',
                 'alt_Szoveg' => 'My first blog post main image',
                 'leiras' => 'Description of the main image'
             ],
