@@ -144,6 +144,6 @@ Route::post('/posts', function (Request $request) {
 })->middleware('auth:sanctum');
 
 Route::get('/termekek', function () {
-    $termekek = Termekek::all()->load('TermekKategoria', 'TermekKep', 'TermekSzinek', 'TermekCimkek');
+    $termekek = Termekek::all('id', 'nev', 'ar', 'leiras', 'darab', 'meter', 'kategoria_id', 'fo_kep_id')->load('TermekKategoria', 'TermekFoKep', 'TermekSzinek', 'TermekCimkek');
     return response()->json($termekek);
 });

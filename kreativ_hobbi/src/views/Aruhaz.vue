@@ -27,7 +27,7 @@
     <!-- PRODUCT GRID -->
     <div id="products">
       <div v-for="item in items" :key="item.id" class="product-card">
-        <img :src="item.termek_kep.url_Link" :alt="item.termek_kep.alt_szoveg" class="product-image" />
+        <img :src="item.termek_fo_kep.url_Link" :alt="item.termek_fo_kep.alt_szoveg" class="product-image" />
 
         <div class="product-body">
           <h3 class="product-title">{{ item.nev }}</h3>
@@ -102,6 +102,7 @@ const options = [
     icon: 'sort-alpha-down'
   }
 ]
+
 
 const selected = ref(options[0])
 const open = ref(false)
