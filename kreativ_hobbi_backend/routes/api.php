@@ -66,7 +66,7 @@ Route::get('/blog/{id}', [BlogController::class, 'show']);
 
 // Comment routes
 Route::get('/blog/{id}/comments', [KommentController::class, 'index']);
-Route::post('/blog/{id}/comments', [KommentController::class, 'store']);
+Route::post('/blog/{id}/comments', [KommentController::class, 'store'])->middleware('auth:sanctum');
 Route::delete('/comments/{id}', [KommentController::class, 'destroy']);
 
 // Címkék az új poszthoz
@@ -75,13 +75,12 @@ Route::get('/cimkek', function () {
     return response()->json($cimkek);
 });
 
-// Create new post ---
+// Új poszt
 Route::post('/posts', function (Request $request) {
     if (!Auth::check()) {
         return response()->json(['error' => 'Unauthorized'], 401);
     }
 
-    // Debug: Log the incoming request
     \Log::info('Post creation request:', $request->all());
 
     $validated = $request->validate([
@@ -97,7 +96,6 @@ Route::post('/posts', function (Request $request) {
 
     $user = Auth::user();
 
-    // Create the post
     $post = new Posztok();
     $post->cim = $validated['title'];
     $post->tartalom = $validated['content'];
@@ -111,7 +109,6 @@ Route::post('/posts', function (Request $request) {
         return response()->json(['error' => 'Failed to save post'], 500);
     }
 
-    // Attach tags if provided
     if ($request->has('tags') && is_array($request->tags) && count($request->tags) > 0) {
         try {
             $post->cimkek()->attach($request->tags);
@@ -121,13 +118,11 @@ Route::post('/posts', function (Request $request) {
         }
     }
 
-    // Attach images if provided
     if ($request->has('images') && is_array($request->images) && count($request->images) > 0) {
         try {
             $imageIds = array_column($request->images, 'id');
             $post->kepek()->attach($imageIds);
 
-            // Set the first image as main image if available
             if (!empty($imageIds)) {
                 $post->fo_kep_id = $imageIds[0];
                 $post->save();

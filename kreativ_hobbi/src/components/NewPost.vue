@@ -243,59 +243,15 @@ const onFileSelect = (event) => {
                 preview: e.target.result,
                 alt: '',
                 description: '',
-                serverId: null  // Will be set after upload
+                serverId: null
             });
         };
         reader.readAsDataURL(file);
     });
     
-    // Clear the file upload component's selection
     if (fileUploadRef.value) {
         fileUploadRef.value.clear();
     }
-};
-
-const onImageUpload = async (event) => {
-  try {
-    // Create FormData object
-    const formData = new FormData();
-    
-    // Append each file and its metadata
-    uploadedImages.value.forEach((image, index) => {
-      formData.append(`images[${index}]`, image.file);  // The actual file
-      formData.append(`alt[${index}]`, image.alt || '');  // Alt text
-      formData.append(`description[${index}]`, image.description || '');  // Description
-    });
-
-    // Make the request - axios will automatically set the correct Content-Type header
-    const response = await axios.post('/api/upload-images', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',  // This is actually optional - axios sets it automatically for FormData
-      }
-    });
-
-    // Update uploaded images with server IDs
-    response.data.images.forEach((serverImage, index) => {
-      if (uploadedImages.value[index]) {
-        uploadedImages.value[index].serverId = serverImage.id;
-        uploadedImages.value[index].url = serverImage.url;  // Store the URL for preview
-      }
-    });
-
-    showNotification('success', 'Képek sikeresen feltöltve!');
-    
-    // Clear the file upload component's internal state
-    if (fileUploadRef.value) {
-      fileUploadRef.value.clear();
-    }
-  } catch (error) {
-    console.error('Image upload error:', error);
-    let errorMessage = 'Nem sikerült feltölteni a képeket';
-    if (error.response?.data?.message) {
-      errorMessage = error.response.data.message;
-    }
-    showNotification('error', errorMessage);
-  }
 };
 
 const removeImage = (index) => {
@@ -313,8 +269,7 @@ const submitForm = async () => {
     
     try {
         let uploadedImageIds = [];
-        
-        // First, upload images if there are any
+
         if (uploadedImages.value.length > 0) {
             console.log('Uploading images:', uploadedImages.value.length);
             
@@ -329,42 +284,33 @@ const submitForm = async () => {
                         description: image.description
                     });
                     
-                    // New image file
                     formData.append(`images[${index}]`, image.file);
                     formData.append(`alt[${index}]`, image.alt || '');
                     formData.append(`description[${index}]`, image.description || '');
                 }
             });
             
-            // Only upload if there are actual files
             if (formData.has('images[0]')) {
                 console.log('Sending image upload request...');
-                const uploadResponse = await axios.post('/api/upload-images', formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                    }
-                });
+                const uploadResponse = await axios.post('/api/upload-images');
                 
                 console.log('Upload response:', uploadResponse.data);
                 
-                // Get the uploaded image IDs
                 uploadedImageIds = uploadResponse.data.images.map(img => img.id);
                 console.log('Uploaded image IDs:', uploadedImageIds);
             }
         }
         
-        // Prepare post data
         const postData = {
             title: post.value.title,
             content: post.value.content,
             kivonat: post.value.kivonat || null,
             tags: selectedTags.value.map(tag => tag.id),
-            images: uploadedImageIds.map(id => ({ id: id })) // Send array of objects with id property
+            images: uploadedImageIds.map(id => ({ id: id }))
         };
                 
         console.log('Sending post data:', postData);
         
-        // Create the post with attached images
         const response = await axios.post('/api/posts', postData, {
             headers: {
                 'Content-Type': 'application/json',
@@ -376,21 +322,18 @@ const submitForm = async () => {
         
         showNotification('success', 'Poszt sikeresen létrehozva!');
         
-        // Reset form
         post.value = { title: '', content: '', kivonat: '' };
         selectedTags.value = [];
         uploadedImages.value = [];
         formTouched.value = false;
         
-        // Clear file upload component
         if (fileUploadRef.value) {
             fileUploadRef.value.clear();
         }
         
-        // Redirect to profile page after 2 seconds
         setTimeout(() => {
             router.push('/profil');
-        }, 2000);
+        }, 900);
         
     } catch (error) {
         console.error('Error creating post:', error);
@@ -424,7 +367,6 @@ const resetForm = () => {
 };
 
 const vissza = () => {
-    // Save as draft functionality (optional)
     showNotification('info', 'Piszkozat mentve (feature fejlesztés alatt)');
 };
 
@@ -474,7 +416,6 @@ onMounted(() => {
 }
 
 :deep() {
-    /* PrimeVue component customizations */
     .p-inputtext {
         border: 2px solid #e2e8f0;
         border-radius: 10px;
