@@ -284,15 +284,22 @@ const submitForm = async () => {
                         description: image.description
                     });
                     
-                    formData.append(`images[${index}]`, image.file);
+                    // Append files properly
+                    formData.append('images[]', image.file);  // Changed from images[index]
                     formData.append(`alt[${index}]`, image.alt || '');
                     formData.append(`description[${index}]`, image.description || '');
                 }
             });
             
-            if (formData.has('images[0]')) {
+            console.log('FormData entries:', Array.from(formData.entries()));
+            
+            if (uploadedImages.value.length > 0) {
                 console.log('Sending image upload request...');
-                const uploadResponse = await axios.post('/api/upload-images');
+                const uploadResponse = await axios.post('/api/upload-images', formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',  // This is important!
+                    }
+                });
                 
                 console.log('Upload response:', uploadResponse.data);
                 

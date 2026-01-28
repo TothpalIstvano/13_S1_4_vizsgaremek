@@ -200,16 +200,16 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faCalendar, faUser, faPaperPlane, faClock, faReply, faUserCircle } from '@fortawesome/free-solid-svg-icons'
 import api from '@/services/api.js'
+import axios from 'axios'
 import CommentItem from '@/components/CommentItem.vue'
 import fallbackImage from '@/assets/Public/b-pl1.jpg'
 import Image from 'primevue/image';
-
 
 library.add(faCalendar, faUser, faPaperPlane, faClock, faReply, faUserCircle)
 
 const route = useRoute()
 
-// Reactive state
+// Reactive state - Remove inject() calls
 const post = ref({})
 const loading = ref(true)
 const error = ref(null)
@@ -226,8 +226,6 @@ const fetchPost = async () => {
   try {
     loading.value = true
     error.value = null
-    
-    await api.get('/sanctum/csrf-cookie')
     
     const response = await api.get(`/api/blog/${postId.value}`)
     post.value = response.data
@@ -262,16 +260,62 @@ const fetchComments = async () => {
     loadingComments.value = false
   }
 }
+// Function to ensure CSRF token is set
+const ensureCsrfToken = async () => {
+  try {
+    // Use the 'api' instance instead of 'axios'
+    await api.get('/sanctum/csrf-cookie');
+    return true;
+  } catch (err) {
+    console.error('CSRF token error:', err);
+    return false;
+  }
+}
 
 const addComment = async () => {
   if (!newComment.value.trim()) return
   
   try {
     loadingComments.value = true
-    const response = await api.post(`/api/blog/${postId.value}/comments`, {
-      komment: newComment.value,
-      elozo_komment_id: replyTo.value
-    })
+    
+    // First, let's manually get CSRF token
+    try {
+      await axios.get('http://localhost:8000/sanctum/csrf-cookie', {
+        withCredentials: true
+      });
+      console.log('CSRF cookie set manually');
+    } catch (csrfErr) {
+      console.error('Failed to get CSRF token:', csrfErr);
+    }
+    
+    // Get CSRF token from cookie
+    const getCookie = (name) => {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop().split(';').shift();
+      return null;
+    };
+    
+    const csrfToken = getCookie('XSRF-TOKEN');
+    console.log('CSRF Token from cookie:', csrfToken);
+    
+    // Make the request with explicit headers
+    const response = await axios.post(
+      `http://localhost:8000/api/blog/${postId.value}/comments`,
+      {
+        komment: newComment.value,
+        elozo_komment_id: replyTo.value
+      },
+      {
+        withCredentials: true,
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest',
+          'X-XSRF-TOKEN': csrfToken
+        }
+      }
+    );
     
     if (replyTo.value) {
       addReplyToParent(replyTo.value, response.data.comment)
@@ -281,11 +325,43 @@ const addComment = async () => {
     
     newComment.value = ''
     replyTo.value = null
+    
   } catch (err) {
-    console.error('Error adding comment:', err)
-    alert('Hiba történt a hozzászólás küldése közben.')
+    console.error('Full error object:', err);
+    console.error('Error response:', err.response);
+    
+    if (err.response?.status === 419) {
+      alert('CSRF token hiba. Próbáld újra az oldal frissítésével (F5).');
+    } else if (err.response?.status === 401) {
+      alert('Kérjük, jelentkezz be a hozzászóláshoz!');
+    } else {
+      alert('Hiba történt a hozzászólás küldése közben: ' + (err.response?.data?.error || err.message));
+    }
   } finally {
     loadingComments.value = false
+  }
+}
+
+// Also update handleDelete to ensure CSRF token
+const handleDelete = async (commentId) => {
+  if (!confirm('Biztosan törölni szeretnéd ezt a hozzászólást?')) return
+  
+  try {
+    // Ensure CSRF token for DELETE request too
+    await ensureCsrfToken()
+    
+    await api.delete(`/api/comments/${commentId}`)
+    removeComment(commentId)
+  } catch (err) {
+    console.error('Error deleting comment:', err)
+    
+    if (err.response?.status === 419) {
+      alert('CSRF token hiba. Kérjük, próbáld újra.')
+    } else if (err.response?.status === 401 || err.response?.status === 403) {
+      alert('Nincs jogosultságod ezt a hozzászólást törölni!')
+    } else {
+      alert('Hiba történt a hozzászólás törlése közben.')
+    }
   }
 }
 
@@ -318,18 +394,6 @@ const handleReply = (commentId) => {
   }
 }
 
-const handleDelete = async (commentId) => {
-  if (!confirm('Biztosan törölni szeretnéd ezt a hozzászólást?')) return
-  
-  try {
-    await api.delete(`/api/comments/${commentId}`)
-    removeComment(commentId)
-  } catch (err) {
-    console.error('Error deleting comment:', err)
-    alert('Hiba történt a hozzászólás törlése közben.')
-  }
-}
-
 const removeComment = (commentId) => {
   const removeFromArray = (commentList) => {
     return commentList.filter(comment => {
@@ -357,13 +421,13 @@ const formatContent = (content) => {
   return content
 }
 
-// Lifecycle
-onMounted(() => {
+onMounted(async () => {
+  // Get CSRF token when component mounts
+  await ensureCsrfToken()
   fetchPost()
   fetchComments()
 })
 
-// Watchers
 watch(
   () => route.params.id,
   () => {
@@ -374,25 +438,22 @@ watch(
   }
 )
 
-const isVisible = ref(false); // Tracks the button's visibility
+const isVisible = ref(false);
 
-// Function to check scroll position and toggle visibility
 const handleScroll = () => {
-	isVisible.value = window.scrollY > 200; // Show when scrolled > 200px
+  isVisible.value = window.scrollY > 200;
 };
 
-// Smoothly scroll to the top of the page
 const scrollToTop = () => {
-	window.scrollTo({ top: 0, behavior: 'smooth' });
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
-// Add and remove scroll event listeners
 onMounted(() => {
-	window.addEventListener('scroll', handleScroll);
+  window.addEventListener('scroll', handleScroll);
 });
 
 onBeforeUnmount(() => {
-	window.removeEventListener('scroll', handleScroll);
+  window.removeEventListener('scroll', handleScroll);
 });
 </script>
 
