@@ -6,7 +6,7 @@
 	  </a>
     <div class="content-wrapper">
       <section class="cards-wrapper">
-        <!-- Loading state -->
+        <!-- Loading -->
         <div v-if="loading" class="loading-container">
           <div class="loading-content">
             <p class="loading-text">Blogbejegyzések betöltése...</p>
@@ -18,7 +18,7 @@
           </div>
         </div>
       
-        <!-- Error state -->
+        <!-- Error -->
         <div v-if="error" class="error-container">
           <div class="error-card">
             <div class="error-icon">⚠️</div>
@@ -27,7 +27,7 @@
           </div>
         </div>
         
-        <!-- Blog posts -->
+        <!-- Blog poszt -->
         <div class="card-grid-space" v-for="post in posztok" :key="post.id">
           <div class="card">
             <div class="card-glow"></div>
@@ -103,7 +103,6 @@
           </div>
         </div>
       
-        <!-- No posts message -->
         <div v-if="!loading && posztok.length === 0" class="no-posts-container">
           <div class="empty-state">
             <div class="empty-icon">📝</div>
@@ -126,7 +125,6 @@ import { faCalendar, faHeart, faArrowRight, faArrowCircleUp, faThumbsUp, faThumb
 
 library.add(faCalendar, faHeart, faArrowRight, faArrowCircleUp, faThumbsUp, faThumbsDown)
 
-// Import your fallback image at the top
 import fallbackImage from '@/assets/Public/b-pl1.jpg'
 
 const router = useRouter()
@@ -146,12 +144,6 @@ const fetchBlogPosts = async () => {
     const response = await api.get('/api/blog')
     posztok.value = response.data;
     console.log(posztok.value)
-    /*.map(post => ({
-      ...post,
-      likes_count: post.likes.count || 0,
-      dislikes_count: post.dislikes.count || 0,
-      userReaction: post.user_reaction || null
-    }))*/
     
   } catch (err) {
     console.error('Error fetching blog posts:', err)
@@ -162,43 +154,9 @@ const fetchBlogPosts = async () => {
   }
 }
 
-/*const handleReaction = async (postId, reactionType) => {
-  try {
-    const postIndex = posztok.value.findIndex(post => post.id === postId)
-    if (postIndex === -1) return
 
-    const post = posztok.value[postIndex]
-    const currentReaction = post.userReaction
-    let newReaction = null
-    
-    // Toggle logic: if clicking the same reaction, remove it
-    if (currentReaction === reactionType) {
-      newReaction = null
-    } else {
-      newReaction = reactionType
-    }
-
-    // Send reaction to backend
-    const response = await api.post(`/api/blog/${postId}/reaction`, {
-      reaction: newReaction
-    })
-
-    // Update local state with backend response
-    if (response.data) {
-      posztok.value[postIndex] = {
-        ...post,
-        likes_count: response.data.likes_count || 0,
-        dislikes_count: response.data.dislikes_count || 0,
-        userReaction: response.data.user_reaction
-      }
-    }
-  } catch (error) {
-    console.error('Error updating reaction:', error)
-  }
-}*/
 
 const handleImageError = (event) => {
-  // Set fallback image - use the imported image directly
   event.target.src = fallbackImage
 }
 
@@ -232,19 +190,16 @@ onMounted(() => {
   fetchBlogPosts()
 })
 
-const isVisible = ref(false); // Tracks the button's visibility
+const isVisible = ref(false);
 
-// Function to check scroll position and toggle visibility
 const handleScroll = () => {
-	isVisible.value = window.scrollY > 200; // Show when scrolled > 200px
+	isVisible.value = window.scrollY > 200;
 };
 
-// Smoothly scroll to the top of the page
 const scrollToTop = () => {
 	window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
-// Add and remove scroll event listeners
 onMounted(() => {
 	window.addEventListener('scroll', handleScroll);
 });
@@ -311,15 +266,6 @@ main {
 }
 
 .cards-wrapper {
-  /*display: grid;
-  justify-content: center;
-  align-items: center;
-  grid-template-columns: 1fr 1fr 1fr;
-  grid-gap: 64px;
-  padding: 64px;
-  margin: 0 auto;
-  width: max-content;
-  text-align: left;*/
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(480px, 1fr));
   gap: 64px;
@@ -331,21 +277,9 @@ main {
 }
 
 .card {
-  /*width: 520px;
-  height: auto;
-  background: var(--b-kartya);
-  color: var(--b-text-light);
-  border-radius: 8px;
-  padding: 24px;
-  overflow: hidden;
-  position: relative;
-  font-family: 'Rubik', sans-serif;
-  box-sizing: border-box;
-  box-shadow: 0 0 80px -16px rgba(0,0,0,0.1);
-  transition: all, var(--b-transition-time);*/
   background: var(--b-kartya);
   border-radius: 20px;
-  padding: 20px;
+  padding: 15px;
   overflow: hidden;
   position: relative;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -382,9 +316,7 @@ main {
   height: 240px;
   position: relative;
   overflow: hidden;
-  /*border-radius: 6px 40px 6px 40px;
-  margin-bottom: 16px;
-  width: 100%;*/
+  border-radius: 20px;
 }
 
 .card-img-holder::before {
@@ -410,7 +342,7 @@ main {
 }
 
 .card-content {
-  padding: 28px;
+  padding: 18px;
   flex-grow: 1;
   display: flex;
   flex-direction: column;
@@ -614,7 +546,6 @@ main {
   transform: translateX(3px);
 }
 
-/* Loading State */
 .loading-container {
   grid-column: 1 / -1;
   display: flex;
@@ -667,7 +598,6 @@ main {
   }
 }
 
-/* Error State */
 .error-container {
   grid-column: 1 / -1;
 }
@@ -744,36 +674,6 @@ main {
   max-width: 400px;
   margin: 0 auto;
 }
-
-
-/* Card hover effects 
-.card:before, .card:after {
-  content: '';
-  transform: scale(0);
-  transform-origin: top left;
-  border-radius: 50%;
-  position: absolute;
-  left: -50%;
-  top: -50%;
-  z-index: -1;
-  transition: all, var(--b-transition-time);
-  transition-timing-function: ease-in-out;
-}
-
-.card:before {
-  width: 250%;
-  height: 250%;
-}
-
-.card:after {
-  background: #ffffff80;
-  width: 200%;
-  height: 200%;
-}
-
-.card:hover:before, .card:hover:after {
-  transform: scale(1);
-}*/
 
 @media (max-width: 1200px) {
   .cards-wrapper {

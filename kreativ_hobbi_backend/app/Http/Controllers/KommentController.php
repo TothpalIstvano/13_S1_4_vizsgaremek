@@ -12,14 +12,6 @@ class KommentController extends Controller
     public function index($id)
     {
         try {
-            // Simple test first - return hardcoded data
-            /*return response()->json([
-                ['id' => 1, 'komment' => 'Test comment 1', 'felhasznalo' => ['felhasz_nev' => 'Test User']],
-                ['id' => 2, 'komment' => 'Test comment 2', 'felhasznalo' => ['felhasz_nev' => 'Another User']]
-            ]);*/
-
-            // If that works, uncomment below:
-
             $post = Posztok::find($id);
 
             if (!$post) {
@@ -47,7 +39,7 @@ class KommentController extends Controller
                                 'felhasznalo' => $reply->kommentIro ? [
                                     'felhasz_nev' => $reply->kommentIro->felhasz_nev,
                                 ] : null,
-                                'gyermekKommentek' => [] // No deeper nesting for now
+                                'gyermekKommentek' => []
                             ];
                         })
                     ];
@@ -78,7 +70,6 @@ class KommentController extends Controller
                 'letrehozas_datuma' => now(),
             ]);
 
-            // Load the user relationship
             $comment->load('kommentIro:id,felhasz_nev');
 
             return response()->json([

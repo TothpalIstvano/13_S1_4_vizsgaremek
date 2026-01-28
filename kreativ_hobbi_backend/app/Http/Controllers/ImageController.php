@@ -28,13 +28,10 @@ class ImageController extends Controller
             $descriptions = $request->input('description', []);
 
             foreach ($files as $index => $file) {
-                // Generate unique filename
                 $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
 
-                // Store in public storage
-                $path = $file->storeAs('blog', $filename, 'public');
+                $path = $file->storeAs('blog', $filename, 'storage');
 
-                // Create database record
                 $image = Kepek::create([
                     'url_Link' => $path,
                     'alt_Szoveg' => $alts[$index] ?? $file->getClientOriginalName(),
@@ -43,7 +40,7 @@ class ImageController extends Controller
 
                 $uploadedImages[] = [
                     'id' => $image->id,
-                    'url' => asset('storage/' . $path), // Use asset() helper for full URL
+                    'url' => $path,
                     'alt' => $image->alt_Szoveg,
                     'description' => $image->leiras,
                     'path' => $path

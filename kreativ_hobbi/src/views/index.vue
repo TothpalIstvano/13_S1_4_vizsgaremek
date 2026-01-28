@@ -2,6 +2,11 @@
 //imports
 import Carousel from '@/components/carousel.vue';
 import { ref, onMounted, onUnmounted, watch } from 'vue';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { faCalendar, faHeart, faArrowRight, faArrowCircleUp, faThumbsUp, faThumbsDown} from '@fortawesome/free-solid-svg-icons'
+
+library.add(faCalendar, faHeart, faArrowRight, faArrowCircleUp, faThumbsUp, faThumbsDown)
 
 //variables
 const featureTitleRef = ref(null);
@@ -171,32 +176,84 @@ function formatDate(dateString) {
     <div class="blog-main-title-container">
       <h2 class="blog-main-title">A hét kiemelt blogposztjai</h2>
     </div>
-    <section class="blog-section">
-        <div class="blog-card-grid-space"v-for="n in blogPosts" :key="n">
-          <div class="blog-card">
-            <div class="blog-card-img-holder">
-              <img :src="n.fo_kep.url_Link" :alt="n.fo_kep.alt_szoveg"/>
+    <div class="content-wrapper">
+      <section class="cards-wrapper">
+        <div class="card-grid-space" v-for="n in blogPosts" :key="n">
+          <div class="card">
+            <div class="card-glow"></div>
+            <div class="card-img-holder">
+              <img 
+                :src="n.fo_kep.url_Link" 
+                :alt="n.cim"
+                @error="handleImageError"
+                loading="lazy"
+              />
             </div>
-            <h3 class="blog-title">{{ n.cim }}</h3>
-            <div class="blog-meta">
-              <span class="blog-time">{{formatDate(n.created_at) }}</span>
-              <span class="blog-author"><strong>{{ n.szerzo }}</strong></span>
-            </div>
-            <p class="blog-description">
-              {{ n.kivonat }}
-            </p>
-            <div class="blog-tags">
-              <div class="blog-tag" v-for="cimke in n.cimkek" :key="cimke.id">{{ cimke.nev }}</div>
-            </div>
-            <div class="blog-options">
-              <span>
-                Read Full Blog
-              </span>
-              <button class="btn" @click="$router.push('/blog/' + n.id )">Blog</button>
+                
+            <div class="card-content">
+              <div class="meta-info">
+                <span class="blog-time"> 
+                  <div class="icon-wrapper">
+                    <font-awesome-icon icon="fa-solid fa-calendar"/> 
+                  </div>
+                  {{ formatDate(n.letrehozas_datuma) }}
+                </span>
+              </div>
+
+              <div class="card-header">
+                <h3 class="blog-title">{{ n.cim }}</h3>
+              </div>
+
+              <p class="description">
+                {{ n.kivonat || n.tartalom?.substring(0, 150) || 'Nincs leírás...' }}
+                <span v-if="(n.kivonat || n.tartalom)?.length > 150">...</span>
+              </p>
+                  
+              <div class="tags">
+                <div class="tag" v-for="cimke in n.cimkek" :key="cimke.id">
+                  <span class="tag-hash">#</span>{{ cimke.nev }}
+                </div>
+              </div>
+                  
+              <div class="card-footer">
+              <!--
+                <div class="reaction-container">
+                  <button 
+                    class="reaction-btn thumbs-up-btn" 
+                    :class="{ 'active': post.userReaction === 'like' }"
+                    @click="handleReaction(post.id, 'like')"
+                  >
+                    <div class="thumb-icon">
+                      <font-awesome-icon icon="fa-solid fa-thumbs-up"/> 
+                    </div>
+                    <span class="reaction-count">{{ post.likes_count || 0 }}</span>
+                  </button>
+                  
+                  <button 
+                    class="reaction-btn thumbs-down-btn" 
+                    :class="{ 'active': post.userReaction === 'dislike' }"
+                    @click="handleReaction(post.id, 'dislike')"
+                  >
+                    <div class="thumb-icon">
+                      <font-awesome-icon icon="fa-solid fa-thumbs-down"/> 
+                    </div>
+                    <span class="reaction-count">{{ post.dislikes_count || 0 }}</span>
+                  </button>
+                </div>-->
+                    
+                <button class="view-btn" @click="navigateToBlog(n.id)">
+                  <span>Megtekintés</span>
+                  <div class="arrow-icon">
+                        <font-awesome-icon icon="fa-solid fa-arrow-right"/>
+                  </div>
+                </button>
+              </div>
             </div>
           </div>
         </div>
-    </section>
+      </section>
+    </div>
+
   </main>
 </template>
 
@@ -448,7 +505,6 @@ function formatDate(dateString) {
 /*#endregion*/
 
 /*#region Blog cards*/
-/* Cards Grid */
 .blog-main-title-container {
   max-width: 800px;
   margin: 0 auto;
@@ -463,198 +519,229 @@ function formatDate(dateString) {
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
-.blog-section {
-  display: grid;
-  justify-content: center;
-  align-items: center;
-  grid-template-columns: 1fr 1fr 1fr;
-  grid-gap: 4rem;
-  padding: 4rem;
+
+.content-wrapper {
+    max-width: 1800px;
   margin: 0 auto;
-  width: max-content;
+  padding: 0 32px;
 }
 
-.blog-card-grid-space {
+.cards-wrapper {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(480px, 1fr));
+  gap: 64px;
+  padding: 48px 0;
+}
+
+.card-grid-space {
   position: relative;
 }
 
-/* Hybrid Card Styles */
-.blog-card {
-  width: 30rem;
-  height:100%;
+.card {
+  background: var(--b-kartya);
+  border-radius: 20px;
+  padding: 15px;
+  overflow: hidden;
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 0 3px rgba(237, 58, 58, 0.1);
+  height: 100%;
   display: flex;
   flex-direction: column;
-  background: #fff;
-  border-radius: 1.5rem;
-  padding: 1.5rem;
-  overflow: hidden;
-  position: relative;
-  font-family: 'Rubik', sans-serif;
-  box-sizing: border-box;
-  box-shadow: 0 0 5em -1em rgba(0,0,0,0.1);
-  transition: all, var(--transition-time);
-  /* border: 10px solid #f0f0f0; */
+  border: 1px solid #e5e7eb;
+  text-align: left;
 }
 
-.blog-card:hover {
+.card-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  opacity: 0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card:hover {
   transform: translateY(-5px);
-  box-shadow: var(--shadow-hover);
-  border-color: var(--color);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+  color: var(--b-text-dark);
 }
 
+.card:hover .card-glow {
+  opacity: 1;
+  height: 3px;
+}
 
-.blog-card-img-holder {
-  width: 100%;
-  height: auto;
+.card-img-holder {
+  height: 240px;
   position: relative;
   overflow: hidden;
-  border-radius: 1.5rem;
-  margin-bottom: 1rem;
+  border-radius: 20px;
 }
 
-.blog-card-img-holder img {
+.card-img-holder::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to bottom, transparent 50%, rgba(0, 0, 0, 0.3));
+  z-index: 1;
+}
+
+.card-img-holder img {
   width: 100%;
-  height: auto;
-  max-height: 15rem;
+  height: 100%;
   object-fit: cover;
-  transition: all, var(--transition-time);
+  transition: all, var(--b-transition-time);
 }
 
-.blog-card:hover .blog-card-img-holder img {
-  transform: scale(1.05);
+.card:hover .card-img-holder img {
+  transform: scale(1.10);
 }
 
-.blog-meta {
-    display: flex;
-    align-items: center;
-    gap: 12rem;
+.card-content {
+  padding: 18px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-header {
+  margin-bottom: 16px;
 }
 
 .blog-title {
-  border-top: 1px solid #ff0000;
-  color: #22215B;
-  padding: 1rem 0 0.5rem 0;
-  font-size: 1.5rem;
+  padding: 16px 0 8px 0;
+  font-size: 24px;
   margin: 0;
-  transition: all, var(--transition-time);
+  transition: all, var(--b-transition-time);
+  display: inline-block;
+  background-image: linear-gradient(90deg, #b39999, #cacaca);
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 100% 3px;
 }
 
-.blog-card:hover .blog-title {
-  color: var(--color);
+.card:hover .blog-title {
+  color: var(--b-text-dark);
 }
 
-.blog-description {
-  padding: 1rem 0;
-  color: #22215B80;
-  font-size: 1rem;
-  margin: 0;
-  line-height: 1.6;
-  flex-grow: 1;
+.meta-info {
+  margin-bottom: 16px;
 }
 
 .blog-time {
-  font-size: .8rem;
-  color: #22215B;
-  display: block;
-  opacity: 0.7;
-}
-
-.blog-author {
-  font-size: .8rem;
-  color: #22215B;
-  display: block;
-}
-
-.blog-tags {
-  display: flex;
-  margin: 1rem 0;
-}
-
-.blog-tags .blog-tag {
-  font-size: 0.75em;
-  background: rgba(60, 49, 99, 0.1);
-  color: var(--color);
-  border-radius: 0.3rem;
-  padding: 0.3em 0.8em;
-  margin-right: 0.5em;
-  line-height: 1.5em;
-  transition: all, var(--transition-time);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #494d55;
+  background: #eedada;
+  padding: 6px 12px;
+  border-radius: 20px;
   font-weight: 500;
 }
 
-.blog-card:hover .blog-tags .blog-tag {
-    background: violet; /* Change color on hover */
-    color: rgb(255, 255, 255); /* Change text color on hover */
-    transform: translateY(-2px);
-}
-
-.blog-options {
+.icon-wrapper {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  font-size: 1rem;
-  margin-top: auto;
-  padding-top: 1rem;
-  border-top: 1px solid #f0f0f0;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
 }
 
-.blog-options span {
-  font-weight: 600;
-  color: #22215B;
-  transition: all, var(--transition-time);
+.description {
+  padding: 16px 0;
+  font-size: 16px;
+  margin: 0;
+  line-height: 1.6;
+  min-height: 80px;
+  overflow: hidden;
 }
 
-.blog-card:hover .blog-options span {
-  color: var(--color);
+.card:hover .description {
+  color: var(--b-text-dark);  
 }
 
-.btn {
-  font-size: 1rem;
-  padding: .5rem 1.5rem;
-  border-radius: .5rem;
-  font-weight: 400;
-  background: #EEF7FE;
-  color: #22215B;
-  cursor: pointer;
-  border: none;
-  transition: all, var(--transition-time);
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 16px 0;
+  gap: 8px;
 }
 
-.btn:hover {
-  background: var(--color);
+.tag {
+  font-size: 12px;
+  background: var(--b-tag);
+  color: var(--b-text-light);
+  border-radius: 20px;
+  padding: 5px 13px;
+  line-height: 24px;
+  transition: all, var(--b-transition-time);
+  font-weight: 500;
+  box-shadow: inset 0px 0px 10px 1px rgba(80, 33, 0, 0.5);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid #e5e7eb;
+}
+
+.tag:hover {
+  background: var(--b-tag-hover);
   color: white;
   transform: translateY(-2px);
+  box-shadow: 0 0 0 3px rgba(237, 58, 58, 0.1);
 }
 
-/* Card hover effects */
-.blog-card:before, .blog-card:after {
-  content: '';
-  transform: scale(0);
-  transform-origin: top left;
-  border-radius: 50%;
-  position: absolute;
-  left: -50%;
-  top: -50%;
-  z-index: -1;
-  transition: all, var(--transition-time);
-  transition-timing-function: ease-in-out;
+.tag-hash {
+  opacity: 0.7;
+  font-size: 14px;
 }
 
-.blog-card:before {
-  background: rgba(60, 49, 99, 0.05);
-  width: 250%;
-  height: 250%;
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+  padding-top: 20px;
+  border-top: 1px solid #d8c7c7;
 }
 
-.blog-card:after {
-  background: rgba(255,255,255,0.5);
-  width: 200%;
-  height: 200%;
+.view-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--b-gomb);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-weight: 500;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 6px -1px rgba(237, 58, 58, 0.2);
 }
 
-.blog-card:hover:before, .blog-card:hover:after {
-  transform: scale(1);
+.view-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(237, 58, 58, 0.3);
+  background: var(--b-gomb-hover);
 }
+
+.arrow-icon {
+  transition: transform 0.3s ease;
+}
+
+.view-btn:hover .arrow-icon {
+  transform: translateX(3px);
+}
+
+/*#endregion*/
 
 /* MEDIA QUERIES */
 @media screen and (max-width: 1660px) {
