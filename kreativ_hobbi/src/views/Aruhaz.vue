@@ -40,18 +40,89 @@
       <!-- SIDEBAR -->
       <div class="side-bar">
         <div class="side-bar-header">
-          <h2>Termékek</h2>
+         <h2>Szűrés ár szerint</h2>
+        </div>
+
+        <div class="side-bar-content price-filter">
+        <!-- Dual range slider -->
+          <div class="range-slider">
+            <input
+              type="range"
+              v-model.number="tempMin"
+              minlength="4"
+              :min="absMin"
+              :max="absMax-500"
+              step="1"
+              class="thumb thumb--left"
+            />
+
+            <input
+              type="range"
+              v-model.number="tempMax"
+              :min="absMin+500"
+              :max="absMax"
+              :value="tempMax"
+              step="1"
+              class="thumb thumb--right"
+            />
+
+            <div class="slider-track">
+              <div
+                class="slider-range"
+                :style="rangeStyle"
+              ></div>
+            </div>
+          </div>
+
+          <!-- Number inputs -->
+          <div class="price-range">
+            <div class="price-input">
+              <label>Ft-től</label>
+              <input
+                type="number"
+                v-model.number="tempMin"
+                :min="absMin"
+                :max="tempMax"
+              />
+            </div>
+
+            <div class="price-input">
+              <label>Ft-ig</label>
+              <input
+                type="number"
+                v-model.number="tempMax"
+                :min="tempMin"
+                :max="absMax"
+              />
+            </div>
+          </div>
+
+          <!-- Apply -->
+          <button class="apply-btn" @click="applyPriceFilter">
+            Alkalmaz
+          </button>
+        </div>
+
+        <div class="side-bar-header">
+          <h2>Szűrés kategória szerint</h2>
         </div>
 
         <div class="side-bar-content">
           <div 
-            v-for="cimke in cimkek" 
+            v-for="(cimke, i) in cimkek"
             :key="cimke.id" 
             class="item-tag"
-            @click="toggleTagFilter(cimke)"
-            :class="{ active: activeTagId === cimke.id }"
+            @click="checkThisandAdd(i+1)"
           >
-            {{ cimke.nev }}
+          <div class="checkbox-wrapper-46">
+              <input type="checkbox" id="cbx-46" class="inp-cbx" :value="cimke.id" :key="i"/>
+              <label for="cbx-46" class="cbx"
+                  ><span>
+                    <svg viewBox="0 0 12 10" height="10px" width="12px">
+                      <polyline points="1.5 6 4.5 9 10.5 1"></polyline></svg></span
+                ><span>{{ cimke.nev }}</span>
+              </label>
+            </div>
           </div>
         </div>
       </div>
@@ -65,7 +136,7 @@
             <h3 class="product-title">{{ item.nev }}</h3>
             <p class="product-price">{{ item.ar }} Ft</p>
 
-            <p class="product-desc">{{ item.leiras }}</p>
+            <p class="product-desc" :style="item.termek_cimkek.length == 0 ? 'margin-bottom: 25px;' : ''">{{ item.leiras }}</p>
 
             <div class="tag-container">
               <span
@@ -90,7 +161,7 @@
 
 <script setup>
 //#region imports
-import { ref, onMounted, onBeforeUnmount, watch } from 'vue'
+import { ref, onMounted, onBeforeUnmount, watch, computed } from 'vue'
 import axios from 'axios'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { library } from '@fortawesome/fontawesome-svg-core'
@@ -103,6 +174,7 @@ import {
   faFilter,
   faMagnifyingGlass
 } from '@fortawesome/free-solid-svg-icons'
+import Checkbox from 'primevue/checkbox'
 
 library.add(
   faArrowUp,
@@ -206,32 +278,34 @@ async function termekRendezes() {
 
 const items = ref([])
 const cimkek = ref([]) // Holds the list of tags for the sidebar
-const activeTagId = ref(null) // Tracks which sidebar tag is clicked
+const min = ref(0)
+const max = ref(0)
 
-function toggleTagFilter(tag) {
-  if (activeTagId.value === tag.id) {
-    activeTagId.value = null; // Deselect if clicking same tag
-    // Ideally refetch or reset filter here
-  } else {
-    activeTagId.value = tag.id;
-    // Ideally filter items here or call API
-    console.log('Filter by:', tag.nev);
-  }
+console.log(min, max)
+
+function checkThisandAdd(id){
+  console.log(id)
+  document.getElementsByTagName('input')[id].checked = !document.getElementsByTagName('input')[id].checked
 }
 
 //#endregion
 
+//#region search bar
+const searchTerm = ref('')
+//#endregion
 //#region mountok, unmountok, watchok, stb.
 onMounted(() => {
   document.addEventListener('click', handleClickOutside)
 
   fetchTermek().then(data => {
     items.value = data
+    min.value = items.value.reduce((acc, item) => Math.min(acc, item.ar), Infinity)
+    max.value = items.value.reduce((acc, item) => Math.max(acc, item.ar), 0)
     console.log(items.value)
   })
 
   fetchCimkek().then(data => {
-    cimkek.value = data
+    cimkek.value = data.sort((a, b) => a.nev.localeCompare(b.nev))
     console.log(cimkek.value)
   })
 })
@@ -241,6 +315,69 @@ watch(selected, () => {
     termekRendezes()
   },1000)
 })
+
+watch(items, () => {
+  min.value = items.value.reduce((acc, item) => Math.min(acc, item.ar), Infinity)
+  max.value = items.value.reduce((acc, item) => Math.max(acc, item.ar), 0)
+})
+
+
+const originalItems = ref([])
+
+// absolute bounds (from backend)
+const absMin = ref(0)
+const absMax = ref(0)
+
+// temporary UI values
+const tempMin = ref(0)
+const tempMax = ref(0)
+
+// calculate slider fill
+const rangeStyle = computed(() => {
+  const minPercent = ((tempMin.value - absMin.value) / (absMax.value - absMin.value)) * 100
+  const maxPercent = ((tempMax.value - absMin.value) / (absMax.value - absMin.value)) * 100
+
+  if (minPercent<0) {
+    minPercent = 0
+  }
+  if (maxPercent>100) {
+    maxPercent = 100
+  }
+  return {
+    left: `${minPercent}%`,
+    width: `${maxPercent - minPercent}%`
+  }
+})
+
+// safety clamps
+watch(tempMin, val => {
+  if (val > tempMax.value) tempMin.value = tempMax.value
+})
+
+watch(tempMax, val => {
+  if (val < tempMin.value) tempMax.value = tempMin.value
+})
+
+
+onMounted(async () => {
+  const data = await fetchTermek()
+
+  originalItems.value = data
+  items.value = data
+
+  absMin.value = Math.min(...data.map(i => i.ar))
+  absMax.value = Math.max(...data.map(i => i.ar))
+
+  tempMin.value = absMin.value
+  tempMax.value = absMax.value
+})
+
+// APPLY FILTER
+function applyPriceFilter() {
+  items.value = originalItems.value.filter(item =>
+    item.ar >= tempMin.value && item.ar <= tempMax.value
+  )
+}
 
 watch(open, () => {
   if (open.value) {
@@ -270,7 +407,14 @@ onBeforeUnmount(() => {
   display: flex;
   justify-content: flex-end;
   margin-bottom: 24px;
-
+  background-color: white;
+  border-radius: 14px;
+  width: 100%;
+  height: 100px;
+  box-shadow:0 4px 12px rgba(0, 0, 0, 0.151);
+  @media screen and (max-width: 480px) {
+    flex-direction: column;
+  }
 }
 /*#endregion*/
 
@@ -278,8 +422,9 @@ onBeforeUnmount(() => {
 /*#region ===== DROPDOWN ===== */
 .dropdown {
   position: relative;
-  width: 260px;
+  width: 300px;
   font-size: 15px;
+  margin: 25px auto;
 }
 
 .dropdown__selected {
@@ -299,7 +444,7 @@ onBeforeUnmount(() => {
 
 .dropdown__menu {
   position: absolute;
-  top: calc(100% - 15px);
+  top: calc(100% - 25px);
   width: 100%;
   border: 1px solid #d0d0d0;
   border-radius: 0 0 8px 8px;
@@ -334,6 +479,8 @@ onBeforeUnmount(() => {
   border-radius: 50px; /* Pill shape */
   background: white;
   width: 300px;
+  height: 40px;
+  margin: 25px auto;
   transition: all 0.2s;
 }
 
@@ -406,10 +553,179 @@ onBeforeUnmount(() => {
   background: #e3e8ff;
   color: #3f51b5;
 }
+/*#endregion*/
 
-.side-bar-content .item-tag.active {
+/*#region ===== Price Filter ===== */
+.price-filter {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* === RANGE SLIDER === */
+.range-slider {
+  position: relative;
+  height: 38px;
+  width: 100%;
+}
+
+.slider-track {
+  position: absolute;
+  top: 50%;
+  width: 100%;
+  height: 6px;
+  background: #e0e0e0;
+  border-radius: 3px;
+  transform: translateY(-50%);
+}
+
+.slider-range {
+  position: absolute;
+  height: 100%;
+  background: #f3a514;
+  max-width: 100%;
+  border-radius: 3px;
+}
+
+.thumb {
+  pointer-events: none;
+  position: absolute;
+  width: 100%;
+  height: 36px;
+  appearance: none;
+  background: none;
+}
+
+.thumb::-webkit-slider-thumb {
+  pointer-events: all;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #3f51b5;
+  border: none;
+  cursor: pointer;
+}
+
+.thumb--left {
+  z-index: 3;
+}
+
+.thumb--right {
+  z-index: 4;
+}
+
+/* === INPUTS === */
+.price-range {
+  display: flex;
+  gap: 10px;
+}
+
+.price-input {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.price-input input {
+  padding: 6px 8px;
+  border: 1px solid #d0d0d0;
+  border-radius: 6px;
+}
+
+/* === APPLY BUTTON === */
+.apply-btn {
+  margin-top: 6px;
+  padding: 8px;
+  border: none;
   background: #3f51b5;
   color: white;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.apply-btn:hover {
+  background: #2f3fa3;
+}
+/*#endregion*/
+
+/*#region Checkbox */
+.checkbox-wrapper-46 input[type="checkbox"] {
+  display: none;
+  visibility: hidden;
+}
+
+.checkbox-wrapper-46 .cbx {
+  margin: auto;
+  -webkit-user-select: none;
+  user-select: none;
+  cursor: pointer;
+}
+.checkbox-wrapper-46 .cbx span {
+  display: inline-block;
+  vertical-align: middle;
+  transform: translate3d(0, 0, 0);
+}
+.checkbox-wrapper-46 .cbx span:first-child {
+  position: relative;
+  width: 18px;
+  height: 18px;
+  border-radius: 3px;
+  transform: scale(1);
+  vertical-align: middle;
+  border: 1px solid #9098a9;
+  transition: all 0.2s ease;
+}
+.checkbox-wrapper-46 .cbx span:first-child svg {
+  position: absolute;
+  top: 3px;
+  left: 2px;
+  fill: none;
+  stroke: #ffffff;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 16px;
+  stroke-dashoffset: 16px;
+  transition: all 0.3s ease;
+  transition-delay: 0.1s;
+  transform: translate3d(0, 0, 0);
+}
+.checkbox-wrapper-46 .cbx span:first-child:before {
+  content: "";
+  width: 100%;
+  height: 100%;
+  background: #506eec;
+  display: block;
+  transform: scale(0);
+  opacity: 1;
+  border-radius: 50%;
+}
+.checkbox-wrapper-46 .cbx span:last-child {
+  padding-left: 8px;
+}
+.checkbox-wrapper-46 .cbx:hover span:first-child {
+  border-color: #506eec;
+}
+
+.checkbox-wrapper-46 .inp-cbx:checked + .cbx span:first-child {
+  background: #506eec;
+  border-color: #506eec;
+  animation: wave-46 0.4s ease;
+}
+.checkbox-wrapper-46 .inp-cbx:checked + .cbx span:first-child svg {
+  stroke-dashoffset: 0;
+}
+.checkbox-wrapper-46 .inp-cbx:checked + .cbx span:first-child:before {
+  transform: scale(3.5);
+  opacity: 0;
+  transition: all 0.6s ease;
+}
+
+@keyframes wave-46 {
+  50% {
+    transform: scale(0.9);
+  }
 }
 /*#endregion*/
 
