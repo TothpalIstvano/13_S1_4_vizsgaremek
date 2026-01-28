@@ -20,8 +20,8 @@ class BlogController extends Controller
                     'cim' => $post->cim,
                     'kivonat' => $post->kivonat,
                     'letrehozas_datuma' => $post->letrehozas_datuma ? $post->letrehozas_datuma->format('d M Y') : 'N/A',
-                    // Use url() helper for full URL
-                    'fo_kep' => $post->foKep ? url($post->foKep->url_Link) : null,
+                    // Just use the stored URL directly
+                    'fo_kep' => $post->foKep ? $post->foKep->url_Link : null,
                     'cimkek' => $post->cimkek->pluck('nev')->toArray(),
                     'szerző' => $post->szerzo ? $post->szerzo->felhasz_nev : 'Ismeretlen',
                 ];
@@ -37,24 +37,18 @@ class BlogController extends Controller
             ->where('statusz', 'közzétett')
             ->firstOrFail();
 
-        // Debug: Check what we're getting
-        \Log::info('Post images:', [
-            'fo_kep_id' => $post->fo_kep_id,
-            'foKep' => $post->foKep,
-            'kepek_count' => $post->kepek->count()
-        ]);
-
         return response()->json([
             'id' => $post->id,
             'cim' => $post->cim,
             'tartalom' => $post->tartalom,
             'kivonat' => $post->kivonat,
             'letrehozas_datuma' => $post->letrehozas_datuma ? $post->letrehozas_datuma->format('d M Y') : 'N/A',
-            // Try direct URL construction first
-            'fo_kep' => $post->foKep ? url($post->foKep->url_Link) : null,
+            // Just use the stored URL directly
+            'fo_kep' => $post->foKep ? $post->foKep->url_Link : null,
             'kepek' => $post->kepek->map(function ($image) {
                 return [
-                    'url' => url($image->url_Link),
+                    // Just use the stored URL directly
+                    'url' => $image->url_Link,
                     'alt' => $image->alt_Szoveg,
                     'leiras' => $image->leiras,
                 ];

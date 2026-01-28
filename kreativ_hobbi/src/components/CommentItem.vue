@@ -1,3 +1,38 @@
+<script setup>
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { faUserCircle, faReply, faTrash } from '@fortawesome/free-solid-svg-icons'
+import { defineProps, defineEmits } from 'vue'
+
+library.add(faUserCircle, faReply, faTrash)
+
+const props = defineProps({
+  comment: {
+    type: Object,
+    required: true
+  },
+  isReply: {
+    type: Boolean,
+    default: false
+  }
+})
+
+const emit = defineEmits(['reply', 'delete'])
+
+// Remove auth logic - let the parent handle delete authorization
+const formatDate = (dateString) => {
+  if (!dateString) return ''
+  const date = new Date(dateString)
+  return date.toLocaleDateString('hu-HU', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  })
+}
+</script>
+
 <template>
   <div class="comment-item" :class="{ 'is-reply': isReply }">
     <div class="comment-header">
@@ -15,8 +50,8 @@
         </div>
       </div>
       
+      <!-- Always show delete button - parent component handles auth -->
       <button 
-        v-if="canDelete" 
         @click="$emit('delete', comment.id)" 
         class="delete-btn"
         title="Törlés"
@@ -55,52 +90,6 @@
     </div>
   </div>
 </template>
-
-<script setup>
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { faUserCircle, faReply, faTrash } from '@fortawesome/free-solid-svg-icons'
-import { computed } from 'vue'
-
-library.add(faUserCircle, faReply, faTrash)
-
-const props = defineProps({
-  comment: {
-    type: Object,
-    required: true
-  },
-  isReply: {
-    type: Boolean,
-    default: false
-  }
-})
-
-const emit = defineEmits(['reply', 'delete'])
-
-const canDelete = computed(() => {
-  return true
-})
-
-const formatDate = (dateString) => {
-  if (!dateString) return ''
-  const date = new Date(dateString)
-  return date.toLocaleDateString('hu-HU', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  })
-}
-
-const handleReply = () => {
-  emit('reply', props.comment.id)
-}
-
-const handleDelete = () => {
-  emit('delete', props.comment.id)
-}
-</script>
 
 <style scoped>
 

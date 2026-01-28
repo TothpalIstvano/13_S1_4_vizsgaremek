@@ -65,9 +65,11 @@ Route::get('/blog', [BlogController::class, 'index']);
 Route::get('/blog/{id}', [BlogController::class, 'show']);
 
 // Comment routes
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/blog/{id}/comments', [KommentController::class, 'store']);
+    Route::delete('/comments/{id}', [KommentController::class, 'destroy']);
+});
 Route::get('/blog/{id}/comments', [KommentController::class, 'index']);
-Route::post('/blog/{id}/comments', [KommentController::class, 'store'])->middleware('auth:sanctum');
-Route::delete('/comments/{id}', [KommentController::class, 'destroy']);
 
 // Címkék az új poszthoz
 Route::get('/cimkek', function () {

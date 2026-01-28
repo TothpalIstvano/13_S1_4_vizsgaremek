@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Kommentek;
 use App\Models\Posztok;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 class KommentController extends Controller
@@ -24,29 +25,27 @@ class KommentController extends Controller
                 ->orderBy('letrehozas_datuma', 'desc')
                 ->get()
                 ->map(function ($comment) {
-                    return [
-                        'id' => $comment->id,
-                        'komment' => $comment->komment,
-                        'letrehozas_datuma' => $comment->letrehozas_datuma,
-                        'felhasznalo' => $comment->kommentIro ? [
-                            'felhasz_nev' => $comment->kommentIro->felhasz_nev,
-                        ] : null,
-                        'gyermekKommentek' => $comment->gyermekKommentek->map(function ($reply) {
-                            return [
-                                'id' => $reply->id,
-                                'komment' => $reply->komment,
-                                'letrehozas_datuma' => $reply->letrehozas_datuma,
-                                'felhasznalo' => $reply->kommentIro ? [
-                                    'felhasz_nev' => $reply->kommentIro->felhasz_nev,
-                                ] : null,
-                                'gyermekKommentek' => []
-                            ];
-                        })
-                    ];
+                    // Rename kommentIro to felhasznalo for frontend compatibility
+                    $commentArray = $comment->toArray();
+                    if (isset($commentArray['komment_iro'])) {
+                        $commentArray['felhasznalo'] = $commentArray['komment_iro'];
+                        unset($commentArray['komment_iro']);
+                    }
+
+                    // Also process child comments
+                    if (isset($commentArray['gyermek_kommentek'])) {
+                        foreach ($commentArray['gyermek_kommentek'] as &$childComment) {
+                            if (isset($childComment['komment_iro'])) {
+                                $childComment['felhasznalo'] = $childComment['komment_iro'];
+                                unset($childComment['komment_iro']);
+                            }
+                        }
+                    }
+
+                    return $commentArray;
                 });
 
             return response()->json($comments);
-
 
         } catch (\Exception $e) {
             Log::error('Error in KommentController@index: ' . $e->getMessage());
@@ -57,6 +56,11 @@ class KommentController extends Controller
     public function store(Request $request, $postId)
     {
         try {
+            // Check if user is authenticated
+            if (!Auth::check()) {
+                return response()->json(['error' => 'Unauthorized'], 401);
+            }
+
             $request->validate([
                 'komment' => 'required|string|min:3|max:1000',
                 'elozo_komment_id' => 'nullable|exists:kommentek,id',
@@ -65,24 +69,23 @@ class KommentController extends Controller
             $comment = Kommentek::create([
                 'komment' => $request->komment,
                 'poszt_id' => $postId,
-                'kommentelo' => 1, // TODO: Replace with authenticated user ID
+                'kommentelo' => Auth::id(), // Use authenticated user ID
                 'elozetes_komment_id' => $request->elozo_komment_id,
                 'letrehozas_datuma' => now(),
             ]);
 
             $comment->load('kommentIro:id,felhasz_nev');
 
+            // Rename the relationship for frontend
+            $commentData = $comment->toArray();
+            if (isset($commentData['komment_iro'])) {
+                $commentData['felhasznalo'] = $commentData['komment_iro'];
+                unset($commentData['komment_iro']);
+            }
+
             return response()->json([
                 'message' => 'Comment added!',
-                'comment' => [
-                    'id' => $comment->id,
-                    'komment' => $comment->komment,
-                    'letrehozas_datuma' => $comment->letrehozas_datuma,
-                    'felhasznalo' => $comment->kommentIro ? [
-                        'felhasz_nev' => $comment->kommentIro->felhasz_nev,
-                    ] : null,
-                    'gyermekKommentek' => []
-                ]
+                'comment' => $commentData
             ], 201);
 
         } catch (\Exception $e) {
@@ -95,6 +98,12 @@ class KommentController extends Controller
     {
         try {
             $comment = Kommentek::findOrFail($id);
+
+            // Check if user owns the comment
+            if ($comment->kommentelo !== Auth::id()) {
+                return response()->json(['error' => 'You can only delete your own comments'], 403);
+            }
+
             $comment->delete();
             return response()->json(['message' => 'Comment deleted!']);
         } catch (\Exception $e) {
