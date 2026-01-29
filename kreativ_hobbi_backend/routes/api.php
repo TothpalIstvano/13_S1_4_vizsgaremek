@@ -144,3 +144,17 @@ Route::get('/termekek', function () {
     $termekek = Termekek::all('id', 'nev', 'ar', 'leiras', 'darab', 'meter', 'kategoria_id', 'fo_kep_id')->load('TermekKategoria', 'TermekFoKep', 'TermekSzinek', 'TermekCimkek');
     return response()->json($termekek);
 });
+
+Route::get('/termekek/{id}', function ($id) {
+    try {
+        $termek = Termekek::with('TermekKategoria', 'TermekFoKep', 'TermekSzinek', 'TermekCimkek')->find($id);
+        if ($termek) {
+            return response()->json($termek);
+        } else {
+            return response()->json(['error' => 'Termék nem található'], 404);
+        }
+    } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage()], 500);
+    }
+});
+

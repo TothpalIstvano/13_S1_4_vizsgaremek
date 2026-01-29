@@ -1,294 +1,333 @@
-<template>
-  <div id="shop">
+  <template>
+    <div id="shop">
 
-    <!-- TOP FILTER BAR -->
-    <div id="toolbar">
-      <div class="search-container">        
-        <div class="search-icon">
-          <FontAwesomeIcon icon="fa-magnifying-glass" />
-        </div>
-        <input
-          type="text"
-          placeholder="Keresés"
-          v-model="searchTerm"
-        />
-      </div>
-
-      <div class="dropdown" ref="dropdown">
-        <div class="dropdown__selected" @click="toggle">
-          <FontAwesomeIcon :icon="selected.icon" />
-          <span>{{ selected.label }}</span>
-          <FontAwesomeIcon icon="chevron-down" class="chevron" />
+      <!-- TOP FILTER BAR -->
+      <div id="toolbar">
+        <div class="search-container">        
+          <div class="search-icon">
+            <FontAwesomeIcon icon="fa-magnifying-glass" />
+          </div>
+          <input
+            type="text"
+            placeholder="Keresés"
+            class="search-input"
+            name="search"
+            v-model="searchTerm"
+          />
         </div>
 
-        <ul v-if="open" class="dropdown__menu">
-          <li
-            v-for="option in options"
-            :key="option.value"
-            @click="select(option)"
-            class="dropdown__item"
-          >
-            <FontAwesomeIcon :icon="option.icon" />
-            <span>{{ option.label }}</span>
-          </li>
-        </ul>
-      </div>
-    </div>
-    
-    <div id="tartalom">
-
-      <!-- SIDEBAR -->
-      <div class="side-bar">
-        <div class="side-bar-header">
-         <h2>Szűrés ár szerint</h2>
-        </div>
-
-        <div class="side-bar-content price-filter">
-        <!-- Dual range slider -->
-          <div class="range-slider">
-            <input
-              type="range"
-              v-model.number="tempMin"
-              minlength="4"
-              :min="absMin"
-              :max="absMax-500"
-              step="1"
-              class="thumb thumb--left"
-            />
-
-            <input
-              type="range"
-              v-model.number="tempMax"
-              :min="absMin+500"
-              :max="absMax"
-              :value="tempMax"
-              step="1"
-              class="thumb thumb--right"
-            />
-
-            <div class="slider-track">
-              <div
-                class="slider-range"
-                :style="rangeStyle"
-              ></div>
-            </div>
+        <div class="dropdown" ref="dropdown">
+          <div class="dropdown__selected" @click="toggle">
+            <FontAwesomeIcon :icon="selected.icon" />
+            <span>{{ selected.label }}</span>
+            <FontAwesomeIcon icon="chevron-down" class="chevron" />
           </div>
 
-          <!-- Number inputs -->
-          <div class="price-range">
-            <div class="price-input">
-              <label>Ft-től</label>
+          <ul v-if="open" class="dropdown__menu">
+            <li
+              v-for="option in options"
+              :key="option.value"
+              @click="select(option)"
+              class="dropdown__item"
+            >
+              <FontAwesomeIcon :icon="option.icon" />
+              <span>{{ option.label }}</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+      
+      <div id="tartalom">
+
+        <!-- SIDEBAR -->
+        <div class="side-bar">
+          <div class="side-bar-header">
+          <h2>Szűrés ár szerint</h2>
+          </div>
+
+          <div class="side-bar-content price-filter">
+          <!-- Dual range slider -->
+            <div class="range-slider">
               <input
-                type="number"
+                type="range"
+                name="min-slide"
                 v-model.number="tempMin"
+                minlength="60"
                 :min="absMin"
-                :max="tempMax"
-              />
-            </div>
-
-            <div class="price-input">
-              <label>Ft-ig</label>
-              <input
-                type="number"
-                v-model.number="tempMax"
-                :min="tempMin"
                 :max="absMax"
+                step="1"
+                class="thumb thumb--left"
               />
-            </div>
-          </div>
 
-          <!-- Apply -->
-          <button class="apply-btn" @click="applyPriceFilter">
-            Alkalmaz
-          </button>
-        </div>
+              <input
+                type="range"
+                name="max-slide"
+                v-model.number="tempMax"
+                :min="absMin"
+                :max="absMax"
+                :value="tempMax"
+                step="1"
+                class="thumb thumb--right"
+              />
 
-        <div class="side-bar-header">
-          <h2>Szűrés kategória szerint</h2>
-        </div>
-
-        <div class="side-bar-content">
-          <div 
-            v-for="(cimke, i) in cimkek"
-            :key="cimke.id" 
-            class="item-tag"
-            @click="checkThisandAdd(i+1)"
-          >
-          <div class="checkbox-wrapper-46">
-              <input type="checkbox" id="cbx-46" class="inp-cbx" :value="cimke.id" :key="i"/>
-              <label for="cbx-46" class="cbx"
-                  ><span>
-                    <svg viewBox="0 0 12 10" height="10px" width="12px">
-                      <polyline points="1.5 6 4.5 9 10.5 1"></polyline></svg></span
-                ><span>{{ cimke.nev }}</span>
-              </label>
-            </div>
-          </div>
-        </div>
-      </div>
-
-       <!-- PRODUCT GRID -->
-      <div id="products">
-        <div v-for="item in items" :key="item.id" class="product-card">
-          <img :src="item.termek_fo_kep.url_Link" :alt="item.termek_fo_kep.alt_szoveg" class="product-image" />
-
-          <div class="product-body">
-            <h3 class="product-title">{{ item.nev }}</h3>
-            <p class="product-price">{{ item.ar }} Ft</p>
-
-            <p class="product-desc" :style="item.termek_cimkek.length == 0 ? 'margin-bottom: 25px;' : ''">{{ item.leiras }}</p>
-
-            <div class="tag-container">
-              <span
-                v-for="cimke in item.termek_cimkek"
-                :key="cimke.id"
-                class="item-tag-sm"
-              >
-                {{ cimke.nev }}
-              </span>
+              <div class="slider-track">
+                <div
+                  class="slider-range"
+                  :style="rangeStyle"
+                ></div>
+              </div>
             </div>
 
-            <button class="add-btn" @click="addToCart(item)">
-              Kosárba
+            <!-- Number inputs -->
+            <div class="price-range">
+              <div class="price-input">
+                <label class="price-label" for="minTextIn">Ft-tól</label>
+                <input
+                  type="number"
+                  id="minTextIn"
+                  v-model.number="tempMin"
+                  :min="absMin"
+                  :max="tempMax - 500"
+                />
+              </div>
+
+              <div class="price-input">
+                <label class="price-label" for="maxTextIn">Ft-ig</label>
+                <input
+                  type="number"
+                  id="maxTextIn"
+                  v-model.number="tempMax"
+                  :min="tempMin"
+                  :max="absMax"
+                />
+              </div>
+            </div>
+
+            <!-- Apply -->
+            <button class="apply-btn" @click="applyPriceFilter">
+              Alkalmaz
             </button>
           </div>
+
+          <div class="side-bar-header">
+            <h2>Szűrés kategória szerint</h2>
+          </div>
+
+          <div class="side-bar-content">
+            <div 
+              v-for="(cimke, index) in cimkek"
+              :key="cimke.id" 
+              class="item-tag"
+              :class="{ active: selectedCimkek.includes(cimke.id) }"
+              @click="toggleCimke(cimke.id)"
+            >
+            <div class="checkbox-wrapper-46">
+                <input type="checkbox" :id="`cbx-${cimke.id}`" class="inp-cbx" :value="cimke.id" :key="index" v-model="selectedCimkek" @click.stop/>
+                <label :for="`cbx-${cimke.id}`" class="cbx"
+                    ><span>
+                      <svg viewBox="0 0 12 10" height="10px" width="12px">
+                        <polyline points="1.5 6 4.5 9 10.5 1"></polyline></svg></span
+                  ><span>{{ cimke.nev }}</span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PRODUCT GRID -->
+        <div id="products">
+          <div v-for="item in filteredItems" :key="item.id" class="product-card" @click="router.push(`/aruhaz/${item.id}`)" style="cursor: pointer;">
+            <img :src="item.termek_fo_kep.url_Link" :alt="item.termek_fo_kep.alt_szoveg" class="product-image" />
+
+            <div class="product-body">
+              <h3 class="product-title">{{ item.nev }}</h3>
+              <p class="product-price">{{ item.ar }} Ft</p>
+
+              <p class="product-desc" :style="item.termek_cimkek.length == 0 ? 'margin-bottom: 25px;' : ''">{{ item.leiras }}</p>
+
+              <div class="tag-container">
+                <span
+                  v-for="cimke in item.termek_cimkek"
+                  :key="cimke.id"
+                  class="item-tag-sm"
+                >
+                  {{ cimke.nev }}
+                </span>
+              </div>
+
+              <button class="add-btn" @click="addToCart(item)" :disabled="!priceChanged">
+                Kosárba
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-</template>
+  </template>
 
 
-<script setup>
-//#region imports
-import { ref, onMounted, onBeforeUnmount, watch, computed } from 'vue'
-import axios from 'axios'
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { library } from '@fortawesome/fontawesome-svg-core'
-import {
-  faArrowUp,
-  faArrowDown,
-  faSortAlphaUp,
-  faSortAlphaDown,
-  faChevronDown,
-  faFilter,
-  faMagnifyingGlass
-} from '@fortawesome/free-solid-svg-icons'
-import Checkbox from 'primevue/checkbox'
+  <script setup>
+  //#region imports
+  import { ref, onMounted, onBeforeUnmount, watch, computed } from 'vue'
+  import axios from 'axios'
+  import { useRouter } from 'vue-router'
+  import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+  import { library } from '@fortawesome/fontawesome-svg-core'
+  import {
+    faArrowUp,
+    faArrowDown,
+    faSortAlphaUp,
+    faSortAlphaDown,
+    faChevronDown,
+    faFilter,
+    faMagnifyingGlass
+  } from '@fortawesome/free-solid-svg-icons'
 
-library.add(
-  faArrowUp,
-  faArrowDown,
-  faSortAlphaUp,
-  faSortAlphaDown,
-  faChevronDown,
-  faFilter,
-  faMagnifyingGlass 
-)
-//#endregion
 
-//#region eszköztár
-const options = [
-  {
-    value: 'price-asc',
-    label: 'Ár szerint növekvő',
-    icon: 'arrow-up'
-  },
-  {
-    value: 'price-desc',
-    label: 'Ár szerint csökkenő',
-    icon: 'arrow-down'
-  },
-  {
-    value: 'name-asc',
-    label: 'Név szerint növekvő',
-    icon: 'sort-alpha-up'
-  },
-  {
-    value: 'name-desc',
-    label: 'Név szerint csökkenő',
-    icon: 'sort-alpha-down'
+  library.add(
+    faArrowUp,
+    faArrowDown,
+    faSortAlphaUp,
+    faSortAlphaDown,
+    faChevronDown,
+    faFilter,
+    faMagnifyingGlass 
+  )
+  
+  const router = useRouter()
+  //#endregion
+
+  //#region eszköztár
+  const options = [
+    {
+      value: 'price-asc',
+      label: 'Ár szerint növekvő',
+      icon: 'arrow-up'
+    },
+    {
+      value: 'price-desc',
+      label: 'Ár szerint csökkenő',
+      icon: 'arrow-down'
+    },
+    {
+      value: 'name-asc',
+      label: 'Név szerint növekvő',
+      icon: 'sort-alpha-up'
+    },
+    {
+      value: 'name-desc',
+      label: 'Név szerint csökkenő',
+      icon: 'sort-alpha-down'
+    }
+  ]
+
+
+  const selected = ref(  {
+      value: 'default',
+      label: 'Sorba rendezés',
+      icon: 'filter'
+    })
+  const open = ref(false)
+  const dropdown = ref(null)
+
+  function toggle() {
+    open.value = !open.value
+
   }
-]
 
-
-const selected = ref(  {
-    value: 'default',
-    label: 'Sorba rendezés',
-    icon: 'filter'
-  })
-const open = ref(false)
-const dropdown = ref(null)
-
-function toggle() {
-  open.value = !open.value
-
-}
-
-function select(option) {
-  selected.value = option
-  open.value = false
-
-  // emit / sort logic goes here
-  console.log('Selected:', option.value)
-}
-
-function handleClickOutside(event) {
-  if (dropdown.value && !dropdown.value.contains(event.target)) {
+  function select(option) {
+    selected.value = option
     open.value = false
-  }
-}
-//#endregion
 
-//#region tartalom
-async function fetchTermek() {
-  try {
-    const response = await axios.get('/api/termekek');
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching products:', error);
-    return [];
+    // emit / sort logic goes here
+    console.log('Selected:', option.value)
   }
-}
 
-async function fetchCimkek() {
-  try {
-    const response = await axios.get('/api/cimkek');
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching tags:', error);
-    return [];
+  function handleClickOutside(event) {
+    if (dropdown.value && !dropdown.value.contains(event.target)) {
+      open.value = false
+    }
   }
-}
+  //#endregion
 
-async function termekRendezes() {
-  if (selected.value.value === 'price-asc') {
-    items.value.sort((a, b) => a.ar - b.ar);
+  //#region tartalom
+  async function fetchTermek() {
+    try {
+      const response = await axios.get('/api/termekek');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching products:', error);
+      return [];
+    }
   }
-  if (selected.value.value === 'price-desc') {
-    items.value.sort((a, b) => b.ar - a.ar);
+
+  async function fetchCimkek() {
+    try {
+      const response = await axios.get('/api/cimkek');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching tags:', error);
+      return [];
+    }
   }
-  if (selected.value.value === 'name-asc') {
-    items.value.sort((a, b) => a.nev.localeCompare(b.nev));
+
+  async function termekRendezes() {
+    if (selected.value.value === 'price-asc') {
+      items.value.sort((a, b) => a.ar - b.ar);
+    }
+    if (selected.value.value === 'price-desc') {
+      items.value.sort((a, b) => b.ar - a.ar);
+    }
+    if (selected.value.value === 'name-asc') {
+      items.value.sort((a, b) => a.nev.localeCompare(b.nev));
+    }
+    if (selected.value.value === 'name-desc') {
+      items.value.sort((a, b) => b.nev.localeCompare(a.nev));
+    }
   }
-  if (selected.value.value === 'name-desc') {
-    items.value.sort((a, b) => b.nev.localeCompare(a.nev));
+
+
+  const items = ref([])
+  const cimkek = ref([]) // Holds the list of tags for the sidebar
+  const selectedCimkek = ref([])
+  const min = ref(0)
+  const max = ref(0)
+
+  console.log(min, max)
+
+  function toggleCimke(id) {
+    const index = selectedCimkek.value.indexOf(id);
+    if (index === -1) {
+      selectedCimkek.value.push(id);
+    } else {
+      selectedCimkek.value.splice(index, 1);
+    }
   }
-}
 
-const items = ref([])
-const cimkek = ref([]) // Holds the list of tags for the sidebar
-const min = ref(0)
-const max = ref(0)
+  const filteredItems = computed(() => {
+  return originalItems.value.filter(item => {
 
-console.log(min, max)
+    // SEARCH
+    const matchesSearch =
+      item.nev.toLowerCase().includes(searchTerm.value.toLowerCase())
 
-function checkThisandAdd(id){
-  console.log(id)
-  document.getElementsByTagName('input')[id].checked = !document.getElementsByTagName('input')[id].checked
-}
+    // PRICE
+    const matchesPrice =
+      item.ar >= appliedMin.value && item.ar <= appliedMax.value
 
-//#endregion
+    // TAGS
+    const matchesTags =
+      selectedCimkek.value.length === 0 ||
+      selectedCimkek.value.every(tagId =>
+        item.termek_cimkek.some(t => t.id === tagId)
+      )
+
+    return matchesSearch && matchesPrice && matchesTags
+  })
+})
+
+
+  //#endregion
 
 //#region search bar
 const searchTerm = ref('')
@@ -332,6 +371,10 @@ const absMax = ref(0)
 const tempMin = ref(0)
 const tempMax = ref(0)
 
+// applied filter values
+const appliedMin = ref(0)
+const appliedMax = ref(0)
+
 // calculate slider fill
 const rangeStyle = computed(() => {
   const minPercent = ((tempMin.value - absMin.value) / (absMax.value - absMin.value)) * 100
@@ -370,14 +413,21 @@ onMounted(async () => {
 
   tempMin.value = absMin.value
   tempMax.value = absMax.value
+
+  appliedMin.value = absMin.value
+  appliedMax.value = absMax.value
 })
 
-// APPLY FILTER
-function applyPriceFilter() {
-  items.value = originalItems.value.filter(item =>
-    item.ar >= tempMin.value && item.ar <= tempMax.value
-  )
+function applyPriceFilter(){
+  appliedMin.value = tempMin.value
+  appliedMax.value = tempMax.value
 }
+
+const priceChanged = computed(() =>
+  tempMin.value !== appliedMin.value ||
+  tempMax.value !== appliedMax.value
+)
+
 
 watch(open, () => {
   if (open.value) {
@@ -553,6 +603,11 @@ onBeforeUnmount(() => {
   background: #e3e8ff;
   color: #3f51b5;
 }
+/*
+.item-tag.active {
+  background: #c7d4ff;
+  color: #2b3ea8;
+}*/
 /*#endregion*/
 
 /*#region ===== Price Filter ===== */

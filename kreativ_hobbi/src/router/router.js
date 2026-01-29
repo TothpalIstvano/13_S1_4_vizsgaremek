@@ -3,6 +3,7 @@ import Aruhaz from '../views/Aruhaz.vue'
 import Belepes from '../views/Belepes.vue'
 import Blog from '../views/Blog.vue'
 import SingleBlog from '../components/SingleBlog.vue'
+import SingleItem from '../components/SingleItem.vue'
 import Fizetes from '../views/Fizetes.vue'
 import Kosar from '../views/Kosar.vue'
 import Mintakeszito from '../views/Mintakeszito.vue'
@@ -27,6 +28,12 @@ const router = createRouter({
       path: '/aruhaz',
       name: 'Aruhaz',
       component: Aruhaz,
+    },
+    {
+      path: '/aruhaz/:id',
+      name: 'SingleItem',
+      component: SingleItem,
+      props: true
     },
     {
       path: '/belepes',

@@ -12,7 +12,7 @@ class SzinekSeeder extends Seeder
      */
     public function run(): void
     {
-        Szinek::factory()->count(10)->create();
+        Szinek::factory()->count(100)->create();
         $this->command->info('Szinek table seeded successfully!');
     }
 }

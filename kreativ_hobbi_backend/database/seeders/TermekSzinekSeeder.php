@@ -16,35 +16,40 @@ class TermekSzinekSeeder extends Seeder
     public function run(): void
     {
         // 2. Szerezzük be a szükséges ID-ket
-        $termekIds = Termekek::pluck('id');
-        $szinIds = Szinek::pluck('id');
+        $termekIds = Termekek::pluck('id')->toArray();
+        $szinIds = Szinek::pluck('id')->toArray();
 
-        if ($termekIds->isEmpty() || $szinIds->isEmpty()) {
+        if (empty($termekIds) || empty($szinIds)) {
             $this->command->error('A termék-szín kapcsolatok seederhez először futtasd a TermekekSeeder-t és a SzinekSeeder-t!');
             return;
         }
 
-        // 3. Hozzuk létre az egyedi párosításokat
-        $numberOfConnections = 30; // Vagy amennyit szeretnél
-        $maxPossibleConnections = $termekIds->count() * $szinIds->count();
-
-        if ($numberOfConnections > $maxPossibleConnections) {
-            $this->command->warn("A kért {$numberOfConnections} kapcsolat helyett csak {$maxPossibleConnections} egyedi párosítás lehetséges. Ekkorát hozunk létre.");
-            $numberOfConnections = $maxPossibleConnections;
-        }
-
-        // A crossJoin() létrehozza az összes lehetséges (termek_id, szin_id) párt.
-        // A random() kiválaszt belőle a kívánt mennyiséget.
-        $uniquePairs = $termekIds->crossJoin($szinIds)->random($numberOfConnections);
-
-        // 4. Hozzuk létre a kapcsolatokat az egyedi párokkal
-        foreach ($uniquePairs as $pair) {
+        // 3. Biztosítsd, hogy minden termék legalább egy színnel rendelkezik
+        foreach ($termekIds as $termekId) {
+            $randomSzinId = $szinIds[array_rand($szinIds)];
             TermekSzinek::create([
-                'termek_id' => $pair[0], // A crossJoin tömböt ad vissza: [termek_id, szin_id]
-                'szin_id' => $pair[1],
+                'termek_id' => $termekId,
+                'szin_id' => $randomSzinId,
             ]);
         }
 
-        $this->command->info('TermekekSzinek tábla sikeresen feltöltve!');
+        // 4. Opcionálisan további véletlen párosítások hozzáadása
+        $additionalConnections = 20; // Még ennyi további véletlen párosítás
+        for ($i = 0; $i < $additionalConnections; $i++) {
+            $randomTermekId = $termekIds[array_rand($termekIds)];
+            $randomSzinId = $szinIds[array_rand($szinIds)];
+            
+            // Ellenőrzés: ha már létezik, ne adjunk hozzá duplikátumot
+            if (!TermekSzinek::where('termek_id', $randomTermekId)
+                                ->where('szin_id', $randomSzinId)
+                                ->exists()) {
+                TermekSzinek::create([
+                    'termek_id' => $randomTermekId,
+                    'szin_id' => $randomSzinId,
+                ]);
+            }
+        }
+
+        $this->command->info('TermekSzinek tábla sikeresen feltöltve! Minden termék legalább egy szinnel rendelkezik.');
     }
 }
