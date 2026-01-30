@@ -2,6 +2,8 @@
 <div class="item-page">
     <button @click="goBack" class="back-btn">← Vissza</button>
 
+    <CartModal ref="cartModal" />
+
     <div v-if="loading" class="loading">Betöltés...</div>
     <div v-else-if="product" class="product-detail">
         <div class="product-images">
@@ -60,9 +62,13 @@
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import axios from 'axios'
+import { useCartStore } from '@/stores/cartStore'
+import CartModal from '@/components/CartModal.vue'
 
 const route = useRoute()
 const router = useRouter()
+const cartStore = useCartStore()
+const cartModal = ref(null)
 
 const product = ref(null)
 const loading = ref(true)
@@ -87,6 +93,22 @@ async function fetchProduct() {
 }
 function goBack() {
   router.push('/aruhaz')
+}
+
+function addToCart() {
+  if (!product.value || product.value.darab === 0) return
+  
+  const result = cartStore.addToCart({
+    ...product.value,
+    selectedColor: selectedColor.value
+  }, qty.value)
+  
+  if (result.success && result.added > 0) {
+    cartModal.value?.open(product.value, result.added)
+    qty.value = 1
+  } else if (!result.success) {
+    alert(`⚠️ ${result.message}`)
+  }
 }
 
 onMounted(() => {

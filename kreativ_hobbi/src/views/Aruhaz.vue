@@ -1,5 +1,6 @@
   <template>
     <div id="shop">
+      <CartModal ref="cartModal" />
 
       <!-- TOP FILTER BAR -->
       <div id="toolbar">
@@ -155,7 +156,7 @@
                 </span>
               </div>
 
-              <button class="add-btn" @click="addToCart(item)" :disabled="!priceChanged">
+              <button class="add-btn" @click="addToCart(item)" @click.stop>
                 Kosárba
               </button>
             </div>
@@ -168,9 +169,11 @@
 
   <script setup>
   //#region imports
-  import { ref, onMounted, onBeforeUnmount, watch, computed } from 'vue'
+  import { ref, onMounted, onBeforeUnmount, watch, computed, provide, inject, onUnmounted } from 'vue'
   import axios from 'axios'
   import { useRouter } from 'vue-router'
+  import { useCartStore } from '@/stores/cartStore'
+  import CartModal from '@/components/CartModal.vue'
   import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
   import { library } from '@fortawesome/fontawesome-svg-core'
   import {
@@ -195,6 +198,8 @@
   )
   
   const router = useRouter()
+  const cartStore = useCartStore()
+  const cartModal = ref(null)
   //#endregion
 
   //#region eszköztár
@@ -292,8 +297,7 @@
   const selectedCimkek = ref([])
   const min = ref(0)
   const max = ref(0)
-
-  console.log(min, max)
+  const searchTerm = ref('')
 
   function toggleCimke(id) {
     const index = selectedCimkek.value.indexOf(id);
@@ -326,12 +330,17 @@
   })
 })
 
-
-  //#endregion
-
-//#region search bar
-const searchTerm = ref('')
+  function addToCart(item) {
+    const result = cartStore.addToCart(item, 1)
+    
+    if (result.success && result.added > 0) {
+      cartModal.value?.open(item, result.added)
+    } else if (!result.success) {
+      alert(`⚠️ ${result.message}`)
+    }
+  }
 //#endregion
+
 //#region mountok, unmountok, watchok, stb.
 onMounted(() => {
   document.addEventListener('click', handleClickOutside)
@@ -340,13 +349,15 @@ onMounted(() => {
     items.value = data
     min.value = items.value.reduce((acc, item) => Math.min(acc, item.ar), Infinity)
     max.value = items.value.reduce((acc, item) => Math.max(acc, item.ar), 0)
-    console.log(items.value)
   })
 
   fetchCimkek().then(data => {
     cimkek.value = data.sort((a, b) => a.nev.localeCompare(b.nev))
-    console.log(cimkek.value)
   })
+})
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickOutside)
 })
 
 watch(selected, () => {
@@ -820,6 +831,8 @@ onBeforeUnmount(() => {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  flex: 1;
+  min-height: 240px;
 }
 
 .product-title {
@@ -838,6 +851,7 @@ onBeforeUnmount(() => {
   line-height: 1.3;
   max-height: 3.8em;
   overflow: hidden;
+  flex: 1;
 }
 
 /* ===== TAGS (Inside Card) ===== */
@@ -845,6 +859,7 @@ onBeforeUnmount(() => {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
+  flex-grow: 0;
 }
 
 .item-tag-sm {

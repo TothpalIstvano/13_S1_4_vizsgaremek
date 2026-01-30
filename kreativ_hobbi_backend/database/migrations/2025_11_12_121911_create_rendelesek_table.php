@@ -16,7 +16,7 @@ return new class extends Migration
             $table->unsignedInteger('felhasznalo_id')->nullable(false);
             $table->enum('statusz',['függőben','szállítás alatt','teljesítve','törölve'])->default('függőben')->nullable(false);
             $table->decimal('osszeg', 10, 2)->nullable(false);
-            $table->foreign('felhasznalo_id')->references('id')->on('felhasznalok')->onDelete('cascade');
+            $table->foreign('felhasznalo_id')->references('id')->on('felhasznalok')->nullable()->onDelete('cascade');
             $table->timestamp('rendeles_datuma')->useCurrent();
             $table->timestamps();
         });
