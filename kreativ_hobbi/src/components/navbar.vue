@@ -46,23 +46,20 @@ function handleClickOutside(event) {
 //response limitálása
 async function checkUser() {
   try {
-    const response = await axios.get('/api/user', { withCredentials: true });
+    const response = await axios.get('/api/user/check', { withCredentials: true });
 
-    console.log("Navbar user:", response.data);
-    const baseUrl = import.meta.env.VITE_API_URL;
-    const hasProfileImage = response.data.profilKep_id;
+    if (response.data.loggedIn && response.data.user) {
+      const user = response.data.user;
+      const baseUrl = import.meta.env.VITE_API_URL;
+      const hasProfileImage = user.profilKep_id;
 
-    if (response.data && hasProfileImage) {
-      console.log('Has profile image:', response.data);
       userPath.value = '/Profil';
-      isLoggedIn.value = `${baseUrl}/storage/profilKepek/kep_${hasProfileImage}.jpg`;
-      
-    } 
-    else if (response.data) {
-      userPath.value = '/Profil';
-      isLoggedIn.value = `${baseUrl}/storage/profilKepek/default.jpg`;
-    } 
-    else {
+      if (hasProfileImage) {
+        isLoggedIn.value = `${baseUrl}/storage/profilKepek/kep_${hasProfileImage}.jpg`;
+      } else {
+        isLoggedIn.value = `${baseUrl}/storage/profilKepek/default.jpg`;
+      }
+    } else {
       userPath.value = '/Belepes';
       isLoggedIn.value = 'Bejelentkezés';
     }

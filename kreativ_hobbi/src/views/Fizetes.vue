@@ -154,7 +154,9 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { ref, computed, nextTick } from 'vue';
+import { ref, computed, nextTick, inject } from 'vue';
+import axios from 'axios';
+import router from '@/router/router';
 
 const cardNumber = ref('');
 const cardName = ref('');
@@ -162,13 +164,17 @@ const cardMonth = ref('');
 const cardYear = ref('');
 const cardCvv = ref('');
 const isCardFlipped = ref(false);
-
 const showOverlay = ref(false);
 const overlayMessage = ref('');
 
 const minYear = new Date().getFullYear();
 const minMonth = new Date().getMonth() + 1;
-console.log(minMonth);
+
+// Read order payload persisted by Kosar (sessionStorage)
+const stored = typeof window !== 'undefined' ? sessionStorage.getItem('orderPayload') : null;
+const orderPayload = ref(stored ? JSON.parse(stored) : null);
+
+console.log('orderPayload loaded', orderPayload);
 // Single cardType computed property
 const cardType = computed(() => {
   const num = cardNumber.value.replace(/\D/g, ''); // Clean number for detection
@@ -234,7 +240,7 @@ const formatCardNumber = async (event: Event) => {
   }
 };
 
-const submit = () => {
+const submit = async () => {
   if (
     cardNumber.value &&
     cardName.value.length >= 8 &&
@@ -244,6 +250,8 @@ const submit = () => {
   ) {
     overlayMessage.value = 'Card accepted!';
     showOverlay.value = true;
+    console.log('submitting order', orderPayload.value);
+    await submitOrder(orderPayload.value);
 
     // Reset form fields
     cardNumber.value = '';
@@ -261,6 +269,53 @@ const submit = () => {
 const closeOverlay = () => {
   showOverlay.value = false;
 };
+
+async function submitOrder(orderData) {
+    if (!orderData) {
+      overlayMessage.value = 'Nincs rendelési adat. Kérlek térj vissza a kosárhoz.';
+      showOverlay.value = true;
+      return;
+    }
+
+    // Transform to API format: { termekek: [{termek_id, mennyiseg, szin_id}], felhasznalo_id }
+    const apiPayload = {
+      felhasznalo_id: null,
+      termekek: (orderData.items || orderData.termekek || []).map(i => ({
+        termek_id: i.termek_id ?? i.id,
+        mennyiseg: i.mennyiseg ?? i.quantity ?? i.mennyiseg ?? 1,
+        szin_id: i.szin_id ?? null
+      }))
+    }
+
+    try {
+      const res = await axios.post('/api/rendeles', apiPayload)
+      // clear persisted payload on success
+      try { sessionStorage.removeItem('orderPayload') } catch(e){}
+      overlayMessage.value = 'Rendelés sikeresen elküldve!';
+      showOverlay.value = true;
+      router.push('/');
+      return res;
+    } catch (error) {
+      console.error('Error submitting order:', error)
+      // Handle validation errors (422)
+      if (error.response && error.response.status === 422) {
+        const data = error.response.data;
+        let msg = data.message || 'Érvénytelen adatok';
+        if (data.errors) {
+          const errs = Object.values(data.errors).flat().join('\n');
+          msg = errs || msg;
+        }
+        overlayMessage.value = msg;
+        showOverlay.value = true;
+        return;
+      }
+
+      overlayMessage.value = 'Hiba a rendelés elküldése közben.';
+      showOverlay.value = true;
+      return;
+    }
+}
+
 </script>
 
 <style scoped lang="scss">

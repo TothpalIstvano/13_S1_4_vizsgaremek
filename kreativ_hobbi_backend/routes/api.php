@@ -7,7 +7,10 @@ use App\Http\Controllers\KommentController;
 use App\Http\Controllers\ImageController;
 use App\Models\Posztok;
 use App\Models\Termekek;
+use App\Models\Rendelesek;
+use App\Models\RendeltTermekek;
 use App\Models\Cimkek;
+use App\Models\Felhasznalok;
 
 //User related API routes:
 
@@ -143,4 +146,90 @@ Route::post('/posts', function (Request $request) {
 Route::get('/termekek', function () {
     $termekek = Termekek::all('id', 'nev', 'ar', 'leiras', 'darab', 'meter', 'kategoria_id', 'fo_kep_id')->load('TermekKategoria', 'TermekFoKep', 'TermekSzinek', 'TermekCimkek');
     return response()->json($termekek);
+});
+
+Route::get('/termekek/{id}', function ($id) {
+    try {
+        $termek = Termekek::with('TermekKategoria', 'TermekFoKep', 'TermekSzinek', 'TermekCimkek')->find($id);
+        if ($termek) {
+            return response()->json($termek);
+        } else {
+            return response()->json(['error' => 'Termék nem található'], 404);
+        }
+    } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage()], 500);
+    }
+});
+
+Route::post('/rendeles', function (Request $request) {
+    $validated = $request->validate([
+        'felhasznalo_id' => 'nullable|exists:felhasznalok,id',
+        'termekek' => 'required|array|min:1',
+        'termekek.*.termek_id' => 'required|integer|exists:termekek,id',
+        'termekek.*.mennyiseg' => 'required|integer|min:1',
+        'termekek.*.szin_id' => 'nullable|integer|exists:szinek,id'
+    ]);
+
+    // Determine user: authenticated > provided felhasznalo_id > fallback to a shared guest account
+    $userId = Auth::check() ? auth()->id() : ($validated['felhasznalo_id'] ?? null);
+    if (!$userId) {
+        \Log::info('No user supplied for rendelés, using or creating a guest user');
+        $guest = Felhasznalok::firstOrCreate(
+            ['email' => 'guest@local'],
+            ['felhasz_nev' => 'guest', 'jelszo' => \Illuminate\Support\Str::random(12)]
+        );
+        $userId = $guest->id;
+    }
+
+    try {
+        \DB::beginTransaction();
+
+        // Recompute total and validate stock under lock
+        $total = 0;
+        foreach ($validated['termekek'] as $t) {
+            $p = Termekek::lockForUpdate()->find($t['termek_id']);
+            if (!$p) {
+                \DB::rollBack();
+                return response()->json(['message' => "Product {$t['termek_id']} not found"], 404);
+            }
+            if ($p->darab < $t['mennyiseg']) {
+                \DB::rollBack();
+                return response()->json(['message' => "Not enough stock for {$p->nev}"], 422);
+            }
+            $total += $p->ar * $t['mennyiseg'];
+        }
+
+        $rendeles = new Rendelesek();
+        $rendeles->felhasznalo_id = $userId;
+        $rendeles->osszeg = $total;
+        $rendeles->statusz = 'függőben';
+        $rendeles->rendeles_datuma = now();
+        $rendeles->save();
+
+        foreach ($validated['termekek'] as $termek) {
+            $p = Termekek::lockForUpdate()->find($termek['termek_id']);
+
+            $rt = new RendeltTermekek();
+            $rt->rendeles_id = $rendeles->id;
+            $rt->termek_id = $termek['termek_id'];
+            $rt->mennyiseg = $termek['mennyiseg'];
+            $rt->egysegar = $p->ar;
+            $rt->szin_id = $termek['szin_id'] ?? null;
+            $rt->save();
+
+            $p->darab -= $termek['mennyiseg'];
+            $p->save();
+        }
+
+        \DB::commit();
+        return response()->json(['message' => 'Rendelés sikeresen létrehozva', 'rendeles_id' => $rendeles->id], 201);
+    } catch (\Exception $e) {
+        \DB::rollBack();
+        \Log::error('Rendeles creation failed', [
+            'message' => $e->getMessage(),
+            'payload' => $request->all(),
+            'trace' => $e->getTraceAsString(),
+        ]);
+        return response()->json(['message' => 'Server error'], 500);
+    }
 });

@@ -1,508 +1,814 @@
 <template>
   <div class="cart-page">
-    <h2>Your Cart</h2>
+    <!-- Header -->
+    <div class="cart-header">
+      <h1>🛒 kosarad</h1>
+      <p class="header-subtitle">Ellenőrizd a termékeket és fejezd be a rendelésed</p>
+    </div>
+
     <div v-if="cartItems.length > 0" class="cart-container">
+      <!-- Cart Items Section -->
       <div class="cart-items">
-      <div v-for="item in cartItems" :key="item.id" class="cart-item">
-        <img :src="item.image" :alt="item.name" class="cart-item-image" />
-        <div class="cart-item-info">
-          <h3>{{ item.name }}</h3>
-          <p>Price: ${{ item.price }}</p>
-          <p>Quantity: 
-            <button
-              class="button2"
-              id="jobb"
-              @click="decreaseFromCart(item.id)"
-              :disabled="item.quantity <= 1"
-            >-</button>
-            <input 
-              type="number"
-              :min="1"
-              :max="item.quantity"
-              class="number"
-              v-model.number="item.quantity"
-              @input="updateQuantity(item.id, $event.target.value)"
-            >
-            <button
-              class="button2"
-              id="bal"
-              @click="addToCart(item, 1)"
-              :disabled="productStock(item.id) <= 1"
-            >+</button>
-          </p>
-          <p>Total: ${{ (item.price * item.quantity).toFixed(2) }}</p>
-          <button @click="removeFromCart(item.id)" class="remove">Remove</button>
+        <div class="items-header">
+          <span>{{ cartItems.length }} termék</span>
+        </div>
+        
+        <div v-for="item in cartItems" :key="item.id" class="cart-item">
+          <div class="item-image-wrapper">
+            <img :src="item.termek_fo_kep.url_Link || '/src/assets/Public/placeholder.png'" :alt="item.nev" class="cart-item-image" />
+          </div>
+
+          <div class="cart-item-details">
+            <h3 class="item-name">{{ item.nev }}</h3>
+            <p class="item-price">{{ (item.ar || item.price).toLocaleString('hu-HU') }} Ft</p>
+          </div>
+
+          <div class="cart-item-controls">
+            <div class="quantity-control">
+              <button class="qty-btn minus" @click="decreaseFromCart(item.id)" :disabled="item.quantity <= 1">−</button>
+              <input type="number" :min="1" :max="item.darab" class="qty-input" v-model.number="item.quantity" @change="updateQuantity(item.id, item.quantity)" />
+              <button class="qty-btn plus" @click="addOne(item.id)" :disabled="item.quantity >= item.darab">+</button>
+            </div>
+          </div>
+
+          <div class="cart-item-total">
+            <p class="total-text">{{ ((item.ar) * item.quantity).toLocaleString('hu-HU') }} Ft</p>
+          </div>
+
+          <button @click="removeFromCart(item.id)" class="remove-btn" title="Eltávolít">
+            ✕
+          </button>
         </div>
       </div>
-      </div>
-      <div class="cart-summary">
-    <div class="cart-summary">
-      <h2>Cart Summary</h2>
-      <p class="total-price">Items: {{ cartItems.reduce((total, item) => total + item.quantity, 0) }}</p>
-      <p class="total-price">Total: ${{ cartTotal }}</p>
 
-      <!-- Delivery Information Form -->
-      <div class="delivery-form">
-        <h3>Delivery Information</h3>
-        <form @submit.prevent="handleSubmit">
-          <div class="form-group">
-            <label for="fullName">Full Name:</label>
-            <input 
-              type="text" 
-              id="fullName" 
-              v-model="deliveryDetails.fullName" 
-              required
-            >
+      <!-- Summary Sidebar -->
+      <div class="cart-sidebar">
+        <!-- Order Summary -->
+        <div class="summary-card">
+          <h2 class="summary-title">Rendelés Összegzés</h2>
+          
+          <div class="summary-row">
+            <span class="summary-label">Tételek száma:</span>
+            <span class="summary-value">{{ cartItems.reduce((t, i) => t + i.quantity, 0) }}</span>
           </div>
 
-          <div class="form-group">
-            <label for="email">Email:</label>
-            <input 
-              type="email" 
-              id="email" 
-              v-model="deliveryDetails.email" 
-              required
-            >
-          </div>
+          <div class="summary-divider"></div>
 
-          <div class="form-group">
-            <label for="address">Street Address:</label>
-            <input 
-              type="text" 
-              id="address" 
-              v-model="deliveryDetails.address" 
-              required
-            >
+          <div class="summary-row total">
+            <span class="summary-label">Végösszeg:</span>
+            <span class="summary-value-total">{{ cartTotal.toLocaleString('hu-HU') }} Ft</span>
           </div>
+        </div>
 
-          <div class="form-row">
+        <!-- Delivery Form -->
+        <div class="delivery-card">
+          <h3 class="delivery-title">Szállítási Adatok</h3>
+          
+          <form @submit.prevent="checkout">
             <div class="form-group">
-              <label for="city">City:</label>
+              <label for="fullName">Teljes Név *</label>
               <input 
-                type="text" 
-                id="city" 
-                v-model="deliveryDetails.city" 
-                required
-              >
+                id="fullName" 
+                v-model="deliveryDetails.fullName" 
+                placeholder="Pl. Nagy János"
+                required 
+              />
             </div>
 
             <div class="form-group">
-              <label for="zipCode">ZIP Code:</label>
+              <label for="email">Email Cím *</label>
               <input 
-                type="text" 
-                id="zipCode" 
-                v-model="deliveryDetails.zipCode" 
-                required
-                pattern="\d{4,5}"
-              >
+                id="email" 
+                type="email" 
+                v-model="deliveryDetails.email" 
+                placeholder="janos@example.com"
+                required 
+              />
             </div>
-          </div>
 
-          <div class="form-group">
-            <label for="phone">Phone Number:</label>
-            <input 
-              type="tel" 
-              id="phone" 
-              v-model="deliveryDetails.phone" 
-              required
-              pattern="[0-9]{9,11}"
-            >
-          </div>
-        </form>
+            <div class="form-group">
+              <label for="address">Szállítási Cím *</label>
+              <input 
+                id="address" 
+                v-model="deliveryDetails.address" 
+                placeholder="Utca, házszám"
+                required 
+              />
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="city">Város *</label>
+                <input 
+                  id="city" 
+                  v-model="deliveryDetails.city" 
+                  placeholder="Budapest"
+                  required 
+                />
+              </div>
+              <div class="form-group">
+                <label for="zipCode">
+                  Irányítószám *
+                  <span v-if="zipCodeError" class="error-indicator">⚠</span>
+                  <span v-else-if="zipCodeValid" class="success-indicator">✓</span>
+                </label>
+                <input 
+                  id="zipCode" 
+                  v-model="deliveryDetails.zipCode" 
+                  type="text"
+                  placeholder="1000"
+                  required 
+                  @blur="validateZipCode"
+                  @keyup.enter="validateZipCode"
+                  :class="{ 'input-error': zipCodeError, 'input-success': zipCodeValid }"
+                  maxlength="5"
+                />
+                <span v-if="zipCodeError" class="error-message">{{ zipCodeError }}</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="phone">Telefonszám *</label>
+              <input 
+                id="phone" 
+                v-model="deliveryDetails.phone" 
+                placeholder="+36 30 123 4567"
+                required 
+                inputmode="tel"
+                aria-describedby="phoneHelp"
+              />
+              <small id="phoneHelp" class="help-text">Formátum: min. 9 számjegy; szóköz, + és - engedélyezett.</small>
+            </div>
+          </form>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+          <button id="checkout" @click="checkout" class="btn-primary">
+            <span>✓</span> Rendelés Véglegesítése
+          </button>
+          <button id="emptyCart" @click="emptyCart(true)" class="btn-secondary">
+            <span>🗑</span> Kosár Ürítése
+          </button>
+        </div>
       </div>
+    </div>
 
-      <button @click="checkout" id="checkout">Checkout</button>
-      <button @click="emptyCart(false)" id="emptyCart">Empty Cart</button>
+    <!-- Empty State -->
+    <div v-else class="empty-state">
+      <div class="empty-icon">🛒</div>
+      <h2>A kosárod üres</h2>
+      <p>Még nincs termék a kosárban. Nézz körül a boltban és válassz szét, amit szívesen megvennél!</p>
+      <router-link to="/aruhaz" class="btn-primary">
+        <span>→</span> Vissza az Áruházba
+      </router-link>
     </div>
-  </div>
-    </div>
-    <p v-else>Your cart is currently empty. <br> Browse our shop to find amazing products and add them to your cart. <br> Once you've added items, they'll appear here for checkout!</p>
   </div>
 </template>
 
 <script setup>
+import { ref, computed, provide } from 'vue'
+import { useRouter } from 'vue-router'
+import { useCartStore } from '@/stores/cartStore'
 
+const router = useRouter()
+const cartStore = useCartStore()
+const cartItems = cartStore.cartItems
+
+const deliveryDetails = ref({
+  fullName: '',
+  email: '',
+  address: '',
+  city: '',
+  zipCode: '',
+  phone: ''
+})
+
+const zipCodeError = ref('')
+const zipCodeValid = ref(false)
+
+const cartTotal = computed(() => {
+  return cartItems.reduce((s, i) => s + (Number(i.ar || i.price) * Number(i.quantity || 0)), 0)
+})
+
+function addOne(id) {
+  cartStore.updateQuantity(id, (cartStore.cartItems.find(i => i.id === id)?.quantity || 0) + 1)
+}
+
+function decreaseFromCart(id) {
+  const item = cartStore.cartItems.find(i => i.id === id)
+  if (!item) return
+  if (item.quantity > 1) {
+    cartStore.updateQuantity(id, item.quantity - 1)
+  } else {
+    cartStore.removeFromCart(id)
+  }
+}
+
+function updateQuantity(id, value) {
+  cartStore.updateQuantity(id, value)
+}
+
+function removeFromCart(id) {
+  cartStore.removeFromCart(id)
+}
+
+function emptyCart(confirmPrompt = true) {
+  if (confirmPrompt && !confirm('Biztosan üríteni szeretnéd a kosarat?')) return
+  cartStore.clearCart()
+}
+
+function validateZipCode() {
+  const value = deliveryDetails.value.zipCode.trim()
+  
+  // Üres érték - nincs hiba, csak nem valid
+  if (!value) {
+    zipCodeError.value = ''
+    zipCodeValid.value = false
+    return
+  }
+
+  // Csak számokat engedünk meg
+  if (!/^\d+$/.test(value)) {
+    zipCodeError.value = 'Csak számok engedélyezve!'
+    zipCodeValid.value = false
+    return
+  }
+
+  // Hossz ellenőrzés - magyar irányítószámok 4-5 számjegyűek
+  if (value.length < 4) {
+    zipCodeError.value = `Túl rövid (${value.length}/4-5 számjegy)`
+    zipCodeValid.value = false
+    return
+  }
+
+  if (value.length > 5) {
+    zipCodeError.value = 'Túl hosszú (max 5 számjegy)'
+    zipCodeValid.value = false
+    return
+  }
+
+  // Sikeres validáció
+  zipCodeError.value = ''
+  zipCodeValid.value = true
+}
+
+const payload = ref({})
+async function checkout() {
+  const currentCart = (cartItems && cartItems.value) ? cartItems.value : (cartStore && cartStore.cartItems ? cartStore.cartItems : [])
+  if (!currentCart.length) {
+    alert('A kosarad üres')
+    return
+  }
+  const d = deliveryDetails.value
+  if (!d.fullName || !d.email || !d.address || !d.city || !d.zipCode || !d.phone) {
+    alert('Kérlek töltsd ki az összes szállítási adatot')
+    return
+  }
+
+  // Irányítószám validáció a checkout előtt
+  if (!zipCodeValid.value) {
+    alert('Az irányítószám nem érvényes!\n\nMagyar irányítószámok: 4-5 számjegy')
+    return
+  }
+
+  // Egyszerű telefonszám ellenőrzés: legalább 9 számjegy
+  const phoneDigits = (d.phone || '').replace(/\D/g, '')
+  if (phoneDigits.length < 9) {
+    alert('A telefonszám érvénytelen (minimum 9 számjegy).')
+    return
+  }
+
+  payload.value = {
+    delivery: { name: d.fullName, address: d.address, zip: d.zipCode, email: d.email, phone: d.phone, city: d.city },
+    items: currentCart.map(i => ({ id: i.id, mennyiseg: i.quantity, szin_id: i.selectedColor?.id ?? null }))
+  }
+
+  // Persist payload across routes (provide/inject doesn't work across route navigation)
+  try {
+    sessionStorage.setItem('orderPayload', JSON.stringify(payload.value))
+  } catch (e) {
+    console.warn('Could not persist order payload to sessionStorage', e)
+  }
+
+  router.push({ path: '/kosar/fizetes' })
+}
 </script>
 
 <style scoped>
+* { box-sizing: border-box; }
 
-/* Delivery Form Styling */
-.delivery-form {
-  margin: 25px 0;
-  padding: 25px;
-  border: 1px solid #e0e0e0;
-  border-radius: 12px;
-  background: #ffffff;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  
+.cart-page {
+  min-height: 100vh;
+  padding: 40px 24px;
 }
 
-.delivery-form h3 {
-  margin: 0 0 25px 0;
-  color: #2c3e50;
-  font-size: 1.4rem;
+/* Header */
+.cart-header {
+  text-align: center;
+  margin-bottom: 48px;
+  animation: slideDown 0.6s ease-out;
+}
+
+.cart-header h1 {
+  font-size: 2.5rem;
+  color: #1a2332;
+  margin: 0 0 8px 0;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.header-subtitle {
+  color: #6b7280;
+  font-size: 16px;
+  margin: 0;
+}
+
+/* Main Container */
+.cart-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  gap: 32px;
+  align-items: flex-start;
+}
+
+/* Cart Items Section */
+.cart-items {
+  flex: 1;
+}
+
+.items-header {
+  background: white;
+  padding: 16px 20px;
+  border-radius: 12px 12px 0 0;
+  border-bottom: 2px solid #f0f1f3;
   font-weight: 600;
-  border-bottom: 2px solid #f0f0f0;
-  padding-bottom: 15px;
+  color: #2c3e50;
+  font-size: 14px;
 }
 
-.form-group {
-  margin-bottom: 20px;
+.cart-item {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-top: none;
+  padding: 20px;
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.cart-item:last-child {
+  border-radius: 0 0 12px 12px;
+}
+
+.cart-item:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.item-image-wrapper {
+  flex-shrink: 0;
+}
+
+.cart-item-image {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 10px;
+  background: #f3f4f6;
+}
+
+.cart-item-details {
+  flex: 1;
   text-align: left;
 }
 
-.form-group label {
-  display: block;
-  margin-bottom: 8px;
+.item-name {
+  margin: 0 0 8px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #1a2332;
+}
+
+.item-price {
+  margin: 0;
+  color: #059669;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.cart-item-controls {
+  display: flex;
+  align-items: center;
+}
+
+.quantity-control {
+  display: flex;
+  align-items: center;
+  background: #f3f4f6;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.qty-btn {
+  background: white;
+  border: none;
+  width: 36px;
+  height: 36px;
+  cursor: pointer;
+  font-weight: 600;
+  color: #3f51b5;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.qty-btn:hover:not(:disabled) {
+  background: #3f51b5;
+  color: white;
+}
+
+.qty-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.qty-input {
+  width: 50px;
+  height: 36px;
+  border: none;
+  background: #f3f4f6;
+  text-align: center;
+  font-weight: 600;
+  color: #1a2332;
+  font-size: 14px;
+}
+
+.qty-input:focus {
+  outline: none;
+  background: white;
+}
+
+.cart-item-total {
+  text-align: right;
+  min-width: 120px;
+  flex-shrink: 0;
+}
+
+.total-text {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #1a2332;
+}
+
+.remove-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #fee2e2;
+  border: none;
+  color: #dc2626;
+  cursor: pointer;
+  font-size: 20px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.remove-btn:hover {
+  background: #dc2626;
+  color: white;
+  transform: scale(1.1);
+}
+
+/* Sidebar */
+.cart-sidebar {
+  width: 380px;
+  position: sticky;
+  top: 20px;
+}
+
+.summary-card,
+.delivery-card {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e5e7eb;
+}
+
+.summary-title,
+.delivery-title {
+  margin: 0 0 20px 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #1a2332;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  font-size: 14px;
+}
+
+.summary-label {
+  color: #6b7280;
   font-weight: 500;
-  color: #4a5568;
-  font-size: 0.95rem;
+}
+
+.summary-value {
+  color: #1a2332;
+  font-weight: 600;
+}
+
+.summary-divider {
+  height: 1px;
+  background: #e5e7eb;
+  margin: 16px 0;
+}
+
+.summary-row.total {
+  padding: 16px 0 0 0;
+  border-top: 2px solid #f0f1f3;
+  font-size: 16px;
+}
+
+.summary-value-total {
+  color: #059669;
+  font-weight: 700;
+  font-size: 20px;
+}
+
+/* Delivery Form */
+.delivery-card form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #4b5563;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .form-group input {
-  width: 90%;
-  padding: 10px 15px;
-  border: 2px solid #e2e8f0;
+  padding: 12px 14px;
+  border: 2px solid #e5e7eb;
   border-radius: 8px;
-  font-size: 1rem;
-  transition: all 0.3s ease;
-  background: #f8fafc;
+  font-size: 14px;
+  color: #1a2332;
+  transition: all 0.2s;
+  background: #f9fafb;
 }
 
 .form-group input:focus {
   outline: none;
-  border-color: #439a57;
-  background: #ffffff;
-  box-shadow: 0 0 0 3px rgba(67, 154, 87, 0.1);
+  border-color: #3f51b5;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(63, 81, 181, 0.1);
+}
+
+.form-group input::placeholder {
+  color: #9ca3af;
+}
+
+.form-group input.input-error {
+  border-color: #dc2626 !important;
+  background: #fef2f2 !important;
+}
+
+.form-group input.input-error:focus {
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1) !important;
+}
+
+.form-group input.input-success {
+  border-color: #059669 !important;
+  background: #f0fdf4 !important;
+}
+
+.form-group input.input-success:focus {
+  box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1) !important;
+}
+
+.error-message {
+  font-size: 12px;
+  color: #dc2626;
+  font-weight: 600;
+  margin-top: 4px;
+  display: block;
+  animation: shake 0.3s ease-in-out;
+}
+
+.error-indicator {
+  color: #dc2626;
+  margin-left: 6px;
+  font-weight: bold;
+}
+
+.success-indicator {
+  color: #059669;
+  margin-left: 6px;
+  font-weight: bold;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
 }
 
 .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  margin-bottom: 20px;
+  gap: 14px;
 }
 
-/* Validation Styles */
-.form-group input:invalid:not(:focus):not(:placeholder-shown) {
-  border-color: #fc8181;
-}
-
-.form-group input:invalid:not(:focus):not(:placeholder-shown) + .error-message {
-  display: block;
-}
-
-/* Button Container */
-.checkout-actions {
-  margin-top: 25px;
+/* Action Buttons */
+.action-buttons {
   display: flex;
-  gap: 15px;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: 12px;
 }
 
-/* Enhanced Checkout Button */
-#checkout {
-  background-color: #439a57;
-  color: white;
+.btn-primary,
+.btn-secondary {
+  padding: 14px 24px;
   border: none;
-  border-radius: 8px;
-  padding: 12px 25px;
-  font-size: 1.1rem;
-  font-weight: 600;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
   transition: all 0.3s ease;
-  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-decoration: none;
+  text-align: center;
 }
 
-#checkout:hover {
-  background-color: #218838;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(33, 136, 56, 0.2);
+.btn-primary {
+  background:  #0fe020;
+  color: white;
+  box-shadow: 0 4px 16px rgba(63, 81, 181, 0.3);
 }
 
-#checkout:active {
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(63, 81, 181, 0.4);
+}
+
+.btn-primary:active {
   transform: translateY(0);
 }
 
-/* Empty Cart Button */
-#emptyCart {
-  background-color: #c24653;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  padding: 12px 25px;
-  font-size: 1.1rem;
-  transition: all 0.3s ease;
+.btn-secondary {
+  background: white;
+  color: #dc2626;
+  border: 2px solid #fecaca;
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.1);
 }
 
-#emptyCart:hover {
-  background-color: #c82333;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(200, 35, 51, 0.2);
+.btn-secondary:hover {
+  background: #fee2e2;
+  border-color: #dc2626;
 }
 
-@media (max-width: 768px) {
+/* Empty State */
+.empty-state {
+  text-align: center;
+  background: white;
+  border-radius: 16px;
+  padding: 60px 40px;
+  max-width: 500px;
+  margin: 0 auto;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.empty-icon {
+  font-size: 80px;
+  margin-bottom: 24px;
+  display: block;
+}
+
+.empty-state h2 {
+  margin: 0 0 12px 0;
+  color: #1a2332;
+  font-size: 28px;
+}
+
+.empty-state p {
+  margin: 0 0 32px 0;
+  color: #6b7280;
+  line-height: 1.6;
+}
+
+.empty-state .btn-primary {
+  max-width: 100%;
+  margin: 0 auto;
+  display: inline-flex;
+}
+
+/* Animations */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive */
+@media (max-width: 900px) {
   .cart-container {
     flex-direction: column;
+    gap: 24px;
   }
-  
-  .cart-items,
-  .cart-summary {
-    min-width: 100%;
-    max-width: 100%;
-  }
-}
 
-@media (max-width: 768px) {
-  .delivery-form {
-    padding: 20px;
+  .cart-sidebar {
+    width: 100%;
+    position: static;
   }
-  
+
+  .cart-header h1 {
+    font-size: 2rem;
+  }
+
+  .cart-item {
+    flex-wrap: wrap;
+  }
+
   .form-row {
     grid-template-columns: 1fr;
-    gap: 15px;
-  }
-  
-  .checkout-actions {
-    flex-direction: column;
-  }
-  
-  #checkout,
-  #emptyCart {
-    width: 100%;
   }
 }
 
-/* Matching Existing Cart Style */
-.delivery-form {
-  background-color: #f6f6f6;
-  border-color: #ddd;
-}
+@media (max-width: 600px) {
+  .cart-page {
+    padding: 24px 16px;
+  }
 
-.delivery-form h3 {
-  color: #2c3e50;
-  text-shadow: none;
-}
+  .cart-header h1 {
+    font-size: 1.5rem;
+  }
 
-.form-group input {
-  border-color: #cbd5e0;
-}
+  .cart-item {
+    padding: 16px;
+    gap: 12px;
+  }
 
-.form-group input:focus {
-  border-color: #2c3e50;
-}
-/* Add/update these styles */
-.button2 {
-  padding: 5px 12px;
-  background-color: #ffffff;
-  border: 1px solid #575656;
-  cursor: pointer;
-  transition: all 0.3s;
-  font-weight: 500;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
+  .cart-item-image {
+    width: 100px;
+    height: 100px;
+  }
 
-.button2:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  background-color: #f0f0f0;
-}
+  .item-name {
+    font-size: 16px;
+  }
 
-.button2:active:not(:disabled) {
-  transform: scale(0.95);
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
-  background-color: #d0d0d0;
-  transition: all 0.1s ease;
-}
+  .summary-card,
+  .delivery-card {
+    padding: 18px;
+  }
 
-.number {
-  -moz-appearance: textfield;
-  -webkit-appearance: none;
-  appearance: none;
-  width: 60px;
-  text-align: center;
-  margin: 0 5px;
-  padding: 5px;
-  border: 1px solid #000000;
-  border-radius: 4px;
-}
+  .btn-primary,
+  .btn-secondary {
+    padding: 12px 16px;
+    font-size: 14px;
+  }
 
-.number::-webkit-inner-spin-button,
-.number::-webkit-outer-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
+  .empty-state {
+    padding: 40px 20px;
+  }
 
-#bal {
-  border-radius: 0px 10px 10px 0px;
-}
+  .empty-icon {
+    font-size: 60px;
+  }
 
-#jobb {
-  border-radius: 10px 0px 0px 10px;
-  padding: 5px 14px;
-  font-weight: 700;
-}
-
-/* Update existing button styles to match */
-.remove, #checkout, #emptyCart {
-  border-radius: 20px;
-  transition: all 0.2s ease;
-}
-
-.remove:hover, #checkout:hover, #emptyCart:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
-}
-
-
-.cart-page {
-  display: flex;
-  flex-direction: column;
-  align-items: center; /* Center content horizontally */
-  justify-content: center; /* Center content vertically */
-  text-align: center; /* Center text */
-  padding: 20px;
-}
-
-.cart-item {
-  display: flex;
-  align-items: center; /* Center items vertically */
-  justify-content: center; /* Center items horizontally */
-  margin-bottom: 20px;
-  width: 90%; /* Adjust width for better alignment */
-  border: 1px solid #ddd;
-  padding: 10px;
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  background-color: #f6f6f6;
-}
-
-.cart-item-image {
-  width: 100px;
-  margin-right: 20px;
-}
-
-.cart-item-info {
-  flex: 1;
-  text-align: left; /* Align text to the left inside the item */
-}
-
-button {
-  margin-top: 10px;
-}
-
-.cart-page h2 {
-  margin-bottom: 20px;
-  font-size: 24px;
-  font-weight: bold;
-}
-
-.cart-page {
-  padding: 20px;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-.cart-page h2 {
-  margin-bottom: 20px;
-  font-size: 24px;
-  font-weight: bold;
-  text-align: center;
-  margin-left: 30px;
-}
-
-.cart-container {
-  display: flex;
-  gap: 60px;
-  width: 100%;
-}
-
-.cart-items {
-  flex: 1;
-  min-width: 400px;
-}
-
-.cart-summary {
-  flex: 1;
-  padding: 20px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  height: fit-content;
-  position: sticky;
-  top: 20px;
-  background-color: #f6f6f6;
-  text-align: center;
-  min-width: 400px; /* Set a minimum width for the form */
-  max-width: 600px; /* Set a maximum width if needed */
-}
-
-.cart-item {
-  display: flex;
-  align-items: center;
-  margin-bottom: 20px;
-  border: 1px solid #ddd;
-  padding: 10px;
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-.cart-item-image {
-  width: 100px;
-  margin-right: 20px;
-}
-
-.cart-item-info {
-  flex: 1;
-  text-align: left;
-}
-
-.plus, .minus {
-  cursor: pointer;
-  background-color: #656565;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  padding: 5px 10px;
-}
-
-.remove {
-  cursor: pointer;
-  background-color: #5f3535;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  padding: 8px 18px;
-}
-
-.total-price {
-  font-size: 18px;
-  font-weight: bold;
-  margin-bottom: 20px;
-}
-
-#checkout {
-  background-color: #439a57;
-  margin-right: 10px;
-  cursor: pointer;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  padding: 8px 18px;
-}
-
-#checkout:hover {
-  background-color: #218838;
-}
-
-#emptyCart {
-  background-color: #c24653;
-  cursor: pointer;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  padding: 8px 18px;
-}
-
-#emptyCart:hover {
-  background-color: #c82333;
+  .empty-state h2 {
+    font-size: 22px;
+  }
 }
 </style>

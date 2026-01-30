@@ -25,6 +25,6 @@ class RendeltTermekek extends Model
         return $this->belongsTo(Termekek::class, 'termekek_id', 'id');
     }
     public function szin(){
-        return $this->belongsTo(termekSzinek::class, 'szin_id', 'id');
+        return $this->belongsTo(Szinek::class, 'szin_id', 'id');
     }
 }
