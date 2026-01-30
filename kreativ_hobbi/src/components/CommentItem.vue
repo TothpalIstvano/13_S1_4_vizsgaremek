@@ -19,7 +19,6 @@ const props = defineProps({
 
 const emit = defineEmits(['reply', 'delete'])
 
-// Remove auth logic - let the parent handle delete authorization
 const formatDate = (dateString) => {
   if (!dateString) return ''
   const date = new Date(dateString)
@@ -50,7 +49,6 @@ const formatDate = (dateString) => {
         </div>
       </div>
       
-      <!-- Always show delete button - parent component handles auth -->
       <button 
         @click="$emit('delete', comment.id)" 
         class="delete-btn"
@@ -77,7 +75,6 @@ const formatDate = (dateString) => {
       </button>
     </div>
     
-    <!-- Replies -->
     <div v-if="comment.gyermekKommentek && comment.gyermekKommentek.length > 0" class="replies">
       <CommentItem 
         v-for="reply in comment.gyermekKommentek" 
@@ -267,7 +264,6 @@ const formatDate = (dateString) => {
   position: relative;
 }
 
-/* Animation for new comments */
 .comment-item-enter-active {
   animation: slideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -283,7 +279,6 @@ const formatDate = (dateString) => {
   }
 }
 
-/* Responsive */
 @media (max-width: 640px) {
   .comment-item {
     padding: 20px;

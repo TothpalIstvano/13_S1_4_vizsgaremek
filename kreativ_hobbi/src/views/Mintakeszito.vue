@@ -71,7 +71,6 @@ function kepfeltoltes(event) {
       img.onload = () => {
         aktualisKep.value = img
         betoltottKep.value = true
-        // Process immediately when image loads
         if (pixelesKep.value) {
           nextTick(() => {
             canvasFeldolgozas(img)
@@ -89,8 +88,6 @@ function toMintavaltoztato() {
  if (file.value) {
     pixelesKep.value = true
     betoltesKorabbrol()
-    // Wait for the view to render and then process the image
-    // Wait for DOM update and ensure canvas is ready
     nextTick(() => {
       setTimeout(() => {
         if (aktualisKep.value && betoltottKep.value && canvas.value) {
@@ -121,7 +118,6 @@ function automatikusSzinCsoportositas(pixelAdatok = null) {
   
   const szinGyakorisag = {}
   
-  // Count color frequency from current pixel data
   pixelSorok.value.forEach(row => {
     row.pixels.forEach(pixel => {
       const color = pixel.color
@@ -129,13 +125,11 @@ function automatikusSzinCsoportositas(pixelAdatok = null) {
     })
   })
   
-  // Sort colors by frequency and take the most frequent ones
   const leggyakoribbSzinek = Object.entries(szinGyakorisag)
     .sort(([,a], [,b]) => b - a)
     .slice(0, szinSzam.value)
     .map(([color]) => color)
   
-  // Update palette with most frequent colors
   szinPaletta.value = leggyakoribbSzinek.map((color, index) => ({
     id: index,
     eredeti: color,
@@ -143,16 +137,13 @@ function automatikusSzinCsoportositas(pixelAdatok = null) {
     hasznalva: true
   }))
   
-  // Update all pixels to use the new limited palette
   pixelSorok.value.forEach(row => {
     row.pixels.forEach(pixel => {
-      // Find the closest color in the new limited palette
       pixel.color = legkozelebbiSzinKereses(pixel.color, szinPaletta.value)
     })
   })
 }
 
-// Pixelation functions from tapestry.vue (fixed version)
 function canvasFeldolgozas(img) {
   if (!canvas.value || !canvas.value.getContext) {
     setTimeout(() => {
@@ -163,14 +154,12 @@ function canvasFeldolgozas(img) {
     return
   }
 
-  // Now we know canvas is ready, proceed with the actual processing
   processImageWithColors(img)
 }
 
 function processImageWithColors(img) {
   const pxMeret = parseInt(pixelMeret.value)
   
-  // Use original image dimensions
   const szelesseg = img.width
   const magassag = img.height
   
@@ -188,14 +177,12 @@ function processImageWithColors(img) {
   
   pixelSorok.value = []
 
-  // Initialize checked rows
   for (let i = 0; i < rows; i++) {
     if (pipaltSorok[i] === undefined) {
       pipaltSorok[i] = false
     }
   }
 
-  // First pass: collect all pixel colors
   const szinGyakorisag = {}
   const atmenetiPixelAdatok = []
 
@@ -213,13 +200,11 @@ function processImageWithColors(img) {
     atmenetiPixelAdatok.push({ pixels })
   }
 
-  // Create limited palette based on szinSzam
   const leggyakoribbSzinek = Object.entries(szinGyakorisag)
     .sort(([,a], [,b]) => b - a)
     .slice(0, szinSzam.value)
     .map(([color]) => color)
   
-  // Update palette
   szinPaletta.value = leggyakoribbSzinek.map((color, index) => ({
     id: index,
     eredeti: color,
@@ -227,13 +212,11 @@ function processImageWithColors(img) {
     hasznalva: true
   }))
 
-  // Second pass: apply color limitation using the palette
   for (let y = 0; y < rows; y++) {
     const pixels = []
     for (let x = 0; x < cols; x++) {
       const originalColor = atmenetiPixelAdatok[y].pixels[x].originalColor
       
-      // Find the closest color in our limited palette
       const legkozelebbiSzin = legkozelebbiSzinKereses(originalColor, szinPaletta.value)
       
       pixels.push({
@@ -247,7 +230,6 @@ function processImageWithColors(img) {
   }
 }
 
-// Add this function for finding closest color
 function legkozelebbiSzinKereses(color, palette) {
     if (palette.length === 0) return color
   
@@ -259,7 +241,6 @@ function legkozelebbiSzinKereses(color, palette) {
   palette.forEach((szinObj, index) => {
     const [r2, g2, b2] = szinObj.jelenlegi.match(/\d+/g).map(Number)
     
-    // Improved color distance calculation using Delta E (perceptual difference)
     const tavolsag = szinTavolsag(r1, g1, b1, r2, g2, b2)
     
     if (tavolsag < legkisebbTavolsag) {
@@ -271,26 +252,15 @@ function legkozelebbiSzinKereses(color, palette) {
   return palette[legkozelebbiIndex].jelenlegi
 }
 
-// Improved color distance calculation
 function szinTavolsag(r1, g1, b1, r2, g2, b2) {
-  // Convert RGB to Lab for better perceptual difference
   const lab1 = rgbToLab(r1, g1, b1)
   const lab2 = rgbToLab(r2, g2, b2)
   
-  // Delta E 2000 formula (complex but very accurate)
   return deltaE00(lab1, lab2)
-  
-  // Simpler alternative: weighted Euclidean distance
-  // return Math.sqrt(
-  //   Math.pow((r1 - r2) * 0.3, 2) +
-  //   Math.pow((g1 - g2) * 0.59, 2) + 
-  //   Math.pow((b1 - b2) * 0.11, 2)
-  // )
+
 }
 
-// RGB to Lab conversion helpers
 function rgbToLab(r, g, b) {
-  // First convert RGB to XYZ
   let rn = r / 255
   let gn = g / 255
   let bn = b / 255
@@ -307,7 +277,6 @@ function rgbToLab(r, g, b) {
   const y = rn * 0.2126 + gn * 0.7152 + bn * 0.0722
   const z = rn * 0.0193 + gn * 0.1192 + bn * 0.9505
   
-  // Then convert XYZ to Lab
   const xn = 95.047
   const yn = 100.0
   const zn = 108.883
@@ -327,7 +296,6 @@ function rgbToLab(r, g, b) {
   }
 }
 
-// Delta E 2000 calculation
 function deltaE00(lab1, lab2) {
   const L1 = lab1.l, a1 = lab1.a, b1 = lab1.b
   const L2 = lab2.l, a2 = lab2.a, b2 = lab2.b
@@ -339,7 +307,7 @@ function deltaE00(lab1, lab2) {
   
   const aC = (C1 + C2) / 2
   const aC7 = Math.pow(aC, 7)
-  const G = 0.5 * (1 - Math.sqrt(aC7 / (aC7 + 6103515625))) // 25^7
+  const G = 0.5 * (1 - Math.sqrt(aC7 / (aC7 + 6103515625)))
   
   const a1p = a1 * (1 + G)
   const a2p = a2 * (1 + G)
@@ -389,8 +357,7 @@ function deltaE00(lab1, lab2) {
 
 function osszevontSzin(data, width, height, startX, startY, blockSize) {
   let r = 0, g = 0, b = 0, a = 0, count = 0
-  
-  // Different sampling strategies for better accuracy
+
   const pixels = []
   
   for (let y = startY; y < startY + blockSize && y < height; y++) {
@@ -417,57 +384,18 @@ function osszevontSzin(data, width, height, startX, startY, blockSize) {
     return { r: 0, g: 0, b: 0, a: 0 }
   }
 
-  // Strategy 1: Simple average (current method)
-  const averageColor = {
-    r: Math.round(r / count),
-    g: Math.round(g / count),
-    b: Math.round(b / count),
-    a: a / count / 255
-  }
-
-  // Strategy 2: Median color (reduces outlier influence)
-  const medianColor = getMedianColor(pixels)
-  
-  // Strategy 3: Dominant color (most frequent color in the block)
   const dominantColor = getDominantColor(pixels)
-  
-  // Strategy 4: Weighted average based on luminance (human perception)
-  const perceptualColor = getPerceptualColor(pixels)
-  
-  // You can choose which strategy to use:
-  // return averageColor; // Simple but fast
-  // return medianColor; // Better for images with noise
-  return dominantColor; // Best for preserving important colors
-  // return perceptualColor; // Most accurate for human vision
+
+  return dominantColor;
 }
 
-// Helper function to get median color (reduces outlier influence)
-function getMedianColor(pixels) {
-  if (pixels.length === 0) return { r: 0, g: 0, b: 0, a: 1 }
-  
-  const rValues = pixels.map(p => p.r).sort((a, b) => a - b)
-  const gValues = pixels.map(p => p.g).sort((a, b) => a - b)
-  const bValues = pixels.map(p => p.b).sort((a, b) => a - b)
-  
-  const mid = Math.floor(pixels.length / 2)
-  
-  return {
-    r: pixels.length % 2 === 0 ? Math.round((rValues[mid - 1] + rValues[mid]) / 2) : rValues[mid],
-    g: pixels.length % 2 === 0 ? Math.round((gValues[mid - 1] + gValues[mid]) / 2) : gValues[mid],
-    b: pixels.length % 2 === 0 ? Math.round((bValues[mid - 1] + bValues[mid]) / 2) : bValues[mid],
-    a: 1
-  }
-}
-
-// Helper function to get dominant color (most frequent)
 function getDominantColor(pixels) {
   if (pixels.length === 0) return { r: 0, g: 0, b: 0, a: 1 }
   
   const colorMap = new Map()
-  const tolerance = 10 // Color grouping tolerance
+  const tolerance = 10 
   
   pixels.forEach(pixel => {
-    // Quantize colors to reduce noise
     const quantizedR = Math.round(pixel.r / tolerance) * tolerance
     const quantizedG = Math.round(pixel.g / tolerance) * tolerance
     const quantizedB = Math.round(pixel.b / tolerance) * tolerance
@@ -476,7 +404,6 @@ function getDominantColor(pixels) {
     colorMap.set(key, (colorMap.get(key) || 0) + 1)
   })
   
-  // Find the most frequent color
   let maxCount = 0
   let dominantKey = ''
   
@@ -490,31 +417,6 @@ function getDominantColor(pixels) {
   const [r, g, b] = dominantKey.split(',').map(Number)
   
   return { r, g, b, a: 1 }
-}
-
-// Helper function for perceptual color (weighted by luminance)
-function getPerceptualColor(pixels) {
-  if (pixels.length === 0) return { r: 0, g: 0, b: 0, a: 1 }
-  
-  let r = 0, g = 0, b = 0, totalWeight = 0
-  
-  pixels.forEach(pixel => {
-    // Calculate luminance (human perception weights)
-    const luminance = 0.299 * pixel.r + 0.587 * pixel.g + 0.114 * pixel.b
-    const weight = luminance / 255 // Normalize weight
-    
-    r += pixel.r * weight
-    g += pixel.g * weight
-    b += pixel.b * weight
-    totalWeight += weight
-  })
-  
-  return {
-    r: Math.round(r / totalWeight),
-    g: Math.round(g / totalWeight),
-    b: Math.round(b / totalWeight),
-    a: 1
-  }
 }
 
 function sorLathatosagValtas(rowIndex) {
@@ -534,10 +436,8 @@ function szinFrissites() {
     const ujSzinErtek = ujSzin.value
     const ujSzinRgb = hexToRgb(ujSzinErtek)
     
-    // Update the color in palette
     szinPaletta.value[kivalasztottSzinIndex.value].jelenlegi = ujSzinRgb
     
-    // Update all pixels that exactly match the old palette color
     pixelSorok.value.forEach(row => {
         row.pixels.forEach(pixel => {
             if (pixel.color === regiSzin) {
@@ -550,9 +450,7 @@ function szinFrissites() {
     kivalasztottSzinIndex.value = null
 }
 
-// Helper functions for color conversion
 function rgbToHex(rgb) {
-   // Convert rgba(r, g, b, a) to hex
     const match = rgb.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/)
     if (!match) return '#000000'
     
@@ -560,7 +458,6 @@ function rgbToHex(rgb) {
     const g = parseInt(match[2])
     const b = parseInt(match[3])
     
-    // Convert to hex and ensure 2 digits
     const toHex = (num) => {
         const hex = num.toString(16)
         return hex.length === 1 ? '0' + hex : hex
@@ -570,14 +467,12 @@ function rgbToHex(rgb) {
 }
 
 function hexToRgb(hex) {
-  // Convert hex to rgba
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
     if (!result) return 'rgba(0, 0, 0, 1)'
     
     return `rgba(${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}, 1)`
 }
 
-// new helper: return true when color is dark
 function isDarkColor(rgba) {
   const m = rgba.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/i)
   if (!m) return false
@@ -590,9 +485,6 @@ function isDarkColor(rgba) {
   return lum < 0.5
 }
 
-
-
-
 function mintaFrissites() {
     if (aktualisKep.value) {
         canvasFeldolgozas(aktualisKep.value)
@@ -600,10 +492,8 @@ function mintaFrissites() {
     }
 }
 
-// Watch for color number changes and update palette
 watch(szinSzam, (newVal) => {
 if (aktualisKep.value && pixelSorok.value.length > 0) {
-    // Use the new function to update colors without reprocessing the entire image
     nextTick(() => {
       automatikusSzinCsoportositas()
     })
@@ -633,7 +523,6 @@ function elozoKep() {
     img.onload = () => {
         aktualisKep.value = img
         betoltottKep.value = true
-        // Wait for next tick to ensure canvas is mounted
         nextTick(() => {
             if (pixelesKep.value && canvas.value) {
                 canvasFeldolgozas(img)
@@ -661,7 +550,6 @@ function kepTorles() {
   localStorage.removeItem('pixelesValtoztatasok')
   localStorage.removeItem('mintakeszitoForm')
   
-  // Reset file input
   const fileInput = document.getElementById('file-upload')
   if (fileInput) fileInput.value = ''
 }
@@ -673,15 +561,7 @@ function adatokVissza() {
 
 function kepletoltes(canvas, filename = 'modified-image.png') {
   if (!canvas.value) return
-  
-  /*const link = document.createElement('a')
-  link.download = 'minta.png'
-  link.href = canvas.value.toDataURL()
-  link.click()*/
-
-    // Convert canvas to blob
   canvas.toBlob((blob) => {
-    // Create a temporary download link
     const link = document.createElement('a');
     link.download = filename;
     link.href = URL.createObjectURL(blob);
@@ -693,11 +573,9 @@ function kepletoltes(canvas, filename = 'modified-image.png') {
 function visszaallitas() {
 if (aktualisKep.value) {
         canvasFeldolgozas(aktualisKep.value)
-        // Reset all checkboxes
         Object.keys(pipaltSorok).forEach(key => {
             pipaltSorok[key] = false
         })
-        // Reset row opacities
         pixelSorok.value.forEach((row, index) => {
             row.sorLathatosag = 1
         })
@@ -707,7 +585,6 @@ if (aktualisKep.value) {
 watch(pixelesKep, (newVal) => {
   if (newVal && aktualisKep.value && betoltottKep.value) {
     nextTick(() => {
-      // Add a small delay to ensure DOM is fully updated
       setTimeout(() => {
         if (canvas.value) {
           canvasFeldolgozas(aktualisKep.value)
@@ -717,15 +594,11 @@ watch(pixelesKep, (newVal) => {
   }
 })
 
-// Initialize when component mounts
 onMounted(() => {
-  // Load form state first
   formBetoltes()
-  // Then check for saved image when component mounts
   elozoKep()
 })
 
-// Add computed property for yarn length calculation
 const fonalHossz = computed(() => {
   const pixelRacsSor = pixelSorok.value.length
   const pixelRacsOszlop = pixelSorok.value[0]?.pixels.length || 0
@@ -737,12 +610,9 @@ const fonalHossz = computed(() => {
   return isNaN(hossz) ? 0 : Number(hossz.toFixed(1))
 })
 
-// Add watch to recalculate yarn length when pixel grid changes
 watch([pixelMeret, pixelSorok], () => {
-  // This will trigger the computed property to recalculate
 }, { deep: true })
 
-// Add these functions to save/restore form state
 function betoltesKorabbrol() {
   const formState = {
     resz: resz.value,
@@ -764,11 +634,9 @@ function formBetoltes() {
   }
 }
 
-// Add this to your script setup section
 const showAlert = ref(false);
 const isMobile = ref(false);
 
-// Function to check screen width
 function checkScreenWidth() {
   isMobile.value = window.innerWidth < 550;
   if (isMobile.value) {
@@ -776,22 +644,15 @@ function checkScreenWidth() {
   }
 }
 
-// Add this function to show the alert
 function showSuccessAlert() {
   showAlert.value = true;
-  // Auto-hide after 5 seconds
-  /*setTimeout(() => {
-    showAlert.value = false;
-  }, 5000);*/
 }
 
-// Check on mount and add resize listener
 onMounted(() => {
   checkScreenWidth();
   window.addEventListener('resize', checkScreenWidth);
 });
 
-// Clean up the event listener when component unmounts
 onUnmounted(() => {
   window.removeEventListener('resize', checkScreenWidth);
 });

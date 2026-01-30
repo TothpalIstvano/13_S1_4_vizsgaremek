@@ -54,4 +54,17 @@ class Posztok extends Model
     {
         return $this->hasMany(Kommentek::class, 'poszt_id')->whereNull('elozetes_komment_id');
     }
+    public function reakciok()
+    {
+        return $this->hasMany(PosztReakciok::class, 'poszt_id');
+    }
+    public function likedBy()
+    {
+        return $this->hasMany(PosztReakciok::class, 'poszt_id')->where('reakcio', 'like');
+    }
+
+    public function dislikedBy()
+    {
+        return $this->hasMany(PosztReakciok::class, 'poszt_id')->where('reakcio', 'dislike');
+    }
 }
