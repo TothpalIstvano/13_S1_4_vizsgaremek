@@ -17,6 +17,17 @@
           />
         </div>
 
+        <div class="active-filters" v-if="activeCimkek.length">
+          <div
+            class="filter-chip"
+            v-for="tag in activeCimkek"
+            :key="tag.id"
+          >
+            {{ tag.nev }}
+            <span class="remove" @click="toggleCimke(tag.id)">✕</span>
+          </div>
+        </div>
+
         <div class="dropdown" ref="dropdown">
           <div class="dropdown__selected" @click="toggle">
             <FontAwesomeIcon :icon="selected.icon" />
@@ -298,6 +309,9 @@
   const min = ref(0)
   const max = ref(0)
   const searchTerm = ref('')
+  const activeCimkek = computed(() =>
+  cimkek.value.filter(c => selectedCimkek.value.includes(c.id))
+)
 
   function toggleCimke(id) {
     const index = selectedCimkek.value.indexOf(id);
@@ -476,6 +490,38 @@ onBeforeUnmount(() => {
   @media screen and (max-width: 480px) {
     flex-direction: column;
   }
+}
+/*#endregion*/
+
+/*#region ===== FILTER CHIPS ===== */
+.active-filters {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-right: 20px;
+}
+
+.filter-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  background: #e3e8ff;
+  color: #2b3ea8;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.filter-chip .remove {
+  cursor: pointer;
+  font-weight: bold;
+  opacity: 0.7;
+}
+
+.filter-chip .remove:hover {
+  opacity: 1;
 }
 /*#endregion*/
 
