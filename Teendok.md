@@ -11,7 +11,20 @@
 * \[x] Blog kártyák
 * \[x] Footer
 * \[x] Jelszó(regisztráció)
-* \[ ] Webshop 
+
+* \[/] Webshop
+* \[ ] cimke szűrés + ha itemen katintás akkkor hozzá adás
+* \[ ] active cimkek
+* \[ ] cimke kategoriára való csere
+* \[ ] szöveg röviditése ha overflow van és ... hozááadása
+* \[ ] cimkeék az itemen való mennyiség kiírás + + jel oda írása + enyitható legyen
+* \[ ] kosár mennyiség írása
+* \[ ] Carouselbe itemek berakása kedvenc alapján
+* \[ ] email verifikáció
+* \[ ] vásárol email
+* \[ ] jelszó reset
+* \[ ] verikád az emailed felszólitás 
+
 * \[ ] Táblák egységesítése ez alat azt értve hogy a táblákban lévő adatok megegyezenek 
 * \[ ] különböző roleok hozzá adása
 * \[ ] Admin site
