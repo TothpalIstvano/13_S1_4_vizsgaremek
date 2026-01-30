@@ -31,7 +31,7 @@ import { RouterLink } from 'vue-router'
       </div>
     </div>
     <div class="footer-bottom">
-      &copy; 2025-2026 Hobbitár. Minden jog fenntartva.
+      🄯 2025-2026 Hobbitár. Minden jog fenntartva.
     </div>
   </footer>
 </template>

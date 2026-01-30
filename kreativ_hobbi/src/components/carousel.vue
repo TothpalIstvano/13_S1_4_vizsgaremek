@@ -24,6 +24,16 @@ function prevImage() {
     }
 }
 
+async function fetchCarouselImages() {
+    try {
+        const response = await fetch('/api/carousel/termekek');
+        const data = await response;
+        console.log('Fetched carousel images:', data.value);
+    } catch (error) {
+        console.error('Error fetching carousel images:', error);
+    }
+}
+
 let interval = setInterval(nextImage, 10000);
 watch(currentIndex, () => {
     clearInterval(interval);

@@ -301,3 +301,8 @@ Route::post('/rendeles', function (Request $request) {
         return response()->json(['message' => 'Server error'], 500);
     }
 });
+
+Route::get('/carousel/termekek', function () {
+    $termekek = Termekek::inRandomOrder()->take(5)->get(['id', 'nev', 'ar', 'fo_kep_id'])->load('TermekFoKep');
+    return response()->json($termekek);
+});
