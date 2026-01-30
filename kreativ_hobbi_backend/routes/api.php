@@ -11,6 +11,7 @@ use App\Models\Rendelesek;
 use App\Models\RendeltTermekek;
 use App\Models\Cimkek;
 use App\Models\Felhasznalok;
+use App\Models\PosztReakciok;
 
 //User related API routes:
 
@@ -78,6 +79,73 @@ Route::get('/blog/{id}/comments', [KommentController::class, 'index']);
 Route::get('/cimkek', function () {
     $cimkek = Cimkek::select('id', 'nev')->get();
     return response()->json($cimkek);
+});
+
+// Reakciók a poszthoz
+Route::middleware('web')->group(function () {
+    Route::post('/blog/{id}/reaction', function (Request $request, $id) {
+        $user = Auth::user();
+        $reaction = $request->input('reaction');
+
+        if (!in_array($reaction, ['like', 'dislike'])) {
+            return response()->json(['error' => 'Invalid reaction'], 400);
+        }
+
+        $post = Posztok::find($id);
+        if (!$post) {
+            return response()->json(['error' => 'Post not found'], 404);
+        }
+
+        $existingReaction = PosztReakciok::where('poszt_id', $id)
+            ->where('felhasznalo_id', $user->id)
+            ->first();
+
+        if ($existingReaction) {
+            if ($existingReaction->reakcio === $reaction) {
+                $existingReaction->delete();
+                $message = 'Reaction removed';
+            } else {
+                $existingReaction->reakcio = $reaction;
+                $existingReaction->save();
+                $message = 'Reaction updated';
+            }
+        } else {
+            PosztReakciok::create([
+                'poszt_id' => $id,
+                'felhasznalo_id' => $user->id,
+                'reakcio' => $reaction
+            ]);
+            $message = 'Reaction added';
+        }
+
+        $likesCount = $post->likedBy()->count();
+        $dislikesCount = $post->dislikedBy()->count();
+
+        return response()->json([
+            'message' => $message,
+            'likes_count' => $likesCount,
+            'dislikes_count' => $dislikesCount,
+            'user_reaction' => $existingReaction ? $existingReaction->reakcio : null
+        ]);
+    });
+
+    Route::get('/user/reactions', function () {
+        $user = Auth::user();
+        $reactions = PosztReakciok::where('felhasznalo_id', $user->id)
+            ->get()
+            ->pluck('reakcio', 'poszt_id');
+
+        return response()->json($reactions);
+    });
+});
+
+// Reakciók száma
+Route::middleware('web')->get('/user/check', function () {
+    if (Auth::check()) {
+        return response()->json(['loggedIn' => true, 'user' => auth()->user()], 200);
+    } else {
+        return response()->json(['loggedIn' => false], 200);
+    }
 });
 
 // Új poszt

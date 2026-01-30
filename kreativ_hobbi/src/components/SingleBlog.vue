@@ -209,7 +209,6 @@ library.add(faCalendar, faUser, faPaperPlane, faClock, faReply, faUserCircle)
 
 const route = useRoute()
 
-// Reactive state - Remove inject() calls
 const post = ref({})
 const loading = ref(true)
 const error = ref(null)
@@ -218,10 +217,8 @@ const newComment = ref('')
 const loadingComments = ref(false)
 const replyTo = ref(null)
 
-// Computed
 const postId = computed(() => route.params.id)
 
-// Methods
 const fetchPost = async () => {
   try {
     loading.value = true
@@ -260,10 +257,9 @@ const fetchComments = async () => {
     loadingComments.value = false
   }
 }
-// Function to ensure CSRF token is set
+
 const ensureCsrfToken = async () => {
   try {
-    // Use the 'api' instance instead of 'axios'
     await api.get('/sanctum/csrf-cookie');
     return true;
   } catch (err) {
@@ -272,13 +268,14 @@ const ensureCsrfToken = async () => {
   }
 }
 
+
+//még azért javítani kéne
 const addComment = async () => {
   if (!newComment.value.trim()) return
   
   try {
     loadingComments.value = true
     
-    // First, let's manually get CSRF token
     try {
       await axios.get('http://localhost:8000/sanctum/csrf-cookie', {
         withCredentials: true
@@ -288,7 +285,6 @@ const addComment = async () => {
       console.error('Failed to get CSRF token:', csrfErr);
     }
     
-    // Get CSRF token from cookie
     const getCookie = (name) => {
       const value = `; ${document.cookie}`;
       const parts = value.split(`; ${name}=`);
@@ -299,7 +295,6 @@ const addComment = async () => {
     const csrfToken = getCookie('XSRF-TOKEN');
     console.log('CSRF Token from cookie:', csrfToken);
     
-    // Make the request with explicit headers
     const response = await axios.post(
       `http://localhost:8000/api/blog/${postId.value}/comments`,
       {
@@ -342,12 +337,10 @@ const addComment = async () => {
   }
 }
 
-// Also update handleDelete to ensure CSRF token
 const handleDelete = async (commentId) => {
   if (!confirm('Biztosan törölni szeretnéd ezt a hozzászólást?')) return
   
   try {
-    // Ensure CSRF token for DELETE request too
     await ensureCsrfToken()
     
     await api.delete(`/api/comments/${commentId}`)
@@ -422,7 +415,6 @@ const formatContent = (content) => {
 }
 
 onMounted(async () => {
-  // Get CSRF token when component mounts
   await ensureCsrfToken()
   fetchPost()
   fetchComments()

@@ -25,14 +25,12 @@ class KommentController extends Controller
                 ->orderBy('letrehozas_datuma', 'desc')
                 ->get()
                 ->map(function ($comment) {
-                    // Rename kommentIro to felhasznalo for frontend compatibility
                     $commentArray = $comment->toArray();
                     if (isset($commentArray['komment_iro'])) {
                         $commentArray['felhasznalo'] = $commentArray['komment_iro'];
                         unset($commentArray['komment_iro']);
                     }
 
-                    // Also process child comments
                     if (isset($commentArray['gyermek_kommentek'])) {
                         foreach ($commentArray['gyermek_kommentek'] as &$childComment) {
                             if (isset($childComment['komment_iro'])) {
@@ -56,7 +54,6 @@ class KommentController extends Controller
     public function store(Request $request, $postId)
     {
         try {
-            // Check if user is authenticated
             if (!Auth::check()) {
                 return response()->json(['error' => 'Unauthorized'], 401);
             }
@@ -69,14 +66,13 @@ class KommentController extends Controller
             $comment = Kommentek::create([
                 'komment' => $request->komment,
                 'poszt_id' => $postId,
-                'kommentelo' => Auth::id(), // Use authenticated user ID
+                'kommentelo' => Auth::id(),
                 'elozetes_komment_id' => $request->elozo_komment_id,
                 'letrehozas_datuma' => now(),
             ]);
 
             $comment->load('kommentIro:id,felhasz_nev');
 
-            // Rename the relationship for frontend
             $commentData = $comment->toArray();
             if (isset($commentData['komment_iro'])) {
                 $commentData['felhasznalo'] = $commentData['komment_iro'];
@@ -99,7 +95,6 @@ class KommentController extends Controller
         try {
             $comment = Kommentek::findOrFail($id);
 
-            // Check if user owns the comment
             if ($comment->kommentelo !== Auth::id()) {
                 return response()->json(['error' => 'You can only delete your own comments'], 403);
             }

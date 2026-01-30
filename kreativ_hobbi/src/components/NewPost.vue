@@ -284,8 +284,7 @@ const submitForm = async () => {
                         description: image.description
                     });
                     
-                    // Append files properly
-                    formData.append('images[]', image.file);  // Changed from images[index]
+                    formData.append('images[]', image.file);
                     formData.append(`alt[${index}]`, image.alt || '');
                     formData.append(`description[${index}]`, image.description || '');
                 }
@@ -297,7 +296,7 @@ const submitForm = async () => {
                 console.log('Sending image upload request...');
                 const uploadResponse = await axios.post('/api/upload-images', formData, {
                     headers: {
-                        'Content-Type': 'multipart/form-data',  // This is important!
+                        'Content-Type': 'multipart/form-data', 
                     }
                 });
                 

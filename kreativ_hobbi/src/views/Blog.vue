@@ -116,9 +116,10 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import api from '@/services/api.js'
+import { useAuthStore } from '@/stores/auth'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faCalendar, faHeart, faArrowRight, faArrowCircleUp, faThumbsUp, faThumbsDown} from '@fortawesome/free-solid-svg-icons'
@@ -128,9 +129,12 @@ library.add(faCalendar, faHeart, faArrowRight, faArrowCircleUp, faThumbsUp, faTh
 import fallbackImage from '@/assets/Public/b-pl1.jpg'
 
 const router = useRouter()
+const authStore = useAuthStore()
 const posztok = ref([])
 const loading = ref(true)
 const error = ref(null)
+
+const isAuthenticated = computed(() => authStore.isAuthenticated)
 
 const navigateToBlog = (postId) => {
   router.push(`/blog/${postId}`)
@@ -144,6 +148,10 @@ const fetchBlogPosts = async () => {
     const response = await api.get('/api/blog')
     posztok.value = response.data;
     console.log(posztok.value)
+
+    if (isAuthenticated.value) {
+      await fetchUserReactions()
+    }
     
   } catch (err) {
     console.error('Error fetching blog posts:', err)
@@ -154,7 +162,49 @@ const fetchBlogPosts = async () => {
   }
 }
 
+const fetchUserReactions = async () => {
+  try {
+    const response = await api.get('/api/user/reactions')
+    const userReactions = response.data
+    
+    posztok.value = posztok.value.map(post => ({
+      ...post,
+      userReaction: userReactions[post.id] || null
+    }))
+    
+  } catch (err) {
+    console.error('Error fetching user reactions:', err)
+  }
+}
 
+const handleReaction = async (postId, reactionType) => {
+  if (!isAuthenticated.value) {
+    alert('Kérjük, jelentkezzen be a reakciókhoz!')
+    router.push('/Belepes')
+    return
+  }
+  
+  try {
+    const response = await api.post(`/api/blog/${postId}/reaction`, {
+      reaction: reactionType
+    })
+    
+    const { likes_count, dislikes_count, user_reaction } = response.data
+    
+    const postIndex = posztok.value.findIndex(post => post.id === postId)
+    if (postIndex !== -1) {
+      posztok.value[postIndex].likes_count = likes_count
+      posztok.value[postIndex].dislikes_count = dislikes_count
+      posztok.value[postIndex].userReaction = user_reaction
+    }
+    
+  } catch (err) {
+    console.error('Error updating reaction:', err)
+    if (err.response?.status === 401) {
+      alert('Hitelesítési hiba. Kérjük, jelentkezzen be újra.')
+    }
+  }
+}
 
 const handleImageError = (event) => {
   event.target.src = fallbackImage
