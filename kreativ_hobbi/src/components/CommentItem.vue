@@ -2,7 +2,6 @@
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faUserCircle, faReply, faTrash } from '@fortawesome/free-solid-svg-icons'
-import { defineProps, defineEmits } from 'vue'
 
 library.add(faUserCircle, faReply, faTrash)
 
