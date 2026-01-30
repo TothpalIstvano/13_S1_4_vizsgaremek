@@ -10,7 +10,6 @@ import 'primevue/resources/primevue.min.css' // Poszt hozzáadás form stílusa
 import 'primeicons/primeicons.css' // Ikonok
 import 'quill/dist/quill.core.css'
 import 'quill/dist/quill.snow.css'
-import { useAuthStore } from './stores/auth'
 
 import App from './App.vue'
 import router from './router/router'

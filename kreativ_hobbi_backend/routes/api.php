@@ -81,7 +81,7 @@ Route::get('/cimkek', function () {
     return response()->json($cimkek);
 });
 
-// Reakciók a poszthoz
+/* Reakciók a poszthoz
 Route::middleware('web')->group(function () {
     Route::post('/blog/{id}/reaction', function (Request $request, $id) {
         $user = Auth::user();
@@ -139,14 +139,14 @@ Route::middleware('web')->group(function () {
     });
 });
 
-// Reakciók száma
+ Reakciók száma
 Route::middleware('web')->get('/user/check', function () {
     if (Auth::check()) {
         return response()->json(['loggedIn' => true, 'user' => auth()->user()], 200);
     } else {
         return response()->json(['loggedIn' => false], 200);
     }
-});
+});*/
 
 // Új poszt
 Route::post('/posts', function (Request $request) {
