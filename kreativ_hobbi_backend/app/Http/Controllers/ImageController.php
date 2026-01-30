@@ -32,18 +32,17 @@ class ImageController extends Controller
 
                 $path = $file->storeAs('blog', $filename, 'public');
 
-                // Generate the FULL URL
-                $fullUrl = asset('storage/' . $path);  // This gives: http://localhost:8000/storage/blog/filename.jpg
+                $fullUrl = asset('storage/' . $path);
 
                 $image = Kepek::create([
-                    'url_Link' => $fullUrl,  // Store the FULL URL
+                    'url_Link' => $fullUrl,
                     'alt_Szoveg' => $alts[$index] ?? $file->getClientOriginalName(),
                     'leiras' => $descriptions[$index] ?? 'Blog image uploaded by ' . Auth::user()->felhasz_nev
                 ]);
 
                 $uploadedImages[] = [
                     'id' => $image->id,
-                    'url' => $fullUrl,  // Return full URL
+                    'url' => $fullUrl,
                     'alt' => $image->alt_Szoveg,
                     'description' => $image->leiras,
                     'path' => $path
