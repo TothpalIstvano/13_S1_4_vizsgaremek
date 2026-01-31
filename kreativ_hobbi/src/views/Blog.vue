@@ -5,6 +5,55 @@
       <font-awesome-icon icon="fa-solid fa-arrow-circle-up"/>
 	  </a>
     <div class="content-wrapper">
+      <div class="szurok">
+        <div class="search-container">        
+          <div class="search-icon">
+            <FontAwesomeIcon icon="fa-magnifying-glass" />
+          </div>
+          <input
+            type="text"
+            placeholder="Keresés"
+            class="search-input"
+            name="search"
+            v-model="searchTerm"
+          />
+        </div>
+        <label for="postCimkek" class="form-label">
+            <!--<i class="pi pi-tags form-label-icon"></i>-->
+            Címkék
+        </label>
+        <MultiSelect
+            id="postCimkek"
+            v-model="selectedTags" 
+            :options="tagOptions" 
+            optionLabel="name" 
+            placeholder="Válassz címkét (több is választható)" 
+            display="chip" 
+            filter
+            class="w-full mb-6"
+          />
+
+        <div class="dropdown" ref="dropdown">
+          <div class="dropdown__selected" @click="toggle">
+            <FontAwesomeIcon :icon="selected.icon" />
+            <span>{{ selected.label }}</span>
+            <FontAwesomeIcon icon="chevron-down" class="chevron" />
+          </div>
+
+          <ul v-if="open" class="dropdown__menu">
+            <li
+              v-for="option in options"
+              :key="option.value"
+              @click="select(option)"
+              class="dropdown__item"
+            >
+              <FontAwesomeIcon :icon="option.icon" />
+              <span>{{ option.label }}</span>
+            </li>
+          </ul>
+        </div>
+
+      </div>
       <section class="cards-wrapper">
         <!-- Loading -->
         <div v-if="loading" class="loading-container">
@@ -118,13 +167,15 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import MultiSelect from 'primevue/multiselect';
+import axios from 'axios';
 import api from '@/services/api.js'
 import { useAuthStore } from '@/stores/auth'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faCalendar, faHeart, faArrowRight, faArrowCircleUp, faThumbsUp, faThumbsDown} from '@fortawesome/free-solid-svg-icons'
+import { faCalendar, faHeart, faArrowRight, faArrowCircleUp, faThumbsUp, faThumbsDown, faMagnifyingGlass} from '@fortawesome/free-solid-svg-icons'
 
-library.add(faCalendar, faHeart, faArrowRight, faArrowCircleUp, faThumbsUp, faThumbsDown)
+library.add(faCalendar, faHeart, faArrowRight, faArrowCircleUp, faThumbsUp, faThumbsDown, faMagnifyingGlass)
 
 import fallbackImage from '@/assets/Public/b-pl1.jpg'
 
@@ -133,6 +184,9 @@ const authStore = useAuthStore()
 const posztok = ref([])
 const loading = ref(true)
 const error = ref(null)
+const searchTerm = ref('')
+const selectedTags = ref([]);
+const tagOptions = ref([]);
 
 const isAuthenticated = computed(() => authStore.isAuthenticated)
 
@@ -206,6 +260,57 @@ const handleReaction = async (postId, reactionType) => {
   }
 }
 
+const options = [
+  {
+    value: 'price-asc',
+    label: 'Legújabb elöl',
+    icon: 'arrow-up'
+  },
+  {
+    value: 'price-desc',
+    label: 'Legrégebbi elöl',
+    icon: 'arrow-down'
+  },
+  {
+    value: 'name-asc',
+    label: 'Kedvelés szerint csökkenő',
+    icon: 'sort-alpha-up'
+  },
+  {
+    value: 'name-desc',
+    label: 'Kedvelés szerint növekvő',
+    icon: 'sort-alpha-down'
+  }
+]
+
+
+const selected = ref(  {
+    value: 'default',
+    label: 'Sorba rendezés',
+    icon: 'filter'
+  })
+const open = ref(false)
+const dropdown = ref(null)
+
+function toggle() {
+  open.value = !open.value
+
+}
+
+function select(option) {
+  selected.value = option
+  open.value = false
+
+  // emit / sort logic goes here
+  console.log('Selected:', option.value)
+}
+
+function handleClickOutside(event) {
+  if (dropdown.value && !dropdown.value.contains(event.target)) {
+    open.value = false
+  }
+}
+
 const handleImageError = (event) => {
   event.target.src = fallbackImage
 }
@@ -270,6 +375,87 @@ main {
   text-align: center;
 }
 
+.search-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px 8px 14px; /* Adjusted padding for better look */
+  border: 1px solid #d0d0d0;
+  border-radius: 50px; /* Pill shape */
+  background: white;
+  width: 300px;
+  height: 40px;
+  margin: 25px auto;
+  transition: all 0.2s;
+}
+
+.search-container:focus-within {
+  border-color: #d49535;
+  box-shadow: 0 0 0 3px rgba(63, 81, 181, 0.1);
+}
+
+.search-icon {
+  color: #999;
+  display: flex;
+  align-items: center;
+}
+
+.search-container input {
+  border: none;
+  outline: none;
+  width: 100%;
+  font-size: 15px;
+  background: transparent;
+}
+
+.dropdown {
+  position: relative;
+  width: 300px;
+  font-size: 15px;
+  margin: 25px auto;
+}
+
+.dropdown__selected {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border: 1px solid #f1f1f1;
+  border-radius: 8px ;
+  cursor: pointer;
+  background: white;
+}
+
+.dropdown__selected:hover {
+  border: 1px solid #d0d0d0;
+}
+
+.dropdown__menu {
+  position: absolute;
+  top: calc(100% - 25px);
+  width: 100%;
+  border: 1px solid #d0d0d0;
+  border-radius: 0 0 8px 8px;
+  background: white;
+  z-index: 2;
+}
+
+.dropdown__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  cursor: pointer;
+}
+
+.dropdown__item:hover {
+  background: #f1f1f1;
+}
+
+.chevron {
+  margin-left: auto;
+}
+
 .back-to-top-control {
 	display: flex;
 	align-items: center;
@@ -317,7 +503,7 @@ main {
 
 .cards-wrapper {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(480px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
   gap: 64px;
   padding: 48px 0;
 }
