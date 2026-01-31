@@ -1,6 +1,6 @@
 <script setup>
-import { ref, watch } from 'vue';
-//webáruház meghívása
+import { onMounted, ref, watch } from 'vue';
+import axios from 'axios';
 
 // Define the array of images
 const kepek = [
@@ -24,14 +24,16 @@ function prevImage() {
     }
 }
 
+
 async function fetchCarouselImages() {
-    try {
-        const response = await fetch('/api/carousel/termekek');
-        const data = await response;
-        console.log('Fetched carousel images:', data.value);
-    } catch (error) {
-        console.error('Error fetching carousel images:', error);
-    }
+  try {
+    const response = await axios.get('/api/carousel/termekek');
+    console.log(response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching carousel images:', error);
+    return [];
+  }
 }
 
 let interval = setInterval(nextImage, 10000);
@@ -39,6 +41,14 @@ watch(currentIndex, () => {
     clearInterval(interval);
     interval = setInterval(nextImage, 10000);
 })
+
+onMounted(() => {
+    fetchCarouselImages().then(fetchedImages => {
+        if (fetchedImages) {
+            kepek.push(fetchedImages);
+        }
+    });
+});
 
 </script>
 
