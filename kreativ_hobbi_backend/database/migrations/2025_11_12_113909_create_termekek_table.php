@@ -15,7 +15,7 @@ return new class extends Migration {
             $table->unsignedInteger('id')->primary()->autoIncrement();
             $table->string('nev', 255)->nullable(false);
             $table->text('leiras')->nullable();
-            $table->decimal('ar', 10, 2)->nullable(false);
+            $table->decimal('ar', 10, 0)->nullable(false);
             $table->integer('darab')->nullable(false)->default(0);
             $table->integer('meter')->nullable();
             $table->unsignedInteger('kategoria_id');
