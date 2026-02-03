@@ -11,7 +11,6 @@ use App\Models\Rendelesek;
 use App\Models\RendeltTermekek;
 use App\Models\Cimkek;
 use App\Models\Felhasznalok;
-use App\Models\PosztReakciok;
 
 //User related API routes:
 
@@ -303,6 +302,12 @@ Route::post('/rendeles', function (Request $request) {
 });
 
 Route::get('/carousel/termekek', function () {
-    $termekek = Termekek::inRandomOrder()->take(5)->get(['id', 'nev', 'ar', 'fo_kep_id'])->load('TermekFoKep');
+    $termekek = Termekek::select('id','darab', 'nev', 'ar', 'fo_kep_id', 'updated_at')
+        ->with('TermekFoKep')
+        ->where('darab', '>', 0)
+        ->orderBy('updated_at', 'desc')
+        ->take(5)
+        ->get()
+        ->toArray();
     return response()->json($termekek);
 });
