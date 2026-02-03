@@ -1,29 +1,85 @@
+<template>
+    <div>
+        <div id="carouselContainer" :style="{ backgroundColor: bgColors[currentIndex % bgColors.length] }">
+            <!--img id="carouselBackground" :src="kepek[currentIndex].src" :alt="kepek[currentIndex].alt" /-->
+
+            <div class="webshop-item" :key="currentIndex">
+                <h2 
+                id="carouselTitle" 
+                :key="currentIndex" 
+                :class="currentIndex % 2 === 0 ? 'leftText' : 'rightText'">{{ kepek[currentIndex].nev }}</h2>
+                <p 
+                id="carouselDescription" 
+                :key="currentIndex" 
+                :class="currentIndex % 2 === 0 ? 'leftText' : 'rightText'">
+                    {{ kepek[currentIndex].leiras || 'Ez egy fantasztikus termék, amelyet érdemes megtekinteni!' }}
+                </p>
+                <p id="carouselPrice" :key="currentIndex" :class="currentIndex % 2 === 0 ? 'leftText' : 'rightText'">
+                    Ár: {{ kepek[currentIndex].ar ? kepek[currentIndex].ar + ' Ft' : 'Ár nincs megadva' }}
+                </p>
+                <button 
+                @click="router.push(`/aruhaz/${kepek[currentIndex].id}`)"
+                :key="currentIndex" 
+                id="termekMegtekinteseGomb" 
+                    :class="currentIndex % 2 === 0 ? 'leftText' : 'rightText'">Termék megtekintése</button>
+                <div id="carouselItemImageContainer"
+                    :style="{ left: currentIndex % 2 === 0 ? '56.6%' : '10%' }"
+                    >
+                    <img 
+                    :src="kepek[currentIndex].termek_fo_kep ? kepek[currentIndex].termek_fo_kep.url_Link : ''"
+                    :key="currentIndex + '-title'"
+                    id="carouselItemImage" 
+                    width="200" 
+                    height="200"
+                    alt="A beautiful webshop item" 
+                    />
+                </div>
+                
+            </div>
+            <button @click="prevImage" type="button" id="balGomb"> 	&#129104;</button>
+            <button @click="nextImage" type="button" id="jobbGomb">&#129106;</button>
+        </div>
+        <div id="helyzetJelzoContainer">
+            <div v-for="(index) in kepek.length" :key="index">
+                <div 
+                class="helyzetJelzo" 
+                :value="index" 
+                    @click="currentIndex = index-1 " :style="{ borderBlockColor: currentIndex === index-1 ? 'white' : '#bebebe', color: currentIndex === index-1 ? 'white' : '#bebebe' }" 
+                    :checked="currentIndex === index-1">
+                    {{ index }}</div>
+            </div>
+        </div>
+    </div>
+</template>
+
 <script setup>
 import { onMounted, ref, watch } from 'vue';
 import axios from 'axios';
+import { useRouter } from 'vue-router';
 
+const router = useRouter();
 // Define the array of images
-const kepek = [
-    { src: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQrtQU3c2xsXwINXpu67nm_M--1igQ55tSYqA&s', alt: 'A beautiful sunset' },
-    { src: 'https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcTTRwJNz1yEui-o79WsNSpWJSZ7dWPACZL4S2F4DNgpXNQ9qpptmVhms5tFYzzkDwHEbBKS1h8K4q3KpHY3NBMh3wytwkq5LcTugeF0NEfUMw', alt: 'A stunning mountain landscape' },
-    { src: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKEAAACUCAMAAADMOLmaAAAAA1BMVEVkAAoIcbc4AAAALUlEQVR4nO3BAQEAAACCIP+vbkhAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAB8GV2oAAFi+4XjAAAAAElFTkSuQmCC', alt: 'A cute cat' },
-    { src: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSgMTaSoiKAZMhA13RNwbv53bBD2nnNeS4-2wWmtg2rZTinHoaqyWInX1RraCNzFgyDygt9mxpqpuE6TDQK93JQaWQRhBkmxM2zIXVka90HLw', alt: 'A delicious looking cake' },
-    { src: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANEAAACUCAMAAAA6cTwCAAAACVBMVEXan/v58v3WmffsqHDhAAAARUlEQVR4nO3dAQkAQAgEsNP+ob/DIwiyFVnqmvQ1AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADgz3ZQOy7bifC4B+SHBOdHjtdMAAAAAElFTkSuQmCC', alt: 'A beautiful beach' }
-];
+const kepek = ref([
+    { nev: '', src: '', alt: '', leiras: '' },
+    { nev: '', src: '', alt: '', leiras: '' },
+    { nev: '', src: '', alt: '', leiras: '' },
+    { nev: '', src: '', alt: '', leiras: '' },
+    { nev: '', src: '', alt: '', leiras: '' },
+]);
+const bgColors = ['#946609', '#944309', '#c7590a', '#c45529', '#912b03'];
 let currentIndex = ref(0);
 function nextImage() {
     currentIndex.value = currentIndex.value + 1 ;
-    if (currentIndex.value >= kepek.length) {
+    if (currentIndex.value >= kepek.value.length) {
         currentIndex.value = 0;
     }
 }
 function prevImage() {
     currentIndex.value = currentIndex.value - 1 ;
     if (currentIndex.value < 0) {
-        currentIndex.value = kepek.length - 1;
+        currentIndex.value = kepek.value.length - 1;
     }
 }
-
 
 async function fetchCarouselImages() {
   try {
@@ -45,70 +101,26 @@ watch(currentIndex, () => {
 onMounted(() => {
     fetchCarouselImages().then(fetchedImages => {
         if (fetchedImages) {
-            kepek.push(fetchedImages);
+            kepek.value = fetchedImages;
         }
+        console.log(kepek.value);
     });
 });
 
 </script>
 
-<template>
-    <div>
-        <div id="carouselContainer">
-            <img id="carouselBackground" :src="kepek[currentIndex].src" :alt="kepek[currentIndex].alt" />
-
-            <div class="webshop-item" :key="currentIndex + '-title'">
-                <h2 
-                    id="carouselTitle" 
-                    :key="currentIndex + '-title'" 
-                    :class="currentIndex % 2 === 0 ? 'leftText' : 'rightText'">{{ kepek[currentIndex].alt }}</h2>
-                <p 
-                    id="carouselDescription" 
-                    :key="currentIndex + '-title'" 
-                    :class="currentIndex % 2 === 0 ? 'leftText' : 'rightText'">
-                    Lorem ipsum dolor sit amet, consectetur adipisicing elit. Est laudantium excepturi illo consectetur iure numquam vitae quo sequi. Quis error magnam non modi vitae atque repellendus dicta distinctio aliquid eius.
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Rerum enim eius maiores, sint qui hic necessitatibus at, officia sunt ducimus dicta. Nam explicabo laboriosam aliquid sed dolor atque fuga provident?
-                </p>
-                <button 
-                    onclick="alert('Termék megtekintése gombra kattintottál!')" 
-                    :key="currentIndex + '-title'" 
-                    id="termekMegtekinteseGomb" 
-                    :class="currentIndex % 2 === 0 ? 'leftText' : 'rightText'">Termék megtekintése</button>
-                <div id="carouselItemImageContainer"
-                    :style="{ left: currentIndex % 2 === 0 ? '56.6%' : '10%' }"
-                    >
-                    <img 
-                        src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQXfpo2zSyUFO56QdVu_0shk8V-jrcl4ckjog&s"
-                        :key="currentIndex + '-title'"
-                        id="carouselItemImage" 
-                        width="200" 
-                        height="200"
-                        alt="A beautiful webshop item" 
-                    />
-                </div>
-                
-            </div>
-            <button @click="prevImage" type="button" id="balGomb"> 	&#129104;</button>
-            <button @click="nextImage" type="button" id="jobbGomb">&#129106;</button>
-        </div>
-        <div id="helyzetJelzoContainer">
-            <div v-for="(index) in kepek.length" :key="index">
-                <div 
-                    class="helyzetJelzo" 
-                    :value="index" 
-                    @click="currentIndex = index-1 " :style="{ borderBlockColor: currentIndex === index-1 ? 'white' : '#bebebe', color: currentIndex === index-1 ? 'white' : '#bebebe' }" 
-                    :checked="currentIndex === index-1">
-                    {{ index }}</div>
-            </div>
-        </div>
-    </div>
-</template>
-
 <style scoped>
 /*#region Carousel elemei */
 #carouselContainer {
     position: relative;
-    overflow: hidden;
+    height: 500px;
+    border-radius: 25px;
+    background-color: var(--carousel-bg);
+    transition: background-color 0.6s ease-in-out;
+    box-shadow: var(--carousel-shadow);
+    width: 97%;
+    margin: 0 auto ;
+    margin-top: 5px;
 }
 #carouselTitle, #carouselDescription {
     position: absolute;
@@ -127,7 +139,15 @@ onMounted(() => {
     animation: fade-in 1.5s ease-in-out;
     opacity: 1;
 }
-
+#carouselPrice{
+    position: absolute;
+    top: 200px;
+    width: 25%; 
+    overflow: hidden;
+    animation: fade-in 1.5s ease-in-out;
+    opacity: 1;
+}
+/*#region Carousel háttér */
 #carouselBackground {
     display: block;
     margin: 0 auto ;
@@ -141,6 +161,7 @@ onMounted(() => {
     z-index: -1;
     
 }
+/*#endregion */
 #balGomb, #jobbGomb {
     width: 40px;
     height: 40px;
