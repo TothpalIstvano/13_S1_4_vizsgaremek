@@ -1,65 +1,64 @@
 <template>
   <main>
     <h1 class="title">Blog</h1>
-    <a v-show="isVisible" href="#" class="back-to-top-control" @click.prevent="scrollToTop">
+    <a v-show="isVisible" href="#" class="ugras-felulre" @click.prevent="ugrasFelulre">
       <font-awesome-icon icon="fa-solid fa-arrow-circle-up"/>
     </a>
     
-    <div class="content-wrapper">
-      <!-- Szűrők (Working like Aruhaz.vue) -->
+    <div class="container">
       <div class="szurok">
-        <div class="search-container">        
-          <div class="search-icon">
+        <div class="kereses">        
+          <div class="kereses-ikon">
             <FontAwesomeIcon icon="fa-magnifying-glass" />
           </div>
           <input
             type="text"
             placeholder="Keresés a blogbejegyzésekben..."
-            class="search-input"
-            name="search"
-            v-model="searchTerm"
+            class="kereses-input"
+            name="kereses"
+            v-model="keresett"
           />
         </div>
 
-        <div class="active-filters" v-if="activeCimkek.length">
+        <div class="aktiv-szurok" v-if="aktivCimkek.length">
           <div
-            class="filter-chip"
-            v-for="tag in activeCimkek"
-            :key="tag.id"
+            class="valasztott-cimkek"
+            v-for="cimke in aktivCimkek"
+            :key="cimke.id"
           >
-            {{ tag.name }}
-            <span class="remove" @click="removeCimke(tag.id)">✕</span>
+            {{ cimke.name }}
+            <span class="torles" @click="cimkeTorles(cimke.id)">✕</span>
           </div>
         </div>
 
-        <div class="filters-right">
-          <div class="multiselect-container">
+        <div class="jobboldal">
+          <div class="multiselect-kontener">
             <MultiSelect
               id="postCimkek"
-              v-model="selectedCimkek" 
-              :options="tagOptions" 
+              v-model="valasztottCimkek" 
+              :options="cimkeOpciok" 
               optionLabel="name"
               optionValue="id"
               placeholder="Válassz címkét" 
               display="chip" 
               filter
-              class="custom-multiselect"
+              class="multiselect-stilus"
             />
           </div>
           
           <div class="dropdown" ref="dropdown">
-            <div class="dropdown__selected" @click="toggle">
-              <FontAwesomeIcon :icon="selected.icon" />
-              <span>{{ selected.label }}</span>
+            <div class="dropdown_opciok" @click="toggle">
+              <FontAwesomeIcon :icon="valasztott.icon" />
+              <span>{{ valasztott.label }}</span>
               <FontAwesomeIcon icon="chevron-down" class="chevron" />
             </div>
 
-            <ul v-if="open" class="dropdown__menu">
+            <ul v-if="open" class="dropdown_menu">
               <li
-                v-for="option in options"
+                v-for="option in opciok"
                 :key="option.value"
                 @click="select(option)"
-                class="dropdown__item"
+                class="dropdown_valasztott"
               >
                 <FontAwesomeIcon :icon="option.icon" />
                 <span>{{ option.label }}</span>
@@ -69,12 +68,12 @@
         </div>
       </div>
       
-      <section class="cards-wrapper">
-        <!-- Loading -->
-        <div v-if="loading" class="loading-container">
-          <div class="loading-content">
-            <p class="loading-text">Blogbejegyzések betöltése...</p>
-            <div class="spinner-wrapper">
+      <section class="kartya-kontener">
+        <!-- Töltés -->
+        <div v-if="loading" class="tolto-kontener">
+          <div class="tolto-content">
+            <p class="tolto-szoveg">Blogbejegyzések betöltése...</p>
+            <div class="toltes">
               <div class="pulse-dot"></div>
               <div class="pulse-dot"></div>
               <div class="pulse-dot"></div>
@@ -82,81 +81,81 @@
           </div>
         </div>
       
-        <!-- Error -->
-        <div v-if="error" class="error-container">
-          <div class="error-card">
-            <div class="error-icon">⚠️</div>
-            <p class="error-message">{{ error }}</p>
-            <button class="retry-btn" @click="fetchBlogPosts">Újra próbálom</button>
+        <!-- Hiba -->
+        <div v-if="error" class="hiba-kontener">
+          <div class="hiba-kartya">
+            <div class="hiba-icon">⚠️</div>
+            <p class="hiba-uzenet">{{ error }}</p>
+            <button class="ujra-gomb" @click="posztokLekerese">Újra próbálom</button>
           </div>
         </div>
         
         <!-- Blog poszt -->
-        <div class="card-grid-space"  v-for="post in filteredPosts"  :key="post.id">
-          <div class="card">
-            <div class="card-glow"></div>
-            <div class="card-img-holder">
+        <div class="kartya-oszlop"  v-for="post in szurtPosztok"  :key="post.id">
+          <div class="kartya">
+            <div class="kartya-glow"></div>
+            <div class="kartya-kep">
               <img 
                 :src="post.fo_kep" 
                 :alt="post.cim"
-                @error="handleImageError"
+                @error="kepHiba"
                 loading="lazy"
               />
             </div>
             
-            <div class="card-content">
+            <div class="kartya-content">
               <div class="meta-info">
-                <span class="blog-time"> 
-                  <div class="icon-wrapper">
+                <span class="datum"> 
+                  <div class="ikon-stilus">
                     <font-awesome-icon icon="fa-solid fa-calendar"/> 
                   </div>
                   {{ formatDate(post.letrehozas_datuma) }}
                 </span>
               </div>
 
-              <div class="card-header">
-                <h3 class="blog-title">{{ post.cim }}</h3>
+              <div class="kartya-fejlec">
+                <h3 class="kartya-cim">{{ post.cim }}</h3>
               </div>
               
-              <p class="description">
+              <p class="leiras">
                 {{ post.kivonat || post.tartalom?.substring(0, 150) || 'Nincs leírás...' }}
                 <span v-if="(post.kivonat || post.tartalom)?.length > 150">...</span>
               </p>
               
-              <div class="tags">
-                <div class="tag" v-for="tag in post.cimkek" :key="tag">
-                  <span class="tag-hash">#</span>{{ tag }}
+              <div class="cimkek">
+                <div class="cimke" v-for="cimke in post.cimkek" :key="cimke">
+                  <span class="cimke-hashtag">#</span>{{ cimke }}
                 </div>
               </div>
               
-              <div class="card-footer">
-                <div class="reaction-container">
+              <div class="kartya-footer">
+                <div class="reakcio-kontener">
                   <button 
-                    class="reaction-btn thumbs-up-btn" 
-                    :class="{ 'active': post.userReaction === 'like' }"
-                    @click="handleReaction(post.id, 'like')"
+                    class="reakcio-gomb like-gomb" 
+                    :class="{ 'active': post.reakcio === 'like' }"
+                    @click="reakcioKezeles(post.id, 'like')"
                   >
-                    <div class="thumb-icon">
+                    <div class="like-ikon">
                       <font-awesome-icon icon="fa-solid fa-thumbs-up"/> 
                     </div>
-                    <span class="reaction-count">{{ post.likes_count || 0 }}</span>
+                    <span class="reakciok-szama">{{ post.likes_count || 0 }}</span>
                   </button>
                   
                   <button 
-                    class="reaction-btn thumbs-down-btn" 
-                    :class="{ 'active': post.userReaction === 'dislike' }"
-                    @click="handleReaction(post.id, 'dislike')"
+                    class="reakcio-gomb dislike-gomb" 
+                    :class="{ 'active': post.reakcio === 'dislike' }"
+                    @click="reakcioKezeles(post.id, 'dislike')"
                   >
-                    <div class="thumb-icon">
+                    <div class="like-ikon">
                       <font-awesome-icon icon="fa-solid fa-thumbs-down"/> 
                     </div>
-                    <span class="reaction-count">{{ post.dislikes_count || 0 }}</span>
+                    <span class="reakciok-szama">{{ post.dislikes_count || 0 }}</span>
                   </button>
                 </div>
                 
-                <button class="view-btn" @click="navigateToBlog(post.id)">
+                <button class="poszt-megtekintese" @click="posztMegjelenitese(post.id)">
                   <span>Megtekintés</span>
-                  <div class="arrow-icon">
+                  <div class="nyil-ikon">
                         <font-awesome-icon icon="fa-solid fa-arrow-right"/>
                   </div>
                 </button>
@@ -165,11 +164,10 @@
           </div>
         </div>
       
-        <div v-if="!loading && filteredPosts.length === 0" class="no-posts-container">
-          <div class="empty-state">
-            <div class="empty-icon">📝</div>
-            <h3 class="empty-title">Nincsenek találatok</h3>
-            <p class="empty-subtitle">Próbálj másik szűrőt vagy keresési kifejezést!</p>
+        <div v-if="!loading && szurtPosztok.length === 0" class="nincs-poszt">
+          <div class="ures-allapot">
+            <div class="ures-ikon">📝</div>
+            <h3 class="ures-cim">Nincsenek találatok</h3>
           </div>
         </div>
       </section>
@@ -200,67 +198,56 @@ library.add(faCalendar, faHeart, faArrowRight,
   faArrowUp, faSortAlphaUp, faSortAlphaDown,
   faFilter)
 
-import fallbackImage from '@/assets/Public/b-pl1.jpg'
+import potKep from '@/assets/Public/b-pl1.jpg'
 
 const router = useRouter()
 const authStore = useAuthStore()
 const posztok = ref([])
-const allPosts = ref([]) // Store original posts
+const mindenPoszt = ref([])
 const loading = ref(true)
 const error = ref(null)
-const searchTerm = ref('')
-const selectedCimkek = ref([]);
-const tagOptions = ref([]);
+const keresett = ref('')
+const valasztottCimkek = ref([]);
+const cimkeOpciok = ref([]);
 
 const isAuthenticated = computed(() => authStore.isAuthenticated)
 
-// Computed properties for filtering
-const activeCimkek = computed(() =>
-  tagOptions.value.filter(tag => selectedCimkek.value.includes(tag.id))
+const aktivCimkek = computed(() =>
+  cimkeOpciok.value.filter(cimke => valasztottCimkek.value.includes(cimke.id))
 );
 
-// Fix: Proper filtering logic
-const filteredPosts = computed(() => {
-  // Start with all posts
-  let filtered = [...allPosts.value];
-  
-  // Apply search filter if there's a search term
-  if (searchTerm.value.trim()) {
-    const searchLower = searchTerm.value.toLowerCase().trim();
+const szurtPosztok = computed(() => {
+  let filtered = [...mindenPoszt.value];
+  if (keresett.value.trim()) {
+    const kisbetusSzoveg = keresett.value.toLowerCase().trim();
     filtered = filtered.filter(post => {
       return (
-        (post.cim && post.cim.toLowerCase().includes(searchLower)) ||
-        (post.kivonat && post.kivonat.toLowerCase().includes(searchLower)) ||
-        (post.tartalom && post.tartalom.toLowerCase().includes(searchLower))
+        (post.cim && post.cim.toLowerCase().includes(kisbetusSzoveg)) ||
+        (post.kivonat && post.kivonat.toLowerCase().includes(kisbetusSzoveg)) ||
+        (post.tartalom && post.tartalom.toLowerCase().includes(kisbetusSzoveg))
       );
     });
   }
   
-  // Apply tag filter if tags are selected
-  if (selectedCimkek.value.length > 0) {
+  if (valasztottCimkek.value.length > 0) {
     filtered = filtered.filter(post => {
-      // Check if post has any of the selected tags
-      // First, let's check the structure of post.cimkek
       if (!post.cimkek || !Array.isArray(post.cimkek)) {
-        return false; // No tags on this post
+        return false;
       }
       
-      // If cimkek are objects with id property
       if (post.cimkek.length > 0 && typeof post.cimkek[0] === 'object') {
         return post.cimkek.some(postTag => 
-          selectedCimkek.value.includes(postTag.id)
+          valasztottCimkek.value.includes(postTag.id)
         );
       } 
-      // If cimkek are tag names (strings)
       else if (typeof post.cimkek[0] === 'string') {
-        // Get the names of selected tags
-        const selectedTagNames = selectedCimkek.value.map(tagId => {
-          const tag = tagOptions.value.find(t => t.id === tagId);
-          return tag ? tag.name : null;
+        const valasztottCimkeNevek = valasztottCimkek.value.map(cimkeId => {
+          const cimke = cimkeOpciok.value.find(t => t.id === cimkeId);
+          return cimke ? cimke.name : null;
         }).filter(Boolean);
         
-        return post.cimkek.some(postTagName => 
-          selectedTagNames.includes(postTagName)
+        return post.cimkek.some(posztCimkeNev => 
+          valasztottCimkeNevek.includes(posztCimkeNev)
         );
       }
       
@@ -271,8 +258,7 @@ const filteredPosts = computed(() => {
   return filtered;
 });
 
-// Sorting options
-const options = [
+const opciok = [
   {
     value: 'date-desc',
     label: 'Legújabb elöl',
@@ -305,7 +291,7 @@ const options = [
   }
 ];
 
-const selected = ref({
+const valasztott = ref({
   value: 'date-desc',
   label: 'Legújabb elöl',
   icon: 'arrow-down'
@@ -318,28 +304,28 @@ function toggle() {
 }
 
 function select(option) {
-  selected.value = option;
+  valasztott.value = option;
   open.value = false;
-  applySorting();
+  rendezes();
 }
 
-function handleClickOutside(event) {
+function kiKattintas(event) {
   if (dropdown.value && !dropdown.value.contains(event.target)) {
     open.value = false;
   }
 }
 
-function removeCimke(id) {
-  const index = selectedCimkek.value.indexOf(id);
+function cimkeTorles(id) {
+  const index = valasztottCimkek.value.indexOf(id);
   if (index !== -1) {
-    selectedCimkek.value.splice(index, 1);
+    valasztottCimkek.value.splice(index, 1);
   }
 }
 
-function applySorting() {
-  const sortOption = selected.value.value;
+function rendezes() {
+  const sortOption = valasztott.value.value;
   
-  allPosts.value.sort((a, b) => {
+  mindenPoszt.value.sort((a, b) => {
     switch (sortOption) {
       case 'date-desc':
         return new Date(b.letrehozas_datuma || 0) - new Date(a.letrehozas_datuma || 0);
@@ -359,59 +345,49 @@ function applySorting() {
   });
 }
 
-// Watch for changes in selected tags and log for debugging
-watch(selectedCimkek, (newVal) => {
-  console.log('Selected tags changed:', newVal);
-  console.log('Active tags:', activeCimkek.value);
-  console.log('Filtered posts count:', filteredPosts.value.length);
-}, { deep: true });
-
-const navigateToBlog = (postId) => {
+const posztMegjelenitese = (postId) => {
   router.push(`/blog/${postId}`)
 }
 
-const fetchBlogPosts = async () => {
+const posztokLekerese = async () => {
   try {
     loading.value = true
     error.value = null
     
     const response = await api.get('/api/blog')
-    allPosts.value = response.data;
-    posztok.value = [...allPosts.value]; // Initialize posztok as well
-    console.log('Fetched posts:', allPosts.value);
-    console.log('First post cimkek:', allPosts.value[0]?.cimkek);
+    mindenPoszt.value = response.data;
+    posztok.value = [...mindenPoszt.value];
     
-    applySorting(); // Apply initial sorting
+    rendezes();
 
     if (isAuthenticated.value) {
-      await fetchUserReactions()
+      await fetchReakcio()
     }
     
   } catch (err) {
-    console.error('Error fetching blog posts:', err)
     error.value = 'Hiba történt a blog bejegyzések betöltése közben.'
   } finally {
     loading.value = false
   }
 }
 
-const fetchUserReactions = async () => {
+const fetchReakcio = async () => {
   try {
     const response = await api.get('/api/user/reactions')
-    const userReactions = response.data
+    const reakcios = response.data
     
-    allPosts.value = allPosts.value.map(post => ({
+    mindenPoszt.value = mindenPoszt.value.map(post => ({
       ...post,
-      userReaction: userReactions[post.id] || null
+      reakcio: userReactions[post.id] || null
     }))
-    posztok.value = [...allPosts.value];
+    posztok.value = [...mindenPoszt.value];
     
   } catch (err) {
     console.error('Error fetching user reactions:', err)
   }
 }
 
-const handleReaction = async (postId, reactionType) => {
+const reakcioKezeles = async (postId, reactionType) => {
   if (!isAuthenticated.value) {
     alert('Kérjük, jelentkezzen be a reakciókhoz!')
     router.push('/Belepes')
@@ -425,24 +401,23 @@ const handleReaction = async (postId, reactionType) => {
     
     const { likes_count, dislikes_count, user_reaction } = response.data
     
-    const postIndex = allPosts.value.findIndex(post => post.id === postId)
+    const postIndex = mindenPoszt.value.findIndex(post => post.id === postId)
     if (postIndex !== -1) {
-      allPosts.value[postIndex].likes_count = likes_count
-      allPosts.value[postIndex].dislikes_count = dislikes_count
-      allPosts.value[postIndex].userReaction = user_reaction
-      posztok.value = [...allPosts.value];
+      mindenPoszt.value[postIndex].likes_count = likes_count
+      mindenPoszt.value[postIndex].dislikes_count = dislikes_count
+      mindenPoszt.value[postIndex].reakcio = user_reaction
+      posztok.value = [...mindenPoszt.value];
     }
     
   } catch (err) {
-    console.error('Error updating reaction:', err)
     if (err.response?.status === 401) {
       alert('Hitelesítési hiba. Kérjük, jelentkezzen be újra.')
     }
   }
 }
 
-const handleImageError = (event) => {
-  event.target.src = fallbackImage
+const kepHiba = (event) => {
+  event.target.src = potKep
 }
 
 const formatDate = (dateString) => {
@@ -450,29 +425,28 @@ const formatDate = (dateString) => {
   return dateString
 }
 
-const fetchTagsFromDatabase = async () => {
+const fetchCimkek = async () => {
     try {
         const response = await axios.get('/api/cimkek');
         
-        tagOptions.value = response.data.map(tag => ({
-            id: tag.id,
-            name: tag.nev,
-            code: tag.nev.toLowerCase().replace(/\s+/g, '_')
+        cimkeOpciok.value = response.data.map(cimke => ({
+            id: cimke.id,
+            name: cimke.nev,
+            code: cimke.nev.toLowerCase().replace(/\s+/g, '_')
         }));
-        console.log('Fetched tags:', tagOptions.value);
     } catch (error) {
-        console.error('Error fetching tags:', error);
+        console.error('Error fetching cimkek:', error);
     }
 };
 
 onMounted(() => {
-  document.addEventListener('click', handleClickOutside);
-  fetchBlogPosts();
-  fetchTagsFromDatabase();
+  document.addEventListener('click', kiKattintas);
+  posztokLekerese();
+  fetchCimkek();
 });
 
 onBeforeUnmount(() => {
-  document.removeEventListener('click', handleClickOutside);
+  document.removeEventListener('click', kiKattintas);
 });
 
 const isVisible = ref(false);
@@ -481,7 +455,7 @@ const handleScroll = () => {
   isVisible.value = window.scrollY > 200;
 };
 
-const scrollToTop = () => {
+const ugrasFelulre = () => {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
@@ -517,7 +491,7 @@ main {
   padding-bottom: 6px;
 }
 
-.content-wrapper {
+.container {
   max-width: 1800px;
   margin: 0 auto;
   padding: 0 32px;
@@ -528,15 +502,15 @@ main {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 32px;
-  background-color: #999;
-  border-radius: 14px;
+  background-color: #a58787;
+  border-radius: 8px;
   padding: 20px 24px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   flex-wrap: wrap;
   gap: 16px;
 }
 
-.active-filters {
+.aktiv-szurok {
   display: flex;
   gap: 8px;
   align-items: center;
@@ -546,25 +520,25 @@ main {
   min-height: 40px;
 }
 
-.filter-chip {
+.valasztott-cimkek {
   display: flex;
   align-items: center;
   gap: 6px;
   padding: 8px 12px;
-  background: #e3e8ff;
-  border-radius: 999px;
+  background: #ffece3;
+  border-radius: 20px;
   font-size: 14px;
   font-weight: 500;
   transition: all 0.2s;
   border: 1px solid transparent;
 }
 
-.filter-chip:hover {
-  background: #c7d4ff;
+.valasztott-cimkek:hover {
+  background: #ffcbc7;
   transform: translateY(-1px);
 }
 
-.filter-chip .remove {
+.valasztott-cimkek .torles {
   cursor: pointer;
   font-weight: bold;
   opacity: 0.7;
@@ -573,27 +547,27 @@ main {
   line-height: 1;
 }
 
-.filter-chip .remove:hover {
+.valasztott-cimkek .torles:hover {
   opacity: 1;
 }
 
-.filters-right {
+.jobboldal {
   display: flex;
   align-items: center;
   gap: 16px;
 }
 
-.multiselect-container {
+.multiselect-kontener {
   width: 300px;
 }
 
-.custom-multiselect {
+.multiselect-stilus {
   width: 100%;
 }
 
 :deep(.p-multiselect) {
   border: 2px solid #e2e8f0 !important;
-  border-radius: 10px !important;
+  border-radius: 6px !important;
   transition: all 0.3s ease !important;
   background: white !important;
   min-height: 44px !important;
@@ -613,10 +587,11 @@ main {
   padding: 10px 14px !important;
   font-size: 15px !important;
   color: #4a5568 !important;
+  text-align: left;
 }
 
 :deep(.p-multiselect-panel) {
-  border-radius: 10px !important;
+  border-radius: 6px !important;
   border: 1px solid #e2e8f0 !important;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1) !important;
 }
@@ -624,7 +599,7 @@ main {
 :deep(.p-multiselect-chip .p-chip) {
   background: linear-gradient(135deg, #d49535 0%, #d45a35 100%) !important;
   color: white !important;
-  border-radius: 20px !important;
+  border-radius: 6px !important;
   padding: 6px 12px !important;
   font-weight: 500 !important;
   margin-right: 6px !important;
@@ -648,14 +623,14 @@ main {
 
 :deep(.p-checkbox-box.p-highlight) {
   background: #d49535 !important;
-  border-color: #667eea !important;
+  border-color: #993b3b !important;
 }
 
 :deep(.p-multiselect-header) {
   padding: 12px 16px !important;
   border-bottom: 1px solid #e2e8f0 !important;
   background: #f8fafc !important;
-  border-radius: 10px 10px 0 0 !important;
+  border-radius: 8px 8px 0 0 !important;
 }
 
 :deep(.p-multiselect-filter) {
@@ -676,40 +651,40 @@ main {
   font-size: 15px;
 }
 
-.dropdown__selected {
+.dropdown_opciok {
   display: flex;
-  align-items: center;
   gap: 10px;
   padding: 12px 16px;
   border: 2px solid #e2e8f0;
-  border-radius: 10px;
+  border-radius: 8px;
   cursor: pointer;
   background: white;
   transition: all 0.3s ease;
   min-height: 44px;
 }
 
-.dropdown__selected:hover {
+.dropdown_opciok:hover {
   border-color: #cbd5e0;
 }
 
-.dropdown__selected:active {
+.dropdown_opciok:active {
   border-color: #d49535;
 }
 
-.dropdown__menu {
+.dropdown_menu {
   position: absolute;
-  top: calc(100% + 4px);
+  top: calc(100% - 14px);
   width: 100%;
   border: 2px solid #e2e8f0;
-  border-radius: 10px;
+  border-radius: 8px;
   background: white;
   z-index: 10;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
   overflow: hidden;
+  padding: 0;
 }
 
-.dropdown__item {
+.dropdown_valasztott {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -719,11 +694,11 @@ main {
   border-bottom: 1px solid #f1f5f9;
 }
 
-.dropdown__item:last-child {
+.dropdown_valasztott:last-child {
   border-bottom: none;
 }
 
-.dropdown__item:hover {
+.dropdown_valasztott:hover {
   background: #f8fafc;
   color: #d49535;
 }
@@ -733,36 +708,36 @@ main {
   transition: transform 0.3s ease;
 }
 
-.dropdown__selected.active .chevron {
+.dropdown_opciok.active .chevron {
   transform: rotate(180deg);
 }
 
-.search-container {
+.kereses {
   display: flex;
   align-items: center;
   gap: 10px;
   padding: 10px 16px;
   border: 2px solid #e2e8f0;
-  border-radius: 10px;
+  border-radius: 8px;
   background: white;
   width: 300px;
   height: 44px;
   transition: all 0.3s ease;
 }
 
-.search-container:focus-within {
+.kereses:focus-within {
   border-color: #d49535;
   box-shadow: 0 0 0 3px rgba(77, 138, 240, 0.1);
 }
 
-.search-icon {
+.kereses-ikon {
   color: #718096;
   display: flex;
   align-items: center;
   font-size: 16px;
 }
 
-.search-container input {
+.kereses input {
   border: none;
   outline: none;
   width: 100%;
@@ -771,12 +746,12 @@ main {
   color: #4a5568;
 }
 
-.search-container input::placeholder {
+.kereses input::placeholder {
   color: #a0aec0;
 }
 
 
-.back-to-top-control {
+.ugras-felulre {
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -803,18 +778,18 @@ main {
 	}
 }
 
-.cards-wrapper {
+.kartya-kontener {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
   gap: 64px;
   padding: 48px 0;
 }
 
-.card-grid-space {
+.kartya-oszlop {
   position: relative;
 }
 
-.card {
+.kartya {
   background: var(--b-kartya);
   border-radius: 20px;
   padding: 15px;
@@ -829,7 +804,7 @@ main {
   text-align: left;
 }
 
-.card-glow {
+.kartya-glow {
   position: absolute;
   top: 0;
   left: 0;
@@ -839,25 +814,25 @@ main {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.card:hover {
+.kartya:hover {
   transform: translateY(-5px);
   box-shadow: 0 10px 30px rgba(0,0,0,0.15);
   color: var(--b-text-dark);
 }
 
-.card:hover .card-glow {
+.kartya:hover .kartya-glow {
   opacity: 1;
   height: 3px;
 }
 
-.card-img-holder {
+.kartya-kep {
   height: 240px;
   position: relative;
   overflow: hidden;
   border-radius: 20px;
 }
 
-.card-img-holder::before {
+.kartya-kep::before {
   content: '';
   position: absolute;
   top: 0;
@@ -868,29 +843,29 @@ main {
   z-index: 1;
 }
 
-.card-img-holder img {
+.kartya-kep img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   transition: all, var(--b-transition-time);
 }
 
-.card:hover .card-img-holder img {
+.kartya:hover .kartya-kep img {
   transform: scale(1.10);
 }
 
-.card-content {
+.kartya-content {
   padding: 18px;
   flex-grow: 1;
   display: flex;
   flex-direction: column;
 }
 
-.card-header {
+.kartya-fejlec {
   margin-bottom: 16px;
 }
 
-.blog-title {
+.kartya-cim {
   padding: 16px 0 8px 0;
   font-size: 24px;
   margin: 0;
@@ -902,7 +877,7 @@ main {
   background-size: 100% 3px;
 }
 
-.card:hover .blog-title {
+.kartya:hover .kartya-cim {
   color: var(--b-text-dark);
 }
 
@@ -910,7 +885,7 @@ main {
   margin-bottom: 16px;
 }
 
-.blog-time {
+.datum {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -922,7 +897,7 @@ main {
   font-weight: 500;
 }
 
-.icon-wrapper {
+.ikon-stilus {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -930,7 +905,7 @@ main {
   height: 20px;
 }
 
-.description {
+.leiras {
   padding: 16px 0;
   font-size: 16px;
   margin: 0;
@@ -939,18 +914,18 @@ main {
   overflow: hidden;
 }
 
-.card:hover .description {
+.kartya:hover .leiras {
   color: var(--b-text-dark);  
 }
 
-.tags {
+.cimkek {
   display: flex;
   flex-wrap: wrap;
   margin: 16px 0;
   gap: 8px;
 }
 
-.tag {
+.cimke {
   font-size: 12px;
   background: var(--b-tag);
   color: var(--b-text-light);
@@ -967,19 +942,19 @@ main {
   border: 1px solid #e5e7eb;
 }
 
-.tag:hover {
+.cimke:hover {
   background: var(--b-tag-hover);
   color: white;
   transform: translateY(-2px);
   box-shadow: 0 0 0 3px rgba(237, 58, 58, 0.1);
 }
 
-.tag-hash {
+.cimke-hashtag {
   opacity: 0.7;
   font-size: 14px;
 }
 
-.card-footer {
+.kartya-footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -988,13 +963,13 @@ main {
   border-top: 1px solid #d8c7c7;
 }
 
-.reaction-container {
+.reakcio-kontener {
   display: flex;
   gap: 8px;
   flex: 1;
 }
 
-.reaction-btn {
+.reakcio-gomb {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -1009,39 +984,39 @@ main {
   font-size: 14px;
 }
 
-.reaction-btn:hover {
+.reakcio-gomb:hover {
   transform: translateY(-2px);
 }
 
-.thumbs-up-btn:hover {
+.like-gomb:hover {
   background-color: #d1f7c4;
   border-color: #22c55e;
   color: #16a34a;
 }
 
-.thumbs-down-btn:hover {
+.dislike-gomb:hover {
   background-color: #ffe4e6;
   border-color: #f43f5e;
   color: #dc2626;
 }
 
-.reaction-btn.active {
+.reakcio-gomb.active {
   font-weight: 600;
 }
 
-.thumbs-up-btn.active {
+.like-gomb.active {
   background-color: #bbf7d0;
   border-color: #16a34a;
   color: #15803d;
 }
 
-.thumbs-down-btn.active {
+.dislike-gomb.active {
   background-color: #fecdd3;
   border-color: #e11d48;
   color: #be123c;
 }
 
-.thumb-icon {
+.like-ikon {
   width: 20px;
   height: 20px;
   display: flex;
@@ -1049,12 +1024,12 @@ main {
   justify-content: center;
 }
 
-.reaction-count {
+.reakciok-szama {
   font-weight: 500;
   min-width: 20px;
 }
 
-.view-btn {
+.poszt-megtekintese {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -1070,21 +1045,21 @@ main {
   box-shadow: 0 4px 6px -1px rgba(237, 58, 58, 0.2);
 }
 
-.view-btn:hover {
+.poszt-megtekintese:hover {
   transform: translateY(-2px);
   box-shadow: 0 10px 15px -3px rgba(237, 58, 58, 0.3);
   background: var(--b-gomb-hover);
 }
 
-.arrow-icon {
+.nyil-ikon {
   transition: transform 0.3s ease;
 }
 
-.view-btn:hover .arrow-icon {
+.poszt-megtekintese:hover .nyil-ikon {
   transform: translateX(3px);
 }
 
-.loading-container {
+.tolto-kontener {
   grid-column: 1 / -1;
   display: flex;
   justify-content: center;
@@ -1092,18 +1067,18 @@ main {
   min-height: 400px;
 }
 
-.loading-content {
+.tolto-content {
   text-align: center;
 }
 
-.loading-text {
+.tolto-szoveg {
   font-size: 18px;
   color: #363636;
   margin-bottom: 32px;
   font-weight: 500;
 }
 
-.spinner-wrapper {
+.toltes {
   display: flex;
   justify-content: center;
   gap: 16px;
@@ -1136,11 +1111,11 @@ main {
   }
 }
 
-.error-container {
+.hiba-kontener {
   grid-column: 1 / -1;
 }
 
-.error-card {
+.hiba-kartya {
   background: white;
   border-radius: 20px;
   padding: 48px;
@@ -1149,19 +1124,19 @@ main {
   border: 1px solid #e5e7eb;
 }
 
-.error-icon {
+.hiba-icon {
   font-size: 48px;
   margin-bottom: 24px;
 }
 
-.error-message {
+.hiba-uzenet {
   font-size: 18px;
   color: var(--text-dark);
   margin-bottom: 32px;
   line-height: 1.6;
 }
 
-.retry-btn {
+.ujra-gomb {
   background: linear-gradient(135deg, #5f1010 0%, #aa2323 100%);
   color: white;
   border: none;
@@ -1173,17 +1148,17 @@ main {
   box-shadow: 0 4px 6px -1px rgba(124, 58, 237, 0.2);
 }
 
-.retry-btn:hover {
+.ujra-gomb:hover {
   transform: translateY(-2px);
   box-shadow: 0 10px 15px -3px rgba(124, 58, 237, 0.3);
 }
 
-/* Empty State */
-.no-posts-container {
+/* Nincs poszt */
+.nincs-poszt {
   grid-column: 1 / -1;
 }
 
-.empty-state {
+.ures-allapot {
   text-align: center;
   padding: 64px 32px;
   background: white;
@@ -1192,13 +1167,13 @@ main {
   border: 1px solid #e5e7eb;
 }
 
-.empty-icon {
+.ures-ikon {
   font-size: 64px;
   margin-bottom: 24px;
   opacity: 0.8;
 }
 
-.empty-title {
+.ures-cim {
   font-family: 'Poppins', sans-serif;
   font-size: 28px;
   color: var(--text-dark);
@@ -1206,15 +1181,8 @@ main {
   font-weight: 600;
 }
 
-.empty-subtitle {
-  color: #6b7280;
-  font-size: 18px;
-  max-width: 400px;
-  margin: 0 auto;
-}
-
 @media (max-width: 1200px) {
-  .cards-wrapper {
+  .kartya-kontener {
     grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
     gap: 24px;
   }
@@ -1231,19 +1199,19 @@ main {
     gap: 16px;
   }
   
-  .search-container,
-  .multiselect-container,
+  .kereses,
+  .multiselect-kontener,
   .dropdown {
     width: 100%;
   }
   
-  .filters-right {
+  .jobboldal {
     width: 100%;
     flex-direction: column;
     gap: 16px;
   }
   
-  .active-filters {
+  .aktiv-szurok {
     margin: 0;
     justify-content: center;
   }
@@ -1254,11 +1222,11 @@ main {
     font-size: 36px;
   }
   
-  .content-wrapper {
+  .container {
     padding: 0 20px;
   }
   
-  .cards-wrapper {
+  .kartya-kontener {
     grid-template-columns: 1fr;
     gap: 24px;
     padding: 32px 0;
@@ -1274,25 +1242,25 @@ main {
     font-size: 28px;
   }
   
-  .content-wrapper {
+  .container {
     padding: 0 16px;
   }
   
-  .cards-wrapper {
+  .kartya-kontener {
     grid-template-columns: 1fr;
   }
   
-  .card {
+  .kartya {
     max-width: 100%;
   }
   
-  .card-footer {
+  .kartya-footer {
     flex-direction: column;
     gap: 16px;
     align-items: stretch;
   }
   
-  .view-btn {
+  .poszt-megtekintese {
     justify-content: center;
   }
 }

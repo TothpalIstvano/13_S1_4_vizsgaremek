@@ -1,11 +1,8 @@
 <template>
   <main>
-    <a v-show="isVisible" href="#" class="back-to-top-control" @click.prevent="scrollToTop">
-		<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-			<path stroke="none" d="M0 0h24v24H0z" fill="none" />
-			<path d="M17 3.34a10 10 0 1 1 -14.995 8.984l-.005 -.324l.005 -.324a10 10 0 0 1 14.995 -8.336zm-4.98 3.66l-.163 .01l-.086 .016l-.142 .045l-.113 .054l-.07 .043l-.095 .071l-.058 .054l-4 4l-.083 .094a1 1 0 0 0 1.497 1.32l2.293 -2.293v5.586l.007 .117a1 1 0 0 0 1.993 -.117v-5.585l2.293 2.292l.094 .083a1 1 0 0 0 1.32 -1.497l-4 -4l-.082 -.073l-.089 -.064l-.113 -.062l-.081 -.034l-.113 -.034l-.112 -.02l-.098 -.006z" stroke-width="0" fill="currentColor" />
-		</svg>
-	</a>
+    <a v-show="isVisible" href="#" class="ugras-felulre" @click.prevent="ugrasFelulre">
+      <font-awesome-icon icon="fa-solid fa-arrow-circle-up"/>
+    </a>
     <div v-if="loading" class="loading-container">
       <div class="loading-content">
         <p class="loading-text">Blogbejegyzések betöltése...</p>
@@ -122,7 +119,7 @@
             <div class="comment-count">{{ comments.length }} hozzászólás</div>
           </div>
           
-          <!-- Add Comment Form -->
+          <!-- Komment hozzáadás -->
           <div class="add-comment">
             <div class="form-header">
               <div class="form-avatar">
@@ -161,7 +158,7 @@
             </div>
           </div>
           
-          <!-- Comments List -->
+          <!-- Kommentek -->
           <div class="comments-list">
             <div v-if="loadingComments" class="loading-comments">
               <div class="loading-spinner"></div>
@@ -198,14 +195,14 @@ import {
 import { useRoute } from 'vue-router'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faCalendar, faUser, faPaperPlane, faClock, faReply, faUserCircle } from '@fortawesome/free-solid-svg-icons'
+import { faCalendar, faUser, faPaperPlane, faClock, faReply, faUserCircle, faArrowCircleUp } from '@fortawesome/free-solid-svg-icons'
 import api from '@/services/api.js'
 import axios from 'axios'
 import CommentItem from '@/components/CommentItem.vue'
 import fallbackImage from '@/assets/Public/b-pl1.jpg'
 import Image from 'primevue/image';
 
-library.add(faCalendar, faUser, faPaperPlane, faClock, faReply, faUserCircle)
+library.add(faCalendar, faUser, faPaperPlane, faClock, faReply, faUserCircle, faArrowCircleUp)
 
 const route = useRoute()
 
@@ -227,7 +224,6 @@ const fetchPost = async () => {
     const response = await api.get(`/api/blog/${postId.value}`)
     post.value = response.data
   } catch (err) {
-    console.error('Error fetching blog post:', err)
     
     if (err.response?.status === 404) {
       error.value = 'A blog bejegyzés nem található.'
@@ -263,7 +259,6 @@ const ensureCsrfToken = async () => {
     await api.get('/sanctum/csrf-cookie');
     return true;
   } catch (err) {
-    console.error('CSRF token error:', err);
     return false;
   }
 }
@@ -280,7 +275,6 @@ const addComment = async () => {
       await axios.get('http://localhost:8000/sanctum/csrf-cookie', {
         withCredentials: true
       });
-      console.log('CSRF cookie set manually');
     } catch (csrfErr) {
       console.error('Failed to get CSRF token:', csrfErr);
     }
@@ -293,7 +287,6 @@ const addComment = async () => {
     };
     
     const csrfToken = getCookie('XSRF-TOKEN');
-    console.log('CSRF Token from cookie:', csrfToken);
     
     const response = await axios.post(
       `http://localhost:8000/api/blog/${postId.value}/comments`,
@@ -322,8 +315,6 @@ const addComment = async () => {
     replyTo.value = null
     
   } catch (err) {
-    console.error('Full error object:', err);
-    console.error('Error response:', err.response);
     
     if (err.response?.status === 419) {
       alert('CSRF token hiba. Próbáld újra az oldal frissítésével (F5).');
@@ -346,7 +337,6 @@ const handleDelete = async (commentId) => {
     await api.delete(`/api/comments/${commentId}`)
     removeComment(commentId)
   } catch (err) {
-    console.error('Error deleting comment:', err)
     
     if (err.response?.status === 419) {
       alert('CSRF token hiba. Kérjük, próbáld újra.')
@@ -436,7 +426,7 @@ const handleScroll = () => {
   isVisible.value = window.scrollY > 200;
 };
 
-const scrollToTop = () => {
+const ugrasFelulre = () => {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
@@ -452,42 +442,7 @@ onBeforeUnmount(() => {
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap');
 
-.gallery-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-:deep(.p-image-preview-container) {
-  cursor: pointer;
-}
-
-:deep(.p-image-preview-indicator) {
-  background: rgba(0, 0, 0, 0.5);
-}
-
-:deep(.p-image-preview-icon) {
-  font-size: 1.5rem;
-}
-
-.gallery-item-inner {
-  position: relative;
-  height: 200px;
-  width: 100%;
-}
-
-:deep(.p-image) {
-  width: 100%;
-  height: 100%;
-}
-
-:deep(.p-image img) {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
+/*#region Loading, error és gombok*/
 .loading-container,
 .error-container,
 .blog-content {
@@ -628,7 +583,7 @@ onBeforeUnmount(() => {
   height: 24px;
 }
 
-.back-to-top-control {
+.ugras-felulre {
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -654,7 +609,9 @@ onBeforeUnmount(() => {
 		height: 24px;
 	}
 }
+/*#endregion*/
 
+/*#region Felső adatok*/
 .blog-article {
   background: rgb(252, 244, 242);
   border-radius: 24px;
@@ -748,7 +705,9 @@ onBeforeUnmount(() => {
   background: linear-gradient(to top, rgba(0, 0, 0, 0.3), transparent);
   pointer-events: none;
 }
+/*#endregion*/
 
+/*#region Tartalom*/
 .blog-body {
   margin: 48px 0;
   text-align: left;
@@ -854,7 +813,9 @@ onBeforeUnmount(() => {
   border-radius: 12px;
   border: 1px dashed white;
 }
+/*#endregion*/
 
+/*#region Címkék*/
 .tags-section {
   border-top: 2px groove rgb(255, 198, 198);
   border-bottom: 2px groove rgb(255, 198, 198);
@@ -899,7 +860,9 @@ onBeforeUnmount(() => {
   opacity: 0.7;
   font-weight: 600;
 }
+/*#endregion*/
 
+/*#region Galéria*/
 .image-gallery {
   margin: 20px 0;
 }
@@ -951,6 +914,44 @@ onBeforeUnmount(() => {
   display: block;
 }
 
+.gallery-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+:deep(.p-image-preview-container) {
+  cursor: pointer;
+}
+
+:deep(.p-image-preview-indicator) {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+:deep(.p-image-preview-icon) {
+  font-size: 1.5rem;
+}
+
+.gallery-item-inner {
+  position: relative;
+  height: 200px;
+  width: 100%;
+}
+
+:deep(.p-image) {
+  width: 100%;
+  height: 100%;
+}
+
+:deep(.p-image img) {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+/*#endregion*/
+
+/*#region Kommentek*/
 .kommentek-section {
   margin-top: 64px;
   border-top: 2px groove rgb(255, 198, 198);
@@ -1170,7 +1171,9 @@ onBeforeUnmount(() => {
   }
 }
 
-/* Responsive Design */
+/*#endregion*/
+
+/*#region Reszponzivitás */
 @media (max-width: 1024px) {
   .blog-article {
     padding: 40px;
@@ -1249,4 +1252,5 @@ onBeforeUnmount(() => {
     padding: 24px;
   }
 }
+/*#endregion*/
 </style>

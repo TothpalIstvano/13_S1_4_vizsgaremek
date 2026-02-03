@@ -3,7 +3,7 @@ import { ref, reactive, onMounted, onUnmounted, nextTick, computed, watch } from
 import Stepper from "primevue/stepper";
 import StepperPanel from "primevue/stepperpanel";
 
-// Adat bekérés változók
+// #region Adat változók
 const resz = ref(1)
 const elsoLepes = ref(null)
 const masodikLepes = ref(null)
@@ -46,22 +46,20 @@ const fonalak = [
     meromintaOszlop: 15
   }
 ]
+//#endregion
 
 async function fonalTermekBetoltese() {
     if (!masodikLepes.value || !masodikLepes.value.fonalTipus) return
     
     kosarBetoltes.value = true
     try {
-        // Clean the fonalTipus for URL
         const fonalTipusEncoded = encodeURIComponent(masodikLepes.value.fonalTipus)
         const response = await fetch(`/api/termekek/fonal-csoport/${fonalTipusEncoded}`)
         
-        // Check if response is OK
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`)
         }
         
-        // Check content type to ensure it's JSON
         const contentType = response.headers.get("content-type")
         if (!contentType || !contentType.includes("application/json")) {
             const text = await response.text()
@@ -72,22 +70,17 @@ async function fonalTermekBetoltese() {
         const data = await response.json()
         
         if (data.length > 0) {
-            fonalTermek.value = data[0] // Take the first matching product
-            
-            // Calculate needed skeins based on yarn length
+            fonalTermek.value = data[0]
             if (fonalTermek.value && fonalTermek.value.meter && fonalHossz.value > 0) {
-                // Convert cm to meters and calculate skeins
                 const fonalMeterben = fonalHossz.value / 100
                 szuksegesGombolyagok.value = Math.ceil(fonalMeterben / fonalTermek.value.meter)
             }
         } else {
-            // No products found - reset values
             fonalTermek.value = null
             szuksegesGombolyagok.value = 0
         }
     } catch (error) {
         console.error('Fonal termék betöltése sikertelen:', error)
-        // Optionally show user-friendly error message
         fonalTermek.value = null
         szuksegesGombolyagok.value = 0
     } finally {
@@ -95,7 +88,7 @@ async function fonalTermekBetoltese() {
     }
 }
 
-// Adatok feldolgozása
+//#region Adatok feldolgozása
 function kovetkezoResz() {
   if (resz.value === 1 && elsoLepes.value === "Hímzés") {
     masodikLepes.value = fonalak.find(f => f.fonalTipus === "A fonal csoport")
@@ -152,8 +145,9 @@ function toMintavaltoztato() {
     })
   }
 }
+//#endregion
 
-// Pixelesítés változók
+//#region Pixelesítés változók
 const pixelMeret = ref(15)
 const racsLathatosag = ref(20)
 const szinSzam = ref(5)
@@ -164,8 +158,9 @@ const szinPaletta = ref([])
 const kivalasztottSzinIndex = ref(null)
 const szinValtoztatasModal = ref(false)
 const ujSzin = ref('#000000')
+//#endregion
 
-
+//#region Színkiválasztás
 function automatikusSzinCsoportositas(pixelAdatok = null) {
   if (pixelSorok.value.length === 0) return
   
@@ -471,7 +466,9 @@ function getDominantColor(pixels) {
   
   return { r, g, b, a: 1 }
 }
+//#endregion
 
+//#region Változtatható inputok
 function sorLathatosagValtas(rowIndex) {
   pixelSorok.value[rowIndex].sorLathatosag = pipaltSorok[rowIndex] ? 0.5 : 1
 }
@@ -525,7 +522,9 @@ function hexToRgb(hex) {
     
     return `rgba(${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}, 1)`
 }
+//#endregion
 
+//#region Optimalizálás
 function isDarkColor(rgba) {
   const m = rgba.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/i)
   if (!m) return false
@@ -552,7 +551,9 @@ if (aktualisKep.value && pixelSorok.value.length > 0) {
     })
   }
 })
+//#endregion
 
+//#region Mentés & törlés
 function localStorageMentes(imageData) {
   localStorage.setItem('pixelesKep', imageData)
   adatokLocalStorage()
@@ -651,7 +652,9 @@ onMounted(() => {
   formBetoltes()
   elozoKep()
 })
+//#endregion
 
+//#region Áruház számítások
 const fonalHossz = computed(() => {
     const pixelRacsSor = pixelSorok.value.length
     const pixelRacsOszlop = pixelSorok.value[0]?.pixels.length || 0
@@ -663,7 +666,6 @@ const fonalHossz = computed(() => {
     
     const result = isNaN(hossz) ? 0 : Number(hossz.toFixed(1))
     
-    // Trigger skein calculation when yarn length changes
     if (result > 0 && fonalTermek.value) {
         nextTick(() => {
             const fonalMeterben = result / 100
@@ -695,7 +697,6 @@ async function fonalHozzaadasKosarhoz() {
             })
         })
         
-        // Check content type
         const contentType = response.headers.get("content-type")
         if (!contentType || !contentType.includes("application/json")) {
             const text = await response.text()
@@ -708,7 +709,6 @@ async function fonalHozzaadasKosarhoz() {
             kosarHozzaadva.value = true
             kosarModal.value = true
             
-            // Auto-close modal after 5 seconds
             setTimeout(() => {
                 kosarModal.value = false
             }, 5000)
@@ -731,7 +731,9 @@ watch(masodikLepes, (newVal) => {
 
 watch([pixelMeret, pixelSorok], () => {
 }, { deep: true })
+//#endregion
 
+//#region Már meglévő beállítás & képszélesség
 function betoltesKorabbrol() {
   const formState = {
     resz: resz.value,
@@ -775,6 +777,7 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener('resize', checkScreenWidth);
 });
+//#endregion
 
 </script>
 
@@ -782,7 +785,7 @@ onUnmounted(() => {
   <main>
     <h1 class="title">Mintakészítő</h1>
     
-    <!-- Felső sávos szövegbobozok-->
+    <!--#region Felső sávos szövegbobozok-->
     <div id="bemutato">
       <div class="ket-oszlop">
         <div class="blog-info-kontener">
@@ -820,99 +823,101 @@ onUnmounted(() => {
 
       </div>
     </div>
+    <!--#endregion-->
 
-    <!-- Adatok bekérése -->
+
+    <!--#region Adatok bekérése -->
      <!-- ide ilyet: https://v3.primevue.org/stepper/-->
     <div v-if="!pixelesKep">
 
-<!--
-<Stepper>
-    <StepperPanel header="Típus">
-              <div v-show="resz === 1" id="elsoResz" class="radioStilus">
-          <p class="cimek">Válassz típust a projektedhez:</p>
-          <div class="radioBelso">
-            <div v-for="option in tipusok" :key="option" class="radio-container">
-              <input
-                type="radio"
-                :id="option"
-                name="elsoLepes"
-                :value="option"
-                v-model="elsoLepes"
-              />
-              <label :for="option">{{ option }}</label>
+      <!--
+      <Stepper>
+        <StepperPanel header="Típus">
+                  <div v-show="resz === 1" id="elsoResz" class="radioStilus">
+              <p class="cimek">Válassz típust a projektedhez:</p>
+              <div class="radioBelso">
+                <div v-for="option in tipusok" :key="option" class="radio-container">
+                  <input
+                    type="radio"
+                    :id="option"
+                    name="elsoLepes"
+                    :value="option"
+                    v-model="elsoLepes"
+                  />
+                  <label :for="option">{{ option }}</label>
+                </div>
+              </div>
+              
+              <button
+                :disabled="!elsoLepes"
+                @click="kovetkezoResz"
+                class="tovabbGomb"
+              >
+                Következő ⇒
+              </button>
             </div>
-          </div>
-          
-          <button
-            :disabled="!elsoLepes"
-            @click="kovetkezoResz"
-            class="tovabbGomb"
-          >
-            Következő ⇒
-          </button>
-        </div>
-    </StepperPanel>
-    <StepperPanel header="Fonal">
-      <div v-show="resz === 2" id="masodikResz" class="radioStilus">
-          <p class="vissza">
-            A projekted: <strong>{{ elsoLepes }}</strong> 
-            <button @click="modositas(1)" class="visszaGomb">Vissza</button>
-          </p>
+        </StepperPanel>
+        <StepperPanel header="Fonal">
+          <div v-show="resz === 2" id="masodikResz" class="radioStilus">
+              <p class="vissza">
+                A projekted: <strong>{{ elsoLepes }}</strong> 
+                <button @click="modositas(1)" class="visszaGomb">Vissza</button>
+              </p>
 
-          <p class="cimek">Válassz fonaltípust:</p>
-          <div class="radioBelso">
-            <div v-for="(option, index) in fonalak" :key="index" class="radio-container">
-              <input
-                type="radio"
-                :id="option.fonalTipus"
-                name="masodikLepes"
-                :value="option"
-                v-model="masodikLepes"
-              />
-              <label :for="option.fonalTipus">{{ option.fonalTipus }}</label>
+              <p class="cimek">Válassz fonaltípust:</p>
+              <div class="radioBelso">
+                <div v-for="(option, index) in fonalak" :key="index" class="radio-container">
+                  <input
+                    type="radio"
+                    :id="option.fonalTipus"
+                    name="masodikLepes"
+                    :value="option"
+                    v-model="masodikLepes"
+                  />
+                  <label :for="option.fonalTipus">{{ option.fonalTipus }}</label>
+                </div>
+              </div>
+              
+              <button
+                :disabled="!masodikLepes"
+                @click="kovetkezoResz"
+                class="tovabbGomb"
+              >
+                Következő ⇒
+              </button>
             </div>
-          </div>
-          
-          <button
-            :disabled="!masodikLepes"
-            @click="kovetkezoResz"
-            class="tovabbGomb"
-          >
-            Következő ⇒
-          </button>
-        </div>
-    </StepperPanel>
-    <StepperPanel header="Fájl">
-      <div v-show="resz === 3" id="harmadikResz">
-          <p class="vissza">
-            A projekted: <strong>{{ elsoLepes }}</strong> 
-            <button @click="modositas(1)" class="visszaGomb">Vissza</button>
-          </p>
-          <p class="vissza">
-            A fonaltípusod: <strong>{{masodikLepes?.fonalTipus || masodikLepes}}</strong> 
-            <button @click="modositas(2)" class="visszaGomb">Vissza</button>
-          </p>
+        </StepperPanel>
+        <StepperPanel header="Fájl">
+          <div v-show="resz === 3" id="harmadikResz">
+              <p class="vissza">
+                A projekted: <strong>{{ elsoLepes }}</strong> 
+                <button @click="modositas(1)" class="visszaGomb">Vissza</button>
+              </p>
+              <p class="vissza">
+                A fonaltípusod: <strong>{{masodikLepes?.fonalTipus || masodikLepes}}</strong> 
+                <button @click="modositas(2)" class="visszaGomb">Vissza</button>
+              </p>
 
-          <p class="cimek">Fájl feltöltése:</p>
-          <label for="file-upload" class="file-upload-label">
-            Kép kiválasztása
-          </label>
-          <input id="file-upload" type="file" @change="kepfeltoltes" accept="image/*" />
-          
-          <div v-if="file" class="file-preview-container">
-            <img :src="kepUrl" alt="Preview" class="file-preview" />
-            <p>{{ file.name }}</p>
-          </div>
+              <p class="cimek">Fájl feltöltése:</p>
+              <label for="file-upload" class="file-upload-label">
+                Kép kiválasztása
+              </label>
+              <input id="file-upload" type="file" @change="kepfeltoltes" accept="image/*" />
+              
+              <div v-if="file" class="file-preview-container">
+                <img :src="kepUrl" alt="Preview" class="file-preview" />
+                <p>{{ file.name }}</p>
+              </div>
 
-          <button
-            :disabled="!file"
-            @click="toMintavaltoztato" 
-            class="tovabbGomb">
-            Minta készítése ⇒
-          </button>
-        </div>
-    </StepperPanel>
-</Stepper>-->
+              <button
+                :disabled="!file"
+                @click="toMintavaltoztato" 
+                class="tovabbGomb">
+                Minta készítése ⇒
+              </button>
+            </div>
+        </StepperPanel>
+    </Stepper>-->
 
       <div id="adatok">
         <div class="progress-container">
@@ -1022,8 +1027,9 @@ onUnmounted(() => {
         </div>
       </div>
     </div>
+    <!--#endregion-->
 
-    <!-- Pixelesített kép -->
+    <!--#region Elkészült minta -->
     <div v-else class="pixelation-main-container">
       <div class="pixelesContainer">
         <h1>Minta változtató</h1>
@@ -1032,7 +1038,7 @@ onUnmounted(() => {
           <p>Nincs kép betöltve. Kérjük, menj vissza és tölts fel egy képet.</p>
           <button @click="adatokVissza" class="visszaGomb">Vissza a feltöltéshez</button>
         </div>
-
+        <!--#region Módosítások-->
         <div v-else class="modositoContainer">
           <div class="modositas">
               <div class="valtoztatok">
@@ -1187,138 +1193,144 @@ onUnmounted(() => {
             <button @click="kepTorles" class="gomb">Új kép</button>
           </div>
         </div>
+        <!--#endregion-->
       </div>
       
 
-      <!-- Oldalsáv -->
-<div class="oldalsav">
-          <div class="oldal-kartya">
-            <h3>Projekt adatai</h3>
-            <p><strong>Technika:</strong> {{ elsoLepes }}</p>
-            <p><strong>Fonal vastagsága:</strong> {{ masodikLepes.fonalTipus }}</p>
-            <p><strong>Minta mérete:</strong> {{ pixelSorok.length }}×{{ pixelSorok[0]?.pixels.length || 0 }}</p>
-            <p><strong>Szükséges fonalhossz:</strong> {{ fonalHossz }} cm</p>
+      <!--#region Oldalsáv -->
+      <div class="oldalsav">
+        <div class="oldal-kartya">
+          <h3>Projekt adatai</h3>
+          <p><strong>Technika:</strong> {{ elsoLepes }}</p>
+          <p><strong>Fonal vastagsága:</strong> {{ masodikLepes.fonalTipus }}</p>
+          <p><strong>Minta mérete:</strong> {{ pixelSorok.length }}×{{ pixelSorok[0]?.pixels.length || 0 }}</p>
+          <p><strong>Szükséges fonalhossz:</strong> {{ fonalHossz }} cm</p>
+          <p><strong>Befejezett sorok:</strong> {{ Object.values(pipaltSorok).filter(Boolean).length }}</p>
+        </div>
+          
+        <div class="oldal-kartya">
+          <h3>Tippek</h3>
+          <ul>
+            <li>Jelöld meg azokat a sorokat, amelyeket külön szeretnél kezelni</li>
+            <li>Kisebb pixel méret részletesebb mintát ad</li>
+            <li>A rács átlátszósága segít a minta követésében</li>
+            <li>A számított fonalmennyiség csak tájékoztató jellegű</li>
+          </ul>
+        </div>
+
+        <div class="oldal-kartya">
+          <div v-if="fonalTermek && szuksegesGombolyagok > 0" class="fonal-info">
+            <div class="fonal-header">
+              <h4>Szükséges anyag:</h4>
+              <div v-if="kosarBetoltes" class="loading-spinner"></div>
+            </div>
             
-            <!-- Yarn requirements section -->
-            <div v-if="fonalTermek && szuksegesGombolyagok > 0" class="fonal-info">
-              <div class="fonal-header">
-                <h4>Szükséges anyag:</h4>
-                <div v-if="kosarBetoltes" class="loading-spinner"></div>
+            <div class="fonal-details">
+              <div class="fonal-kep">
+                <img v-if="fonalTermek.termek_fo_kep?.url_Link" 
+                      :src="fonalTermek.termek_fo_kep.url_Link" 
+                      :alt="fonalTermek.nev"
+                      class="fonal-kep-img">
               </div>
-              
-              <div class="fonal-details">
-                <div class="fonal-kep">
-                  <img v-if="fonalTermek.termek_fo_kep?.url_Link" 
-                       :src="fonalTermek.termek_fo_kep.url_Link" 
-                       :alt="fonalTermek.nev"
-                       class="fonal-kep-img">
-                </div>
-                <div class="fonal-adatok">
-                  <p class="fonal-nev">{{ fonalTermek.nev }}</p>
-                  <p class="fonal-ar">{{ fonalTermek.ar.toLocaleString('hu-HU') }} Ft/gombolyag</p>
-                  <p class="fonal-mennyiseg">
-                    <strong>{{ szuksegesGombolyagok }} gombolyag</strong> 
-                    ({{ fonalTermek.meter }} m/gombolyag)
-                  </p>
-                  <p class="fonal-osszeg">
-                    Összesen: <strong>{{ (fonalTermek.ar * szuksegesGombolyagok).toLocaleString('hu-HU') }} Ft</strong>
-                  </p>
-                </div>
+              <div class="fonal-adatok">
+                <p class="fonal-nev">{{ fonalTermek.nev }}</p>
+                <p class="fonal-ar">{{ fonalTermek.ar.toLocaleString('hu-HU') }} Ft/gombolyag</p>
+                <p class="fonal-mennyiseg">
+                  <strong>{{ szuksegesGombolyagok }} gombolyag</strong> 
+                  ({{ fonalTermek.meter }} m/gombolyag)
+                </p>
+                <p class="fonal-osszeg">
+                  Összesen: <strong>{{ (fonalTermek.ar * szuksegesGombolyagok).toLocaleString('hu-HU') }} Ft</strong>
+                </p>
               </div>
-              
-              <button 
-                @click="fonalHozzaadasKosarhoz" 
-                :disabled="kosarBetoltes || kosarHozzaadva"
-                class="kosar-gomb"
-                :class="{ 'hozzaadva': kosarHozzaadva }">
-                {{ kosarHozzaadva ? '✓ Hozzáadva' : (kosarBetoltes ? 'Feldolgozás...' : 'Kosárhoz adás') }}
-              </button>
             </div>
             
-            <div v-else-if="kosarBetoltes" class="fonal-betoltes">
-              <p>Fonal információk betöltése...</p>
-            </div>
-            <div v-else class="fonal-nincs">
-              <p>Válassz fonaltípust a fonal számításához</p>
-            </div>
-            
-            <p><strong>Befejezett sorok:</strong> {{ Object.values(pipaltSorok).filter(Boolean).length }}</p>
+            <button 
+              @click="fonalHozzaadasKosarhoz" 
+              :disabled="kosarBetoltes || kosarHozzaadva"
+              class="kosar-gomb"
+              :class="{ 'hozzaadva': kosarHozzaadva }">
+              {{ kosarHozzaadva ? '✓ Hozzáadva' : (kosarBetoltes ? 'Feldolgozás...' : 'Kosárhoz adás') }}
+            </button>
           </div>
           
-          <div class="oldal-kartya">
-            <h3>Tippek</h3>
-            <ul>
-              <li>Jelöld meg azokat a sorokat, amelyeket külön szeretnél kezelni</li>
-              <li>Kisebb pixel méret részletesebb mintát ad</li>
-              <li>A rács átlátszósága segít a minta követésében</li>
-              <li>A számított fonalmennyiség csak tájékoztató jellegű</li>
-            </ul>
+          <div v-else-if="kosarBetoltes" class="fonal-betoltes">
+            <p>Fonal információk betöltése...</p>
+          </div>
+          <div v-else class="fonal-nincs">
+            <p>Válassz fonaltípust a fonal számításához</p>
           </div>
         </div>
+      </div>
+      <!--#endregion-->
 
-        <!-- Cart Success Modal -->
-        <div v-if="kosarModal" class="modal-overlay" @click="kosarModal = false">
-          <div class="modal-content kosar-modal" @click.stop>
-            <button class="modal-close" @click="kosarModal = false">×</button>
+      <!--#region Kosár -->
+      <div v-if="kosarModal" class="modal-overlay" @click="kosarModal = false">
+        <div class="modal-content kosar-modal" @click.stop>
+          <button class="modal-close" @click="kosarModal = false">×</button>
+          <div class="modal-success">
+            <div class="success-icon">✓</div>
+            <h3>Sikeresen hozzáadva a kosárhoz!</h3>
             
-            <div class="modal-success">
-              <div class="success-icon">✓</div>
-              <h3>Sikeresen hozzáadva a kosárhoz!</h3>
+            <div class="kosar-termek-info">
+              <img v-if="fonalTermek?.termek_fo_kep?.url_Link" 
+                    :src="fonalTermek.termek_fo_kep.url_Link" 
+                    :alt="fonalTermek.nev"
+                    class="modal-termek-kep">
               
-              <div class="kosar-termek-info">
-                <img v-if="fonalTermek?.termek_fo_kep?.url_Link" 
-                     :src="fonalTermek.termek_fo_kep.url_Link" 
-                     :alt="fonalTermek.nev"
-                     class="modal-termek-kep">
-                
-                <div class="modal-termek-details">
-                  <p class="modal-termek-nev">{{ fonalTermek?.nev }}</p>
-                  <p class="modal-termek-mennyiseg">
-                    {{ szuksegesGombolyagok }} gombolyag × 
-                    {{ fonalTermek?.ar?.toLocaleString('hu-HU') }} Ft
-                  </p>
-                  <p class="modal-termek-osszeg">
-                    Összesen: <strong>{{ (fonalTermek?.ar * szuksegesGombolyagok).toLocaleString('hu-HU') }} Ft</strong>
-                  </p>
-                </div>
-              </div>
-              
-              <div class="modal-gombok">
-                <button @click="kosarModal = false" class="modal-gomb folytatas">
-                  Folytatás
-                </button>
-                <router-link to="/kosar" class="modal-gomb kosar">
-                  Kosár megtekintése
-                </router-link>
+              <div class="modal-termek-details">
+                <p class="modal-termek-nev">{{ fonalTermek?.nev }}</p>
+                <p class="modal-termek-mennyiseg">
+                  {{ szuksegesGombolyagok }} gombolyag × 
+                  {{ fonalTermek?.ar?.toLocaleString('hu-HU') }} Ft
+                </p>
+                <p class="modal-termek-osszeg">
+                  Összesen: <strong>{{ (fonalTermek?.ar * szuksegesGombolyagok).toLocaleString('hu-HU') }} Ft</strong>
+                </p>
               </div>
             </div>
-          </div>
-        </div>
-
-        <div v-if="szinValtoztatasModal" class="modal-overlay" @click="szinValtoztatasModal = false">
-          <div class="modal-content" @click.stop>
-            <h3 style="color: var(--mk-text-light);">Szín módosítása</h3>
-            <div class="szin-osszehasonlitas">
-              <div class="szin-minta" :style="{ backgroundColor: szinPaletta[kivalasztottSzinIndex]?.eredeti }"></div>
-              <span style="color: var(--mk-text-light);">→</span>
-              <div class="szin-minta" :style="{ backgroundColor: ujSzin }"></div>
-            </div>
-            <input type="color" v-model="ujSzin" class="szin-valaszto" />
+            
             <div class="modal-gombok">
-              <button @click="szinValtoztatasModal = false" class="szinek-gomb-megse">Mégse</button>
-              <button @click="szinFrissites" class="szinek-gomb-mentes">Mentés</button>
+              <button @click="kosarModal = false" class="modal-gomb folytatas">
+                Folytatás
+              </button>
+              <router-link to="/kosar" class="modal-gomb kosar">
+                Kosár megtekintése
+              </router-link>
             </div>
           </div>
         </div>
+      </div>
+      <!--#endregion-->
+
+      <!--#region Színváltoztatás-->
+      <div v-if="szinValtoztatasModal" class="modal-overlay" @click="szinValtoztatasModal = false">
+        <div class="modal-content" @click.stop>
+          <h3 style="color: var(--mk-text-light);">Szín módosítása</h3>
+          <div class="szin-osszehasonlitas">
+            <div class="szin-minta" :style="{ backgroundColor: szinPaletta[kivalasztottSzinIndex]?.eredeti }"></div>
+            <span style="color: var(--mk-text-light);">→</span>
+            <div class="szin-minta" :style="{ backgroundColor: ujSzin }"></div>
+          </div>
+          <input type="color" v-model="ujSzin" class="szin-valaszto" />
+          <div class="modal-gombok">
+            <button @click="szinValtoztatasModal = false" class="szinek-gomb-megse">Mégse</button>
+            <button @click="szinFrissites" class="szinek-gomb-mentes">Mentés</button>
+          </div>
+        </div>
+      </div>
+      <!--#endregion-->
 
     </div>
-    <!-- Alert -->
+    <!--#region Alert -->
     <div class="alert-overlay" :class="{ active: showAlert }">
       <div class="alert success">
         <span class="closebtn" @click="showAlert = false">&times;</span>  
         <strong>A jobb láthatóság érdekében fordítsa el az eszközét.</strong> 
       </div>
     </div>
+    <!--#endregion-->
+    <!--#endregion-->
   </main>
 </template>
 
@@ -1467,7 +1479,6 @@ main {
   font-style: italic;
 }
 
-/* Cart Modal Styles */
 .kosar-modal {
   max-width: 400px;
 }
@@ -1599,7 +1610,6 @@ main {
   color: #333;
 }
 
-/* Responsive adjustments */
 @media (max-width: 768px) {
   .fonal-details {
     flex-direction: column;
@@ -2525,6 +2535,7 @@ input[type="file"] {
 }
 /*#endregion*/
 
+/*#region Reszponzivitás*/
 @media (max-width: 1250px) {
   .ket-oszlop {
     grid-template-columns: 1fr;
@@ -2624,5 +2635,5 @@ input[type="file"] {
     padding: 16px;
   }
 }
-
+/*#endregion*/
 </style>
