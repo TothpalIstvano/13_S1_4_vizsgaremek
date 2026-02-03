@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 
 class VerifyEmailController extends Controller
@@ -27,5 +28,13 @@ class VerifyEmailController extends Controller
         return redirect()->intended(
             config('app.frontend_url').'/dashboard?verified=1'
         );
+    }
+
+    public function notice(Request $request)
+    {
+        return response()->json([
+            'message' => 'You need to verify your email address.',
+            'resend_url' => route('verification.send'),
+        ], 403);
     }
 }

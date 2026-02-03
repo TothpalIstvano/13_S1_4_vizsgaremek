@@ -53,16 +53,25 @@
 </template>
 
 <script setup>
-import { inject, ref, watch } from 'vue'
+import { inject, onMounted, ref, watch } from 'vue'
 import axios from 'axios' 
 import router from '@/router/router'
 
-//#region reactive elements
-const loggedIn = inject('loggedIn');
+async function check (){
+    try {
+      const response = await axios.get('/api/user/check', { withCredentials: true })
+      if (response.data.loggedIn) {
+        router.push('/profil')
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
-if (loggedIn && loggedIn.value) {
-  router.push('/profil'); // initially not logged in
-}
+onMounted(() => {
+  check();
+});
+
 
 const isSignInMode = ref(true)
 const loading = ref(false)

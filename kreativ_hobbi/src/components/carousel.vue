@@ -138,10 +138,15 @@ onMounted(() => {
     top: 100px;
     animation: fade-in 1.5s ease-in-out;
     opacity: 1;
+    overflow: hidden;          
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 6; /* number of lines to show */
+    -webkit-box-orient: vertical;
 }
 #carouselPrice{
     position: absolute;
-    top: 200px;
+    top: 270px;
     width: 25%; 
     overflow: hidden;
     animation: fade-in 1.5s ease-in-out;

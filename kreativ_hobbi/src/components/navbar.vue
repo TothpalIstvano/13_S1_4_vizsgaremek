@@ -13,7 +13,7 @@ const xbeValtas = ref(false);
 const navbarRef = ref(null)
 const userPath = ref('/Belepes');
 const isLoggedIn = ref('Bejelentkezés');
-const logged = inject('loggedIn');
+let altSzoveg = 'Profilkép';
 
 function open() {
   if (window.innerWidth > 1200) {
@@ -45,28 +45,33 @@ function handleClickOutside(event) {
 
 //response limitálása
 async function checkUser() {
-  try {
-    const response = await axios.get('/api/user/check', { withCredentials: true });
-
-    if (response.data.loggedIn && response.data.user) {
-      const user = response.data.user;
-      const baseUrl = import.meta.env.VITE_API_URL;
-      const hasProfileImage = user.profilKep_id;
-
-      userPath.value = '/Profil';
-      if (hasProfileImage) {
-        isLoggedIn.value = `${baseUrl}/storage/profilKepek/kep_${hasProfileImage}.jpg`;
-      } else {
-        isLoggedIn.value = `${baseUrl}/storage/profilKepek/default.jpg`;
-      }
-    } else {
+  const check = await axios.get('/api/user/check', { withCredentials: true });
+  if (!check.data.loggedIn) {
+    userPath.value = '/Belepes';
+    isLoggedIn.value = 'Bejelentkezés';
+    return;
+  }
+  else {
+    try {
+      const response = await axios.get('/api/user', { withCredentials: true });
+      if (response.data) {
+        const user = response.data;
+        const baseUrl = import.meta.env.VITE_API_URL;
+        const hasProfileImage =  user.profil_kep;
+        userPath.value = '/Profil';
+        if (hasProfileImage) {
+          isLoggedIn.value = user.profil_kep.url_Link;
+          altSzoveg = 'Profilkép';
+        } else {
+          isLoggedIn.value = `${baseUrl}/storage/profilKepek/default.jpg`;
+          altSzoveg = 'Alapértelmezett profilkép';
+        }
+      } 
+    } catch (error) {
+      console.error('Error checking user:', error);
       userPath.value = '/Belepes';
       isLoggedIn.value = 'Bejelentkezés';
     }
-  } catch (error) {
-    console.error('Error checking user:', error);
-    userPath.value = '/Belepes';
-    isLoggedIn.value = 'Bejelentkezés';
   }
 }
 
@@ -172,7 +177,7 @@ onUnmounted(() => {
           class="menu_link" 
           :class="{ hamburgerElem: !latszik }"
           :to="userPath"
-        ><p v-if="isLoggedIn === 'Bejelentkezés'">{{ isLoggedIn }}</p> <img id="profilkep" v-else :src="isLoggedIn" /></RouterLink>
+        ><p v-if="isLoggedIn === 'Bejelentkezés'">{{ isLoggedIn }}</p> <img id="profilkep" v-else :src="isLoggedIn" :alt="altSzoveg" /></RouterLink>
 
       </nav>
     </header>
