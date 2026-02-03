@@ -12,6 +12,11 @@ const pixelesKep = ref(false)
 const kepUrl = ref(null)
 const aktualisKep = ref(null)
 const betoltottKep = ref(false)
+const fonalTermek = ref(null)
+const szuksegesGombolyagok = ref(0)
+const kosarModal = ref(false)
+const kosarHozzaadva = ref(false)
+const kosarBetoltes = ref(false)
 
 const tipusok = ["Horgolás", "Kötés", "Hímzés"]
 const fonalak = [
@@ -41,6 +46,54 @@ const fonalak = [
     meromintaOszlop: 15
   }
 ]
+
+async function fonalTermekBetoltese() {
+    if (!masodikLepes.value || !masodikLepes.value.fonalTipus) return
+    
+    kosarBetoltes.value = true
+    try {
+        // Clean the fonalTipus for URL
+        const fonalTipusEncoded = encodeURIComponent(masodikLepes.value.fonalTipus)
+        const response = await fetch(`/api/termekek/fonal-csoport/${fonalTipusEncoded}`)
+        
+        // Check if response is OK
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`)
+        }
+        
+        // Check content type to ensure it's JSON
+        const contentType = response.headers.get("content-type")
+        if (!contentType || !contentType.includes("application/json")) {
+            const text = await response.text()
+            console.error('Expected JSON but got:', text.substring(0, 100))
+            throw new Error("Response was not JSON")
+        }
+        
+        const data = await response.json()
+        
+        if (data.length > 0) {
+            fonalTermek.value = data[0] // Take the first matching product
+            
+            // Calculate needed skeins based on yarn length
+            if (fonalTermek.value && fonalTermek.value.meter && fonalHossz.value > 0) {
+                // Convert cm to meters and calculate skeins
+                const fonalMeterben = fonalHossz.value / 100
+                szuksegesGombolyagok.value = Math.ceil(fonalMeterben / fonalTermek.value.meter)
+            }
+        } else {
+            // No products found - reset values
+            fonalTermek.value = null
+            szuksegesGombolyagok.value = 0
+        }
+    } catch (error) {
+        console.error('Fonal termék betöltése sikertelen:', error)
+        // Optionally show user-friendly error message
+        fonalTermek.value = null
+        szuksegesGombolyagok.value = 0
+    } finally {
+        kosarBetoltes.value = false
+    }
+}
 
 // Adatok feldolgozása
 function kovetkezoResz() {
@@ -600,15 +653,81 @@ onMounted(() => {
 })
 
 const fonalHossz = computed(() => {
-  const pixelRacsSor = pixelSorok.value.length
-  const pixelRacsOszlop = pixelSorok.value[0]?.pixels.length || 0
-  
-  const hossz = ((pixelRacsSor * pixelRacsOszlop) / 
-                (masodikLepes.value.meromintaSor * masodikLepes.value.meromintaOszlop)) * 100
-  
-  
-  return isNaN(hossz) ? 0 : Number(hossz.toFixed(1))
+    const pixelRacsSor = pixelSorok.value.length
+    const pixelRacsOszlop = pixelSorok.value[0]?.pixels.length || 0
+    
+    if (pixelRacsSor === 0 || pixelRacsOszlop === 0 || !masodikLepes.value) return 0
+    
+    const hossz = ((pixelRacsSor * pixelRacsOszlop) / 
+                  (masodikLepes.value.meromintaSor * masodikLepes.value.meromintaOszlop)) * 100
+    
+    const result = isNaN(hossz) ? 0 : Number(hossz.toFixed(1))
+    
+    // Trigger skein calculation when yarn length changes
+    if (result > 0 && fonalTermek.value) {
+        nextTick(() => {
+            const fonalMeterben = result / 100
+            szuksegesGombolyagok.value = Math.ceil(fonalMeterben / fonalTermek.value.meter)
+        })
+    }
+    
+    return result
 })
+
+async function fonalHozzaadasKosarhoz() {
+    if (!fonalTermek.value || szuksegesGombolyagok.value <= 0) {
+        alert('Kérjük, először válassz fonaltípust!')
+        return
+    }
+    
+    kosarBetoltes.value = true
+    try {
+        const response = await fetch('/api/kosar/hozzaad', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+            },
+            body: JSON.stringify({
+                termek_id: fonalTermek.value.id,
+                mennyiseg: szuksegesGombolyagok.value
+            })
+        })
+        
+        // Check content type
+        const contentType = response.headers.get("content-type")
+        if (!contentType || !contentType.includes("application/json")) {
+            const text = await response.text()
+            throw new Error(`Nem JSON válasz érkezett: ${text.substring(0, 100)}`)
+        }
+        
+        const data = await response.json()
+        
+        if (response.ok) {
+            kosarHozzaadva.value = true
+            kosarModal.value = true
+            
+            // Auto-close modal after 5 seconds
+            setTimeout(() => {
+                kosarModal.value = false
+            }, 5000)
+        } else {
+            alert('Hiba: ' + (data.error || 'Ismeretlen hiba történt'))
+        }
+    } catch (error) {
+        console.error('Kosárhoz adás sikertelen:', error)
+        alert('Hiba történt a kosárhoz adás során: ' + error.message)
+    } finally {
+        kosarBetoltes.value = false
+    }
+}
+
+watch(masodikLepes, (newVal) => {
+    if (newVal && newVal.fonalTipus) {
+        fonalTermekBetoltese()
+    }
+}, { immediate: true })
 
 watch([pixelMeret, pixelSorok], () => {
 }, { deep: true })
@@ -1072,22 +1191,107 @@ onUnmounted(() => {
       
 
       <!-- Oldalsáv -->
-      <div class="oldalsav">
+<div class="oldalsav">
           <div class="oldal-kartya">
             <h3>Projekt adatai</h3>
             <p><strong>Technika:</strong> {{ elsoLepes }}</p>
             <p><strong>Fonal vastagsága:</strong> {{ masodikLepes.fonalTipus }}</p>
             <p><strong>Minta mérete:</strong> {{ pixelSorok.length }}×{{ pixelSorok[0]?.pixels.length || 0 }}</p>
-            <p><strong>Szükséges fonalhossz: ~</strong> {{ fonalHossz }} cm</p>
+            <p><strong>Szükséges fonalhossz:</strong> {{ fonalHossz }} cm</p>
+            
+            <!-- Yarn requirements section -->
+            <div v-if="fonalTermek && szuksegesGombolyagok > 0" class="fonal-info">
+              <div class="fonal-header">
+                <h4>Szükséges anyag:</h4>
+                <div v-if="kosarBetoltes" class="loading-spinner"></div>
+              </div>
+              
+              <div class="fonal-details">
+                <div class="fonal-kep">
+                  <img v-if="fonalTermek.termek_fo_kep?.url_Link" 
+                       :src="fonalTermek.termek_fo_kep.url_Link" 
+                       :alt="fonalTermek.nev"
+                       class="fonal-kep-img">
+                </div>
+                <div class="fonal-adatok">
+                  <p class="fonal-nev">{{ fonalTermek.nev }}</p>
+                  <p class="fonal-ar">{{ fonalTermek.ar.toLocaleString('hu-HU') }} Ft/gombolyag</p>
+                  <p class="fonal-mennyiseg">
+                    <strong>{{ szuksegesGombolyagok }} gombolyag</strong> 
+                    ({{ fonalTermek.meter }} m/gombolyag)
+                  </p>
+                  <p class="fonal-osszeg">
+                    Összesen: <strong>{{ (fonalTermek.ar * szuksegesGombolyagok).toLocaleString('hu-HU') }} Ft</strong>
+                  </p>
+                </div>
+              </div>
+              
+              <button 
+                @click="fonalHozzaadasKosarhoz" 
+                :disabled="kosarBetoltes || kosarHozzaadva"
+                class="kosar-gomb"
+                :class="{ 'hozzaadva': kosarHozzaadva }">
+                {{ kosarHozzaadva ? '✓ Hozzáadva' : (kosarBetoltes ? 'Feldolgozás...' : 'Kosárhoz adás') }}
+              </button>
+            </div>
+            
+            <div v-else-if="kosarBetoltes" class="fonal-betoltes">
+              <p>Fonal információk betöltése...</p>
+            </div>
+            <div v-else class="fonal-nincs">
+              <p>Válassz fonaltípust a fonal számításához</p>
+            </div>
+            
             <p><strong>Befejezett sorok:</strong> {{ Object.values(pipaltSorok).filter(Boolean).length }}</p>
           </div>
+          
           <div class="oldal-kartya">
             <h3>Tippek</h3>
             <ul>
               <li>Jelöld meg azokat a sorokat, amelyeket külön szeretnél kezelni</li>
               <li>Kisebb pixel méret részletesebb mintát ad</li>
               <li>A rács átlátszósága segít a minta követésében</li>
+              <li>A számított fonalmennyiség csak tájékoztató jellegű</li>
             </ul>
+          </div>
+        </div>
+
+        <!-- Cart Success Modal -->
+        <div v-if="kosarModal" class="modal-overlay" @click="kosarModal = false">
+          <div class="modal-content kosar-modal" @click.stop>
+            <button class="modal-close" @click="kosarModal = false">×</button>
+            
+            <div class="modal-success">
+              <div class="success-icon">✓</div>
+              <h3>Sikeresen hozzáadva a kosárhoz!</h3>
+              
+              <div class="kosar-termek-info">
+                <img v-if="fonalTermek?.termek_fo_kep?.url_Link" 
+                     :src="fonalTermek.termek_fo_kep.url_Link" 
+                     :alt="fonalTermek.nev"
+                     class="modal-termek-kep">
+                
+                <div class="modal-termek-details">
+                  <p class="modal-termek-nev">{{ fonalTermek?.nev }}</p>
+                  <p class="modal-termek-mennyiseg">
+                    {{ szuksegesGombolyagok }} gombolyag × 
+                    {{ fonalTermek?.ar?.toLocaleString('hu-HU') }} Ft
+                  </p>
+                  <p class="modal-termek-osszeg">
+                    Összesen: <strong>{{ (fonalTermek?.ar * szuksegesGombolyagok).toLocaleString('hu-HU') }} Ft</strong>
+                  </p>
+                </div>
+              </div>
+              
+              <div class="modal-gombok">
+                <button @click="kosarModal = false" class="modal-gomb folytatas">
+                  Folytatás
+                </button>
+                <router-link to="/kosar" class="modal-gomb kosar">
+                  Kosár megtekintése
+                </router-link>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -1151,6 +1355,266 @@ main {
   padding-bottom: 6px;
 }
 
+.fonal-info {
+  margin: 20px 0;
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+}
+
+.fonal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.fonal-header h4 {
+  margin: 0;
+  color: var(--mk-text-light);
+}
+
+.loading-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: var(--mk-text-light);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.fonal-details {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.fonal-kep {
+  flex-shrink: 0;
+}
+
+.fonal-kep-img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.fonal-adatok {
+  flex: 1;
+  text-align: left;
+}
+
+.fonal-nev {
+  font-weight: 600;
+  margin: 0 0 5px 0;
+  color: var(--mk-text-light);
+  font-size: 14px;
+}
+
+.fonal-ar,
+.fonal-mennyiseg,
+.fonal-osszeg {
+  margin: 3px 0;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 13px;
+}
+
+.fonal-osszeg {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.kosar-gomb {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 14px;
+}
+
+.kosar-gomb:hover:not(:disabled) {
+  background: linear-gradient(135deg, #45a049 0%, #3d8b40 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+}
+
+.kosar-gomb:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.kosar-gomb.hozzaadva {
+  background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+}
+
+.fonal-betoltes,
+.fonal-nincs {
+  padding: 20px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.7);
+  font-style: italic;
+}
+
+/* Cart Modal Styles */
+.kosar-modal {
+  max-width: 400px;
+}
+
+.modal-success {
+  text-align: center;
+}
+
+.success-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+  color: white;
+  font-size: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  font-weight: bold;
+}
+
+.modal-success h3 {
+  margin: 0 0 20px 0;
+  color: var(--mk-text-dark);
+}
+
+.kosar-termek-info {
+  display: flex;
+  gap: 15px;
+  padding: 15px;
+  background: #f5f5f5;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.modal-termek-kep {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.modal-termek-details {
+  flex: 1;
+  text-align: left;
+}
+
+.modal-termek-nev {
+  font-weight: 600;
+  margin: 0 0 5px 0;
+  color: #333;
+}
+
+.modal-termek-mennyiseg,
+.modal-termek-osszeg {
+  margin: 5px 0;
+  color: #666;
+  font-size: 14px;
+}
+
+.modal-termek-osszeg {
+  font-size: 16px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #ddd;
+}
+
+.modal-gombok {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.modal-gomb {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  text-align: center;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.modal-gomb.folytatas {
+  background: #f0f0f0;
+  color: #333;
+}
+
+.modal-gomb.folytatas:hover {
+  background: #e0e0e0;
+}
+
+.modal-gomb.kosar {
+  background: linear-gradient(135deg, #3f51b5 0%, #303f9f 100%);
+  color: white;
+}
+
+.modal-gomb.kosar:hover {
+  background: linear-gradient(135deg, #303f9f 0%, #283593 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(63, 81, 181, 0.3);
+}
+
+.modal-close {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #666;
+  cursor: pointer;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.modal-close:hover {
+  background: #f5f5f5;
+  color: #333;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .fonal-details {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .fonal-adatok {
+    text-align: center;
+  }
+  
+  .modal-gombok {
+    flex-direction: column;
+  }
+}
+
 /*#region felső szövegdobozok*/
 #bemutato {
   text-align: justify;
@@ -1185,16 +1649,6 @@ main {
 }
 
 .kartya {
-  /*background-color: var(--mk-szovegdoboz);
-  border-radius: 8px;
-  padding: 10px;
-  box-shadow: 0 4px 15px var(--mk-arnyekszin);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  position: relative;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  color: var(--mk-text-dark);*/
   background: linear-gradient(145deg, #ffffff, #fff8f3);
   border-radius: 16px;
   padding: 0;
@@ -1209,21 +1663,6 @@ main {
   opacity: 0.3;
   mix-blend-mode: multiply;
 }
-
-/* Ha vissza akarjuk tenni akkor ezt még a másik kettőhöz is meg kell csinálni
-.kartya:nth-child(1)::before {
-  background-image: url('../assets/public/mk-horgolas.png');
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-size: cover;
-  background-position: center;
-  filter: blur(1px);
-  opacity: 0.6;
-}*/
 
 .kartya:hover {
   transform: translateY(-10px);
@@ -1337,21 +1776,18 @@ main {
 
 /*#region adatbekérés*/
 #adatok {
-  /*max-width: 900px;
-  margin: 0 auto;
-  padding: 32px;*/
   background-color: var(--mk-hatterszin);
   border-radius: 8px;
   box-shadow: 0 2px 15px var(--mk-arnyekszin);
-  /*background: linear-gradient(145deg, #ffffff, #fff8f3);*/
   border-radius: 20px;
   padding: 40px;
   box-shadow: 
     0 15px 40px rgba(139, 67, 64, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.8);
   border: 1px solid rgba(139, 67, 64, 0.08);
-  width: 80%;
+  width: 70%;
   margin: 0 auto;
+  
 }
 
 .radioStilus {
@@ -1360,12 +1796,7 @@ main {
 }
 
 .cimek {
-  /*font-size: 24px;
-  font-weight: 600;
-  color: var(--mk-text-dark);
-  margin-bottom: 24px;
-  text-align: center;*/
-    color: #8B4340;
+  color: #8B4340;
   font-size: 28px;
   font-weight: 700;
   margin-bottom: 30px;
@@ -1377,14 +1808,12 @@ main {
   background-color: var(--mk-radioszin);
   border-radius: 5px;
   padding: 25px;
-  margin-bottom: 20px;
   box-shadow: 0 4px 5px var(--mk-arnyekszin);
+  max-width: 990px;
+  margin: 0 auto;
 }
 
 .radio-container {
-  /*isplay: flex;
-  align-items: center;
-  margin-bottom: 15px;*/
   display: flex;
   align-items: center;
   padding: 15px 20px;
@@ -1393,6 +1822,8 @@ main {
   border-radius: 10px;
   box-shadow: 0 4px 15px rgba(139, 67, 64, 0.05);
   transition: all 0.3s ease;
+  max-width: 600px;
+  margin: 0 auto 10px auto;
 }
 
 input[type="radio"] {
@@ -1453,11 +1884,7 @@ input[type="radio"]:hover {
 }
 
 label {
-  /*color: var(--mk-text-light);
-  cursor: pointer;
-  transition: color 0.2s ease;
-  font-size: 18px;*/
-    color: #5a4e42;
+  color: #5a4e42;
   font-size: 18px;
   font-weight: 500;
   cursor: pointer;
@@ -1575,18 +2002,14 @@ input[type="file"] {
 }
 
 .progress-container {
-  /*margin-bottom: 32px;*/
-    background: rgba(139, 67, 64, 0.05);
+  background: rgba(139, 67, 64, 0.05);
   border-radius: 12px;
   padding: 25px;
   margin-bottom: 40px;
 }
 
 .progress-bar {
-  /*display: flex;
-  justify-content: space-between;
-  margin-bottom: 8px;*/
-    position: relative;
+  position: relative;
   height: 6px;
   background: rgba(139, 67, 64, 0.1);
   border-radius: 3px;
@@ -1604,27 +2027,13 @@ input[type="file"] {
   font-weight: 600;
   color: #999;
   position: relative;
- position: absolute;
+  position: absolute;
   top: 50%;
   transform: translateY(-50%);
-   /*width: 40px;
-  height: 40px;
-  background: white;
-  border: 3px solid rgba(139, 67, 64, 0.2);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  color: rgba(139, 67, 64, 0.5);
-  box-shadow: 0 4px 12px rgba(139, 67, 64, 0.1);
-  transition: all 0.3s ease;*/
 }
 
 .progress-step.active {
-  /*background-color: var(--mk-radioszin);
-  color: white;*/
-    background: linear-gradient(135deg, #8B4340, #C86C68);
+  background: linear-gradient(135deg, #8B4340, #C86C68);
   border-color: transparent;
   color: white;
   transform: translateY(-50%) scale(1.1);
@@ -1639,20 +2048,6 @@ input[type="file"] {
   background-color: rgb(110, 29, 29);
 }
 
-/*.progress-step:not(:last-child)::after {
-  content: '';
-  position: absolute;
-  left: 100%;
-  width: 900%;
-  height: 8px;
-  background-color: rgb(71, 60, 60);
-  z-index: -1;
-}
-
-.progress-step.active:not(:last-child)::after {
-  background-color: rgb(82, 3, 3);
-}*/
-
 .progress-step:nth-child(1) { left: 0; }
 .progress-step:nth-child(2) { left: 50%; transform: translate(-50%, -50%); }
 .progress-step:nth-child(3) { left: 100%; transform: translate(-100%, -50%); }
@@ -1663,9 +2058,7 @@ input[type="file"] {
 }
 
 .progress-label {
-  /*font-size: 14px;
-  color: var(--mk-text-dark);*/
-    color: #8B4340;
+  color: #8B4340;
   font-weight: 600;
   font-size: 14px;
   text-transform: uppercase;
@@ -1687,10 +2080,9 @@ input[type="file"] {
 }
 
 .pixelesContainer {
-  flex: 1 1 auto; /* This makes it take all available space */
+  flex: 1 1 auto;
   padding: 32px;
   background-color: var(--mk-hatterszin);
-  /*min-height: 100vh;*/
   border-radius: 10px;
   max-width: calc(100% - 320px);
   overflow: auto;
@@ -1891,7 +2283,7 @@ input[type="file"] {
   cursor: pointer;
   -webkit-appearance: none;
   appearance: none;
-  margin-top: -7px; /* Center the thumb on the track */
+  margin-top: -7px;
   transition: all 0.3s ease;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }

@@ -312,3 +312,65 @@ Route::get('/carousel/termekek', function () {
         ->toArray();
     return response()->json($termekek);
 });
+
+Route::get('/termekek/fonal-csoport/{fonalTipus}', function ($fonalTipus) {
+    try {
+        // Clean the fonalTipus parameter to match your data structure
+        $cleanFonalTipus = str_replace(' fonal csoport', '', $fonalTipus);
+
+        // Find products that match the fonal type
+        // Adjust this query based on your actual database structure
+        $termekek = Termekek::with('TermekKategoria', 'TermekFoKep', 'TermekSzinek', 'TermekCimkek')
+            ->whereHas('TermekKategoria', function ($query) use ($cleanFonalTipus) {
+                $query->where('nev', 'like', '%' . $cleanFonalTipus . '%')
+                    ->orWhere('leiras', 'like', '%' . $cleanFonalTipus . '%');
+            })
+            ->orWhere('nev', 'like', '%' . $cleanFonalTipus . '%')
+            ->orWhere('leiras', 'like', '%' . $cleanFonalTipus . '%')
+            ->get();
+
+        if ($termekek->isEmpty()) {
+            // If no direct match, return empty array
+            return response()->json([]);
+        }
+
+        return response()->json($termekek);
+    } catch (\Exception $e) {
+        \Log::error('Fonal termék betöltése sikertelen: ' . $e->getMessage());
+        return response()->json(['error' => $e->getMessage()], 500);
+    }
+});
+
+// Add cart endpoint
+Route::post('/kosar/hozzaad', function (Request $request) {
+    $validated = $request->validate([
+        'termek_id' => 'required|integer|exists:termekek,id',
+        'mennyiseg' => 'required|integer|min:1',
+        'user_id' => 'nullable|integer'
+    ]);
+
+    try {
+        // Check if product exists and has enough stock
+        $termek = Termekek::find($validated['termek_id']);
+
+        if (!$termek) {
+            return response()->json(['error' => 'Termék nem található'], 404);
+        }
+
+        if ($termek->darab < $validated['mennyiseg']) {
+            return response()->json(['error' => 'Nincs elegendő készlet'], 422);
+        }
+
+        // In a real application, you'd save to session or database cart
+        // For now, we'll return success
+        return response()->json([
+            'message' => 'Termék sikeresen hozzáadva a kosárhoz',
+            'termek' => $termek,
+            'mennyiseg' => $validated['mennyiseg'],
+            'osszeg' => $termek->ar * $validated['mennyiseg']
+        ], 200);
+
+    } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage()], 500);
+    }
+});
