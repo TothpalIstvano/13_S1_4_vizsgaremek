@@ -302,10 +302,11 @@ Route::post('/rendeles', function (Request $request) {
 });
 
 Route::get('/carousel/termekek', function () {
-    $termekek = Termekek::select('id','darab', 'nev', 'ar', 'fo_kep_id', 'updated_at')
+    $termekek = Termekek::select('id','darab', 'nev', 'ar', 'fo_kep_id','leiras', 'updated_at')
         ->with('TermekFoKep')
         ->where('darab', '>', 0)
         ->orderBy('updated_at', 'desc')
+        ->orderBy('darab', 'desc')
         ->take(5)
         ->get()
         ->toArray();

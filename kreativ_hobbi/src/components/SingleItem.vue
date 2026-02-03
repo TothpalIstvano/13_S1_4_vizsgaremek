@@ -92,7 +92,11 @@ async function fetchProduct() {
   }
 }
 function goBack() {
-  router.push('/aruhaz')
+  if (window.history.length > 1) {
+    router.back()
+  } else {
+    router.push('/') // alapértelmezett oldal
+  }
 }
 
 function addToCart() {
