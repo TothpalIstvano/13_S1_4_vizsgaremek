@@ -83,52 +83,52 @@
             </div>
 
               <div class="form-section">
-    <label class="form-label">
-      Képek feltöltése
-    </label>
-    <FileUpload
-    ref="fileUploadRef"
-    name="images[]"
-    @select="onFileSelect"
-    :multiple="true"
-    accept="image/*"
-    :maxFileSize="5000000"
-    :auto="false"
-    :showUploadButton="false"
-    :showCancelButton="false"
-    chooseLabel="Képek kiválasztása"
-    class="mb-6"
->
-    <template #empty>
-        <div class="drag-drop-area">
-            <i class="pi pi-cloud-upload" style="font-size: 3rem; color: #667eea; margin-bottom: 1rem;"></i>
-            <p>Húzd ide a képeidet vagy kattints a feltöltéshez</p>
-        </div>
-    </template>
-</FileUpload>
-    <div v-if="uploadedImages.length > 0" class="image-preview-container">
-      <div v-for="(image, index) in uploadedImages" :key="index" class="image-preview">
-        <img :src="image.preview" class="preview-image" />
-        <Button 
-          type="button" 
-          icon="pi pi-times" 
-          class="p-button-rounded p-button-danger image-remove-btn"
-          @click="removeImage(index)">
-        </Button>
-        <InputText 
-          v-model="image.alt" 
-          placeholder="Alternatív szöveg" 
-          class="image-alt-input"
-        />
-        <InputText 
-          v-model="image.description" 
-          placeholder="Leírás" 
-          class="image-description-input"
-        />
-      </div>
-    </div>
-    <small class="form-hint">Támogatott formátumok: JPG, PNG, GIF. Maximális fájlméret: 5MB.</small>
-  </div>
+                <label class="form-label">
+                Képek feltöltése
+                </label>
+                <FileUpload
+                ref="fileUploadRef"
+                name="images[]"
+                @select="onFileSelect"
+                :multiple="true"
+                accept="image/*"
+                :maxFileSize="5000000"
+                :auto="false"
+                :showUploadButton="false"
+                :showCancelButton="false"
+                chooseLabel="Képek kiválasztása"
+                class="mb-6"
+                >
+                <template #empty>
+                    <div class="drag-drop-area">
+                        <i class="pi pi-cloud-upload" style="font-size: 3rem; color: #667eea; margin-bottom: 1rem;"></i>
+                        <p>Húzd ide a képeidet vagy kattints a feltöltéshez</p>
+                    </div>
+                </template>
+                </FileUpload>
+                <div v-if="uploadedImages.length > 0" class="image-preview-container">
+                <div v-for="(image, index) in uploadedImages" :key="index" class="image-preview">
+                    <img :src="image.preview" class="preview-image" />
+                    <Button 
+                    type="button" 
+                    icon="pi pi-times" 
+                    class="p-button-rounded p-button-danger image-remove-btn"
+                    @click="removeImage(index)">
+                    </Button>
+                    <InputText 
+                    v-model="image.alt" 
+                    placeholder="Alternatív szöveg" 
+                    class="image-alt-input"
+                    />
+                    <InputText 
+                    v-model="image.description" 
+                    placeholder="Leírás" 
+                    class="image-description-input"
+                    />
+                </div>
+                </div>
+                <small class="form-hint">Támogatott formátumok: JPG, PNG, GIF. Maximális fájlméret: 5MB.</small>
+            </div>
 
             <div class="form-actions">
                 <Button

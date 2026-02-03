@@ -3,8 +3,10 @@
     <h1 class="title">Blog</h1>
     <a v-show="isVisible" href="#" class="back-to-top-control" @click.prevent="scrollToTop">
       <font-awesome-icon icon="fa-solid fa-arrow-circle-up"/>
-	  </a>
+    </a>
+    
     <div class="content-wrapper">
+      <!-- Szűrők (Working like Aruhaz.vue) -->
       <div class="szurok">
         <div class="search-container">        
           <div class="search-icon">
@@ -12,48 +14,61 @@
           </div>
           <input
             type="text"
-            placeholder="Keresés"
+            placeholder="Keresés a blogbejegyzésekben..."
             class="search-input"
             name="search"
             v-model="searchTerm"
           />
         </div>
-        <label for="postCimkek" class="form-label">
-            <!--<i class="pi pi-tags form-label-icon"></i>-->
-            Címkék
-        </label>
-        <MultiSelect
-            id="postCimkek"
-            v-model="selectedTags" 
-            :options="tagOptions" 
-            optionLabel="name" 
-            placeholder="Válassz címkét (több is választható)" 
-            display="chip" 
-            filter
-            class="w-full mb-6"
-          />
 
-        <div class="dropdown" ref="dropdown">
-          <div class="dropdown__selected" @click="toggle">
-            <FontAwesomeIcon :icon="selected.icon" />
-            <span>{{ selected.label }}</span>
-            <FontAwesomeIcon icon="chevron-down" class="chevron" />
+        <div class="active-filters" v-if="activeCimkek.length">
+          <div
+            class="filter-chip"
+            v-for="tag in activeCimkek"
+            :key="tag.id"
+          >
+            {{ tag.name }}
+            <span class="remove" @click="removeCimke(tag.id)">✕</span>
           </div>
-
-          <ul v-if="open" class="dropdown__menu">
-            <li
-              v-for="option in options"
-              :key="option.value"
-              @click="select(option)"
-              class="dropdown__item"
-            >
-              <FontAwesomeIcon :icon="option.icon" />
-              <span>{{ option.label }}</span>
-            </li>
-          </ul>
         </div>
 
+        <div class="filters-right">
+          <div class="multiselect-container">
+            <MultiSelect
+              id="postCimkek"
+              v-model="selectedCimkek" 
+              :options="tagOptions" 
+              optionLabel="name"
+              optionValue="id"
+              placeholder="Válassz címkét" 
+              display="chip" 
+              filter
+              class="custom-multiselect"
+            />
+          </div>
+          
+          <div class="dropdown" ref="dropdown">
+            <div class="dropdown__selected" @click="toggle">
+              <FontAwesomeIcon :icon="selected.icon" />
+              <span>{{ selected.label }}</span>
+              <FontAwesomeIcon icon="chevron-down" class="chevron" />
+            </div>
+
+            <ul v-if="open" class="dropdown__menu">
+              <li
+                v-for="option in options"
+                :key="option.value"
+                @click="select(option)"
+                class="dropdown__item"
+              >
+                <FontAwesomeIcon :icon="option.icon" />
+                <span>{{ option.label }}</span>
+              </li>
+            </ul>
+          </div>
+        </div>
       </div>
+      
       <section class="cards-wrapper">
         <!-- Loading -->
         <div v-if="loading" class="loading-container">
@@ -77,7 +92,7 @@
         </div>
         
         <!-- Blog poszt -->
-        <div class="card-grid-space" v-for="post in posztok" :key="post.id">
+        <div class="card-grid-space"  v-for="post in filteredPosts"  :key="post.id">
           <div class="card">
             <div class="card-glow"></div>
             <div class="card-img-holder">
@@ -102,8 +117,6 @@
               <div class="card-header">
                 <h3 class="blog-title">{{ post.cim }}</h3>
               </div>
-              
-              
               
               <p class="description">
                 {{ post.kivonat || post.tartalom?.substring(0, 150) || 'Nincs leírás...' }}
@@ -152,11 +165,11 @@
           </div>
         </div>
       
-        <div v-if="!loading && posztok.length === 0" class="no-posts-container">
+        <div v-if="!loading && filteredPosts.length === 0" class="no-posts-container">
           <div class="empty-state">
             <div class="empty-icon">📝</div>
-            <h3 class="empty-title">Még nincsenek blog bejegyzések</h3>
-            <p class="empty-subtitle">Legyél te az első, aki megoszt valamit!</p>
+            <h3 class="empty-title">Nincsenek találatok</h3>
+            <p class="empty-subtitle">Próbálj másik szűrőt vagy keresési kifejezést!</p>
           </div>
         </div>
       </section>
@@ -165,7 +178,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
+import { ref, onMounted, onBeforeUnmount, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import MultiSelect from 'primevue/multiselect';
 import axios from 'axios';
@@ -173,22 +186,185 @@ import api from '@/services/api.js'
 import { useAuthStore } from '@/stores/auth'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faCalendar, faHeart, faArrowRight, faArrowCircleUp, faThumbsUp, faThumbsDown, faMagnifyingGlass} from '@fortawesome/free-solid-svg-icons'
+import {
+  faCalendar, faHeart, faArrowRight,
+  faArrowCircleUp, faThumbsUp, faThumbsDown,
+  faMagnifyingGlass, faChevronDown, faArrowDown,
+  faArrowUp, faSortAlphaUp, faSortAlphaDown,
+  faFilter
+} from '@fortawesome/free-solid-svg-icons'
 
-library.add(faCalendar, faHeart, faArrowRight, faArrowCircleUp, faThumbsUp, faThumbsDown, faMagnifyingGlass)
+library.add(faCalendar, faHeart, faArrowRight,
+  faArrowCircleUp, faThumbsUp, faThumbsDown,
+  faMagnifyingGlass, faChevronDown, faArrowDown,
+  faArrowUp, faSortAlphaUp, faSortAlphaDown,
+  faFilter)
 
 import fallbackImage from '@/assets/Public/b-pl1.jpg'
 
 const router = useRouter()
 const authStore = useAuthStore()
 const posztok = ref([])
+const allPosts = ref([]) // Store original posts
 const loading = ref(true)
 const error = ref(null)
 const searchTerm = ref('')
-const selectedTags = ref([]);
+const selectedCimkek = ref([]);
 const tagOptions = ref([]);
 
 const isAuthenticated = computed(() => authStore.isAuthenticated)
+
+// Computed properties for filtering
+const activeCimkek = computed(() =>
+  tagOptions.value.filter(tag => selectedCimkek.value.includes(tag.id))
+);
+
+// Fix: Proper filtering logic
+const filteredPosts = computed(() => {
+  // Start with all posts
+  let filtered = [...allPosts.value];
+  
+  // Apply search filter if there's a search term
+  if (searchTerm.value.trim()) {
+    const searchLower = searchTerm.value.toLowerCase().trim();
+    filtered = filtered.filter(post => {
+      return (
+        (post.cim && post.cim.toLowerCase().includes(searchLower)) ||
+        (post.kivonat && post.kivonat.toLowerCase().includes(searchLower)) ||
+        (post.tartalom && post.tartalom.toLowerCase().includes(searchLower))
+      );
+    });
+  }
+  
+  // Apply tag filter if tags are selected
+  if (selectedCimkek.value.length > 0) {
+    filtered = filtered.filter(post => {
+      // Check if post has any of the selected tags
+      // First, let's check the structure of post.cimkek
+      if (!post.cimkek || !Array.isArray(post.cimkek)) {
+        return false; // No tags on this post
+      }
+      
+      // If cimkek are objects with id property
+      if (post.cimkek.length > 0 && typeof post.cimkek[0] === 'object') {
+        return post.cimkek.some(postTag => 
+          selectedCimkek.value.includes(postTag.id)
+        );
+      } 
+      // If cimkek are tag names (strings)
+      else if (typeof post.cimkek[0] === 'string') {
+        // Get the names of selected tags
+        const selectedTagNames = selectedCimkek.value.map(tagId => {
+          const tag = tagOptions.value.find(t => t.id === tagId);
+          return tag ? tag.name : null;
+        }).filter(Boolean);
+        
+        return post.cimkek.some(postTagName => 
+          selectedTagNames.includes(postTagName)
+        );
+      }
+      
+      return false;
+    });
+  }
+  
+  return filtered;
+});
+
+// Sorting options
+const options = [
+  {
+    value: 'date-desc',
+    label: 'Legújabb elöl',
+    icon: 'arrow-down'
+  },
+  {
+    value: 'date-asc',
+    label: 'Legrégebbi elöl',
+    icon: 'arrow-up'
+  },
+  {
+    value: 'title-asc',
+    label: 'Cím szerint A-Z',
+    icon: 'sort-alpha-up'
+  },
+  {
+    value: 'title-desc',
+    label: 'Cím szerint Z-A',
+    icon: 'sort-alpha-down'
+  },
+  {
+    value: 'likes-desc',
+    label: 'Legtöbb kedvelés',
+    icon: 'thumbs-up'
+  },
+  {
+    value: 'likes-asc',
+    label: 'Legkevesebb kedvelés',
+    icon: 'thumbs-up'
+  }
+];
+
+const selected = ref({
+  value: 'date-desc',
+  label: 'Legújabb elöl',
+  icon: 'arrow-down'
+});
+const open = ref(false);
+const dropdown = ref(null);
+
+function toggle() {
+  open.value = !open.value;
+}
+
+function select(option) {
+  selected.value = option;
+  open.value = false;
+  applySorting();
+}
+
+function handleClickOutside(event) {
+  if (dropdown.value && !dropdown.value.contains(event.target)) {
+    open.value = false;
+  }
+}
+
+function removeCimke(id) {
+  const index = selectedCimkek.value.indexOf(id);
+  if (index !== -1) {
+    selectedCimkek.value.splice(index, 1);
+  }
+}
+
+function applySorting() {
+  const sortOption = selected.value.value;
+  
+  allPosts.value.sort((a, b) => {
+    switch (sortOption) {
+      case 'date-desc':
+        return new Date(b.letrehozas_datuma || 0) - new Date(a.letrehozas_datuma || 0);
+      case 'date-asc':
+        return new Date(a.letrehozas_datuma || 0) - new Date(b.letrehozas_datuma || 0);
+      case 'title-asc':
+        return (a.cim || '').localeCompare(b.cim || '');
+      case 'title-desc':
+        return (b.cim || '').localeCompare(a.cim || '');
+      case 'likes-desc':
+        return (b.likes_count || 0) - (a.likes_count || 0);
+      case 'likes-asc':
+        return (a.likes_count || 0) - (b.likes_count || 0);
+      default:
+        return 0;
+    }
+  });
+}
+
+// Watch for changes in selected tags and log for debugging
+watch(selectedCimkek, (newVal) => {
+  console.log('Selected tags changed:', newVal);
+  console.log('Active tags:', activeCimkek.value);
+  console.log('Filtered posts count:', filteredPosts.value.length);
+}, { deep: true });
 
 const navigateToBlog = (postId) => {
   router.push(`/blog/${postId}`)
@@ -200,8 +376,12 @@ const fetchBlogPosts = async () => {
     error.value = null
     
     const response = await api.get('/api/blog')
-    posztok.value = response.data;
-    console.log(posztok.value)
+    allPosts.value = response.data;
+    posztok.value = [...allPosts.value]; // Initialize posztok as well
+    console.log('Fetched posts:', allPosts.value);
+    console.log('First post cimkek:', allPosts.value[0]?.cimkek);
+    
+    applySorting(); // Apply initial sorting
 
     if (isAuthenticated.value) {
       await fetchUserReactions()
@@ -210,7 +390,6 @@ const fetchBlogPosts = async () => {
   } catch (err) {
     console.error('Error fetching blog posts:', err)
     error.value = 'Hiba történt a blog bejegyzések betöltése közben.'
-    posztok.value = getDummyPosts()
   } finally {
     loading.value = false
   }
@@ -221,10 +400,11 @@ const fetchUserReactions = async () => {
     const response = await api.get('/api/user/reactions')
     const userReactions = response.data
     
-    posztok.value = posztok.value.map(post => ({
+    allPosts.value = allPosts.value.map(post => ({
       ...post,
       userReaction: userReactions[post.id] || null
     }))
+    posztok.value = [...allPosts.value];
     
   } catch (err) {
     console.error('Error fetching user reactions:', err)
@@ -245,11 +425,12 @@ const handleReaction = async (postId, reactionType) => {
     
     const { likes_count, dislikes_count, user_reaction } = response.data
     
-    const postIndex = posztok.value.findIndex(post => post.id === postId)
+    const postIndex = allPosts.value.findIndex(post => post.id === postId)
     if (postIndex !== -1) {
-      posztok.value[postIndex].likes_count = likes_count
-      posztok.value[postIndex].dislikes_count = dislikes_count
-      posztok.value[postIndex].userReaction = user_reaction
+      allPosts.value[postIndex].likes_count = likes_count
+      allPosts.value[postIndex].dislikes_count = dislikes_count
+      allPosts.value[postIndex].userReaction = user_reaction
+      posztok.value = [...allPosts.value];
     }
     
   } catch (err) {
@@ -257,57 +438,6 @@ const handleReaction = async (postId, reactionType) => {
     if (err.response?.status === 401) {
       alert('Hitelesítési hiba. Kérjük, jelentkezzen be újra.')
     }
-  }
-}
-
-const options = [
-  {
-    value: 'price-asc',
-    label: 'Legújabb elöl',
-    icon: 'arrow-up'
-  },
-  {
-    value: 'price-desc',
-    label: 'Legrégebbi elöl',
-    icon: 'arrow-down'
-  },
-  {
-    value: 'name-asc',
-    label: 'Kedvelés szerint csökkenő',
-    icon: 'sort-alpha-up'
-  },
-  {
-    value: 'name-desc',
-    label: 'Kedvelés szerint növekvő',
-    icon: 'sort-alpha-down'
-  }
-]
-
-
-const selected = ref(  {
-    value: 'default',
-    label: 'Sorba rendezés',
-    icon: 'filter'
-  })
-const open = ref(false)
-const dropdown = ref(null)
-
-function toggle() {
-  open.value = !open.value
-
-}
-
-function select(option) {
-  selected.value = option
-  open.value = false
-
-  // emit / sort logic goes here
-  console.log('Selected:', option.value)
-}
-
-function handleClickOutside(event) {
-  if (dropdown.value && !dropdown.value.contains(event.target)) {
-    open.value = false
   }
 }
 
@@ -320,47 +450,47 @@ const formatDate = (dateString) => {
   return dateString
 }
 
-const getDummyPosts = () => {
-  return [
-    {
-      id: 1,
-      title: "HTML Syntax",
-      excerpt: "The syntax of a language is how it works. How to actually write it. Learn HTML syntax…",
-      created_at: "6 Oct 2017",
-      tags: ["HTML"],
-      main_image: null
-    },
-    {
-      id: 2,
-      title: "Basic types of HTML tags",
-      excerpt: "Learn about some of the most common HTML tags…",
-      created_at: "9 Oct 2017",
-      tags: ["HTML", "CSS", "JavaScript", "Vue"],
-      main_image: null
+const fetchTagsFromDatabase = async () => {
+    try {
+        const response = await axios.get('/api/cimkek');
+        
+        tagOptions.value = response.data.map(tag => ({
+            id: tag.id,
+            name: tag.nev,
+            code: tag.nev.toLowerCase().replace(/\s+/g, '_')
+        }));
+        console.log('Fetched tags:', tagOptions.value);
+    } catch (error) {
+        console.error('Error fetching tags:', error);
     }
-  ]
-}
+};
 
 onMounted(() => {
-  fetchBlogPosts()
-})
+  document.addEventListener('click', handleClickOutside);
+  fetchBlogPosts();
+  fetchTagsFromDatabase();
+});
+
+onBeforeUnmount(() => {
+  document.removeEventListener('click', handleClickOutside);
+});
 
 const isVisible = ref(false);
 
 const handleScroll = () => {
-	isVisible.value = window.scrollY > 200;
+  isVisible.value = window.scrollY > 200;
 };
 
 const scrollToTop = () => {
-	window.scrollTo({ top: 0, behavior: 'smooth' });
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
 onMounted(() => {
-	window.addEventListener('scroll', handleScroll);
+  window.addEventListener('scroll', handleScroll);
 });
 
 onBeforeUnmount(() => {
-	window.removeEventListener('scroll', handleScroll);
+  window.removeEventListener('scroll', handleScroll);
 });
 </script>
 
@@ -375,29 +505,261 @@ main {
   text-align: center;
 }
 
+.title {
+  font-weight: 700;
+  font-size: 45px;
+  color: var(--mk-text-dark);
+  display: inline-block;
+  background-image: linear-gradient(90deg, #a08283, #4d0303);
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 100% 4px;
+  padding-bottom: 6px;
+}
+
+.content-wrapper {
+  max-width: 1800px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+.szurok {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+  background-color: #999;
+  border-radius: 14px;
+  padding: 20px 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.active-filters {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  flex: 1;
+  margin: 0 16px;
+  min-height: 40px;
+}
+
+.filter-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: #e3e8ff;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s;
+  border: 1px solid transparent;
+}
+
+.filter-chip:hover {
+  background: #c7d4ff;
+  transform: translateY(-1px);
+}
+
+.filter-chip .remove {
+  cursor: pointer;
+  font-weight: bold;
+  opacity: 0.7;
+  margin-left: 4px;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.filter-chip .remove:hover {
+  opacity: 1;
+}
+
+.filters-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.multiselect-container {
+  width: 300px;
+}
+
+.custom-multiselect {
+  width: 100%;
+}
+
+:deep(.p-multiselect) {
+  border: 2px solid #e2e8f0 !important;
+  border-radius: 10px !important;
+  transition: all 0.3s ease !important;
+  background: white !important;
+  min-height: 44px !important;
+}
+
+:deep(.p-multiselect:not(.p-disabled):hover) {
+  border-color: #cbd5e0 !important;
+}
+
+:deep(.p-multiselect:not(.p-disabled).p-focus) {
+  border-color: #d49535 !important;
+  box-shadow: 0 0 0 3px rgba(77, 138, 240, 0.1) !important;
+  outline: none !important;
+}
+
+:deep(.p-multiselect-label) {
+  padding: 10px 14px !important;
+  font-size: 15px !important;
+  color: #4a5568 !important;
+}
+
+:deep(.p-multiselect-panel) {
+  border-radius: 10px !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1) !important;
+}
+
+:deep(.p-multiselect-chip .p-chip) {
+  background: linear-gradient(135deg, #d49535 0%, #d45a35 100%) !important;
+  color: white !important;
+  border-radius: 20px !important;
+  padding: 6px 12px !important;
+  font-weight: 500 !important;
+  margin-right: 6px !important;
+  margin-bottom: 4px !important;
+  font-size: 13px !important;
+}
+
+:deep(.p-multiselect-chip .p-chip .p-chip-remove-icon) {
+  color: white !important;
+  opacity: 0.8 !important;
+}
+
+:deep(.p-multiselect-chip .p-chip .p-chip-remove-icon:hover) {
+  opacity: 1 !important;
+}
+
+:deep(.p-checkbox-box) {
+  border-radius: 6px !important;
+  border: 2px solid #cbd5e0 !important;
+}
+
+:deep(.p-checkbox-box.p-highlight) {
+  background: #d49535 !important;
+  border-color: #667eea !important;
+}
+
+:deep(.p-multiselect-header) {
+  padding: 12px 16px !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+  background: #f8fafc !important;
+  border-radius: 10px 10px 0 0 !important;
+}
+
+:deep(.p-multiselect-filter) {
+  padding: 8px 12px !important;
+  border-radius: 8px !important;
+  border: 1px solid #e2e8f0 !important;
+}
+
+:deep(.p-multiselect-filter:focus) {
+  border-color: #d49535 !important;
+  box-shadow: 0 0 0 3px rgba(77, 138, 240, 0.1) !important;
+  outline: none !important;
+}
+
+.dropdown {
+  position: relative;
+  width: 250px;
+  font-size: 15px;
+}
+
+.dropdown__selected {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  cursor: pointer;
+  background: white;
+  transition: all 0.3s ease;
+  min-height: 44px;
+}
+
+.dropdown__selected:hover {
+  border-color: #cbd5e0;
+}
+
+.dropdown__selected:active {
+  border-color: #d49535;
+}
+
+.dropdown__menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  width: 100%;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  background: white;
+  z-index: 10;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.dropdown__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.dropdown__item:last-child {
+  border-bottom: none;
+}
+
+.dropdown__item:hover {
+  background: #f8fafc;
+  color: #d49535;
+}
+
+.chevron {
+  margin-left: auto;
+  transition: transform 0.3s ease;
+}
+
+.dropdown__selected.active .chevron {
+  transform: rotate(180deg);
+}
+
 .search-container {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 8px 14px 8px 14px; /* Adjusted padding for better look */
-  border: 1px solid #d0d0d0;
-  border-radius: 50px; /* Pill shape */
+  padding: 10px 16px;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
   background: white;
   width: 300px;
-  height: 40px;
-  margin: 25px auto;
-  transition: all 0.2s;
+  height: 44px;
+  transition: all 0.3s ease;
 }
 
 .search-container:focus-within {
   border-color: #d49535;
-  box-shadow: 0 0 0 3px rgba(63, 81, 181, 0.1);
+  box-shadow: 0 0 0 3px rgba(77, 138, 240, 0.1);
 }
 
 .search-icon {
-  color: #999;
+  color: #718096;
   display: flex;
   align-items: center;
+  font-size: 16px;
 }
 
 .search-container input {
@@ -406,55 +768,13 @@ main {
   width: 100%;
   font-size: 15px;
   background: transparent;
+  color: #4a5568;
 }
 
-.dropdown {
-  position: relative;
-  width: 300px;
-  font-size: 15px;
-  margin: 25px auto;
+.search-container input::placeholder {
+  color: #a0aec0;
 }
 
-.dropdown__selected {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 14px;
-  border: 1px solid #f1f1f1;
-  border-radius: 8px ;
-  cursor: pointer;
-  background: white;
-}
-
-.dropdown__selected:hover {
-  border: 1px solid #d0d0d0;
-}
-
-.dropdown__menu {
-  position: absolute;
-  top: calc(100% - 25px);
-  width: 100%;
-  border: 1px solid #d0d0d0;
-  border-radius: 0 0 8px 8px;
-  background: white;
-  z-index: 2;
-}
-
-.dropdown__item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 14px;
-  cursor: pointer;
-}
-
-.dropdown__item:hover {
-  background: #f1f1f1;
-}
-
-.chevron {
-  margin-left: auto;
-}
 
 .back-to-top-control {
 	display: flex;
@@ -481,24 +801,6 @@ main {
 		width: 24px;
 		height: 24px;
 	}
-}
-
-.title {
-  font-weight: 700;
-  font-size: 45px;
-  color: var(--mk-text-dark);
-  display: inline-block;
-  background-image: linear-gradient(90deg, #a08283, #4d0303);
-  background-repeat: no-repeat;
-  background-position: 0 100%;
-  background-size: 100% 4px;
-  padding-bottom: 6px;
-}
-
-.content-wrapper {
-  max-width: 1800px;
-  margin: 0 auto;
-  padding: 0 32px;
 }
 
 .cards-wrapper {
@@ -914,21 +1216,46 @@ main {
 @media (max-width: 1200px) {
   .cards-wrapper {
     grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-    gap: 32px;
+    gap: 24px;
+  }
+  
+  .szurok {
+    padding: 16px 20px;
+  }
+}
+
+@media (max-width: 992px) {
+  .szurok {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+  
+  .search-container,
+  .multiselect-container,
+  .dropdown {
+    width: 100%;
+  }
+  
+  .filters-right {
+    width: 100%;
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .active-filters {
+    margin: 0;
+    justify-content: center;
   }
 }
 
 @media (max-width: 768px) {
-  .blog-header {
-    padding: 48px 24px 32px;
-  }
-  
   .title {
-    font-size: 40px;
+    font-size: 36px;
   }
   
   .content-wrapper {
-    padding: 0 24px;
+    padding: 0 20px;
   }
   
   .cards-wrapper {
@@ -937,26 +1264,26 @@ main {
     padding: 32px 0;
   }
   
-  .card {
-    max-width: 100%;
+  .szurok {
+    padding: 14px 16px;
   }
 }
 
 @media (max-width: 480px) {
-  .blog-header {
-    padding: 32px 16px 24px;
-  }
-  
   .title {
-    font-size: 32px;
+    font-size: 28px;
   }
   
   .content-wrapper {
     padding: 0 16px;
   }
   
-  .card-content {
-    padding: 20px;
+  .cards-wrapper {
+    grid-template-columns: 1fr;
+  }
+  
+  .card {
+    max-width: 100%;
   }
   
   .card-footer {
