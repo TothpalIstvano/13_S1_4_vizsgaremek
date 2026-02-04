@@ -1,5 +1,8 @@
 <script setup>
 import { ref, reactive, onMounted, onUnmounted, nextTick, computed, watch } from "vue"
+import axios from 'axios';
+import { useCartStore } from "@/stores/cartStore";
+import api from '@/services/api.js'
 import Stepper from "primevue/stepper";
 import StepperPanel from "primevue/stepperpanel";
 
@@ -54,21 +57,18 @@ async function fonalTermekBetoltese() {
     kosarBetoltes.value = true
     try {
         const fonalTipusEncoded = encodeURIComponent(masodikLepes.value.fonalTipus)
-        const response = await fetch(`/api/termekek/fonal-csoport/${fonalTipusEncoded}`)
         
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`)
-        }
+        const response = await axios.get(`http://localhost:8000/api/termekek/fonal-csoport/${fonalTipusEncoded}`, {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            withCredentials: true  // IMPORTANT: This sends cookies with the request
+        })
         
-        const contentType = response.headers.get("content-type")
-        if (!contentType || !contentType.includes("application/json")) {
-            const text = await response.text()
-            console.error('Expected JSON but got:', text.substring(0, 100))
-            throw new Error("Response was not JSON")
-        }
-        
-        const data = await response.json()
-        
+        const data = response.data
+        console.log('Fonal termék betöltése:', data)
         if (data.length > 0) {
             fonalTermek.value = data[0]
             if (fonalTermek.value && fonalTermek.value.meter && fonalHossz.value > 0) {
@@ -684,28 +684,24 @@ async function fonalHozzaadasKosarhoz() {
     
     kosarBetoltes.value = true
     try {
-        const response = await fetch('/api/kosar/hozzaad', {
-            method: 'POST',
+        // First validate with API
+        const response = await axios.post('/api/kosar/hozzaad', {
+            termek_id: fonalTermek.value.id,
+            mennyiseg: szuksegesGombolyagok.value
+        }, {
             headers: {
-                'Content-Type': 'application/json',
                 'Accept': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
             },
-            body: JSON.stringify({
-                termek_id: fonalTermek.value.id,
-                mennyiseg: szuksegesGombolyagok.value
-            })
+            withCredentials: true
         })
         
-        const contentType = response.headers.get("content-type")
-        if (!contentType || !contentType.includes("application/json")) {
-            const text = await response.text()
-            throw new Error(`Nem JSON válasz érkezett: ${text.substring(0, 100)}`)
-        }
+        // If API validation passes, add to client-side cart store
+        const cartStore = useCartStore()
+        const result = cartStore.addToCart(fonalTermek.value, szuksegesGombolyagok.value)
         
-        const data = await response.json()
-        
-        if (response.ok) {
+        if (result.success) {
             kosarHozzaadva.value = true
             kosarModal.value = true
             
@@ -713,11 +709,12 @@ async function fonalHozzaadasKosarhoz() {
                 kosarModal.value = false
             }, 5000)
         } else {
-            alert('Hiba: ' + (data.error || 'Ismeretlen hiba történt'))
+            alert('Hiba: ' + result.message)
         }
+        
     } catch (error) {
         console.error('Kosárhoz adás sikertelen:', error)
-        alert('Hiba történt a kosárhoz adás során: ' + error.message)
+        alert('Hiba történt a kosárhoz adás során: ' + (error.response?.data?.error || error.message))
     } finally {
         kosarBetoltes.value = false
     }
@@ -1252,7 +1249,7 @@ onUnmounted(() => {
               :disabled="kosarBetoltes || kosarHozzaadva"
               class="kosar-gomb"
               :class="{ 'hozzaadva': kosarHozzaadva }">
-              {{ kosarHozzaadva ? '✓ Hozzáadva' : (kosarBetoltes ? 'Feldolgozás...' : 'Kosárhoz adás') }}
+              {{ kosarHozzaadva ? '✓ Hozzáadva' : (kosarBetoltes ? 'Feldolgozás...' : 'Kosárhoz adás &nbsp ↪') }}
             </button>
           </div>
           
@@ -2226,10 +2223,7 @@ input[type="file"] {
 
 /*#region Fonal számítás*/
 .fonal-info {
-  margin: 20px 0;
-  padding: 15px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
+  padding: 10px;
 }
 
 .fonal-header {
@@ -2284,7 +2278,6 @@ input[type="file"] {
   font-weight: 600;
   margin: 0 0 5px 0;
   color: var(--mk-text-light);
-  font-size: 14px;
 }
 
 .fonal-ar,
@@ -2292,7 +2285,6 @@ input[type="file"] {
 .fonal-osszeg {
   margin: 3px 0;
   color: rgba(255, 255, 255, 0.8);
-  font-size: 13px;
 }
 
 .fonal-osszeg {
@@ -2304,20 +2296,19 @@ input[type="file"] {
 .kosar-gomb {
   width: 100%;
   padding: 12px;
-  background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
-  color: white;
+  background: #f8e4e4;
+  color: black;
   border: none;
   border-radius: 6px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  font-size: 14px;
 }
 
 .kosar-gomb:hover:not(:disabled) {
-  background: linear-gradient(135deg, #45a049 0%, #3d8b40 100%);
+  background: #cc7973;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+  box-shadow: 0 4px 12px rgba(175, 76, 76, 0.3);
 }
 
 .kosar-gomb:disabled {
@@ -2326,7 +2317,7 @@ input[type="file"] {
 }
 
 .kosar-gomb.hozzaadva {
-  background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+  background: #91744e;
 }
 
 .fonal-betoltes,
@@ -2349,7 +2340,7 @@ input[type="file"] {
   width: 60px;
   height: 60px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+  background:#4CAF50;
   color: white;
   font-size: 32px;
   display: flex;
@@ -2434,14 +2425,14 @@ input[type="file"] {
 }
 
 .modal-gomb.kosar {
-  background: linear-gradient(135deg, #3f51b5 0%, #303f9f 100%);
+  background: #7649b1;
   color: white;
 }
 
 .modal-gomb.kosar:hover {
-  background: linear-gradient(135deg, #303f9f 0%, #283593 100%);
+  background: #9946c0;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(63, 81, 181, 0.3);
+  box-shadow: 0 4px 12px rgba(175, 115, 194, 0.3);
 }
 
 .modal-close {

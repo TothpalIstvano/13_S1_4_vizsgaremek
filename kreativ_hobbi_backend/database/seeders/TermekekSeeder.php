@@ -31,7 +31,7 @@ class TermekekSeeder extends Seeder
                 'leiras' => 'Kiváló minőségű ' . $subcategory->nev . ' kézzel készítéshez.',
                 'ar' => rand(2000, 4500),
                 'darab' => rand(100, 250),
-                'meter' => rand(1000, 5000),
+                'meter' => rand(90, 200),
                 'kategoria_id' => $subcategory->id,
             ]);
         }
