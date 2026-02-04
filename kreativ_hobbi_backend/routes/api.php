@@ -11,21 +11,25 @@ use App\Models\Rendelesek;
 use App\Models\RendeltTermekek;
 use App\Models\Cimkek;
 use App\Models\Felhasznalok;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\Auth\VerifyEmailController;
+use App\Http\Controllers\Auth\EmailVerificationNotificationController;
 
 //User related API routes:
 
-// Get authenticated user
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
 
 // Check if user is logged in
 Route::get('/user/check', function () {
     if (Auth::check()) {
-        return response()->json(['loggedIn' => true, 'user' => auth()->user()], 200);
+        return response()->json(['loggedIn' => true], 200);
     } else {
         return response()->json(['loggedIn' => false], 200);
     }
+});
+
+// Get authenticated user
+Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+    return $request->user()->load('profilKep:id,url_Link,alt_szoveg')->toArray();
 });
 
 // Get posts of authenticated user

@@ -7,7 +7,7 @@
                 <h2 
                 id="carouselTitle" 
                 :key="currentIndex" 
-                :class="currentIndex % 2 === 0 ? 'leftText' : 'rightText'">{{ kepek[currentIndex].nev }}</h2>
+                :class="currentIndex % 2 === 0 ? 'leftText' : 'rightText'">{{ kepek[currentIndex].nev || 'Termék neve' }}</h2>
                 <p 
                 id="carouselDescription" 
                 :key="currentIndex" 
@@ -26,7 +26,7 @@
                     :style="{ left: currentIndex % 2 === 0 ? '56.6%' : '10%' }"
                     >
                     <img 
-                    :src="kepek[currentIndex].termek_fo_kep ? kepek[currentIndex].termek_fo_kep.url_Link : ''"
+                    :src="kepek[currentIndex].termek_fo_kep ? kepek[currentIndex].termek_fo_kep.url_Link : 'http://localhost:8000/storage/termekkepek/default.jpg'"
                     :key="currentIndex + '-title'"
                     id="carouselItemImage" 
                     width="200" 
@@ -138,10 +138,16 @@ onMounted(() => {
     top: 100px;
     animation: fade-in 1.5s ease-in-out;
     opacity: 1;
+    overflow: hidden;          
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    line-clamp: 6; /* number of lines to show */
+    -webkit-line-clamp: 6; /* number of lines to show */
+    -webkit-box-orient: vertical;
 }
 #carouselPrice{
     position: absolute;
-    top: 200px;
+    top: 270px;
     width: 25%; 
     overflow: hidden;
     animation: fade-in 1.5s ease-in-out;

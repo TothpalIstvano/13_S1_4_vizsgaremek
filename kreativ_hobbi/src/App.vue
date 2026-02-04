@@ -47,9 +47,9 @@ provide('user', user);
 </script>
 
 <template>
-  <div>
+  <div id="app">
     <Navbar></Navbar>
-    <main>
+    <main class="main-content">
       <RouterView></RouterView>
     </main>
     <Footer></Footer>
@@ -57,5 +57,13 @@ provide('user', user);
 </template>
 
 <style>
+#app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
 
+.main-content {
+  flex: 1; 
+}
 </style>

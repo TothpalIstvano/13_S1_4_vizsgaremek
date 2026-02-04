@@ -23,7 +23,7 @@
 * \[ ] email verifikáció
 * \[ ] vásárol email
 * \[ ] jelszó reset
-* \[ ] verikád az emailed felszólitás 
+* \[/] verifikáld az emailed felszólitás 
 
 * \[ ] Táblák egységesítése ez alat azt értve hogy a táblákban lévő adatok megegyezenek 
 * \[ ] különböző roleok hozzá adása

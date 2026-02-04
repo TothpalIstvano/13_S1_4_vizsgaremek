@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Models\Kategoriak;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Model>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Termekek>
  */
 class TermekekFactory extends Factory
 {
@@ -19,7 +19,7 @@ class TermekekFactory extends Factory
     {
         return [
             "nev" => $this->faker->words(rand(1, 3), true),
-            "leiras" => $this->faker->sentence(),
+            "leiras" => $this->faker->sentence(rand(50, 80)),
             "ar" => rand(1000, 5000),
             "darab" => $this->faker->numberBetween(201, 300),
             "meter" => rand(min: 1000, max: 5000),
