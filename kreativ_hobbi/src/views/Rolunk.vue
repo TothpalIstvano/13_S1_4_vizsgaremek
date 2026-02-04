@@ -44,6 +44,50 @@ export default {
       </div>
 
       <hr>
+      <div class="gyik">
+        <h1>Gyakran ismételt kérdések</h1>
+        <h3>Rendelés nélkül is lehet nálatok vásárolni?</h3>
+        <p>Igen, a üzletben rendelés nélkül is meg lehet vásárolni a készleten lévő termékeket.
+          Nyitvatartási idő:
+          Hétfő-Péntek:10.00-18.30
+          Szombat: 10.00-16.00</p>
+        <h3>Hol van a bolt?</h3>
+        <p>A boltunk a Szent Gellért térhez nagyon közel helyezkedik el, a metró megállótól minössze pár perc sétára. Az üzlethez nagyon közel van még a 7-es, 133E, és a 107-es autóbusz megállója.</p>
+        <h3>Honnan tudom, mennyi van az adott termékből az üzletben?</h3>
+        <p>A weboldalon a termékek mellett olvasható készlet információ az üzletre is vonatkozik, hiszen itt kerülnek összeállításra az olnine megrendelt csomagok is. Ha valamit elérhetőnek látsz az webshopon, azt az üzletben is meg fogod találni.</p>
+        <h3>Egy termék mellett az szerepel, hogy 'előrendelhető'. Ez mit jelent?</h3>
+        <p>A termék mellett olvasható 'előrendelhető' státusz azt jelenti, hogy az adott temék pillanatnyilag nincs készleten, de várhatóan fog érkezni belőle hamarosan.</p>
+        <h3>Hogyan tudok előrendelést leadni?</h3>
+        <p>Az előrendelés is ugyan úgy működik, mint a sima megrendelés, de ilyenkor a terméket csak a készletre érkezése után küldjük/vehető át, ez minden márkánál más időtartamot vesz igénybe. Igyekszünk minen előrendelt terméket minél hamarabb beszerezni. A várható szállítási idővel kapcsolatban kapcsolatban érdeklődj kollégáinknál a fiok@fiok.net email címen!</p>
+        <h3>Hogyan rendelhetek?</h3>
+        <p>Megrendelését egy egyszerű regisztrációt követően a www.fiok.net oldalon a webáruházunkon keresztül tudjuk fogadni. A későbbi rendeléseit, a bejelentkezést követően a termékek kosárba helyezésével, majd a megrendelés véglegesítésével adhatja fel.</p>
+        <h3>Mennyi idő alatt kapom meg az árut?</h3>
+        <p>Ha a termék készleten van, telefon vagy e-mail értesítés után átvehető a Fiók Shop-ban. Ha pedig a terméket szállítással ( GLS ) küldjük Önnek, akkor az a következő munkanapon a futárszolgálathoz kerül. Amennyiben a rendelt termék nincs raktáron, akkor kollégáink egyeztetnek a megrendelővel.</p>
+        <h3>Hogyan vehetem át a megrendelt és visszaigazolt árut?</h3>
+        <p>A vásárlónak lehetősége van futárszolgálattal elküldetni a rendelését, de személyesen is átveheti hétfőtől - péntekig 10:00-18:30 óra között üzletünkben. </p>
+        <h3>Mi történik akkor, ha a megrendelt termék elfogyott?</h3>
+        <p>Előfordul, hogy egy termék mind saját, mind importőr partnerünk készleteiről elfogy. Amennyiben a termék 8 munkanapon belül nem szerezhető be, értesítjük Önt a beszerezhetőség dátumáról illetve alternatív terméket ajánlunk helyette. Ez esetben természetesen lehetősége van a megrendelési tételek módosítására, vagy visszamondásra. Amennyiben a megrendelés tisztázására küldött levelünk, megkeresésünk 8 napon belül nem kerül megválaszolásra, a megrendelést automatikusan töröljük.</p>
+        <h3>Meggondoltam magam, hogyan törölhetem, vagy vonhatom vissza a megrendelést?</h3>
+        <p>Az elállás joga
+        Az áru kézhezvételétől számított 14 napon belül az érvényben lévő törvényi rendelkezések szerint a Megrendelőnek
+        lehetősége nyílik a rendeléstől való elállásra (a megvásárolt áru visszaküldésére). Az elállási igénynek legkésőbb az
+        átvétel utáni 14. nap végéig kell megérkeznie ügyfélszolgálatunkhoz. Az elállást nem kötelező megindokolni. A
+        Megrendelő köteles az elállás bejelentését követő 14 napon belül visszajuttatni a terméket. A visszaküldés költségei a
+        Megrendelőt terhelik. Az Eladó köteles az elállás bejelentését követő 14 napon belül visszajuttatni a termék árát a
+        szállítási költséggel együtt a Megrendelő részére. Az Eladó ugyanazt a fizetési módot alkalmazza a visszatérítésnél,
+        mint amit az eredeti ügylet során alkalmazott. Az Eladó visszatarthatja a termék és a szállítás díjának visszatérítését ha a
+        termék nem érkezett vissza hozzá 14 napig, vagy ha a Megrendelő nem szolgáltat részére bizonyítékot arról, hogy a
+        csomag úton van.
+        Az elállás jogát csak természetüknél fogva visszaszolgáltatható áruk esetén gyakorolhatja a Megrendelő és abban az
+        esetben, ha az árut sértetlenül juttatja vissza. A sértetlenséget nem zárja ki a felbontott külső csomagolás.
+        Kozmetikai és higiéniai termékeknél csak akkor alkalmazható az elállás, ha a csomagolás, védőfólia nem lett kibontva.</p>
+        <h3>A kézbesített csomagot sérültnek látom, mi a teendőm?</h3>
+        <p>Kérjük, még a futár jelenlétében bontsák ki a csomagot. Ha a kézbesített csomagot sérültnek vagy hiányosnak látja, a sérülést vagy hiányt a helyszínen jegyzőkönyvben rögzítsék, majd vegyék fel munkatársainkkal a kapcsolatot az alábbi telefonszámok egyikén:
+        Ennek elmaradása esetén szállítási sérülésre, vagy termék hiányra vonatkozó reklamációt nem áll módunkban elfogadni.</p>
+        <h3>Bankkártyával tudok-e fizetni az üzletükben?</h3>
+        <p>Igen, üzletünkben lehetőség van a bankkártyával történő fizetésre.</p>
+      </div>
+      <hr>
 
       <h1>Csapatunk: </h1>
       <div class="cardscontainer">
@@ -264,6 +308,11 @@ main {
 .kepdiv {
   width: 50%;
   position: relative;
+}
+
+.gyik {
+  text-align: left;
+  max-width: 1300px;
 }
 
 @media (max-width: 1024px) {
