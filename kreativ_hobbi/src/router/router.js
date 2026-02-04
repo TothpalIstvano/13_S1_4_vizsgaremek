@@ -16,6 +16,8 @@ import Adatfelhasznalas from "@/views/Adatfelhasznalas.vue";
 import Dino from "@/views/Dino.vue";
 import NotFound from "@/views/NotFound.vue";
 import NewPost from '@/components/NewPost.vue'
+import EmailVerified from '@/components/EmailVerified.vue'
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -100,6 +102,11 @@ const router = createRouter({
       path: '/dino',
       name: 'Dino',
       component: Dino
+    },
+    {
+      path: '/email-verified',
+      name: 'EmailVerified',
+      component: EmailVerified
     },
     {
       path: '/:pathMatch(.*)*',
