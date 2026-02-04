@@ -88,6 +88,7 @@ onMounted(async () => {
 
 
 const showLogout = ref(false);
+const showSzerkesztes = ref(false);
 
 
 function formatDate(d) {
@@ -96,6 +97,11 @@ function formatDate(d) {
 function kijelentkezes() {
   showLogout.value = true;
 }
+
+function szerkesztes() {
+  showSzerkesztes.value = true;
+}
+
 async function confirmLogout() {
   showLogout.value = false;
   try {
@@ -110,6 +116,10 @@ async function confirmLogout() {
 }
 function cancelLogout() {
   showLogout.value = false;
+}
+
+function cancelSzerkesztes() {
+  showSzerkesztes.value = false;
 }
 </script>
 
@@ -131,7 +141,7 @@ function cancelLogout() {
             </div>
           </div>
           <div class="profile-actions">
-            <button class="btn edit"><RouterLink to="/profil/szerkesztes">Szerkesztés</RouterLink></button>
+            <button class="btn edit" @click="szerkesztes">Szerkesztés</button>
             <button type="button" class="btn logout" @click="kijelentkezes">Kijelentkezés</button>
           </div>
         </div>
@@ -148,6 +158,30 @@ function cancelLogout() {
             </div>
           </div>
         </div>
+        <div v-else-if="showSzerkesztes" class="modal-backdrop" @click.self="cancelSzerkesztes">
+          <div class="modal">
+            <div class="modal-actions">
+              <div>
+                <form action="">
+                  <label for="vezeteknev">Vezetéknév:</label>
+                  <input type="text" id="vezeteknev" name="vezeteknev">
+                  <label for="keresztnev">Keresztnév:</label>
+                  <input type="tel" id="keresztnev" name="keresztnev">
+                  <label for="telefon">Telefonszám:</label>
+                  <input type="text" id="telefon" name="telefon">
+                  <label for="bio">Bio:</label>
+                  <input type="text" id="bio" name="bio">
+                  <label for="avatar">Profilkép</label>
+                  <input type="file" name="avatar" id="avatar">
+                  <label for="cim">Szállítási cím</label>
+                  <input type="text" id="cim" name="cim">
+                </form>
+                <button class="btn confirm" @click="confirmLogout">Mentés</button>
+                <button class="btn cancel" @click="cancelSzerkesztes">Mégse</button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     <section class="content">
       <div class="content-grid">
@@ -157,7 +191,7 @@ function cancelLogout() {
             <p><strong>Csatlakozott:</strong> {{ formatDate(user.joined) }}</p>
             <p><strong>Hobbi:</strong> Kötés, horgolás, hímzés, mintatervezés</p>
             <hr />
-            <h4>Gyors stat</h4>
+            <h4>Információk</h4>
             <ul>
               <li><strong>{{ user.stats.posts }}</strong> bejegyzés</li>
               <li><strong>{{ user.stats.followers }}</strong> követő</li>
@@ -217,6 +251,10 @@ function cancelLogout() {
 </template>
 
 <style scoped> 
+
+/*#region Szerkesztés*/
+
+/*#endregion*/
 
 .profile-page {
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
