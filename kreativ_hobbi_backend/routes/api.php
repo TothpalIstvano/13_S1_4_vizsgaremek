@@ -378,14 +378,3 @@ Route::post('/kosar/hozzaad', function (Request $request) {
         return response()->json(['error' => $e->getMessage()], 500);
     }
 });
-
-// Add these routes after your existing user routes
-Route::middleware(['auth:sanctum'])->group(function () {
-    // Email verification routes
-    Route::get('/email/verify', [VerifyEmailController::class, 'notice'])->name('verification.notice');
-    Route::get('/email/verify/{id}/{hash}', [VerifyEmailController::class, '__invoke'])
-        ->middleware(['signed'])
-        ->name('verification.verify');
-    Route::post('/email/verification-notification', [EmailVerificationNotificationController::class, 'store'])
-        ->name('verification.send');
-});

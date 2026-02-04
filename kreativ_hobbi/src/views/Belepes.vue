@@ -213,6 +213,9 @@ const handleSignUp = async () => {
     // backend returns noContent() (204) after registering and logging in the user
     if (response.status === 204 || response.status === 201) {
       // user is logged in server-side, go to profile
+      console.log(      await axios.post('/email/verification-notification', {}, {
+        withCredentials: true
+      }))
       router.push('/Profil')
       
       window.dispatchEvent(new Event('user-logged-in'));
