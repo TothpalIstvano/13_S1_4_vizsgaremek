@@ -759,7 +759,7 @@ const showAlert = ref(false);
 const isMobile = ref(false);
 
 function checkScreenWidth() {
-  isMobile.value = window.innerWidth < 550;
+  isMobile.value = window.innerWidth < 440;
   if (isMobile.value) {
     showSuccessAlert();
   }
@@ -1138,7 +1138,7 @@ onUnmounted(() => {
           <!--Canvas -->
           <canvas ref="canvas" style="display: none;"></canvas>
 
-          <!-- Pixeles kép konténere -->
+          <!--#region Pixeles kép konténere -->
           <div class="pixel-grid-container">
             <div class="pixel-info">
               <p>Kép mérete: {{ aktualisKep.width }}×{{ aktualisKep.height }} px | 
@@ -1184,14 +1184,16 @@ onUnmounted(() => {
               <p>Kép betöltése folyamatban</p>
             </div>
           </div>
+          <!--#endregion-->
 
-          <!-- Mintaváltoztató gombok -->
+          <!--#region Mintaváltoztató gombok -->
           <div class="gombok">
-            <button @click="adatokVissza" class="gomb">Vissza a feltöltéshez</button>
+            <button @click="adatokVissza" class="gomb">↩ &nbsp Vissza a feltöltéshez</button>
             <button @click="visszaallitas" class="gomb">Eredeti állapot</button>
             <button @click="kepletoltes(canvas)" class="gomb letolt">Letöltés</button>
             <button @click="kepTorles" class="gomb">Új kép</button>
           </div>
+          <!--#endregion-->
         </div>
         <!--#endregion-->
       </div>
@@ -1365,264 +1367,6 @@ main {
   background-position: 0 100%;
   background-size: 100% 4px;
   padding-bottom: 6px;
-}
-
-.fonal-info {
-  margin: 20px 0;
-  padding: 15px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-}
-
-.fonal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-}
-
-.fonal-header h4 {
-  margin: 0;
-  color: var(--mk-text-light);
-}
-
-.loading-spinner {
-  width: 20px;
-  height: 20px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-top-color: var(--mk-text-light);
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-.fonal-details {
-  display: flex;
-  gap: 15px;
-  margin-bottom: 15px;
-}
-
-.fonal-kep {
-  flex-shrink: 0;
-}
-
-.fonal-kep-img {
-  width: 60px;
-  height: 60px;
-  object-fit: cover;
-  border-radius: 4px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.fonal-adatok {
-  flex: 1;
-  text-align: left;
-}
-
-.fonal-nev {
-  font-weight: 600;
-  margin: 0 0 5px 0;
-  color: var(--mk-text-light);
-  font-size: 14px;
-}
-
-.fonal-ar,
-.fonal-mennyiseg,
-.fonal-osszeg {
-  margin: 3px 0;
-  color: rgba(255, 255, 255, 0.8);
-  font-size: 13px;
-}
-
-.fonal-osszeg {
-  margin-top: 8px;
-  padding-top: 8px;
-  border-top: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.kosar-gomb {
-  width: 100%;
-  padding: 12px;
-  background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-size: 14px;
-}
-
-.kosar-gomb:hover:not(:disabled) {
-  background: linear-gradient(135deg, #45a049 0%, #3d8b40 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
-}
-
-.kosar-gomb:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.kosar-gomb.hozzaadva {
-  background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
-}
-
-.fonal-betoltes,
-.fonal-nincs {
-  padding: 20px;
-  text-align: center;
-  color: rgba(255, 255, 255, 0.7);
-  font-style: italic;
-}
-
-.kosar-modal {
-  max-width: 400px;
-}
-
-.modal-success {
-  text-align: center;
-}
-
-.success-icon {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
-  color: white;
-  font-size: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 20px;
-  font-weight: bold;
-}
-
-.modal-success h3 {
-  margin: 0 0 20px 0;
-  color: var(--mk-text-dark);
-}
-
-.kosar-termek-info {
-  display: flex;
-  gap: 15px;
-  padding: 15px;
-  background: #f5f5f5;
-  border-radius: 8px;
-  margin-bottom: 20px;
-}
-
-.modal-termek-kep {
-  width: 80px;
-  height: 80px;
-  object-fit: cover;
-  border-radius: 4px;
-}
-
-.modal-termek-details {
-  flex: 1;
-  text-align: left;
-}
-
-.modal-termek-nev {
-  font-weight: 600;
-  margin: 0 0 5px 0;
-  color: #333;
-}
-
-.modal-termek-mennyiseg,
-.modal-termek-osszeg {
-  margin: 5px 0;
-  color: #666;
-  font-size: 14px;
-}
-
-.modal-termek-osszeg {
-  font-size: 16px;
-  margin-top: 8px;
-  padding-top: 8px;
-  border-top: 1px solid #ddd;
-}
-
-.modal-gombok {
-  display: flex;
-  gap: 10px;
-  margin-top: 20px;
-}
-
-.modal-gomb {
-  flex: 1;
-  padding: 12px;
-  border: none;
-  border-radius: 6px;
-  font-weight: 600;
-  cursor: pointer;
-  text-decoration: none;
-  text-align: center;
-  font-size: 14px;
-  transition: all 0.3s ease;
-}
-
-.modal-gomb.folytatas {
-  background: #f0f0f0;
-  color: #333;
-}
-
-.modal-gomb.folytatas:hover {
-  background: #e0e0e0;
-}
-
-.modal-gomb.kosar {
-  background: linear-gradient(135deg, #3f51b5 0%, #303f9f 100%);
-  color: white;
-}
-
-.modal-gomb.kosar:hover {
-  background: linear-gradient(135deg, #303f9f 0%, #283593 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(63, 81, 181, 0.3);
-}
-
-.modal-close {
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  background: none;
-  border: none;
-  font-size: 24px;
-  color: #666;
-  cursor: pointer;
-  padding: 0;
-  width: 30px;
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  transition: all 0.3s ease;
-}
-
-.modal-close:hover {
-  background: #f5f5f5;
-  color: #333;
-}
-
-@media (max-width: 768px) {
-  .fonal-details {
-    flex-direction: column;
-    text-align: center;
-  }
-  
-  .fonal-adatok {
-    text-align: center;
-  }
-  
-  .modal-gombok {
-    flex-direction: column;
-  }
 }
 
 /*#region felső szövegdobozok*/
@@ -2244,11 +1988,11 @@ input[type="file"] {
 }
 
 .gomb.letolt {
-  background-color: #4caf5c;
+  background-color: #af683f;
 }
 
 .gomb.letolt:hover {
-  background-color: #45a049;
+  background-color: #9e4e1f;
 }
 /*#endregion*/
 
@@ -2477,6 +2221,266 @@ input[type="file"] {
 .oldal-kartya li {
   margin-bottom: 8px;
   font-size: 0.9em;
+}
+/*#endregion*/
+
+/*#region Fonal számítás*/
+.fonal-info {
+  margin: 20px 0;
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+}
+
+.fonal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.fonal-header h4 {
+  margin: 0;
+  color: var(--mk-text-light);
+}
+
+.loading-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: var(--mk-text-light);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.fonal-details {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.fonal-kep {
+  flex-shrink: 0;
+}
+
+.fonal-kep-img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.fonal-adatok {
+  flex: 1;
+  text-align: left;
+}
+
+.fonal-nev {
+  font-weight: 600;
+  margin: 0 0 5px 0;
+  color: var(--mk-text-light);
+  font-size: 14px;
+}
+
+.fonal-ar,
+.fonal-mennyiseg,
+.fonal-osszeg {
+  margin: 3px 0;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 13px;
+}
+
+.fonal-osszeg {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.kosar-gomb {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 14px;
+}
+
+.kosar-gomb:hover:not(:disabled) {
+  background: linear-gradient(135deg, #45a049 0%, #3d8b40 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+}
+
+.kosar-gomb:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.kosar-gomb.hozzaadva {
+  background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+}
+
+.fonal-betoltes,
+.fonal-nincs {
+  padding: 20px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.7);
+  font-style: italic;
+}
+
+.kosar-modal {
+  max-width: 400px;
+}
+
+.modal-success {
+  text-align: center;
+}
+
+.success-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+  color: white;
+  font-size: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  font-weight: bold;
+}
+
+.modal-success h3 {
+  margin: 0 0 20px 0;
+  color: var(--mk-text-dark);
+}
+
+.kosar-termek-info {
+  display: flex;
+  gap: 15px;
+  padding: 15px;
+  background: #f5f5f5;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.modal-termek-kep {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.modal-termek-details {
+  flex: 1;
+  text-align: left;
+}
+
+.modal-termek-nev {
+  font-weight: 600;
+  margin: 0 0 5px 0;
+  color: #333;
+}
+
+.modal-termek-mennyiseg,
+.modal-termek-osszeg {
+  margin: 5px 0;
+  color: #666;
+  font-size: 14px;
+}
+
+.modal-termek-osszeg {
+  font-size: 16px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #ddd;
+}
+
+.modal-gombok {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.modal-gomb {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  text-align: center;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.modal-gomb.folytatas {
+  background: #f0f0f0;
+  color: #333;
+}
+
+.modal-gomb.folytatas:hover {
+  background: #e0e0e0;
+}
+
+.modal-gomb.kosar {
+  background: linear-gradient(135deg, #3f51b5 0%, #303f9f 100%);
+  color: white;
+}
+
+.modal-gomb.kosar:hover {
+  background: linear-gradient(135deg, #303f9f 0%, #283593 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(63, 81, 181, 0.3);
+}
+
+.modal-close {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #666;
+  cursor: pointer;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.modal-close:hover {
+  background: #f5f5f5;
+  color: #333;
+}
+
+@media (max-width: 768px) {
+  .fonal-details {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .fonal-adatok {
+    text-align: center;
+  }
+  
+  .modal-gombok {
+    flex-direction: column;
+  }
 }
 /*#endregion*/
 

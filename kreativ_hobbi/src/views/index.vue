@@ -756,6 +756,10 @@ function formatDate(dateString) {
   .blog-card {
     width: 25rem;
   }
+  .content-wrapper {
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 24px;
+  }
 }
 
 @media screen and (max-width: 945px) {
@@ -771,6 +775,11 @@ function formatDate(dateString) {
   .blog-card {
     font-size: 15px;
   }
+  .content-wrapper {
+    grid-template-columns: 1fr;
+    gap: 24px;
+    padding: 32px 0;
+  }
 }
 
 @media screen and (max-width: 500px) {
@@ -779,6 +788,12 @@ function formatDate(dateString) {
   }
   .blog-card {
     max-width: calc(90vw - 4rem);
+  }
+  .content-wrapper {
+    grid-template-columns: 1fr;
+  }
+  .card {
+    max-width: 100%;
   }
 }
 

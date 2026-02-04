@@ -20,7 +20,7 @@
         <h3 class="error-title">A bejegyzés nem található</h3>
         <p class="error-message">{{ error }}</p>
         <button @click="$router.go(-1)" class="back-btn error-back-btn">
-          <div class="btn-icon">←</div>
+          <div class="btn-icon">↩</div>
           Vissza a bloghoz
         </button>
       </div>
@@ -29,7 +29,7 @@
     <div v-else class="blog-content">
       <div class="navigation-container">
         <button @click="$router.go(-1)" class="back-btn">
-          <div class="btn-icon">←</div>
+          <div class="btn-icon">↩</div>
           <span>Vissza a bloghoz</span>
         </button>
       </div>
