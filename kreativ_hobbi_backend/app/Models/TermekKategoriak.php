@@ -5,10 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class TermekCimkek extends Model
+class TermekKategoriak extends Model
 {
     use HasFactory;
-    protected $table = "termekCimkek";
+    protected $table = "termekKategoriak";
     protected $fillable = ["termek_id", "cimke_id"];
     protected $primaryKey = ["termek_id", "cimke_id"];
     public $incrementing = false;

@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class termekSzinek extends Model
+class TermekSzinek extends Model
 {
     use HasFactory;
     protected $table = "termekSzinek";
@@ -17,7 +17,7 @@ class termekSzinek extends Model
     {
         return $this->belongsTo(Termekek::class, 'termek_id', 'id');
     }
-    public function termekSzinek()
+    public function TermekSzinek()
     {
         return $this->belongsToMany(Szinek::class, 'termekSzinek', 'termek_id', 'szin_id');
     }

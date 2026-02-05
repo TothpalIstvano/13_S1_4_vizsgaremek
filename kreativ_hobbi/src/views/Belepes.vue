@@ -4,6 +4,7 @@
     <div class="container a-container" :class="{ 'is-txl': isSignInMode }">
       <form class="form" @submit.prevent="handleSignUp">
         <h2 class="title">Fiók készítése</h2>
+        <label v-if="registerError !== ''" class="error-message">{{ registerError }}</label>
         <input class="form__input" autocomplete="username" name="username" type="text" placeholder="Felhasználónév" v-model="signUpForm.name" required>
         <input class="form__input" autocomplete="email" type="email" name="email" placeholder="Email" v-model="signUpForm.email" required>
         <input class="form__input" autocomplete="new-password" name="password" type="password" placeholder="Jelszó" v-model="signUpForm.password" minlength="8" required>
@@ -18,7 +19,7 @@
         <label class='form__checkbox'>
           <input type="checkbox" required name="checkbox" v-model="signUpForm.privacy" /> Elolvastam és elfogadom a Adatvédelmi irányelveket
         </label>
-        <button class="button" type="submit" :disabled="!passwordValid">Fiók létrehozása</button>
+        <button class="button" type="submit" :disabled="buttonflag  ">Fiók létrehozása</button>
       </form>
     </div>
 
@@ -53,7 +54,7 @@
 </template>
 
 <script setup>
-import { inject, onMounted, ref, watch } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import axios from 'axios' 
 import router from '@/router/router'
 
@@ -76,9 +77,10 @@ onMounted(() => {
 const isSignInMode = ref(true)
 const loading = ref(false)
 const loginError = ref('')
+const registerError = ref('')
 const errors = ref([])
 const passwordValid = ref(false)
-
+const buttonflag = ref(false)
 const signUpForm = ref({
   name: '',
   email: '',
@@ -125,6 +127,12 @@ watch(
   (newPassword) => {
     errors.value = validatePassword(newPassword)
     passwordValid.value = errors.value.length === 0
+  }
+)
+watch(
+  () => [signUpForm.value.password, signUpForm.value.terms, signUpForm.value.privacy, buttonflag.value, signUpForm.value.email, signUpForm.value.name, signUpForm.value.password_confirmation],
+  ([password, terms, privacy, buttonFlag, email, name, passwordConfirmation]) => {
+    buttonflag.value = !passwordValid.value || !terms || !privacy || !email || !name || !passwordConfirmation || password !== passwordConfirmation
   }
 )
 
@@ -180,6 +188,7 @@ const handleSignUp = async () => {
 
   loading.value = true
   loginError.value = ''
+  buttonflag.value = true
 
   try {
     if (!signUpForm.value.name || !signUpForm.value.email || !signUpForm.value.password) {
@@ -227,12 +236,14 @@ const handleSignUp = async () => {
     if (error.response?.status === 422 && error.response.data?.errors) {
       // join validation errors into a single message
       const errs = Object.values(error.response.data.errors).flat().join(' ')
-      loginError.value = errs || error.response.data.message || error.message
+      registerError.value = errs || error.response.data.message || error.message
+      console.log('Validation errors:', error.response.data.errors);
     } else {
-      loginError.value = error.response?.data?.message || error.message || 'Registration failed. Please try again.'
+      registerError.value = error.response?.data?.message?.includes('felhasz_nev', 'duplicate') ? 'Username already exists.' : 'Registration failed. Please try again.'
     }
   } finally {
     loading.value = false
+    buttonflag.value = false
   }
 }
 

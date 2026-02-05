@@ -215,13 +215,13 @@ Route::post('/posts', function (Request $request) {
 })->middleware('auth:sanctum');
 
 Route::get('/termekek', function () {
-    $termekek = Termekek::all('id', 'nev', 'ar', 'leiras', 'darab', 'meter', 'kategoria_id', 'fo_kep_id')->load('TermekKategoria', 'TermekFoKep', 'TermekSzinek', 'TermekCimkek');
+    $termekek = Termekek::all('id', 'nev', 'ar', 'leiras', 'darab', 'meter', 'kategoria_id', 'fo_kep_id')->load('TermekKategoria', 'TermekFoKep', 'TermekSzinek', 'TermekKategoriak');
     return response()->json($termekek);
 });
 
 Route::get('/termekek/{id}', function ($id) {
     try {
-        $termek = Termekek::with('TermekKategoria', 'TermekFoKep', 'TermekSzinek', 'TermekCimkek')->find($id);
+        $termek = Termekek::with('TermekKategoria', 'TermekFoKep', 'TermekSzinek', 'TermekKategoriak')->find($id);
         if ($termek) {
             return response()->json($termek);
         } else {
@@ -324,7 +324,7 @@ Route::get('/termekek/fonal-csoport/{fonalTipus}', function ($fonalTipus) {
 
         // Find products that match the fonal type
         // Adjust this query based on your actual database structure
-        $termekek = Termekek::with('TermekKategoria', 'TermekFoKep', 'TermekSzinek', 'TermekCimkek')
+        $termekek = Termekek::with('TermekKategoria', 'TermekFoKep', 'TermekSzinek', 'TermekKategoriak')
             ->whereHas('TermekKategoria', function ($query) use ($cleanFonalTipus) {
                 $query->where('nev', 'like', '%' . $cleanFonalTipus . '%')
                     ->orWhere('leiras', 'like', '%' . $cleanFonalTipus . '%');

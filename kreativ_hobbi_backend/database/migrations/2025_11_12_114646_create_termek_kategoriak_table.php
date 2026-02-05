@@ -11,12 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('termekCimkek', function (Blueprint $table) {
+        Schema::create('termekKategoriak', function (Blueprint $table) {
             $table->unsignedInteger('termek_id')->nullable(false);
-            $table->unsignedInteger('cimke_id')->nullable(false);
-            $table->primary(['termek_id', 'cimke_id']);
+            $table->unsignedInteger('kategoria_id')->nullable(false);
+            $table->primary(['termek_id', 'kategoria_id']);
             $table->foreign('termek_id')->references('id')->on('termekek')->onDelete('cascade');
-            $table->foreign('cimke_id')->references('id')->on('cimkek')->onDelete('cascade');
+            $table->foreign('kategoria_id')->references('id')->on('kategoriak')->onDelete('cascade');
             $table->timestamps();
         });
     }
@@ -26,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('termekCimkek');
+        Schema::dropIfExists('termekKategoriak');
     }
 };
