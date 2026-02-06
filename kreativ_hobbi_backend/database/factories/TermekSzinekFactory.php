@@ -7,7 +7,7 @@ use App\Models\Szinek;
 use App\Models\Termekek;
 
 /*
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\termekSzinek>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\TermekSzinek>
  */
 class TermekSzinekFactory extends Factory
 {

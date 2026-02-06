@@ -4,12 +4,12 @@ namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Models\Termekek;
-use App\Models\Cimkek;
+use App\Models\Kategoriak;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\TermekKepek>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\TermekKategoriak>
  */
-class TermekCimkekFactory extends Factory
+class TermekKategoriakFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -20,7 +20,7 @@ class TermekCimkekFactory extends Factory
     {
         return [
             "termek_id"=> Termekek::pluck('id')->random(),
-            'cimke_id'=> Cimkek::pluck('id')->random(),
+            'kategoria_id'=> Kategoriak::pluck('id')->random(),
         ];
     }
 }

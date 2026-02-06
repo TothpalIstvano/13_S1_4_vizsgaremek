@@ -54,8 +54,8 @@ class DatabaseSeeder extends Seeder
             // 13. Termékek adatok seedelése.
             TermekekSeeder::class,
 
-            // 14. Termék címkék adatok seedelése.
-            TermekCimkekSeeder::class,
+            // 14. Termék kategóriák adatok seedelése.
+            TermekKategoriakSeeder::class,
 
             // 15. Termék színek adatok seedelése.
             TermekSzinekSeeder::class,

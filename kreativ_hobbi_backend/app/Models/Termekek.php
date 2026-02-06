@@ -32,8 +32,8 @@ class Termekek extends Model
         return $this->belongsToMany(Szinek::class,'termekSzinek', 'termek_id', 'szin_id');
     }
 
-    public function TermekCimkek()
+    public function TermekKategoriak()
     {
-        return $this->belongsToMany(Cimkek::class, 'termekCimkek', 'termek_id', 'cimke_id');
+        return $this->belongsToMany(Cimkek::class, 'termekKategoriak', 'termek_id', 'cimke_id');
     }
 }

@@ -2,13 +2,13 @@
 
 namespace Database\Seeders;
 
-use App\Models\TermekCimkek;
+use App\Models\Kategoriak;
+use App\Models\TermekKategoriak;
 use App\Models\Termekek; // Feltételezett modellnév
-use App\Models\Cimkek;    // Feltételezett modellnév
 use Illuminate\Database\Seeder;
 
 
-class TermekCimkekSeeder extends Seeder
+class TermekKategoriakSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -18,34 +18,34 @@ class TermekCimkekSeeder extends Seeder
         
         // 2. Szerezzük be a szükséges ID-ket
         $termekIds = Termekek::pluck('id');
-        $cimkeIds = Cimkek::pluck('id');
+        $kategoriaIds = Kategoriak::pluck('id');
 
-        if ($termekIds->isEmpty() || $cimkeIds->isEmpty()) {
-            $this->command->error('A termék-kép kapcsolatok seederhez először futtasd a TermekekSeeder-t és a KepekSeeder-t!');
+        if ($termekIds->isEmpty() || $kategoriaIds->isEmpty()) {
+            $this->command->error('A termék-kategória kapcsolatok seederhez először futtasd a TermekekSeeder-t és a KategoriakSeeder-t!');
             return;
         }
 
         // 3. Hozzuk létre az egyedi párosításokat
         $numberOfConnections = 30; // Vagy amennyit szeretnél
-        $maxPossibleConnections = $termekIds->count() * $cimkeIds->count();
+        $maxPossibleConnections = $termekIds->count() * $kategoriaIds->count();
 
         if ($numberOfConnections > $maxPossibleConnections) {
             $this->command->warn("A kért {$numberOfConnections} kapcsolat helyett csak {$maxPossibleConnections} egyedi párosítás lehetséges. Ekkorát hozunk létre.");
             $numberOfConnections = $maxPossibleConnections;
         }
 
-        // A crossJoin() létrehozza az összes lehetséges (termek_id, kep_id) párt.
+        // A crossJoin() létrehozza az összes lehetséges (termek_id, kategoria_id) párt.
         // A random() kiválaszt belőle a kívánt mennyiséget.
-        $uniquePairs = $termekIds->crossJoin($cimkeIds)->random($numberOfConnections);
+        $uniquePairs = $termekIds->crossJoin($kategoriaIds)->random($numberOfConnections);
 
         // 4. Hozzuk létre a kapcsolatokat az egyedi párokkal
         foreach ($uniquePairs as $pair) {
-            TermekCimkek::create([
-                'termek_id' => $pair[0], // A crossJoin tömböt ad vissza: [termek_id, kep_id]
-                'cimke_id' => $pair[1],
+            TermekKategoriak::create([
+                'termek_id' => $pair[0], // A crossJoin tömböt ad vissza: [termek_id, kategoria_id]
+                'kategoria_id' => $pair[1],
             ]);
         }
 
-        $this->command->info('TermekekKepek tábla sikeresen feltöltve!');
+        $this->command->info('TermekekKategoriak tábla sikeresen feltöltve!');
     }
 }

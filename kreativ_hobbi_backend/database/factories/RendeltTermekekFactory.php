@@ -5,7 +5,7 @@ namespace Database\Factories;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Models\Rendelesek;
 use App\Models\Termekek;
-use App\Models\termekSzinek;
+use App\Models\TermekSzinek;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\RendeltTermekek>
