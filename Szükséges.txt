@@ -1,6 +1,6 @@
 - kommentek helyes profilképpel, saját törléssel, elelnőrzéssel
 - profil szerkesztése
-- mintakészítő fonalszámítás, színek figyelembevételével
+- mintakészítő letöltés, néhány megnevezés/szöveg átírása
 - rólunk oldal rendes szöveg
 - reszponzívitás
 - rip dino

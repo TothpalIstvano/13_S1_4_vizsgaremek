@@ -319,22 +319,59 @@ Route::get('/carousel/termekek', function () {
 
 Route::get('/termekek/fonal-csoport/{fonalTipus}', function ($fonalTipus) {
     try {
-        // Clean the fonalTipus parameter to match your data structure
-        $cleanFonalTipus = str_replace(' fonal csoport', '', $fonalTipus);
+        $fonalTipus = str_replace(' fonal csoport', '', $fonalTipus);
 
-        // Find products that match the fonal type
-        // Adjust this query based on your actual database structure
-        $termekek = Termekek::with('TermekKategoria', 'TermekFoKep', 'TermekSzinek', 'TermekKategoriak')
-            ->whereHas('TermekKategoria', function ($query) use ($cleanFonalTipus) {
-                $query->where('nev', 'like', '%' . $cleanFonalTipus . '%')
-                    ->orWhere('leiras', 'like', '%' . $cleanFonalTipus . '%');
+        $fonalMapping = [
+            'A fonal csoport' => 'A fonal',
+            'B fonal csoport' => 'B fonal',
+            'C fonal csoport' => 'C fonal',
+            'D fonal csoport' => 'D fonal',
+            'E fonal csoport' => 'E fonal'
+        ];
+
+        $searchTerm = $fonalMapping[$fonalTipus] ?? substr($fonalTipus, 0, 1);
+
+        $termekek = Termekek::with([
+            'TermekKategoria',
+            'TermekFoKep',
+            'TermekSzinek' => function ($query) {
+                $query->select('szinek.id', 'szinek.hex_kod', 'szinek.nev as szin_nev');
+            },
+            'TermekKategoriak'
+        ])
+            ->where(function ($query) use ($searchTerm, $fonalTipus) {
+                $query->whereHas('TermekKategoria', function ($q) use ($searchTerm, $fonalTipus) {
+                    $q->where('nev', '=', $fonalTipus)
+                        ->orWhere('nev', 'like', $searchTerm . '%')
+                        ->orWhere('nev', 'like', '%' . $fonalTipus . '%');
+                })
+                    ->orWhere('nev', '=', $fonalTipus)
+                    ->orWhere('nev', 'like', $searchTerm . '%')
+                    ->orWhere('nev', 'like', '%' . $fonalTipus . '%');
             })
-            ->orWhere('nev', 'like', '%' . $cleanFonalTipus . '%')
-            ->orWhere('leiras', 'like', '%' . $cleanFonalTipus . '%')
             ->get();
 
+        if ($termekek->count() > 1) {
+            $termekek = $termekek->filter(function ($termek) use ($searchTerm) {
+                $name = strtolower($termek->nev);
+                $search = strtolower($searchTerm);
+
+                return strpos($name, $search . ' ') === 0 ||
+                    strpos($name, $search . ' fonal') !== false ||
+                    strpos($name, 'fonal ' . $search) !== false;
+            })->values();
+        }
+
+        $termekek->each(function ($termek) {
+            $termek->available_colors = $termek->TermekSzinek->map(function ($szin) {
+                return [
+                    'hex' => $szin->hex_kod,
+                    'name' => $szin->szin_nev
+                ];
+            });
+        });
+
         if ($termekek->isEmpty()) {
-            // If no direct match, return empty array
             return response()->json([]);
         }
 
@@ -345,7 +382,7 @@ Route::get('/termekek/fonal-csoport/{fonalTipus}', function ($fonalTipus) {
     }
 });
 
-// Add cart endpoint
+// Kosárhoz adás mintakészítőből
 Route::post('/kosar/hozzaad', function (Request $request) {
     $validated = $request->validate([
         'termek_id' => 'required|integer|exists:termekek,id',
@@ -354,7 +391,6 @@ Route::post('/kosar/hozzaad', function (Request $request) {
     ]);
 
     try {
-        // Check if product exists and has enough stock
         $termek = Termekek::find($validated['termek_id']);
 
         if (!$termek) {
@@ -365,8 +401,6 @@ Route::post('/kosar/hozzaad', function (Request $request) {
             return response()->json(['error' => 'Nincs elegendő készlet'], 422);
         }
 
-        // In a real application, you'd save to session or database cart
-        // For now, we'll return success
         return response()->json([
             'message' => 'Termék sikeresen hozzáadva a kosárhoz',
             'termek' => $termek,

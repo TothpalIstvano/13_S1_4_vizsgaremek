@@ -24,16 +24,16 @@ class Termekek extends Model
 
     public function TermekKepek()
     {
-        return $this->belongsToMany(Kepek::class,'termekKepek', 'termek_id', 'id');
+        return $this->belongsToMany(Kepek::class, 'termekKepek', 'termek_id', 'id');
     }
 
     public function TermekSzinek()
     {
-        return $this->belongsToMany(Szinek::class,'termekSzinek', 'termek_id', 'szin_id');
+        return $this->belongsToMany(Szinek::class, 'termekSzinek', 'termek_id', 'szin_id');
     }
 
     public function TermekKategoriak()
     {
-        return $this->belongsToMany(Cimkek::class, 'termekKategoriak', 'termek_id', 'cimke_id');
+        return $this->belongsToMany(Cimkek::class, 'termekKategoriak', 'termek_id', 'kategoria_id');
     }
 }
