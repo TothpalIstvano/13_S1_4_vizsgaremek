@@ -12,8 +12,7 @@ use App\Models\RendeltTermekek;
 use App\Models\Cimkek;
 use App\Models\Felhasznalok;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\Auth\VerifyEmailController;
-use App\Http\Controllers\Auth\EmailVerificationNotificationController;
+use App\Models\Kategoriak;
 
 //User related API routes:
 
@@ -82,6 +81,11 @@ Route::get('/blog/{id}/comments', [KommentController::class, 'index']);
 Route::get('/cimkek', function () {
     $cimkek = Cimkek::select('id', 'nev')->get();
     return response()->json($cimkek);
+});
+
+Route::get('/kategoriak', function () {
+    $kategoriak = Kategoriak::select('id', 'nev', 'fo_kategoria_id')->get();
+    return response()->json($kategoriak);
 });
 
 /* Reakciók a poszthoz
