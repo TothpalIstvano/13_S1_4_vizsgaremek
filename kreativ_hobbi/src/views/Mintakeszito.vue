@@ -1358,16 +1358,6 @@ onUnmounted(() => {
           <p><strong>Szükséges fonalhossz:</strong> {{ fonalHossz }} cm</p>
           <p><strong>Befejezett sorok:</strong> {{ Object.values(pipaltSorok).filter(Boolean).length }}</p>
         </div>
-          
-        <div class="oldal-kartya">
-          <h3>Tippek</h3>
-          <ul>
-            <li>Jelöld meg azokat a sorokat, amelyeket külön szeretnél kezelni</li>
-            <li>Kisebb pixel méret részletesebb mintát ad</li>
-            <li>A rács átlátszósága segít a minta követésében</li>
-            <li>A számított fonalmennyiség csak tájékoztató jellegű</li>
-          </ul>
-        </div>
 
         <div class="oldal-kartya" v-if="fonalTermek && szinPaletta && szinPaletta.length > 0">
           <h3>Szín egyeztetés</h3>
