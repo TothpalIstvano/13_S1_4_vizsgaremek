@@ -84,7 +84,7 @@ Route::get('/cimkek', function () {
 });
 
 Route::get('/kategoriak', function () {
-    $kategoriak = Kategoriak::select('id', 'nev')->get();
+    $kategoriak = Kategoriak::select('id', 'nev', 'fo_kategoria_id')->get();
     return response()->json($kategoriak);
 });
 

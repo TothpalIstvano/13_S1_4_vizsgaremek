@@ -172,6 +172,9 @@
               </button>
             </div>
           </div>
+          <div v-if="filteredItems.length == 0" style="grid-column: 1/-1; text-align: center; color: #555; font-size: 24px; padding: 2rem 0;">
+            Nincs találat
+          </div>
         </div>
       </div>
     </div>
@@ -309,9 +312,8 @@
   const min = ref(0)
   const max = ref(0)
   const searchTerm = ref('')
-  const activekategoriak = computed(() =>
-  kategoriak.value.filter(c => selectedkategoriak.value.includes(c.id), console.log('Active tags:', selectedkategoriak.value))
-)
+  const activekategoriak = computed(() => kategoriak.value.filter(c => selectedkategoriak.value.includes(c.id)))
+  const foKategoriak = computed(() => kategoriak.value.filter(k => !k.fo_kategoria_id))
 
   function togglekategoria(id) {
     const index = selectedkategoriak.value.indexOf(id);
@@ -367,7 +369,6 @@ onMounted(() => {
 
   fetchkategoriak().then(data => {
     kategoriak.value = data.sort((a, b) => a.nev.localeCompare(b.nev))
-    console.log('Fetched tags:', kategoriak.value)
   })
 })
 
