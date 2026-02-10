@@ -122,24 +122,25 @@
           </div>
 
           <div class="side-bar-header">
-            <h2>Szűrés kategória szerint</h2>
+            <h2>Kategóriák</h2>
           </div>
 
           <div class="side-bar-content">
             <div 
-              v-for="(kategoria, index) in kategoriak"
-              :key="kategoria.id" 
+              v-for="(foKategoriak, index) in foKategoriak"
+              :id="foKategoriak.id"
+              :key="foKategoriak.id" 
               class="item-tag"
-              :class="{ active: selectedkategoriak.includes(kategoria.id) }"
-              @click="togglekategoria(kategoria.id)"
+              :class="{ active: selectedkategoriak.includes(foKategoriak.id) }"
+              @click="togglekategoria(foKategoriak.id)"
             >
             <div class="checkbox-wrapper-46">
-                <input type="checkbox" :id="`cbx-${kategoria.id}`" class="inp-cbx" :value="kategoria.id" :key="index" v-model="selectedkategoriak" @click.stop/>
-                <label :for="`cbx-${kategoria.id}`" class="cbx"
+                <input type="checkbox" :id="`cbx-${foKategoriak.id}`" class="inp-cbx" :value="foKategoriak.id" :key="index" v-model="selectedkategoriak" @click.stop/>
+                <label :for="`cbx-${foKategoriak.id}`" class="cbx"
                     ><span>
                       <svg viewBox="0 0 12 10" height="10px" width="12px">
                         <polyline points="1.5 6 4.5 9 10.5 1"></polyline></svg></span
-                  ><span>{{ kategoria.nev }}</span>
+                  ><span>{{ foKategoriak.nev }}</span>
                 </label>
               </div>
             </div>
@@ -162,6 +163,7 @@
                   v-for="kategoria in item.termek_kategoriak"
                   :key="kategoria.id"
                   class="item-tag-sm"
+                  :class="{ 'main-category': kategoria.fo_kategoria_id === null }"
                 >
                   {{ kategoria.nev }}
                 </span>
@@ -470,13 +472,14 @@ watch(open, () => {
 onBeforeUnmount(() => {
   document.removeEventListener('click', handleClickOutside)
 })
+
 //#endregion
 </script>
 
 <style scoped>
 #shop {
   min-height: 90vh;
-  padding: 24px;
+  padding: 15px;
 }
 
 /*#region ===== TOP TOOLBAR ===== */
@@ -911,8 +914,8 @@ onBeforeUnmount(() => {
 }
 
 .item-tag-sm {
-  background: #e3e8ff;
-  color: #2b3ea8;
+  background: #ffebd3;
+  color: #a8532b;
   font-size: 12px;
   padding: 4px 8px;
   border-radius: 999px;
@@ -920,8 +923,19 @@ onBeforeUnmount(() => {
   transition: all 0.2s;
 }
 
+.item-tag-sm.main-category {
+  background: #f19c7562;
+  color: #a8532b;
+}
+
 .item-tag-sm:hover {
-  background: #c7d4ff;
+  background: #ffc583fd;
+  color: #553000;
+}
+
+.item-tag-sm:hover.main-category {
+  background: #ffa074d2;
+  color: #553000;
 }
 
 /* ===== BUTTON ===== */
