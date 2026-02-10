@@ -9,16 +9,16 @@ class TermekKategoriak extends Model
 {
     use HasFactory;
     protected $table = "termekKategoriak";
-    protected $fillable = ["termek_id", "cimke_id"];
-    protected $primaryKey = ["termek_id", "cimke_id"];
+    protected $fillable = ["termek_id", "kategoria_id"];
+    protected $primaryKey = ["termek_id", "kategoria_id"];
     public $incrementing = false;
 
     public function termek()
     {
         return $this->belongsTo(Termekek::class, 'termek_id', 'id');
     }
-    public function cimkek()
+    public function kategoriak()
     {
-        return $this->belongsTo(Cimkek::class, 'cimke_id', 'id');
+        return $this->belongsTo(Kategoriak::class, 'kategoria_id', 'id');
     }
 }
