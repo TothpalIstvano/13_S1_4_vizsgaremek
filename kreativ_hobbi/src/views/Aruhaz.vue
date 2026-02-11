@@ -8,11 +8,18 @@
           <span class="filter-label">Aktiv kategóriák:</span>
           <div
             class="filter-chip"
-            v-for="tag in activekategoriak"
+            v-for="tag in lathatoFilter"
             :key="tag.id"
           >
             {{ tag.nev }}
             <span class="remove" @click="togglekategoria(tag.id)">✕</span>
+          </div>
+
+          <div
+            v-if="rejtettFilter > 0"
+            class="filter-chip more-chip"
+          >
+            +{{ rejtettFilter }} 
           </div>
           <button type="button" id="clear-filters" @click="clearFilters">Összes törlése</button>
         </div>
@@ -305,7 +312,6 @@
 
   function toggle() {
     open.value = !open.value
-
   }
 
   function select(option) {
@@ -368,6 +374,22 @@
   const searchTerm = ref('')
   const activekategoriak = computed(() => kategoriak.value.filter(c => selectedkategoriak.value.includes(c.id)))
   const foKategoriak = computed(() => kategoriak.value.filter(k => !k.fo_kategoria_id))
+  const maxLathatoFilter = 8 //max látható szűrők száma a chipben
+  const originalItems = ref([])
+
+  // absolute bounds (from backend)
+  const absMin = ref(0)
+  const absMax = ref(0)
+
+  // temporary UI values
+  const tempMin = ref(0)
+  const tempMax = ref(0)
+
+  // applied filter values
+  const appliedMin = ref(0)
+  const appliedMax = ref(0)
+
+  const openCategories = ref([])
 
   function togglekategoria(id) {
     const index = selectedkategoriak.value.indexOf(id);
@@ -456,7 +478,13 @@ const kategoriakTree = computed(() => {
     }))
 })
 
-const openCategories = ref([])
+const lathatoFilter = computed(() => {
+  return activekategoriak.value.slice(0, maxLathatoFilter)
+})
+
+const rejtettFilter = computed(() => {
+  return activekategoriak.value.length - maxLathatoFilter
+})
 
 function toggleCategoryDropdown(id) {
   const index = openCategories.value.indexOf(id)
@@ -466,21 +494,6 @@ function toggleCategoryDropdown(id) {
     openCategories.value.splice(index, 1)
   }
 }
-
-
-const originalItems = ref([])
-
-// absolute bounds (from backend)
-const absMin = ref(0)
-const absMax = ref(0)
-
-// temporary UI values
-const tempMin = ref(0)
-const tempMax = ref(0)
-
-// applied filter values
-const appliedMin = ref(0)
-const appliedMax = ref(0)
 
 // calculate slider fill
 const rangeStyle = computed(() => {
@@ -556,16 +569,41 @@ onBeforeUnmount(() => {
 
 /*#region ===== TOP TOOLBAR ===== */
 #toolbar {
-  display: flex;
-  justify-content: flex-end;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
   margin-bottom: 24px;
   background-color: white;
   border-radius: 14px;
   width: 100%;
-  height: 100px;
+  min-height: 80px;
+  padding: 0 24px;
   box-shadow:0 4px 12px rgba(0, 0, 0, 0.151);
-  @media screen and (max-width: 480px) {
-    flex-direction: column;
+}  
+
+@media screen and (max-width: 480px) {
+  #toolbar {
+    grid-template-columns: 1fr;
+    height: auto;
+    gap: 15px;
+  }
+
+  .active-filters {
+    justify-self: start;
+    width: 100%;
+    margin-bottom: 0;
+  }
+
+  .search-container{
+    justify-self: center;
+    width: 100% !important;
+    margin: 0 auto 15px auto !important;
+  }
+
+  .dropdown {
+    justify-self: center;
+    width: 100% !important;
+    margin: 0 auto !important;
   }
 }
 /*#endregion*/
@@ -573,32 +611,91 @@ onBeforeUnmount(() => {
 /*#region ===== FILTER CHIPS ===== */
 .active-filters {
   display: flex;
-  gap: 8px;
+  gap: 12px; /* Increased spacing for a cleaner look */
   align-items: center;
   flex-wrap: wrap;
-  margin-right: 20px;
+  margin-right: 0;
+  justify-self: start;
+  grid-column: 1; /* Helps prevent the section from getting squashed */
+  min-width: 0;
 }
 
 .filter-chip {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 6px 10px;
+  gap: 8px;
+  padding: 6px 12px;
   background: #e3e8ff;
   color: #2b3ea8;
+  border: 1px solid rgba(43, 62, 168, 0.1); /* Subtle border added */
   border-radius: 999px;
   font-size: 13px;
   font-weight: 500;
+  transition: all 0.2s ease; /* Smooth animation for hover */
+  cursor: default;
 }
 
+.filter-chip:hover {
+  background-color: #dbe0ff;
+  border-color: #2b3ea8;
+  transform: translateY(-1px); /* Slight lift effect */
+  box-shadow: 0 2px 5px rgba(43, 62, 168, 0.15);
+}
+
+/* The 'X' remove button styling */
 .filter-chip .remove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.6);
+  color: #2b3ea8;
+  font-size: 10px;
   cursor: pointer;
-  font-weight: bold;
-  opacity: 0.7;
+  transition: all 0.2s;
+  line-height: 1;
 }
 
 .filter-chip .remove:hover {
-  opacity: 1;
+  background-color: #2b3ea8; /* Fills with color on hover */
+  color: white;
+}
+
+/* Specific style for the "+X" counter chip */
+.filter-chip.more-chip {
+  background-color: #f8f9fa;
+  color: #666;
+  border: 1px dashed #d0d0d0;
+  font-weight: 600;
+  padding: 6px 10px;
+}
+
+.filter-chip.more-chip:hover {
+  transform: none; /* No lift effect for the counter */
+  background-color: #f8f9fa;
+  box-shadow: none;
+  border-color: #d0d0d0;
+}
+
+/* Style for the Clear Button */
+#clear-filters {
+  padding: 6px 14px;
+  font-size: 13px;
+  color: #555;
+  background: transparent;
+  border: 1px solid #d0d0d0;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+#clear-filters:hover {
+  border-color: #dc3545;
+  color: #dc3545;
+  background-color: #fff5f5;
 }
 /*#endregion*/
 
@@ -608,7 +705,9 @@ onBeforeUnmount(() => {
   position: relative;
   width: 300px;
   font-size: 15px;
-  margin: 25px auto;
+  margin: 0;
+  grid-column: 3;
+  justify-self: end;
 }
 
 .dropdown__selected {
@@ -664,7 +763,9 @@ onBeforeUnmount(() => {
   background: white;
   width: 300px;
   height: 40px;
-  margin: 25px auto;
+  margin: 0;
+  grid-column: 2;
+  justify-self: center;
   transition: all 0.2s;
 }
 
@@ -960,7 +1061,7 @@ margin-left: 10px;
 #products {
   flex: 1;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); /*ezt kell majd reszponzívvá tenni*/
   gap: 24px;
 }
 
