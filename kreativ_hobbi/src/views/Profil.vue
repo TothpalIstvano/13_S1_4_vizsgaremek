@@ -173,7 +173,7 @@ function cancelSzerkesztes() {
                   <input type="text" id="bio" name="bio">
                   <label for="avatar">Profilkép</label>
                   <input type="file" name="avatar" id="avatar">
-                  <label for="cim">Szállítási cím</label>
+                  <label for="cim">Szállítási cím:</label>
                   <input type="text" id="cim" name="cim">
                 </form>
                 <button class="btn confirm" @click="confirmLogout">Mentés</button>

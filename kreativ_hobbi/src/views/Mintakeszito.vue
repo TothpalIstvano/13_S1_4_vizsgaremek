@@ -55,6 +55,8 @@ async function fonalTermekBetoltese() {
     if (!masodikLepes.value || !masodikLepes.value.fonalTipus) return
     
     kosarBetoltes.value = true
+    colorMatchLoading.value = true
+    
     try {
         const fonalTipusEncoded = encodeURIComponent(masodikLepes.value.fonalTipus)
         
@@ -64,27 +66,51 @@ async function fonalTermekBetoltese() {
                 'Content-Type': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
             },
-            withCredentials: true  // IMPORTANT: This sends cookies with the request
+            withCredentials: true
         })
         
         const data = response.data
-        console.log('Fonal termék betöltése:', data)
+        
         if (data.length > 0) {
             fonalTermek.value = data[0]
+            
+            // Extract yarn colors from the product
+            if (fonalTermek.value.TermekSzinek && fonalTermek.value.TermekSzinek.length > 0) {
+                yarnColors.value = fonalTermek.value.TermekSzinek.map(szin => ({
+                    hex: szin.hex_kod,
+                    name: szin.szin_nev || szin.nev || 'Névtelen'
+                }))
+            } else if (fonalTermek.value.available_colors) {
+                yarnColors.value = fonalTermek.value.available_colors
+            } else {
+                yarnColors.value = []
+            }
+            
+            // Calculate necessary gombolyagok
             if (fonalTermek.value && fonalTermek.value.meter && fonalHossz.value > 0) {
                 const fonalMeterben = fonalHossz.value / 100
                 szuksegesGombolyagok.value = Math.ceil(fonalMeterben / fonalTermek.value.meter)
             }
+            
+            // Check color matching
+            if (szinPaletta.value && szinPaletta.value.length > 0) {
+                checkColorMatching()
+            }
         } else {
             fonalTermek.value = null
             szuksegesGombolyagok.value = 0
+            yarnColors.value = []
+            colorMatchResult.value = null
         }
     } catch (error) {
         console.error('Fonal termék betöltése sikertelen:', error)
         fonalTermek.value = null
         szuksegesGombolyagok.value = 0
+        yarnColors.value = []
+        colorMatchResult.value = null
     } finally {
         kosarBetoltes.value = false
+        colorMatchLoading.value = false
     }
 }
 
@@ -466,6 +492,132 @@ function getDominantColor(pixels) {
   
   return { r, g, b, a: 1 }
 }
+//#endregion
+
+//#region Színmatch
+const colorMatchResult = ref(null)
+const colorMatchLoading = ref(false)
+const yarnColors = ref([])
+
+function hexToRgbObject(hex) {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
+    if (!result) return { r: 0, g: 0, b: 0 }
+    return {
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16)
+    }
+}
+
+function rgbaToRgbObject(rgba) {
+    const match = rgba.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/)
+    if (!match) return { r: 0, g: 0, b: 0 }
+    return {
+        r: parseInt(match[1]),
+        g: parseInt(match[2]),
+        b: parseInt(match[3])
+    }
+}
+
+function calculateColorDistance(rgb1, rgb2) {
+    // Calculate Euclidean distance between colors
+    const dr = rgb1.r - rgb2.r
+    const dg = rgb1.g - rgb2.g
+    const db = rgb1.b - rgb2.b
+    return Math.sqrt(dr * dr + dg * dg + db * db)
+}
+
+function findNearestYarnColor(imageColor) {
+    if (!yarnColors.value || yarnColors.value.length === 0) return null
+    
+    const imageRgb = rgbaToRgbObject(imageColor)
+    let nearestColor = null
+    let minDistance = Infinity
+    
+    yarnColors.value.forEach(yarnColor => {
+        const yarnRgb = hexToRgbObject(yarnColor.hex)
+        const distance = calculateColorDistance(imageRgb, yarnRgb)
+        
+        if (distance < minDistance) {
+            minDistance = distance
+            nearestColor = yarnColor
+        }
+    })
+    
+    // Check if the distance is within an acceptable threshold (you can adjust this)
+    return minDistance <= 100 ? nearestColor : null // Threshold of 100
+}
+
+async function checkColorMatching() {
+    if (!fonalTermek.value || !szinPaletta.value || szinPaletta.value.length === 0) return
+    
+    colorMatchLoading.value = true
+    
+    try {
+        // Get yarn colors from the product
+        if (fonalTermek.value.TermekSzinek && fonalTermek.value.TermekSzinek.length > 0) {
+            yarnColors.value = fonalTermek.value.TermekSzinek.map(szin => ({
+                hex: szin.hex_kod,
+                name: szin.szin_nev || szin.nev || 'Névtelen'
+            }))
+        } else if (fonalTermek.value.available_colors) {
+            yarnColors.value = fonalTermek.value.available_colors
+        } else {
+            // If no colors available, set empty array
+            yarnColors.value = []
+        }
+        
+        // Extract unique colors from the image
+        const imageColors = [...new Set(szinPaletta.value.map(szin => szin.jelenlegi))]
+        
+        // Check for matches
+        const matches = []
+        const noMatches = []
+        
+        imageColors.forEach(imageColor => {
+            const yarnColor = findNearestYarnColor(imageColor)
+            if (yarnColor) {
+                matches.push({
+                    imageColor: imageColor,
+                    yarnColor: yarnColor,
+                    hexColor: rgbToHex(imageColor)
+                })
+            } else {
+                noMatches.push({
+                    imageColor: imageColor,
+                    hexColor: rgbToHex(imageColor)
+                })
+            }
+        })
+        
+        colorMatchResult.value = {
+            matches: matches,
+            noMatches: noMatches,
+            hasYarnColors: yarnColors.value.length > 0,
+            allYarnColors: yarnColors.value
+        }
+        
+    } catch (error) {
+        console.error('Szín egyeztetés sikertelen:', error)
+        colorMatchResult.value = null
+    } finally {
+        colorMatchLoading.value = false
+    }
+}
+
+// Watch for changes in the fonalTermek and trigger color matching
+watch(fonalTermek, (newVal) => {
+    if (newVal && szinPaletta.value && szinPaletta.value.length > 0) {
+        checkColorMatching()
+    }
+})
+
+// Also trigger when palette changes
+watch(szinPaletta, () => {
+    if (fonalTermek.value && szinPaletta.value && szinPaletta.value.length > 0) {
+        checkColorMatching()
+    }
+}, { deep: true })
 //#endregion
 
 //#region Változtatható inputok
@@ -1206,15 +1358,70 @@ onUnmounted(() => {
           <p><strong>Szükséges fonalhossz:</strong> {{ fonalHossz }} cm</p>
           <p><strong>Befejezett sorok:</strong> {{ Object.values(pipaltSorok).filter(Boolean).length }}</p>
         </div>
+
+        <div class="oldal-kartya" v-if="fonalTermek && szinPaletta && szinPaletta.length > 0">
+          <h3>Szín egyeztetés</h3>
           
-        <div class="oldal-kartya">
-          <h3>Tippek</h3>
-          <ul>
-            <li>Jelöld meg azokat a sorokat, amelyeket külön szeretnél kezelni</li>
-            <li>Kisebb pixel méret részletesebb mintát ad</li>
-            <li>A rács átlátszósága segít a minta követésében</li>
-            <li>A számított fonalmennyiség csak tájékoztató jellegű</li>
-          </ul>
+          <div v-if="colorMatchLoading" class="color-match-loading">
+              <p>Színek egyeztetése...</p>
+              <div class="loading-spinner-small"></div>
+          </div>
+          
+          <div v-else-if="colorMatchResult">
+              <div v-if="colorMatchResult.matches.length > 0">
+                  <div class="color-match-success">
+                      <p class="match-title">✓ Egyező színek találhatók</p>
+                      <div v-for="(match, index) in colorMatchResult.matches" :key="index" class="color-match-item">
+                          <div class="color-comparison">
+                              <span class="color-sample" :style="{ backgroundColor: match.imageColor }" 
+                                    :title="'Kép színe: ' + match.hexColor"></span>
+                              <span style="margin: 0 8px; color: var(--mk-text-light);">→</span>
+                              <span class="color-sample" :style="{ backgroundColor: match.yarnColor.hex }" 
+                                    :title="'Fonal színe: ' + match.yarnColor.name"></span>
+                          </div>
+                          <div class="color-names">
+                              <span class="color-name">{{ match.yarnColor.name }}</span>
+                          </div>
+                      </div>
+                  </div>
+                  
+                  <div v-if="colorMatchResult.noMatches.length > 0" class="color-no-match">
+                      <p class="no-match-title">⚠ Nem található pontosan egyező szín</p>
+                      <p class="no-match-subtitle">Az alábbi kép színekhöz nincs pontosan megegyező fonal szín:</p>
+                      <div class="unmatched-colors">
+                          <div v-for="(noMatch, index) in colorMatchResult.noMatches" :key="index" class="unmatched-color">
+                              <span class="color-sample" :style="{ backgroundColor: noMatch.imageColor }"
+                                    :title="'Kép színe: ' + noMatch.hexColor"></span>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+              
+              <div v-else class="color-no-match-all">
+                  <p class="no-match-title">⚠ Nincs egyező szín</p>
+                  <p class="no-match-subtitle">A képen használt színekhez nem található egyező fonal szín.</p>
+                  
+                  <div v-if="colorMatchResult.hasYarnColors" class="available-yarn-colors">
+                      <p class="available-title">Elérhető színek ehhez a fonaltípushoz:</p>
+                      <div class="yarn-colors-grid">
+                          <div v-for="(yarnColor, index) in colorMatchResult.allYarnColors" 
+                              :key="index" class="yarn-color-item">
+                              <span class="color-sample" :style="{ backgroundColor: yarnColor.hex }"
+                                    :title="yarnColor.name"></span>
+                              <span class="yarn-color-name">{{ yarnColor.name }}</span>
+                          </div>
+                      </div>
+                  </div>
+                  
+                  <div v-else class="no-colors-info">
+                      <p>Ehhez a fonaltípushoz nincsenek elérhető színek az adatbázisban.</p>
+                  </div>
+              </div>
+          </div>
+          
+          <div v-else class="color-match-empty">
+              <p>Válassz fonaltípust és hozz létre egy mintát a szín egyeztetéshez.</p>
+          </div>
         </div>
 
         <div class="oldal-kartya">
@@ -2221,6 +2428,172 @@ input[type="file"] {
 }
 /*#endregion*/
 
+/*#region Színmatch */
+.color-match-loading {
+    text-align: center;
+    padding: 20px;
+    color: var(--mk-text-light);
+}
+
+.loading-spinner-small {
+    width: 30px;
+    height: 30px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-top-color: var(--mk-text-light);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 10px auto;
+}
+
+.color-match-success {
+    margin-bottom: 20px;
+}
+
+.match-title {
+    color: #4CAF50;
+    font-weight: 600;
+    margin-bottom: 15px;
+    font-size: 16px;
+}
+
+.color-match-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.color-match-item:last-child {
+    border-bottom: none;
+}
+
+.color-comparison {
+    display: flex;
+    align-items: center;
+}
+
+.color-comparison .color-sample {
+    width: 30px;
+    height: 30px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+}
+
+.color-names {
+    text-align: right;
+    flex: 1;
+    margin-left: 15px;
+}
+
+.color-name {
+    font-size: 14px;
+    color: var(--mk-text-light);
+    opacity: 0.9;
+}
+
+.color-no-match, .color-no-match-all {
+    background: rgba(255, 193, 7, 0.1);
+    border-left: 4px solid #FFC107;
+    padding: 15px;
+    border-radius: 4px;
+    margin-top: 15px;
+}
+
+.no-match-title {
+    color: #FFC107;
+    font-weight: 600;
+    margin-bottom: 8px;
+    font-size: 16px;
+}
+
+.no-match-subtitle {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 14px;
+    margin-bottom: 12px;
+}
+
+.unmatched-colors {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.unmatched-color .color-sample {
+    width: 25px;
+    height: 25px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+}
+
+.available-yarn-colors {
+    margin-top: 15px;
+}
+
+.available-title {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 14px;
+    margin-bottom: 12px;
+    font-weight: 500;
+}
+
+.yarn-colors-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    max-height: 200px;
+    overflow-y: auto;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+}
+
+.yarn-color-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.yarn-color-item .color-sample {
+    width: 30px;
+    height: 30px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+    margin-bottom: 5px;
+}
+
+.yarn-color-name {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.8);
+    word-break: break-word;
+    line-height: 1.2;
+}
+
+.no-colors-info {
+    background: rgba(255, 87, 87, 0.1);
+    border-left: 4px solid #FF5757;
+    padding: 15px;
+    border-radius: 4px;
+    margin-top: 15px;
+    text-align: center;
+}
+
+.no-colors-info p {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 14px;
+    margin: 0;
+}
+
+.color-match-empty {
+    text-align: center;
+    padding: 20px;
+    color: rgba(255, 255, 255, 0.7);
+    font-style: italic;
+}
+/*#endregion*/
+
 /*#region Fonal számítás*/
 .fonal-info {
   padding: 10px;
@@ -2629,6 +3002,21 @@ input[type="file"] {
   .modal-content {
     padding: 16px;
   }
+
+  .yarn-colors-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .color-match-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .color-names {
+        margin-left: 0;
+        margin-top: 8px;
+        text-align: left;
+    }
 }
 /*#endregion*/
 </style>
