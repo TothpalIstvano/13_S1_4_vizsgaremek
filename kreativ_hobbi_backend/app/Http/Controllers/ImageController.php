@@ -33,12 +33,16 @@ class ImageController extends Controller
                 $path = $file->storeAs('blog', $filename, 'public');
 
                 $fullUrl = asset('storage/' . $path);
+                //vagy hátha talán: $fullUrl = url('images/blog/' . basename($path));
 
                 $image = Kepek::create([
                     'url_Link' => $fullUrl,
                     'alt_Szoveg' => $alts[$index] ?? $file->getClientOriginalName(),
                     'leiras' => $descriptions[$index] ?? 'Blog image uploaded by ' . Auth::user()->felhasz_nev
                 ]);
+                /* ez is hátha megoldja
+                $filePath = Storage::disk('public')->path($path);
+                chmod($filePath, 0644);*/
 
                 $uploadedImages[] = [
                     'id' => $image->id,
