@@ -158,26 +158,45 @@ function cancelSzerkesztes() {
             </div>
           </div>
         </div>
-        <div v-else-if="showSzerkesztes" class="modal-backdrop" @click.self="cancelSzerkesztes">
-          <div class="modal">
-            <div class="modal-actions">
-              <div>
+        <div v-else-if="showSzerkesztes" class="szerk-modal-backdrop" @click.self="cancelSzerkesztes">
+          <div class="szerk-modal">
+            <div class="szerk-modal-actions">
+              <div class="szerkesztes">
+                <h3>Profil szerkesztése</h3>
                 <form action="">
                   <label for="vezeteknev">Vezetéknév:</label>
-                  <input type="text" id="vezeteknev" name="vezeteknev">
+                  <input type="text" id="vezeteknev" name="vezeteknev" placeholder="Írd ide a vezetékneved...">
+
                   <label for="keresztnev">Keresztnév:</label>
-                  <input type="tel" id="keresztnev" name="keresztnev">
+                  <input type="text" id="keresztnev" name="keresztnev" placeholder="Írd ide a keresztneved...">
+
                   <label for="telefon">Telefonszám:</label>
-                  <input type="text" id="telefon" name="telefon">
-                  <label for="bio">Bio:</label>
-                  <input type="text" id="bio" name="bio">
-                  <label for="avatar">Profilkép</label>
-                  <input type="file" name="avatar" id="avatar">
+                  <input type="tel" id="telefon" name="telefon" placeholder="Írd ide a telefonszámodat...">
+
+                  <label for="bio">Rólam:</label>
+                  <textarea name="bio" id="bio" placeholder="Írd ide a leírásodat..."></textarea>
+
+                  <label for="avatar">Profilkép:</label>
+                  <input type="file" name="avatar" id="avatar" accept="image/*">
+
                   <label for="cim">Szállítási cím:</label>
-                  <input type="text" id="cim" name="cim">
+                  <input type="text" id="cim" name="cim" placeholder="Írd ide az utcát és a házszámot...">
+
+                  <div class="varos-adat">
+                    <div class="varos">
+                      <label for="cim">Város:</label>
+                      <input type="text" id="varos" name="cim" placeholder="Írd ide a városod...">
+                    </div>
+                    <div class="iranyitoszam">
+                      <label for="cim">Irányítószám:</label>
+                      <input type="text" id="irszam" name="cim" placeholder="Írd ide az irányítószámod...">
+                    </div>
+                  </div>
                 </form>
-                <button class="btn confirm" @click="confirmLogout">Mentés</button>
-                <button class="btn cancel" @click="cancelSzerkesztes">Mégse</button>
+                <div class="szerk-gombok">
+                  <button class="btn mentes">Mentés</button>
+                  <button class="btn megse" @click="cancelSzerkesztes">Mégse</button>
+                </div>
               </div>
             </div>
           </div>
@@ -253,7 +272,87 @@ function cancelSzerkesztes() {
 <style scoped> 
 
 /*#region Szerkesztés*/
+.szerkesztes {
+  box-sizing: border-box;
+}
 
+.szerk-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.szerk-modal {
+  background: #fff;
+  padding: 0px 24px 24px 24px;
+  border-radius: 12px;
+  box-shadow: 0 8px 28px rgba(12,12,12,0.15);
+  max-width: 400px;
+  width: 100%;
+}
+
+label {
+  display: block;
+}
+
+input[type=text], input[type=tel], textarea, input[type=file] {
+  width: 100%;
+  padding: 5px;
+  margin: 6px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+input[type=text]:focus, input[type=tel]:focus, textarea:focus {
+  background-color: #ddd;
+}
+
+.varos-adat {
+  display: inline-block;
+  margin: 0 auto;
+  width: 380px;
+}
+
+.varos {
+  float: left;
+  width: auto;
+}
+.varos input[type=text] {
+  width: 100%;
+}
+
+.iranyitoszam {
+  float: right;
+}
+
+.iranyitoszam input[type=text] {
+  width: 80%;
+}
+
+.szerk-gombok {
+  width: 350px;
+  display:inline-block;
+  overflow: auto;
+  white-space: nowrap;
+  margin:0px auto;
+}
+
+.mentes {
+  float: left;
+  background-color: #317431;
+  color: #f3f3e2;
+}
+
+.megse {
+  float: right;
+  background: #e5e7eb; 
+  color: #374151; 
+}
 /*#endregion*/
 
 .profile-page {
@@ -342,8 +441,6 @@ function cancelSzerkesztes() {
   border-radius: 10px;
   cursor: pointer;
   font-weight: 600;
-  background: #edf2ff;
-  color: #1e293b;
   text-decoration: none;
 }
 .btn.edit { background: #eef2ff; }
@@ -470,6 +567,24 @@ function cancelSzerkesztes() {
   .post-cover { display: none; }
   .profile-card { flex-direction: column; align-items: flex-start; transform: translateY(40px); }
   .profile-actions { flex-direction: row; width: 100%; justify-content: space-between; }
+}
+
+@media (max-width: 390px) {
+  .szerk-gombok {
+    width: 270px;
+  }
+}
+
+@media (max-width: 310px) {
+  .szerk-gombok {
+    width: 170px;
+  }
+}
+
+@media (max-width: 210px) {
+  .szerk-gombok {
+    width: 80px;
+  }
 }
 
 .section-header {

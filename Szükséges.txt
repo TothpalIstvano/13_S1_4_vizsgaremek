@@ -1,6 +1,11 @@
-- kommentek helyes profilképpel, saját törléssel, elelnőrzéssel
-- profil szerkesztése
+- kommentek helyes profilképpel, saját törléssel, ellenőrzéssel
+- profil szerkesztése, profilkép szelfi feltöltése (?)
 - mintakészítő letöltés, néhány megnevezés/szöveg átírása
+- blog képfeltöltés esetleg: https://stackoverflow.com/questions/50730143/laravel-storage-link-wont-work-on-production
+- newpost notifications magyarul/jobban
+- poszt mentése vázlatként
+- reakciók poszthoz
+- városok importálása
 - rólunk oldal rendes szöveg
 - reszponzívitás
 - rip dino
