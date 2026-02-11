@@ -17,8 +17,8 @@ class TermekKategoriak extends Model
     {
         return $this->belongsTo(Termekek::class, 'termek_id', 'id');
     }
-    public function cimkek()
+    public function kategoriak()
     {
-        return $this->belongsTo(Cimkek::class, 'kategoria_id', 'id');
+        return $this->belongsTo(Kategoriak::class, 'kategoria_id', 'id');
     }
 }

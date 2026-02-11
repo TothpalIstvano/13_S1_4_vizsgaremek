@@ -17,14 +17,14 @@
           />
         </div>
 
-        <div class="active-filters" v-if="activeCimkek.length">
+        <div class="active-filters" v-if="activekategoriak.length">
           <div
             class="filter-chip"
-            v-for="tag in activeCimkek"
+            v-for="tag in activekategoriak"
             :key="tag.id"
           >
             {{ tag.nev }}
-            <span class="remove" @click="toggleCimke(tag.id)">✕</span>
+            <span class="remove" @click="togglekategoria(tag.id)">✕</span>
           </div>
         </div>
 
@@ -122,24 +122,25 @@
           </div>
 
           <div class="side-bar-header">
-            <h2>Szűrés kategória szerint</h2>
+            <h2>Kategóriák</h2>
           </div>
 
           <div class="side-bar-content">
             <div 
-              v-for="(cimke, index) in cimkek"
-              :key="cimke.id" 
+              v-for="(foKategoriak, index) in foKategoriak"
+              :id="foKategoriak.id"
+              :key="foKategoriak.id" 
               class="item-tag"
-              :class="{ active: selectedCimkek.includes(cimke.id) }"
-              @click="toggleCimke(cimke.id)"
+              :class="{ active: selectedkategoriak.includes(foKategoriak.id) }"
+              @click="togglekategoria(foKategoriak.id)"
             >
             <div class="checkbox-wrapper-46">
-                <input type="checkbox" :id="`cbx-${cimke.id}`" class="inp-cbx" :value="cimke.id" :key="index" v-model="selectedCimkek" @click.stop/>
-                <label :for="`cbx-${cimke.id}`" class="cbx"
+                <input type="checkbox" :id="`cbx-${foKategoriak.id}`" class="inp-cbx" :value="foKategoriak.id" :key="index" v-model="selectedkategoriak" @click.stop/>
+                <label :for="`cbx-${foKategoriak.id}`" class="cbx"
                     ><span>
                       <svg viewBox="0 0 12 10" height="10px" width="12px">
                         <polyline points="1.5 6 4.5 9 10.5 1"></polyline></svg></span
-                  ><span>{{ cimke.nev }}</span>
+                  ><span>{{ foKategoriak.nev }}</span>
                 </label>
               </div>
             </div>
@@ -155,15 +156,16 @@
               <h3 class="product-title">{{ item.nev }}</h3>
               <p class="product-price">{{ item.ar }} Ft</p>
 
-              <p class="product-desc" :style="item.termek_cimkek.length == 0 ? 'margin-bottom: 25px;' : ''">{{ item.leiras }}</p>
+              <p class="product-desc" :style="item.termek_kategoriak.length == 0 ? 'margin-bottom: 25px;' : ''">{{ item.leiras }}</p>
 
               <div class="tag-container">
                 <span
-                  v-for="cimke in item.termek_cimkek"
-                  :key="cimke.id"
+                  v-for="kategoria in item.termek_kategoriak"
+                  :key="kategoria.id"
                   class="item-tag-sm"
+                  :class="{ 'main-category': kategoria.fo_kategoria_id === null }"
                 >
-                  {{ cimke.nev }}
+                  {{ kategoria.nev }}
                 </span>
               </div>
 
@@ -171,6 +173,9 @@
                 Kosárba
               </button>
             </div>
+          </div>
+          <div v-if="filteredItems.length == 0" style="grid-column: 1/-1; text-align: center; color: #555; font-size: 24px; padding: 2rem 0;">
+            Nincs találat
           </div>
         </div>
       </div>
@@ -277,9 +282,9 @@
     }
   }
 
-  async function fetchCimkek() {
+  async function fetchkategoriak() {
     try {
-      const response = await axios.get('/api/cimkek');
+      const response = await axios.get('/api/kategoriak');
       return response.data;
     } catch (error) {
       console.error('Error fetching tags:', error);
@@ -304,21 +309,20 @@
 
 
   const items = ref([])
-  const cimkek = ref([]) // Holds the list of tags for the sidebar
-  const selectedCimkek = ref([])
+  const kategoriak = ref([]) // Holds the list of tags for the sidebar
+  const selectedkategoriak = ref([])
   const min = ref(0)
   const max = ref(0)
   const searchTerm = ref('')
-  const activeCimkek = computed(() =>
-  cimkek.value.filter(c => selectedCimkek.value.includes(c.id))
-)
+  const activekategoriak = computed(() => kategoriak.value.filter(c => selectedkategoriak.value.includes(c.id)))
+  const foKategoriak = computed(() => kategoriak.value.filter(k => !k.fo_kategoria_id))
 
-  function toggleCimke(id) {
-    const index = selectedCimkek.value.indexOf(id);
+  function togglekategoria(id) {
+    const index = selectedkategoriak.value.indexOf(id);
     if (index === -1) {
-      selectedCimkek.value.push(id);
+      selectedkategoriak.value.push(id);
     } else {
-      selectedCimkek.value.splice(index, 1);
+      selectedkategoriak.value.splice(index, 1);
     }
   }
 
@@ -335,9 +339,9 @@
 
     // TAGS
     const matchesTags =
-      selectedCimkek.value.length === 0 ||
-      selectedCimkek.value.every(tagId =>
-        item.termek_cimkek.some(t => t.id === tagId)
+      selectedkategoriak.value.length === 0 ||
+      selectedkategoriak.value.every(tagId =>
+        item.termek_kategoriak.some(t => t.id === tagId)
       )
 
     return matchesSearch && matchesPrice && matchesTags
@@ -365,8 +369,8 @@ onMounted(() => {
     max.value = items.value.reduce((acc, item) => Math.max(acc, item.ar), 0)
   })
 
-  fetchCimkek().then(data => {
-    cimkek.value = data.sort((a, b) => a.nev.localeCompare(b.nev))
+  fetchkategoriak().then(data => {
+    kategoriak.value = data.sort((a, b) => a.nev.localeCompare(b.nev))
   })
 })
 
@@ -468,13 +472,14 @@ watch(open, () => {
 onBeforeUnmount(() => {
   document.removeEventListener('click', handleClickOutside)
 })
+
 //#endregion
 </script>
 
 <style scoped>
 #shop {
   min-height: 90vh;
-  padding: 24px;
+  padding: 15px;
 }
 
 /*#region ===== TOP TOOLBAR ===== */
@@ -909,8 +914,8 @@ onBeforeUnmount(() => {
 }
 
 .item-tag-sm {
-  background: #e3e8ff;
-  color: #2b3ea8;
+  background: #ffebd3;
+  color: #a8532b;
   font-size: 12px;
   padding: 4px 8px;
   border-radius: 999px;
@@ -918,8 +923,19 @@ onBeforeUnmount(() => {
   transition: all 0.2s;
 }
 
+.item-tag-sm.main-category {
+  background: #f19c7562;
+  color: #a8532b;
+}
+
 .item-tag-sm:hover {
-  background: #c7d4ff;
+  background: #ffc583fd;
+  color: #553000;
+}
+
+.item-tag-sm:hover.main-category {
+  background: #ffa074d2;
+  color: #553000;
 }
 
 /* ===== BUTTON ===== */
