@@ -4,7 +4,20 @@
 
       <!-- TOP FILTER BAR -->
       <div id="toolbar">
-        <div class="search-container">        
+        <div class="active-filters" v-if="activekategoriak.length">
+          <span class="filter-label">Aktiv kategóriák:</span>
+          <div
+            class="filter-chip"
+            v-for="tag in activekategoriak"
+            :key="tag.id"
+          >
+            {{ tag.nev }}
+            <span class="remove" @click="togglekategoria(tag.id)">✕</span>
+          </div>
+          <button type="button" id="clear-filters" @click="clearFilters">Összes törlése</button>
+        </div>
+
+        <div class="search-container">
           <div class="search-icon">
             <FontAwesomeIcon icon="fa-magnifying-glass" />
           </div>
@@ -15,17 +28,6 @@
             name="search"
             v-model="searchTerm"
           />
-        </div>
-
-        <div class="active-filters" v-if="activekategoriak.length">
-          <div
-            class="filter-chip"
-            v-for="tag in activekategoriak"
-            :key="tag.id"
-          >
-            {{ tag.nev }}
-            <span class="remove" @click="togglekategoria(tag.id)">✕</span>
-          </div>
         </div>
 
         <div class="dropdown" ref="dropdown">
@@ -48,7 +50,7 @@
           </ul>
         </div>
       </div>
-      
+
       <div id="tartalom">
 
         <!-- SIDEBAR -->
@@ -126,26 +128,76 @@
           </div>
 
           <div class="side-bar-content">
-            <div 
-              v-for="(foKategoriak, index) in foKategoriak"
-              :id="foKategoriak.id"
-              :key="foKategoriak.id" 
-              class="item-tag"
-              :class="{ active: selectedkategoriak.includes(foKategoriak.id) }"
-              @click="togglekategoria(foKategoriak.id)"
+          <div
+            v-for="fo in kategoriakTree"
+            :key="fo.id"
+            class="category-group"
+          >
+            <!-- FŐ KATEGÓRIA (DROPDOWN HEADER) -->
+            <div
+              class="category-header"
+              @click="toggleCategoryDropdown(fo.id)"
             >
             <div class="checkbox-wrapper-46">
-                <input type="checkbox" :id="`cbx-${foKategoriak.id}`" class="inp-cbx" :value="foKategoriak.id" :key="index" v-model="selectedkategoriak" @click.stop/>
-                <label :for="`cbx-${foKategoriak.id}`" class="cbx"
-                    ><span>
+              <input
+                type="checkbox"
+                :id="`cbx-${fo.id}`"
+                class="inp-cbx"
+                :value="fo.id"
+                @change="togglekategoria(fo.id)"
+                v-model="selectedkategoriak"
+              />
+              <label :for="`cbx-${fo.id}`" class="cbx">
+                <span>
+                  <svg viewBox="0 0 12 10" height="10px" width="12px">
+                    <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
+                  </svg>
+                </span>
+              </label>
+            </div>
+              <span class="category-name">{{ fo.nev }}</span>
+              <FontAwesomeIcon
+                icon="chevron-down"
+                :class="{ rotated: openCategories.includes(fo.id) }"
+              />
+            </div>
+
+            <!-- ALKATEGÓRIÁK -->
+            <div
+              v-if="openCategories.includes(fo.id)"
+              class="subcategory-list"
+            >
+              <div
+                v-for="child in fo.children"
+                :key="child.id"
+                class="item-tag"
+                :class="{ active: selectedkategoriak.includes(child.id) }"
+                @click="togglekategoria(child.id)"
+              >
+                <div class="checkbox-wrapper-46">
+                  <input
+                    type="checkbox"
+                    :id="`cbx-${child.id}`"
+                    class="inp-cbx"
+                    :value="child.id"
+                    @change="togglekategoria(child.id)"
+                    v-model="selectedkategoriak"
+                    @click.stop
+                  />
+                  <label :for="`cbx-${child.id}`" class="cbx">
+                    <span>
                       <svg viewBox="0 0 12 10" height="10px" width="12px">
-                        <polyline points="1.5 6 4.5 9 10.5 1"></polyline></svg></span
-                  ><span>{{ foKategoriak.nev }}</span>
-                </label>
+                        <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
+                      </svg>
+                    </span>
+                    <span>{{ child.nev }}</span>
+                  </label>
+                </div>
               </div>
             </div>
           </div>
         </div>
+      </div>
 
         <!-- PRODUCT GRID -->
         <div id="products">
@@ -284,7 +336,7 @@
 
   async function fetchkategoriak() {
     try {
-      const response = await axios.get('/api/kategoriak');
+      const response = await axios.get('/api/termekek/kategoriak');
       return response.data;
     } catch (error) {
       console.error('Error fetching tags:', error);
@@ -357,6 +409,10 @@
       alert(`⚠️ ${result.message}`)
     }
   }
+
+  function clearFilters() {
+    selectedkategoriak.value = []
+  }
 //#endregion
 
 //#region mountok, unmountok, watchok, stb.
@@ -388,6 +444,28 @@ watch(items, () => {
   min.value = items.value.reduce((acc, item) => Math.min(acc, item.ar), Infinity)
   max.value = items.value.reduce((acc, item) => Math.max(acc, item.ar), 0)
 })
+
+const kategoriakTree = computed(() => {
+  return kategoriak.value
+    .filter(k => !k.fo_kategoria_id) // fő kategóriák
+    .map(fo => ({
+      ...fo,
+      children: kategoriak.value.filter(
+        k => k.fo_kategoria_id === fo.id
+      )
+    }))
+})
+
+const openCategories = ref([])
+
+function toggleCategoryDropdown(id) {
+  const index = openCategories.value.indexOf(id)
+  if (index === -1) {
+    openCategories.value.push(id)
+  } else {
+    openCategories.value.splice(index, 1)
+  }
+}
 
 
 const originalItems = ref([])
@@ -451,12 +529,6 @@ function applyPriceFilter(){
   appliedMin.value = tempMin.value
   appliedMax.value = tempMax.value
 }
-
-const priceChanged = computed(() =>
-  tempMin.value !== appliedMin.value ||
-  tempMax.value !== appliedMax.value
-)
-
 
 watch(open, () => {
   if (open.value) {
@@ -664,12 +736,50 @@ onBeforeUnmount(() => {
 .side-bar-content .item-tag:hover {
   background: #e3e8ff;
   color: #3f51b5;
+};
+
+.category-group {
+  margin-bottom: 10px;
 }
-/*
-.item-tag.active {
-  background: #c7d4ff;
-  color: #2b3ea8;
-}*/
+
+.category-header {
+  display: flex;
+  align-items: center;
+  padding: 10px 14px;
+  background: #f3f4f6;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.category-header .svg-inline--fa {
+  margin-left: auto;
+}
+
+.category-header:hover {
+  background: #e3e8ff;
+}
+
+.category-name {
+margin-left: 10px;
+}
+
+.subcategory-list {
+  padding-left: 10px;
+  margin-top: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.category-header .svg-inline--fa {
+  transition: transform 0.5s ease;
+}
+
+.rotated {
+  transform: rotate(180deg);
+}
+
 /*#endregion*/
 
 /*#region ===== Price Filter ===== */
@@ -924,7 +1034,7 @@ onBeforeUnmount(() => {
 }
 
 .item-tag-sm.main-category {
-  background: #f19c7562;
+  background: #ff753657;
   color: #a8532b;
 }
 
