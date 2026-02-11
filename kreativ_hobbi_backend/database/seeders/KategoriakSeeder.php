@@ -46,7 +46,7 @@ class KategoriakSeeder extends Seeder
         }
 
         // Step 3: Create other random parent categories (9 instead of 10 since we already have "Fonalak")
-        $parentCategories = Kategoriak::factory(18)->create(['fo_kategoria_id' => null]);
+        $parentCategories = Kategoriak::factory(10)->create(['fo_kategoria_id' => null]);
 
         // Step 4: Create child categories for each parent (including "Fonalak")
         $allParents = $parentCategories->push($fonalakCategory);
