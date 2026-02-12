@@ -350,3 +350,34 @@ Route::post('/kosar/hozzaad', function (Request $request) {
         return response()->json(['error' => $e->getMessage()], 500);
     }
 });
+
+/*
+és ide akkor kéne majd terminálba hogy: mkdir public/demo-images
+
+és a newpost-ba hogy:// In submitForm, replace image upload with:
+const uploadResponse = await axios.post('/api/demo-upload', formData, {
+    headers: {
+        'Content-Type': 'multipart/form-data'
+    }
+});
+
+
+Route::post('/demo-upload', function (Request $request) {
+    $image = $request->file('image');
+
+    // Save directly to public folder (no storage link needed)
+    $filename = time() . '_' . $image->getClientOriginalName();
+    $image->move(public_path('demo-images'), $filename);
+
+    // Create database record
+    $dbImage = \App\Models\Kepek::create([
+        'url_Link' => url('demo-images/' . $filename),
+        'alt_Szoveg' => $request->input('alt', 'Demo image'),
+        'leiras' => $request->input('description', 'Demo upload')
+    ]);
+
+    return response()->json([
+        'id' => $dbImage->id,
+        'url' => url('demo-images/' . $filename)
+    ]);
+});*/
