@@ -18,10 +18,7 @@ class ImageController extends Controller
             ]);
 
             if ($validator->fails()) {
-                return response()->json([
-                    'error' => 'Validation failed',
-                    'messages' => $validator->errors()
-                ], 422);
+                return response()->json(['error' => 'Validation failed', 'messages' => $validator->errors()], 422);
             }
 
             $uploadedImages = [];
@@ -30,12 +27,12 @@ class ImageController extends Controller
             $descriptions = $request->input('description', []);
 
             foreach ($files as $index => $file) {
-                // ✅ CORRECT: Use $file (not $request->file('image'))
+                // ✅ Save DIRECTLY to public/uploads/blog
                 $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-                $path = $file->storeAs('blog', $filename, 'public'); // ✅ storeAs()
+                $file->move(public_path('uploads/blog'), $filename);
 
-                // ✅ Generate correct public URL
-                $fullUrl = asset('storage/' . $path);
+                // ✅ Public URL is /uploads/blog/...
+                $fullUrl = asset('uploads/blog/' . $filename);
 
                 $image = Kepek::create([
                     'url_Link' => $fullUrl,
@@ -48,50 +45,14 @@ class ImageController extends Controller
                     'url' => $fullUrl,
                     'alt' => $image->alt_Szoveg,
                     'description' => $image->leiras,
-                    'path' => $path
                 ];
             }
 
-            return response()->json([
-                'message' => 'Images uploaded successfully',
-                'images' => $uploadedImages
-            ], 201);
+            return response()->json(['message' => 'Images uploaded successfully', 'images' => $uploadedImages], 201);
 
         } catch (\Exception $e) {
             \Log::error('Image upload error: ' . $e->getMessage());
-            return response()->json([
-                'error' => 'Failed to upload images',
-                'message' => $e->getMessage()
-            ], 500);
+            return response()->json(['error' => 'Failed to upload images', 'message' => $e->getMessage()], 500);
         }
     }
-    /*public function upload(Request $request)
-    {
-        // Skip validation for demo
-        $uploadedImages = [];
-
-        // Get base64 images from request
-        $base64Images = $request->input('images', []);
-
-        foreach ($base64Images as $index => $base64) {
-            // Store base64 directly in database
-            $image = Kepek::create([
-                'url_Link' => $base64,  // Store base64 string directly
-                'alt_Szoveg' => $request->input('alt')[$index] ?? 'Demo image',
-                'leiras' => $request->input('description')[$index] ?? 'Demo image description'
-            ]);
-
-            $uploadedImages[] = [
-                'id' => $image->id,
-                'url' => $base64,
-                'alt' => $image->alt_Szoveg,
-                'description' => $image->leiras
-            ];
-        }
-
-        return response()->json([
-            'message' => 'Images uploaded successfully',
-            'images' => $uploadedImages
-        ], 201);
-    }*/
 }
