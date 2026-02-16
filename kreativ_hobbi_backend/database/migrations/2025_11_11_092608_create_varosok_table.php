@@ -4,22 +4,17 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
-    /**
-     * Run the migrations.
-     */
+return new class extends Migration {
     public function up(): void
     {
         Schema::create('varosok', function (Blueprint $table) {
             $table->unsignedInteger('id')->primary()->autoIncrement();
-            $table->string('varos_nev', 100)->unique()->nullable(false);
+            $table->string('iranyitoszam', 5)->nullable();          // postal code
+            $table->string('varos_nev', 100);            // city name (no longer unique)
+            $table->string('megye', 100)->nullable();    // county (optional)
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('varosok');

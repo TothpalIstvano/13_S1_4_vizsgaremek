@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use App\Models\FelhasznaloAdatok;
 
 
 class Felhasznalok extends Authenticatable implements MustVerifyEmail
@@ -46,5 +47,10 @@ class Felhasznalok extends Authenticatable implements MustVerifyEmail
     public function getAuthPassword()
     {
         return $this->jelszo;
+    }
+
+    public function adatok()
+    {
+        return $this->hasOne(FelhasznaloAdatok::class, 'felhasznalo_id', 'id');
     }
 }
