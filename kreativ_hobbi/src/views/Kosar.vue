@@ -578,6 +578,7 @@ async function checkout() {
   color: #1a2332;
   transition: all 0.2s;
   background: #f9fafb;
+  width: 100%;
 }
 
 .form-group input:focus {
