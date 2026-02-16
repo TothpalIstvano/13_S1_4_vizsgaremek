@@ -1,11 +1,49 @@
 <script setup>
 import axios from 'axios';
-import { ref, reactive, onMounted} from 'vue';
+import { ref, reactive, onMounted, watch, onUnmounted, nextTick } from 'vue';
 import { RouterLink } from 'vue-router';
+import Dropdown from 'primevue/dropdown';
 
 const userData = ref(null);
+const baseUrl = `${import.meta.env.VITE_API_URL}/storage`;
+const defaultAvatar = `${baseUrl}/profilKepek/default.jpg`;
 
+const editForm = reactive({
+  vezeteknev: '',
+  keresztnev: '',
+  telefonszam: '',
+  utca: '',
+  hazszam: '',
+  emeletAjto: '',
+  varos: '',
+});
 
+const saving = ref(false);
+const cities = ref([]);
+const loadingCities = ref(false);
+
+const showCamera = ref(false);
+const videoRef = ref(null);
+const canvasRef = ref(null);
+const capturedBlob = ref(null);
+const objectUrl = ref(null);
+const cameraStream = ref(null);
+const uploading = ref(false);
+
+const user = reactive({
+  name: '',
+  username: '',
+  avatar: '',
+  cover: '',
+  stats: { posts: 0, followers: 0, following: 0 },
+  joined: ''
+});
+
+const posts = ref([]);
+const showLogout = ref(false);
+const showSzerkesztes = ref(false);
+
+// Fetch user data
 async function fetchUserData() {
   try {
     const response = await axios.get('/api/user');
@@ -26,86 +64,238 @@ async function fetchUserBlogPosts() {
   }
 }
 
-// --- ÚJ: Default kép definíciója ---
-const baseUrl = `${import.meta.env.VITE_API_URL}/storage`;
-const defaultAvatar = `${baseUrl}/profilKepek/default.jpg`;
-
-// --- ÚJ: Függvény a hibás képek cseréjére ---
 function setAvatarDefault(event) {
-  // Ha a kép betöltése sikertelen (pl. 404), akkor beállítjuk a default-ot
   event.target.src = defaultAvatar;
 }
 
-const user = reactive({
-  name: '',
-  username: '',
-  bio: '',
-  avatar: '',
-  cover: '',
-  stats: {
-    posts: 0,
-    followers: 0,
-    following: 0
-  },
-  joined: ''
-});
+async function fetchCities() {
+  loadingCities.value = true;
+  try {
+    const response = await axios.get('/api/cities');
+    cities.value = response.data;
+  } catch (error) {
+    console.error('Failed to load cities', error);
+  } finally {
+    loadingCities.value = false;
+  }
+}
 
-const posts = ref([]);
+function getCityName(id) {
+  const city = cities.value.find(c => c.id === id);
+  return city ? city.varos_nev : '';
+}
+function getCityPostal(id) {
+  const city = cities.value.find(c => c.id === id);
+  return city ? city.iranyitoszam : '';
+}
 
 onMounted(async () => {
   userData.value = await fetchUserData();
+  await fetchCities();
   if (userData.value) {
+    // Display data
     user.name = userData.value.felhasz_nev;
     user.username = userData.value.felhasz_nev;
-    user.bio = userData.value.bio || 'Kreatív hobbi rajongó';
-    
     posts.value = await fetchUserBlogPosts();
-    console.log('Fetched posts:', posts.value);
-    
-    // --- ÚJ: Profilkep betöltés ---
-    const hasProfileImage = userData.value.profilKep_id; // Ellenőrizzük, van-e ID
+
+    // Profile picture
+    const hasProfileImage = userData.value.profilKep_id;
     if (hasProfileImage) {
-      // Itt szándékosan rossz a mappa neve a tesztelésedhez (profilkepedddk)
-      user.avatar = `${baseUrl}/profilKepek/kep_${hasProfileImage}.jpg`;
+        if (userData.value.profilKep?.url_Link) {
+            const url = userData.value.profilKep.url_Link;
+            user.avatar = url.startsWith('http') ? url : `${baseUrl}/${url}`;
+        } else {
+            user.avatar = `${baseUrl}/profilKepek/kep_${hasProfileImage}.jpg`;
+        }
+    } else {
+        user.avatar = defaultAvatar;
     }
-    else {
-      user.avatar = defaultAvatar; // Alapértelmezett kép
-    }
-    
+
     user.cover = 'https://images.unsplash.com/photo-1503264116251-35a269479413?w=1600&h=400&fit=crop';
     user.stats = {
       posts: userData.value.posts_count || 12,
       followers: userData.value.followers_count || 842,
       following: userData.value.following_count || 134
-    }
+    };
     user.joined = userData.value.letrehozas_Datuma || '2022-09-15';
-  } 
-  else {
-    console.log('No user data available.');
+
+    // Populate edit form
+    const adat = userData.value.adatok || {};
+    editForm.vezeteknev = adat.vezeteknev || '';
+    editForm.keresztnev = adat.keresztnev || '';
+    editForm.telefonszam = adat.telefonszam || '';
+    editForm.utca = adat.utca || '';
+    editForm.hazszam = adat.hazszam || '';
+    editForm.emeletAjto = adat.emeletAjto || '';
+    editForm.varos = adat.varos || '';
+    if (videoRef.value) {
+    videoRef.value.addEventListener('loadedmetadata', () => {
+      console.log('Video metadata loaded, ready to play');
+      videoRef.value.play()
+        .then(() => console.log('Video playing'))
+        .catch(err => console.error('Video play failed:', err));
+    });
+    };
+  };
+});
+
+onUnmounted(() => {
+  if (cameraStream.value) {
+    cameraStream.value.getTracks().forEach(track => track.stop());
+  }
+  if (objectUrl.value) {
+    URL.revokeObjectURL(objectUrl.value);
   }
 });
 
-
-
-const showLogout = ref(false);
-const showSzerkesztes = ref(false);
-
-
-function formatDate(d) {
-  return new Date(d).toLocaleDateString();
+// Save profile
+async function saveProfile() {
+  saving.value = true;
+  try {
+    const response = await axios.put('/api/user/profile', editForm);
+    userData.value = response.data.user;
+    user.name = userData.value.felhasz_nev;
+    user.username = userData.value.felhasz_nev;
+    showSzerkesztes.value = false;
+  } catch (error) {
+    console.error('Error saving profile:', error);
+    if (error.response && error.response.status === 422) {
+      alert('Hibás adatok: ' + JSON.stringify(error.response.data.errors));
+    }
+  } finally {
+    saving.value = false;
+  }
 }
-function kijelentkezes() {
-  showLogout.value = true;
+
+// Camera functions
+async function startCamera() {
+  try {
+    console.log('Requesting camera access...');
+    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+    console.log('Stream obtained:', stream);
+    console.log('Stream active:', stream.active);
+    stream.getTracks().forEach(track => {
+      console.log('Track kind:', track.kind, 'readyState:', track.readyState);
+    });
+
+    cameraStream.value = stream;
+    showCamera.value = true;  // This triggers Vue to render the video element
+
+    await nextTick();
+    console.log('After nextTick, videoRef.value:', videoRef.value);
+
+    if (videoRef.value) {
+      videoRef.value.srcObject = stream;
+      console.log('srcObject assigned to video element');
+
+      await new Promise((resolve) => {
+        videoRef.value.onloadedmetadata = () => {
+          console.log('loadedmetadata fired');
+          console.log('Video dimensions:', videoRef.value.videoWidth, 'x', videoRef.value.videoHeight);
+          videoRef.value.play()
+            .then(() => {
+              console.log('Video play succeeded');
+              resolve();
+            })
+            .catch(err => {
+              console.error('Play failed:', err);
+              resolve();
+            });
+        };
+      });
+
+      console.log('Camera started successfully');
+    } else {
+      console.error('videoRef is still null after nextTick');
+    }
+  } catch (err) {
+    console.error('Camera access denied', err);
+    alert('Nem sikerült elérni a kamerát.');
+  }
 }
 
-function szerkesztes() {
-  showSzerkesztes.value = true;
+function stopCamera() {
+  if (cameraStream.value) {
+    cameraStream.value.getTracks().forEach(track => track.stop());
+    cameraStream.value = null;
+  }
+  showCamera.value = false;
+  capturedBlob.value = null;
 }
 
+function capturePhoto() {
+  const video = videoRef.value;
+  const canvas = canvasRef.value;
+  if (!video || !canvas) {
+    console.warn('Video or canvas not ready');
+    return;
+  }
+  if (video.readyState < 2) {
+    console.warn('Video not ready yet');
+    return;
+  }
+  const context = canvas.getContext('2d');
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  context.drawImage(video, 0, 0, canvas.width, canvas.height);
+  console.log('Captured dimensions:', canvas.width, canvas.height);
+
+  canvas.toBlob((blob) => {
+    if (blob) {
+      capturedBlob.value = blob;
+      console.log('Blob created, size:', blob.size);
+    } else {
+      console.error('Failed to create blob');
+    }
+  }, 'image/jpeg', 0.9);
+}
+
+watch(capturedBlob, (newBlob, oldBlob) => {
+  if (objectUrl.value) {
+    URL.revokeObjectURL(objectUrl.value);
+  }
+  objectUrl.value = newBlob ? URL.createObjectURL(newBlob) : null;
+}, { immediate: true });
+
+async function uploadProfilePhoto() {
+  if (!capturedBlob.value) return;
+
+  uploading.value = true;
+  const file = new File([capturedBlob.value], 'profile-photo.jpg', { type: 'image/jpeg' });
+  const formData = new FormData();
+  formData.append('images[]', file);
+  formData.append('alt[]', 'Profilkép');
+  formData.append('description[]', 'Fénykép a profilhoz');
+
+  try {
+    const uploadRes = await axios.post('/api/upload-images', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    const imageId = uploadRes.data.images[0].id;
+
+    await axios.put('/api/user/profile-picture', { profilKep_id: imageId });
+
+    userData.value = await fetchUserData();
+    if (userData.value.profilKep) {
+      user.avatar = userData.value.profilKep.url_Link;
+    }
+
+    stopCamera();
+  } catch (error) {
+    console.error('Upload failed', error);
+    alert('Kép feltöltés sikertelen.');
+  } finally {
+    uploading.value = false;
+  }
+}
+
+
+function kijelentkezes() { showLogout.value = true; }
+function szerkesztes() { showSzerkesztes.value = true; }
+function cancelSzerkesztes() { showSzerkesztes.value = false; }
 async function confirmLogout() {
   showLogout.value = false;
   try {
-    // if you have a backend logout route, call it (uncomment)
     await axios.post('/logout', { withCredentials: true });
   } catch (e) {
     console.error('Error during logout:', e);
@@ -114,13 +304,8 @@ async function confirmLogout() {
     setTimeout(() => window.location.href = '/belepes', 10); // or router.push('/belepes')
   }
 }
-function cancelLogout() {
-  showLogout.value = false;
-}
-
-function cancelSzerkesztes() {
-  showSzerkesztes.value = false;
-}
+function cancelLogout() { showLogout.value = false; }
+function formatDate(d) { return new Date(d).toLocaleDateString(); }
 </script>
 
 <template>
@@ -133,7 +318,7 @@ function cancelSzerkesztes() {
           <div class="profile-info">
             <h2 class="name">{{ user.name }}</h2>
             <p class="username">@{{ user.username }}</p>
-            <p class="bio">{{ user.bio }}</p>
+            <p class="bio">Kreatív hobbi rajongó</p> <!--{{ user.bio }}-->
             <div class="meta">
               <span>{{ user.stats.posts }} bejegyzés</span>
               <span>{{ user.stats.followers }} követő</span>
@@ -163,40 +348,73 @@ function cancelSzerkesztes() {
             <div class="szerk-modal-actions">
               <div class="szerkesztes">
                 <h3>Profil szerkesztése</h3>
-                <form action="">
-                  <label for="vezeteknev">Vezetéknév:</label>
-                  <input type="text" id="vezeteknev" name="vezeteknev" placeholder="Írd ide a vezetékneved...">
+                <form @submit.prevent="saveProfile">
+  <!-- all existing input fields with v-model -->
+  <label for="vezeteknev">Vezetéknév</label>
+  <input type="text" id="vezeteknev" v-model="editForm.vezeteknev">
+  <label for="keresztnev">Keresztnév</label>
+  <input type="text" id="keresztnev" v-model="editForm.keresztnev">
+  <label for="telefon">Telefonszám</label>
+  <input type="tel" id="telefon" v-model="editForm.telefonszam">
+  <!--<label for="bio">Bio</label>
+  <textarea id="bio" v-model="editForm.bio"></textarea>-->
+  <label for="utca">Utca</label>
+  <input type="text" id="utca" v-model="editForm.utca">
+  <label for="hazszam">Házszám</label>
+  <input type="number" id="hazszam" v-model="editForm.hazszam">
+  <label for="emeletAjto">Emelet/Ajtó</label>
+  <input type="text" id="emeletAjto" v-model="editForm.emeletAjto">
+  <label for="varos">Város</label>
+  <Dropdown
+    id="varos"
+    v-model="editForm.varos"
+    :options="cities"
+    optionLabel="varos_nev"
+    optionValue="id"
+    placeholder="Válassz vagy írj be egy várost"
+    :filter="true"
+    filterBy="varos_nev,iranyitoszam"
+    :showClear="true"
+    :loading="loadingCities"
+    class="w-full"
+  >
+    <template #value="slotProps">
+      <div v-if="slotProps.value">
+        {{ getCityName(slotProps.value) }} ({{ getCityPostal(slotProps.value) }})
+      </div>
+      <span v-else>{{ slotProps.placeholder }}</span>
+    </template>
+    <template #option="slotProps">
+      <div>{{ slotProps.option.varos_nev }} ({{ slotProps.option.iranyitoszam }})</div>
+    </template>
+  </Dropdown>
 
-                  <label for="keresztnev">Keresztnév:</label>
-                  <input type="text" id="keresztnev" name="keresztnev" placeholder="Írd ide a keresztneved...">
+  <!-- file input for manual upload (optional) 
+  <label for="avatar">Profilkép feltöltése:</label>
+  <input type="file" id="avatar" accept="image/*" @change="handleFileUpload">-->
+  <label for="profilkep">Kép kiválasztása/feltöltése</label>
+  <div v-if="showCamera" class="camera-preview">
+  <video ref="videoRef" autoplay playsinline></video>
+  <canvas ref="canvasRef" style="display: none;"></canvas>
+  <div class="camera-controls">
+    <button type="button" @click="capturePhoto">Fotózás</button>
+    <button type="button" @click="stopCamera">Mégse</button>
+  </div>
+  <div v-if="capturedBlob">
+    <p>Előkép:</p>
+    <img :src="objectUrl" alt="preview" style="max-width: 200px;">
+    <button type="button" @click="uploadProfilePhoto" :disabled="uploading">
+      {{ uploading ? 'Feltöltés...' : 'Profilkép beállítása' }}
+    </button>
+  </div>
+</div>
+<button type="button" v-if="!showCamera" @click="startCamera">Kamera használata</button>
 
-                  <label for="telefon">Telefonszám:</label>
-                  <input type="tel" id="telefon" name="telefon" placeholder="Írd ide a telefonszámodat...">
-
-                  <label for="bio">Rólam:</label>
-                  <textarea name="bio" id="bio" placeholder="Írd ide a leírásodat..."></textarea>
-
-                  <label for="avatar">Profilkép:</label>
-                  <input type="file" name="avatar" id="avatar" accept="image/*">
-
-                  <label for="cim">Szállítási cím:</label>
-                  <input type="text" id="cim" name="cim" placeholder="Írd ide az utcát és a házszámot...">
-
-                  <div class="varos-adat">
-                    <div class="varos">
-                      <label for="cim">Város:</label>
-                      <input type="text" id="varos" name="cim" placeholder="Írd ide a városod...">
-                    </div>
-                    <div class="iranyitoszam">
-                      <label for="cim">Irányítószám:</label>
-                      <input type="text" id="irszam" name="cim" placeholder="Írd ide az irányítószámod...">
-                    </div>
-                  </div>
-                </form>
-                <div class="szerk-gombok">
-                  <button class="btn mentes">Mentés</button>
-                  <button class="btn megse" @click="cancelSzerkesztes">Mégse</button>
-                </div>
+  <div class="szerk-gombok">
+    <button type="submit" class="btn mentes" :disabled="saving">Mentés</button>
+    <button type="button" class="btn megse" @click="cancelSzerkesztes">Mégse</button>
+  </div>
+</form>
               </div>
             </div>
           </div>
@@ -293,10 +511,26 @@ function cancelSzerkesztes() {
   box-shadow: 0 8px 28px rgba(12,12,12,0.15);
   max-width: 400px;
   width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
 label {
   display: block;
+}
+
+.camera-preview {
+  background-color: #f0f0f0;
+  padding: 10px;
+  margin: 10px 0;
+}
+
+.camera-preview video {
+  width: 100%;
+  max-width: 400px;
+  min-height: 300px;
+  border: 2px solid blue; /* Temporary border to see if element renders */
+  object-fit: cover;
 }
 
 input[type=text], input[type=tel], textarea, input[type=file] {

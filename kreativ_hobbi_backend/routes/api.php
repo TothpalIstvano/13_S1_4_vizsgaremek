@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\KommentController;
 use App\Http\Controllers\ImageController;
+use App\Http\Controllers\FelhasznaloController;
 use App\Models\Posztok;
 use App\Models\Termekek;
 use App\Models\Rendelesek;
@@ -27,37 +28,52 @@ Route::get('/user/check', function () {
     }
 });
 
-// Get authenticated user
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user()->load('profilKep:id,url_Link,alt_szoveg')->toArray();
+Route::middleware('auth:sanctum')->group(function () {
+    // existing routes
+    Route::get('/user', function (Request $request) {
+        return $request->user()->load('profilKep:id,url_Link,alt_szoveg', 'adatok')->toArray();
+    });
+    // Get posts of authenticated user
+    Route::get('/user/posts', function () {
+        if (Auth::check()) {
+            $user = auth()->user();
+            $posts = Posztok::with('cimkek:id,nev', 'foKep:id,url_Link,alt_szoveg')
+                ->where('szerzo_id', $user->id)
+                ->get()
+                ->map(function ($post) {
+                    // Transform the post to ensure fo_kep has default values if null
+                    $postArray = $post->toArray();
+
+                    // If fo_kep is null, set default values
+                    if (!$post->foKep) {
+                        $postArray['fo_kep'] = [
+                            'url_Link' => 'profilKepek/default.jpg',
+                            'alt_szoveg' => $post->cim
+                        ];
+                    }
+
+                    return $postArray;
+                });
+            return response()->json(data: $posts);
+        } else {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+    });
+
+    // Update user profile
+    Route::put('/user/profile', [FelhasznaloController::class, 'updateProfile']);
+
+    // Update profile picture ID
+    Route::put('/user/profile-picture', [FelhasznaloController::class, 'updateProfilePicture']);
+
+    Route::get('/cities', function () {
+        return App\Models\Varosok::select('id', 'varos_nev', 'iranyitoszam')
+            ->orderBy('varos_nev')
+            ->get();
+    });
 });
 
-// Get posts of authenticated user
-Route::get('/user/posts', function () {
-    if (Auth::check()) {
-        $user = auth()->user();
-        $posts = Posztok::with('cimkek:id,nev', 'foKep:id,url_Link,alt_szoveg')
-            ->where('szerzo_id', $user->id)
-            ->get()
-            ->map(function ($post) {
-                // Transform the post to ensure fo_kep has default values if null
-                $postArray = $post->toArray();
 
-                // If fo_kep is null, set default values
-                if (!$post->foKep) {
-                    $postArray['fo_kep'] = [
-                        'url_Link' => 'profilKepek/default.jpg',
-                        'alt_szoveg' => $post->cim
-                    ];
-                }
-
-                return $postArray;
-            });
-        return response()->json(data: $posts);
-    } else {
-        return response()->json(['error' => 'Unauthorized'], 401);
-    }
-});
 
 // Image upload routes
 Route::post('/upload-images', [ImageController::class, 'upload'])->middleware('auth:sanctum');
@@ -350,34 +366,3 @@ Route::post('/kosar/hozzaad', function (Request $request) {
         return response()->json(['error' => $e->getMessage()], 500);
     }
 });
-
-/*
-és ide akkor kéne majd terminálba hogy: mkdir public/demo-images
-
-és a newpost-ba hogy:// In submitForm, replace image upload with:
-const uploadResponse = await axios.post('/api/demo-upload', formData, {
-    headers: {
-        'Content-Type': 'multipart/form-data'
-    }
-});
-
-
-Route::post('/demo-upload', function (Request $request) {
-    $image = $request->file('image');
-
-    // Save directly to public folder (no storage link needed)
-    $filename = time() . '_' . $image->getClientOriginalName();
-    $image->move(public_path('demo-images'), $filename);
-
-    // Create database record
-    $dbImage = \App\Models\Kepek::create([
-        'url_Link' => url('demo-images/' . $filename),
-        'alt_Szoveg' => $request->input('alt', 'Demo image'),
-        'leiras' => $request->input('description', 'Demo upload')
-    ]);
-
-    return response()->json([
-        'id' => $dbImage->id,
-        'url' => url('demo-images/' . $filename)
-    ]);
-});*/
