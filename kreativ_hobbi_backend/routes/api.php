@@ -194,6 +194,12 @@ Route::post('/rendeles', function (Request $request) {
         'termekek.*.mennyiseg' => 'required|integer|min:1',
         'termekek.*.szin_id' => 'nullable|integer|exists:szinek,id'
     ]);
+    if($validated == false) {
+        return response()->json(['error' => 'Validation failed'], 422);
+    }
+    else {
+        response()->json(['message' => 'Validation passed'], 200);
+    }
 
     // Determine user: authenticated > provided felhasznalo_id > fallback to a shared guest account
     $userId = Auth::check() ? auth()->id() : ($validated['felhasznalo_id'] ?? null);

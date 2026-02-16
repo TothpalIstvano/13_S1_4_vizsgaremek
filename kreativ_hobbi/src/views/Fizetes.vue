@@ -289,6 +289,7 @@ async function submitOrder(orderData) {
 
     try {
       const res = await axios.post('/api/rendeles', apiPayload)
+      console.log('Order submitted:', res.data);
       // clear persisted payload on success
       try { sessionStorage.removeItem('orderPayload') } catch(e){}
       overlayMessage.value = 'Rendelés sikeresen elküldve!';
