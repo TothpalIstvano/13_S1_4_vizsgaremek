@@ -19,31 +19,37 @@ class KommentController extends Controller
                 return response()->json(['error' => 'Post not found'], 404);
             }
 
-            $comments = Kommentek::with(['kommentIro:id,felhasz_nev', 'gyermekKommentek.kommentIro:id,felhasz_nev'])
+            $comments = Kommentek::with([
+                'kommentIro:id,felhasz_nev',
+                'kommentIro.profilKep:id,url_Link',
+                'gyermekKommentek.kommentIro:id,felhasz_nev',
+                'gyermekKommentek.kommentIro.profilKep:id,url_Link'
+            ])
                 ->where('poszt_id', $id)
                 ->whereNull('elozetes_komment_id')
                 ->orderBy('letrehozas_datuma', 'desc')
-                ->get()
-                ->map(function ($comment) {
-                    $commentArray = $comment->toArray();
-                    if (isset($commentArray['komment_iro'])) {
-                        $commentArray['felhasznalo'] = $commentArray['komment_iro'];
-                        unset($commentArray['komment_iro']);
-                    }
+                ->get();
 
-                    if (isset($commentArray['gyermek_kommentek'])) {
-                        foreach ($commentArray['gyermek_kommentek'] as &$childComment) {
-                            if (isset($childComment['komment_iro'])) {
-                                $childComment['felhasznalo'] = $childComment['komment_iro'];
-                                unset($childComment['komment_iro']);
-                            }
-                        }
-                    }
+            $transform = function ($comment) use (&$transform) {
+                $user = $comment->kommentIro;
+                return [
+                    'id' => $comment->id,
+                    'komment' => $comment->komment,
+                    'letrehozas_datuma' => $comment->letrehozas_datuma,
+                    'poszt_id' => $comment->poszt_id,
+                    'elozetes_komment_id' => $comment->elozetes_komment_id,
+                    'felhasznalo' => [
+                        'id' => $user->id,
+                        'felhasz_nev' => $user->felhasz_nev,
+                        'profil_kep_url' => $user->profilKep?->url_Link,
+                    ],
+                    'gyermekKommentek' => $comment->gyermekKommentek->map($transform)->values()->toArray(),
+                ];
+            };
 
-                    return $commentArray;
-                });
+            $result = $comments->map($transform)->values()->toArray();
 
-            return response()->json($comments);
+            return response()->json($result);
 
         } catch (\Exception $e) {
             Log::error('Error in KommentController@index: ' . $e->getMessage());
@@ -71,13 +77,23 @@ class KommentController extends Controller
                 'letrehozas_datuma' => now(),
             ]);
 
-            $comment->load('kommentIro:id,felhasz_nev');
+            $comment->load('kommentIro:id,felhasz_nev', 'kommentIro.profilKep:id,url_Link');
 
-            $commentData = $comment->toArray();
-            if (isset($commentData['komment_iro'])) {
-                $commentData['felhasznalo'] = $commentData['komment_iro'];
-                unset($commentData['komment_iro']);
-            }
+            $user = $comment->kommentIro;
+
+            $commentData = [
+                'id' => $comment->id,
+                'komment' => $comment->komment,
+                'letrehozas_datuma' => $comment->letrehozas_datuma,
+                'poszt_id' => $comment->poszt_id,
+                'elozetes_komment_id' => $comment->elozetes_komment_id,
+                'felhasznalo' => [
+                    'id' => $user->id,
+                    'felhasz_nev' => $user->felhasz_nev,
+                    'profil_kep_url' => $user->profilKep?->url_Link,
+                ],
+                'gyermekKommentek' => [],
+            ];
 
             return response()->json([
                 'message' => 'Comment added!',

@@ -37,7 +37,13 @@ const formatDate = (dateString) => {
       <div class="comment-author">
         <div class="avatar-container">
           <div class="avatar">
-            <font-awesome-icon icon="fa-solid fa-user-circle" class="user-icon" />
+            <img
+              v-if="comment.felhasznalo?.profil_kep_url"
+              :src="comment.felhasznalo.profil_kep_url"
+              :alt="comment.felhasznalo.felhasz_nev"
+              class="avatar-img"
+            />
+            <font-awesome-icon v-else icon="fa-solid fa-user-circle" class="user-icon" />
           </div>
           <div class="author-info">
             <span class="author-name">{{ comment.felhasznalo?.felhasz_nev || 'Ismeretlen' }}</span>
@@ -132,6 +138,13 @@ const formatDate = (dateString) => {
   gap: 14px;
 }
 
+.avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
 .avatar {
   width: 48px;
   height: 48px;
@@ -142,6 +155,7 @@ const formatDate = (dateString) => {
   justify-content: center;
   border: 2px solid white;
   box-shadow: 0 2px 4px rgba(124, 58, 237, 0.1);
+  overflow: hidden;
 }
 
 .user-icon {

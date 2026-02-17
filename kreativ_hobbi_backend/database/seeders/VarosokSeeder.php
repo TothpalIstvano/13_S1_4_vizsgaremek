@@ -10,7 +10,6 @@ class VarosokSeeder extends Seeder
 {
     public function run(): void
     {
-        // Path to your CSV file
         $csvFile = database_path('seeders/iranyitoszamok.csv');
 
         if (!file_exists($csvFile)) {
@@ -24,9 +23,6 @@ class VarosokSeeder extends Seeder
             return;
         }
 
-        // Skip the first line (header) – it contains messy column names
-        fgetcsv($handle, 0, ';', '"', '"');
-
         $batch = [];
         $batchSize = 500;
         $inserted = 0;
@@ -34,9 +30,8 @@ class VarosokSeeder extends Seeder
         DB::beginTransaction();
         try {
             while (($row = fgetcsv($handle, 0, ';', '"', '"')) !== false) {
-                // Each row should have at least 3 columns: postal code, city, county
                 if (count($row) < 3) {
-                    continue; // skip malformed lines
+                    continue;
                 }
 
                 $postalCode = trim($row[0]);
@@ -60,7 +55,6 @@ class VarosokSeeder extends Seeder
                 }
             }
 
-            // Insert any remaining rows
             if (!empty($batch)) {
                 DB::table('varosok')->insert($batch);
                 $inserted += count($batch);
@@ -74,9 +68,6 @@ class VarosokSeeder extends Seeder
         } finally {
             fclose($handle);
         }
-
-        // Optional: you can still add extra test records via factory if you want
-        // Varosok::factory()->count(20)->create();
 
         $this->command->info('Varosok table seeded successfully!');
     }

@@ -260,7 +260,6 @@ const removeImage = (index) => {
 
 
 const submitForm = async () => {
-    // ✅ STEP 1: Fetch CSRF cookie FIRST
     try {
         await axios.get('/sanctum/csrf-cookie', {
             withCredentials: true
@@ -282,8 +281,6 @@ const submitForm = async () => {
         let uploadedImageIds = [];
 
         if (uploadedImages.value.length > 0) {
-            console.log('Uploading images:', uploadedImages.value.length);
-            
             const formData = new FormData();
             
             uploadedImages.value.forEach((image, index) => {
@@ -301,23 +298,16 @@ const submitForm = async () => {
                 }
             });
             
-            console.log('FormData entries:', Array.from(formData.entries()));
-            
             if (uploadedImages.value.length > 0) {
-                console.log('Sending image upload request...');
                 
-                // ✅ STEP 2: Add withCredentials: true to image upload
                 const uploadResponse = await axios.post('/api/upload-images', formData, {
-                    withCredentials: true, // ← THIS IS CRITICAL
+                    withCredentials: true,
                     headers: {
                         'Content-Type': 'multipart/form-data', 
                     }
                 });
                 
-                console.log('Upload response:', uploadResponse.data);
-                
                 uploadedImageIds = uploadResponse.data.images.map(img => img.id);
-                console.log('Uploaded image IDs:', uploadedImageIds);
             }
         }
         
@@ -328,12 +318,9 @@ const submitForm = async () => {
             tags: selectedTags.value.map(tag => tag.id),
             images: uploadedImageIds.map(id => ({ id: id }))
         };
-                
-        console.log('Sending post data:', postData);
         
-        // ✅ STEP 3: Add withCredentials: true to post creation
         const response = await axios.post('/api/posts', postData, {
-            withCredentials: true, // ← THIS IS CRITICAL
+            withCredentials: true,
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json'
@@ -355,7 +342,7 @@ const submitForm = async () => {
         
         setTimeout(() => {
             router.push('/profil');
-        }, 900);
+        }, 500);
         
     } catch (error) {
         console.error('Error creating post:', error);
@@ -380,61 +367,6 @@ const submitForm = async () => {
         showNotification('error', errorMessage);
     }
 };
-/*const submitForm = async () => {
-    formTouched.value = true;
-    
-    if (!isFormValid.value) {
-        showNotification('warn', 'Kérjük töltsd ki a kötelező mezőket!');
-        return;
-    }
-    
-    try {
-        let uploadedImageIds = [];
-
-        // Convert preview images to base64 and send directly
-        if (uploadedImages.value.length > 0) {
-            const base64Images = uploadedImages.value.map(img => img.preview);
-            const alts = uploadedImages.value.map(img => img.alt || '');
-            const descriptions = uploadedImages.value.map(img => img.description || '');
-            
-            const uploadResponse = await axios.post('/api/upload-images', {
-                images: base64Images,
-                alt: alts,
-                description: descriptions
-            }, {
-                withCredentials: true
-            });
-            
-            uploadedImageIds = uploadResponse.data.images.map(img => img.id);
-        }
-        
-        // Rest of your post creation code...
-        const postData = {
-            title: post.value.title,
-            content: post.value.content,
-            kivonat: post.value.kivonat || null,
-            tags: selectedTags.value.map(tag => tag.id),
-            images: uploadedImageIds.map(id => ({ id: id }))
-        };
-        
-        const response = await axios.post('/api/posts', postData, {
-            withCredentials: true,
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            }
-        });
-        
-        showNotification('success', 'Poszt sikeresen létrehozva!');
-        setTimeout(() => {
-            router.push('/profil');
-        }, 900);
-        
-    } catch (error) {
-        console.error('Error:', error);
-        showNotification('error', 'Hiba történt');
-    }
-};*/
 
 const resetForm = () => {
     post.value = { title: '', content: '', kivonat: '' };

@@ -9,9 +9,9 @@ return new class extends Migration {
     {
         Schema::create('varosok', function (Blueprint $table) {
             $table->unsignedInteger('id')->primary()->autoIncrement();
-            $table->string('iranyitoszam', 5)->nullable();          // postal code
-            $table->string('varos_nev', 100);            // city name (no longer unique)
-            $table->string('megye', 100)->nullable();    // county (optional)
+            $table->string('iranyitoszam', 5)->nullable();
+            $table->string('varos_nev', 100);
+            $table->string('megye', 100)->nullable();
         });
     }
 

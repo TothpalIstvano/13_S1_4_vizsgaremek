@@ -123,7 +123,13 @@
           <div class="add-comment">
             <div class="form-header">
               <div class="form-avatar">
-                <font-awesome-icon icon="fa-solid fa-user-circle" id="user-icon"/>
+                <img
+                  v-if="currentUser?.profilKep?.url_Link"
+                  :src="currentUser.profilKep.url_Link"
+                  :alt="currentUser.felhasz_nev"
+                  class="form-avatar-img"
+                />
+                <font-awesome-icon v-else icon="fa-solid fa-user-circle" id="user-icon"/>
               </div>
               <h4 class="form-title">Hozzászólás írása</h4>
             </div>
@@ -213,6 +219,7 @@ const comments = ref([])
 const newComment = ref('')
 const loadingComments = ref(false)
 const replyTo = ref(null)
+const currentUser = ref(null)
 
 const postId = computed(() => route.params.id)
 
@@ -263,6 +270,17 @@ const ensureCsrfToken = async () => {
   }
 }
 
+const fetchCurrentUser = async () => {
+  try {
+    const response = await api.get('/api/user')
+    currentUser.value = response.data
+  } catch (err) {
+    if (err.response?.status !== 401) {
+      console.error('Error fetching current user:', err)
+    }
+    currentUser.value = null
+  }
+}
 
 //még azért javítani kéne
 const addComment = async () => {
@@ -408,6 +426,7 @@ onMounted(async () => {
   await ensureCsrfToken()
   fetchPost()
   fetchComments()
+  fetchCurrentUser()
 })
 
 watch(
@@ -982,6 +1001,7 @@ onBeforeUnmount(() => {
   justify-content: center;
   color: var(--b-tag);
   font-size: 24px;
+  overflow: hidden;
 }
 
 #user-icon {
