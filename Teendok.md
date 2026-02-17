@@ -14,8 +14,12 @@
 
 * \[/] Webshop
 * \[ ] cimke szűrés + ha itemen katintás akkkor hozzá adás
-* \[ ] active cimkek
-* \[ ] cimke kategoriára való csere
+* \[X] active cimkek
+* \[ ] active termékeknél cimkek
+* \[ ] active cimkek megtartása sessionstorage
+* \[/] active cimkek stilus
+* \[ ] termek cimkek termékeken katinthatók legyenek
+* \[X] cimke kategoriára való csere
 * \[ ] szöveg röviditése ha overflow van és ... hozááadása
 * \[ ] cimkeék az itemen való mennyiség kiírás + + jel oda írása + enyitható legyen
 * \[ ] kosár mennyiség írása
@@ -24,7 +28,7 @@
 * \[ ] vásárol email
 * \[ ] jelszó reset
 * \[ ] resend ki cserélésre gmailre
-* \[/] verifikáld az emailed felszólitás
+* \[X] verifikáld az emailed felszólitás
 
 * \[ ] Táblák egységesítése ez alat azt értve hogy a táblákban lévő adatok megegyezenek 
 * \[ ] különböző roleok hozzá adása
@@ -36,8 +40,4 @@
 * \[ ] Az oldal kódjának tisztázás
 * \[ ] Az oldal tesztelése
 * \[ ] Az oldal dokumenálása
-
-
-
-so lets start over with simplified things. I did none of the above, so my files are like i sent them earlier. so i don't want a working cart and everything, i just want it to calculate how much yarn is needed for the made pixelated image, and display it in its place, with text and an 'add to cart' button, but that don't have to work. the database still only have 1 item for each yarn cathegory, so for the time being it don't have to take in account the colors of the yarns
 

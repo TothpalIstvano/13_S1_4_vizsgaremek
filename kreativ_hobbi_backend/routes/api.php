@@ -7,6 +7,7 @@ use App\Http\Controllers\BlogController;
 use App\Http\Controllers\KommentController;
 use App\Http\Controllers\ImageController;
 use App\Http\Controllers\FelhasznaloController;
+use App\Models\FelhasznaloAdatok;
 use App\Models\Posztok;
 use App\Models\Termekek;
 use App\Models\Rendelesek;
@@ -19,13 +20,16 @@ use App\Models\Kategoriak;
 //User related API routes:
 
 
-// Check if user is logged in
+// Check if user is logged in and return szerepkor
 Route::get('/user/check', function () {
     if (Auth::check()) {
-        return response()->json(['loggedIn' => true], 200);
-    } else {
-        return response()->json(['loggedIn' => false], 200);
+        $adatok = FelhasznaloAdatok::find(auth()->user()->id);
+        if (!$adatok) {
+            return response()->json(['loggedIn' => true, 'szerepkor' => null], 200);
+        }
+        return response()->json(['loggedIn' => true, 'szerepkor' => $adatok->szerepkor], 200);
     }
+    return response()->json(['loggedIn' => false], 200);
 });
 
 Route::middleware('auth:sanctum')->group(function () {

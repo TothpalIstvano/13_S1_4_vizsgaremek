@@ -13,7 +13,7 @@ class FelhasznaloAdatok extends Model
     use HasFactory;
     use HasApiTokens;
     protected $table = 'felhasznaloAdatok';
-
+    protected $primaryKey = 'felhasznalo_id';
     protected $fillable = [
         'felhasznalo_id',
         'szerepkor',
