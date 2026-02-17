@@ -27,6 +27,10 @@
 * \[ ] email verifikáció
 * \[ ] vásárol email
 * \[ ] jelszó reset
+* \[ ] rendelés pending
+* \[ ] kosár eltárolása
+* \[ ] Dashboard betöltése + valós input"" from database
+* \[ ] áruház loading 
 * \[ ] resend ki cserélésre gmailre
 * \[X] verifikáld az emailed felszólitás
 
@@ -40,4 +44,5 @@
 * \[ ] Az oldal kódjának tisztázás
 * \[ ] Az oldal tesztelése
 * \[ ] Az oldal dokumenálása
+* \[ ] Optimalizálás
 
