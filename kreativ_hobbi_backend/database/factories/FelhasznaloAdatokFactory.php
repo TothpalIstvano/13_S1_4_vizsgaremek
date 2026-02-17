@@ -33,11 +33,11 @@ class FelhasznaloAdatokFactory extends Factory
             'felhasznalo_id' => Felhasznalok::factory(),
             'vezeteknev' => $this->faker->lastName(),
             'keresztnev' => $this->faker->firstName(),
-            'varos' => Varosok::factory(),
+            'varos' => Varosok::pluck('id')->random(),
             'utca' => $this->faker->streetName(),
             'hazszam' => $this->faker->buildingNumber(),
             'emeletAjto' => $this->faker->bothify('##??'),
-            'telefonszam' => str_replace([' ', '-','(',')','+','.','',','], '', $this->faker->phoneNumber()),
+            'telefonszam' => str_replace([' ', '-', '(', ')', '+', '.', '', ','], '', $this->faker->phoneNumber()),
             'kartyaszam' => str_replace([' ', '-'], '', $this->faker->creditCardNumber()),
         ];
     }

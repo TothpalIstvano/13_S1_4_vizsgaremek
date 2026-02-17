@@ -349,72 +349,71 @@ function formatDate(d) { return new Date(d).toLocaleDateString(); }
               <div class="szerkesztes">
                 <h3>Profil szerkesztése</h3>
                 <form @submit.prevent="saveProfile">
-  <!-- all existing input fields with v-model -->
-  <label for="vezeteknev">Vezetéknév</label>
-  <input type="text" id="vezeteknev" v-model="editForm.vezeteknev">
-  <label for="keresztnev">Keresztnév</label>
-  <input type="text" id="keresztnev" v-model="editForm.keresztnev">
-  <label for="telefon">Telefonszám</label>
-  <input type="tel" id="telefon" v-model="editForm.telefonszam">
-  <!--<label for="bio">Bio</label>
-  <textarea id="bio" v-model="editForm.bio"></textarea>-->
-  <label for="utca">Utca</label>
-  <input type="text" id="utca" v-model="editForm.utca">
-  <label for="hazszam">Házszám</label>
-  <input type="number" id="hazszam" v-model="editForm.hazszam">
-  <label for="emeletAjto">Emelet/Ajtó</label>
-  <input type="text" id="emeletAjto" v-model="editForm.emeletAjto">
-  <label for="varos">Város</label>
-  <Dropdown
-    id="varos"
-    v-model="editForm.varos"
-    :options="cities"
-    optionLabel="varos_nev"
-    optionValue="id"
-    placeholder="Válassz vagy írj be egy várost"
-    :filter="true"
-    filterBy="varos_nev,iranyitoszam"
-    :showClear="true"
-    :loading="loadingCities"
-    class="w-full"
-  >
-    <template #value="slotProps">
-      <div v-if="slotProps.value">
-        {{ getCityName(slotProps.value) }} ({{ getCityPostal(slotProps.value) }})
-      </div>
-      <span v-else>{{ slotProps.placeholder }}</span>
-    </template>
-    <template #option="slotProps">
-      <div>{{ slotProps.option.varos_nev }} ({{ slotProps.option.iranyitoszam }})</div>
-    </template>
-  </Dropdown>
+                  <label for="vezeteknev">Vezetéknév</label>
+                  <input type="text" id="vezeteknev" v-model="editForm.vezeteknev">
+                  <label for="keresztnev">Keresztnév</label>
+                  <input type="text" id="keresztnev" v-model="editForm.keresztnev">
+                  <label for="telefon">Telefonszám</label>
+                  <input type="tel" id="telefon" v-model="editForm.telefonszam">
+                  <!--<label for="bio">Bio</label>
+                  <textarea id="bio" v-model="editForm.bio"></textarea>-->
+                  <label for="utca">Utca</label>
+                  <input type="text" id="utca" v-model="editForm.utca">
+                  <label for="hazszam">Házszám</label>
+                  <input type="number" id="hazszam" v-model="editForm.hazszam">
+                  <label for="emeletAjto">Emelet/Ajtó</label>
+                  <input type="text" id="emeletAjto" v-model="editForm.emeletAjto">
+                  <label for="varos">Város</label>
+                  <Dropdown
+                    id="varos"
+                    v-model="editForm.varos"
+                    :options="cities"
+                    optionLabel="varos_nev"
+                    optionValue="id"
+                    placeholder="Válassz vagy írj be egy várost"
+                    :filter="true"
+                    filterBy="varos_nev,iranyitoszam"
+                    :showClear="true"
+                    :loading="loadingCities"
+                    class="w-full"
+                  >
+                    <template #value="slotProps">
+                      <div v-if="slotProps.value">
+                        {{ getCityName(slotProps.value) }} ({{ getCityPostal(slotProps.value) }})
+                      </div>
+                      <span v-else>{{ slotProps.placeholder }}</span>
+                    </template>
+                    <template #option="slotProps">
+                      <div>{{ slotProps.option.varos_nev }} ({{ slotProps.option.iranyitoszam }})</div>
+                    </template>
+                  </Dropdown>
 
-  <!-- file input for manual upload (optional) 
-  <label for="avatar">Profilkép feltöltése:</label>
-  <input type="file" id="avatar" accept="image/*" @change="handleFileUpload">-->
-  <label for="profilkep">Kép kiválasztása/feltöltése</label>
-  <div v-if="showCamera" class="camera-preview">
-  <video ref="videoRef" autoplay playsinline></video>
-  <canvas ref="canvasRef" style="display: none;"></canvas>
-  <div class="camera-controls">
-    <button type="button" @click="capturePhoto">Fotózás</button>
-    <button type="button" @click="stopCamera">Mégse</button>
-  </div>
-  <div v-if="capturedBlob">
-    <p>Előkép:</p>
-    <img :src="objectUrl" alt="preview" style="max-width: 200px;">
-    <button type="button" @click="uploadProfilePhoto" :disabled="uploading">
-      {{ uploading ? 'Feltöltés...' : 'Profilkép beállítása' }}
-    </button>
-  </div>
-</div>
-<button type="button" v-if="!showCamera" @click="startCamera">Kamera használata</button>
+                  file input
+                  <label for="avatar">Profilkép feltöltése:</label>
+                  <input type="file" id="avatar" accept="image/*" @change="handleFileUpload">
+                  <label for="profilkep">Kép kiválasztása/feltöltése</label>
+                  <div v-if="showCamera" class="camera-preview">
+                  <video ref="videoRef" autoplay playsinline></video>
+                  <canvas ref="canvasRef" style="display: none;"></canvas>
+                  <div class="camera-controls">
+                    <button type="button" @click="capturePhoto">Fotózás</button>
+                    <button type="button" @click="stopCamera">Mégse</button>
+                  </div>
+                  <div v-if="capturedBlob">
+                    <p>Előkép:</p>
+                    <img :src="objectUrl" alt="preview" style="max-width: 200px;">
+                    <button type="button" @click="uploadProfilePhoto" :disabled="uploading">
+                      {{ uploading ? 'Feltöltés...' : 'Profilkép beállítása' }}
+                    </button>
+                  </div>
+                </div>
+                <button type="button" v-if="!showCamera" @click="startCamera">Kamera használata</button>
 
-  <div class="szerk-gombok">
-    <button type="submit" class="btn mentes" :disabled="saving">Mentés</button>
-    <button type="button" class="btn megse" @click="cancelSzerkesztes">Mégse</button>
-  </div>
-</form>
+                  <div class="szerk-gombok">
+                    <button type="submit" class="btn mentes" :disabled="saving">Mentés</button>
+                    <button type="button" class="btn megse" @click="cancelSzerkesztes">Mégse</button>
+                  </div>
+                </form>
               </div>
             </div>
           </div>
