@@ -14,6 +14,7 @@ const navbarRef = ref(null)
 const userPath = ref('/Belepes');
 const isLoggedIn = ref('Bejelentkezés');
 let altSzoveg = 'Profilkép';
+const jogosult = ref(false);
 
 function open() {
   if (window.innerWidth > 1200) {
@@ -46,6 +47,10 @@ function handleClickOutside(event) {
 //response limitálása
 async function checkUser() {
   const check = await axios.get('/api/user/check', { withCredentials: true });
+  if(check.data.szerepkor === 'admin') {
+    jogosult.value = true;
+  }
+
   if (!check.data.loggedIn) {
     userPath.value = '/Belepes';
     isLoggedIn.value = 'Bejelentkezés';
@@ -177,7 +182,16 @@ onUnmounted(() => {
           class="menu_link" 
           :class="{ hamburgerElem: !latszik }"
           :to="userPath"
-        ><p v-if="isLoggedIn === 'Bejelentkezés'">{{ isLoggedIn }}</p> <img id="profilkep" v-else :src="isLoggedIn" :alt="altSzoveg" /></RouterLink>
+        ><p v-if="isLoggedIn === 'Bejelentkezés'">{{ isLoggedIn }}</p> <img id="profilkep" v-else :src="isLoggedIn" :alt="altSzoveg" />
+        </RouterLink>
+        
+        <RouterLink 
+          v-if="jogosult"
+          class="menu_link"
+          to="/dashboard"
+          :class="{ hamburgerElem: !latszik }"
+          >Dashboard
+        </RouterLink>
 
       </nav>
     </header>
@@ -276,6 +290,7 @@ onUnmounted(() => {
 }
 .menu_link:last-child {
   margin-right: 10rem;
+  margin-left: 25px;
 }
 .menu_link::after {
   content: '';
@@ -372,6 +387,7 @@ onUnmounted(() => {
   }
   .menu_link:last-child {
     margin-right: 10px;
+    margin-left: 10px;
   }
   .vonal {
     display: none !important;
