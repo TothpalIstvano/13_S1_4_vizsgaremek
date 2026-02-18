@@ -91,7 +91,7 @@
                 name="images[]"
                 @select="onFileSelect"
                 :multiple="true"
-                accept="image/*"
+                accept="image/avif, image/jpg, image/jpeg, image/gif, image/png"
                 :maxFileSize="5000000"
                 :auto="false"
                 :showUploadButton="false"
@@ -127,7 +127,7 @@
                     />
                 </div>
                 </div>
-                <small class="form-hint">Támogatott formátumok: JPG, PNG, GIF. Maximális fájlméret: 5MB.</small>
+                <small class="form-hint">Támogatott formátumok: JPG, PNG, GIF, AVIF. Maximális fájlméret: 5MB.</small>
             </div>
 
             <div class="form-actions">
@@ -234,7 +234,7 @@ const fetchTagsFromDatabase = async () => {
 };
 
 const onFileSelect = (event) => {
-    const files = event.files;
+    const files = event.files.filter(file => file.type.startsWith('image/'));
     files.forEach(file => {
         const reader = new FileReader();
         reader.onload = (e) => {
@@ -345,7 +345,7 @@ const submitForm = async () => {
         }, 500);
         
     } catch (error) {
-        console.error('Error creating post:', error);
+        console.error('Hiba a poszt létrehozása közben:', error);
         
         let errorMessage = 'Nem sikerült menteni a posztot';
         
