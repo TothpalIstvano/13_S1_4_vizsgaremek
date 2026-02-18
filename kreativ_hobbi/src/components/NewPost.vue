@@ -91,7 +91,7 @@
                 name="images[]"
                 @select="onFileSelect"
                 :multiple="true"
-                accept="image/*"
+                accept="image/avif,image/jpeg,image/png,image/gif,image/webp"
                 :maxFileSize="5000000"
                 :auto="false"
                 :showUploadButton="false"
@@ -234,7 +234,9 @@ const fetchTagsFromDatabase = async () => {
 };
 
 const onFileSelect = (event) => {
-    const files = event.files;
+    const files = event.files.filter(file => 
+        file.type.startsWith('image/')
+    );
     files.forEach(file => {
         const reader = new FileReader();
         reader.onload = (e) => {
