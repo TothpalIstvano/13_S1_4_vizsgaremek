@@ -1,8 +1,9 @@
-- kommentek helyes profilképpel, saját törléssel, ellenőrzéssel
-- profil szerkesztése, profilkép szelfi feltöltése - félig
-- mintakészítő letöltés, néhány megnevezés/szöveg átírása
+- kommentek saját törléssel, ellenőrzéssel (csúnya beszéd szűrés)
+- profil szerkesztése, profilkép szelfi feltöltése - félig (profilképet nem tölt fel csak) - visszaigazoló üzi kellene: adatok sikeresen mentve (vagy nem)
+- mintakészítő letöltés, néhány megnevezés/szöveg átírása ÉS A CSÚSZKA ÉS A NUMBERINPUT IZÉ ÖSSZEHANGOLÁSA
+- blogba oldalak (hogyha sok van alul számok meg minden) + szólj pistinek hogycsinálja meg ezt a termékeknél is, mert ott sincs, mert elfelejtette :(
 - newpost notifications magyarul/jobban
-- poszt mentése vázlatként
+- poszt mentése vázlatként - már csak a tartalom nem loadol
 - reakciók poszthoz
 - rólunk oldal rendes szöveg
 - reszponzívitás
