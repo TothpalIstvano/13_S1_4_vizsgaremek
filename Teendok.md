@@ -1,5 +1,3 @@
-## 1\. Főoldal / Landing page:
-
 * \[x] Navbar alapok
 * \[x] Navbar
 * \[x] Regsiztráció / Belépés
@@ -11,6 +9,7 @@
 * \[x] Blog kártyák
 * \[x] Footer
 * \[x] Jelszó(regisztráció)
+* \[x] Jelszó(megtekintés)
 
 * \[/] Webshop
 * \[ ] cimke szűrés + ha itemen katintás akkkor hozzá adás
@@ -27,7 +26,12 @@
 * \[ ] email verifikáció
 * \[ ] vásárol email
 * \[ ] jelszó reset
-* \[ ] resend ki cserélésre gmailre
+* \[ ] rendelés pending
+* \[ ] kosár eltárolása
+* \[ ] Dashboard betöltése + valós input"" from database
+* \[ ] áruház loading 
+* \[ ] kicsit akad az animáció a belépés oldalon a váltásnál 
+* \[X] resend ki cserélésre gmailre
 * \[X] verifikáld az emailed felszólitás
 
 * \[ ] Táblák egységesítése ez alat azt értve hogy a táblákban lévő adatok megegyezenek 
@@ -40,4 +44,5 @@
 * \[ ] Az oldal kódjának tisztázás
 * \[ ] Az oldal tesztelése
 * \[ ] Az oldal dokumenálása
+* \[ ] Optimalizálás
 

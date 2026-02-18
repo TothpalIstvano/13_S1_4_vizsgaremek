@@ -1,12 +1,10 @@
 <?php
 namespace App\Http\Controllers;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use App\Models\Kepek;
-use Illuminate\Http\JsonResponse;
 
 class ImageController extends Controller
 {
@@ -14,11 +12,23 @@ class ImageController extends Controller
     {
         try {
             $validator = Validator::make($request->all(), [
-                'images.*' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
+                'images.*' => 'required|max:5120',
             ]);
 
             if ($validator->fails()) {
                 return response()->json(['error' => 'Validation failed', 'messages' => $validator->errors()], 422);
+            }
+
+            $allowedMimes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/avif'];
+            $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'avif'];
+
+            foreach ($request->file('images') as $file) {
+                $ext = strtolower($file->getClientOriginalExtension());
+                $mime = $file->getMimeType();
+
+                if (!in_array($mime, $allowedMimes) && !in_array($ext, $allowedExtensions)) {
+                    return response()->json(['error' => 'Invalid file type: ' . $file->getClientOriginalName()], 422);
+                }
             }
 
             $uploadedImages = [];
@@ -27,11 +37,9 @@ class ImageController extends Controller
             $descriptions = $request->input('description', []);
 
             foreach ($files as $index => $file) {
-                // ✅ Save DIRECTLY to public/uploads/blog
                 $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
                 $file->move(public_path('uploads/blog'), $filename);
 
-                // ✅ Public URL is /uploads/blog/...
                 $fullUrl = asset('uploads/blog/' . $filename);
 
                 $image = Kepek::create([
