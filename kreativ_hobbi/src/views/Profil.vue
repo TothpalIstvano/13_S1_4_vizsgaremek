@@ -287,6 +287,18 @@ async function uploadProfilePhoto() {
   }
 }
 
+const handleFileUpload = (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    // Create a blob from the file (reuse camera upload flow)
+    const blob = new Blob([e.target.result], { type: file.type });
+    capturedBlob.value = blob;
+  };
+  reader.readAsArrayBuffer(file);
+};
 
 function kijelentkezes() { showLogout.value = true; }
 function szerkesztes() { showSzerkesztes.value = true; }
@@ -451,23 +463,23 @@ function formatDate(d) { return new Date(d).toLocaleDateString(); }
 
 
           <div class="posts">
-            <article v-for="p in posts" :key="p" class="post-card">
+            <article v-for="p in posts" :key="p.id" class="post-card">
               <div class="post-cover">
-                <img 
-                  :src="p.fo_kep.url_Link "
-                  :alt="p.fo_kep.alt_szoveg" />
+                <img :src="p.fo_kep.url_Link" :alt="p.fo_kep.alt_szoveg" />
               </div>
               <div class="post-body">
-                <h3 class="post-title">{{ p.cim }}</h3>
                 <div class="post-meta">
                   <span>{{ formatDate(p.letrehozas_datuma) }}</span>
                   <span class="tags">
                     <small v-for="cimke in p.cimkek" :key="cimke.id" class="tag">#{{ cimke.nev }}</small>
                   </span>
+                  <span v-if="p.statusz === 'piszkozat'" class="draft-badge">Piszkozat</span>
                 </div>
+                <h3 class="post-title">{{ p.cim }}</h3>
                 <p class="post-excerpt">{{ p.kivonat }}</p>
                 <div class="post-actions">
                   <RouterLink :to="`/blog/${p.id}`" class="read">Olvasás</RouterLink>
+                  <RouterLink :to="`/editpost/${p.id}`" class="edit">Szerkesztés</RouterLink>
                 </div>
               </div>
             </article>
@@ -479,6 +491,23 @@ function formatDate(d) { return new Date(d).toLocaleDateString(); }
 </template>
 
 <style scoped> 
+
+.draft-badge {
+  background: #fbbf24;
+  color: #000;
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: 999px;
+  margin-left: 8px;
+}
+.edit {
+  background: #e5e7eb;
+  color: #111827;
+  padding: 8px 12px;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: 600;
+}
 
 /*#region Szerkesztés*/
 .szerkesztes {

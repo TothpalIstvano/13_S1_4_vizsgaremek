@@ -4,6 +4,11 @@
         <h1 class="title">Új poszt hozzáadása</h1>
         <p class="subtitle">Töltsd ki az alábbi mezőket egy új blogposzt létrehozásához</p>
     </div>
+
+    <button @click="$router.go(-1)" class="back-btn error-back-btn">
+        <div class="btn-icon">↩</div>
+        Vissza a profilra
+    </button>
     
     <div v-if="notification.show" 
          :class="['notification', notification.type]"
@@ -136,7 +141,7 @@
                     label="Mentés piszkozatként" 
                     icon="pi pi-pencil" 
                     class="draft-button"
-                    @click="vissza">
+                    @click="savePost('piszkozat')">
                 </Button>
                 <Button
                     type="submit" 
@@ -144,7 +149,9 @@
                     icon="pi pi-check" 
                     class="submit-button"
                     :disabled="!isFormValid"
-                    :class="{ 'p-button-success': isFormValid }">
+                    :class="{ 'p-button-success': isFormValid }"
+                    @click="savePost('közzétett')"
+                    >
                 </Button>
                 <Button
                     type="button" 
@@ -162,7 +169,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from "vue";
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import MultiSelect from 'primevue/multiselect';
 import Editor from 'primevue/editor';
 import Button from 'primevue/button';
@@ -170,20 +177,28 @@ import axios from 'axios';
 import FileUpload from 'primevue/fileupload';
 import InputText from 'primevue/inputtext';
 
-const router = useRouter();
+const props = defineProps({
+  postId: {
+    type: String,
+    default: null
+  }
+})
+
+const route = useRoute()
+const router = useRouter()
+
+const isEditMode = computed(() => !!props.postId)
 
 const post = ref({
-    title: '',
-    content: '',
-    kivonat: ''
-});
+  title: '',
+  content: '',
+  kivonat: ''
+})
+const selectedTags = ref([])
+const uploadedImages = ref([])   // each item: { id: null|number, file: File|null, preview: string, alt: string, description: string }
 
 const formTouched = ref(false);
-
-const selectedTags = ref([]);
 const tagOptions = ref([]);
-
-const uploadedImages = ref([]);
 const fileUploadRef = ref(null);
 
 const isFormValid = computed(() => {
@@ -260,115 +275,115 @@ const removeImage = (index) => {
   uploadedImages.value.splice(index, 1);
 };
 
+const fetchPostForEdit = async () => {
+  try {
+    const response = await axios.get(`/api/posts/${props.postId}/edit`, {
+      withCredentials: true
+    })
+    const data = response.data
 
-const submitForm = async () => {
-    try {
-        await axios.get('/sanctum/csrf-cookie', {
-            withCredentials: true
-        });
-    } catch (csrfError) {
-        console.error('CSRF cookie fetch failed:', csrfError);
-        showNotification('error', 'Hitelesítési hiba. Próbáld újra.');
-        return;
+    post.value.title = data.cim
+    post.value.content = data.tartalom
+    post.value.kivonat = data.kivonat || ''
+
+    // populate tags
+    selectedTags.value = data.cimkek.map(tag => ({
+      id: tag.id,
+      name: tag.nev,
+      code: tag.nev.toLowerCase().replace(/\s+/g, '_')
+    }))
+
+    // populate images
+    uploadedImages.value = data.kepek.map(img => ({
+      id: img.id,
+      file: null,
+      preview: img.url_Link,   // assume full URL is stored
+      alt: img.alt_Szoveg || '',
+      description: img.leiras || ''
+    }))
+  } catch (error) {
+    console.error('Failed to fetch post for edit:', error)
+    showNotification('error', 'Nem sikerült betölteni a posztot')
+  }
+}
+
+onMounted(async () => {
+  await fetchTagsFromDatabase()
+  if (isEditMode.value) {
+    await fetchPostForEdit()
+  }
+})
+
+const savePost = async (status) => {
+  try {
+    await axios.get('/sanctum/csrf-cookie', { withCredentials: true })
+  } catch (csrfError) {
+    showNotification('error', 'Hitelesítési hiba')
+    return
+  }
+
+  if (!post.value.title.trim() || !post.value.content.trim()) {
+    showNotification('warn', 'Töltsd ki a kötelező mezőket!')
+    return
+  }
+
+  try {
+    // 1. Upload new images (those with a file)
+    const newImageIds = []
+    const newImages = uploadedImages.value.filter(img => img.file)
+    if (newImages.length > 0) {
+      const formData = new FormData()
+      newImages.forEach((img, index) => {
+        formData.append('images[]', img.file)
+        formData.append(`alt[${index}]`, img.alt || '')
+        formData.append(`description[${index}]`, img.description || '')
+      })
+      const uploadRes = await axios.post('/api/upload-images', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+        withCredentials: true
+      })
+      uploadRes.data.images.forEach((uploaded, idx) => {
+        newImageIds.push(uploaded.id)
+      })
     }
 
-    formTouched.value = true;
-    
-    if (!isFormValid.value) {
-        showNotification('warn', 'Kérjük töltsd ki a kötelező mezőket!');
-        return;
-    }
-    
-    try {
-        let uploadedImageIds = [];
+    // 2. Collect all image ids (existing + new)
+    const existingImageIds = uploadedImages.value
+      .filter(img => img.id && !img.file)
+      .map(img => img.id)
+    const allImageIds = [...existingImageIds, ...newImageIds]
 
-        if (uploadedImages.value.length > 0) {
-            const formData = new FormData();
-            
-            uploadedImages.value.forEach((image, index) => {
-                if (image.file) {
-                    console.log(`Image ${index}:`, {
-                        file: image.file,
-                        name: image.file.name,
-                        alt: image.alt,
-                        description: image.description
-                    });
-                    
-                    formData.append('images[]', image.file);
-                    formData.append(`alt[${index}]`, image.alt || '');
-                    formData.append(`description[${index}]`, image.description || '');
-                }
-            });
-            
-            if (uploadedImages.value.length > 0) {
-                
-                const uploadResponse = await axios.post('/api/upload-images', formData, {
-                    withCredentials: true,
-                    headers: {
-                        'Content-Type': 'multipart/form-data', 
-                    }
-                });
-                
-                uploadedImageIds = uploadResponse.data.images.map(img => img.id);
-            }
-        }
-        
-        const postData = {
-            title: post.value.title,
-            content: post.value.content,
-            kivonat: post.value.kivonat || null,
-            tags: selectedTags.value.map(tag => tag.id),
-            images: uploadedImageIds.map(id => ({ id: id }))
-        };
-        
-        const response = await axios.post('/api/posts', postData, {
-            withCredentials: true,
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            }
-        });
-        
-        console.log('Post created successfully:', response.data);
-        
-        showNotification('success', 'Poszt sikeresen létrehozva!');
-        
-        post.value = { title: '', content: '', kivonat: '' };
-        selectedTags.value = [];
-        uploadedImages.value = [];
-        formTouched.value = false;
-        
-        if (fileUploadRef.value) {
-            fileUploadRef.value.clear();
-        }
-        
-        setTimeout(() => {
-            router.push('/profil');
-        }, 500);
-        
-    } catch (error) {
-        console.error('Hiba a poszt létrehozása közben:', error);
-        
-        let errorMessage = 'Nem sikerült menteni a posztot';
-        
-        if (error.response) {
-            console.error('Response error:', error.response.data);
-            errorMessage = error.response.data.message || 
-                          error.response.data.error || 
-                          'Szerver hiba történt';
-            
-            if (error.response.data.messages) {
-                const messages = Object.values(error.response.data.messages).flat();
-                errorMessage = messages.join(', ');
-            }
-        } else if (error.request) {
-            console.error('Request error:', error.request);
-            errorMessage = 'Nem sikerült kapcsolódni a szerverhez';
-        }
-        
-        showNotification('error', errorMessage);
+    // 3. Prepare post data
+    const postData = {
+      title: post.value.title,
+      content: post.value.content,
+      kivonat: post.value.kivonat || null,
+      status: status,
+      tags: selectedTags.value.map(tag => tag.id),
+      images: allImageIds.map(id => ({ id }))
     }
-};
+
+    // 4. Send request (POST or PUT)
+    let response
+    if (isEditMode.value) {
+      response = await axios.put(`/api/posts/${props.postId}`, postData, {
+        withCredentials: true,
+        headers: { 'Content-Type': 'application/json' }
+      })
+    } else {
+      response = await axios.post('/api/posts', postData, {
+        withCredentials: true,
+        headers: { 'Content-Type': 'application/json' }
+      })
+    }
+
+    showNotification('success', status === 'közzétett' ? 'Poszt közzétéve!' : 'Piszkozat mentve!')
+    setTimeout(() => router.push('/profil'), 500)
+  } catch (error) {
+    console.error('Save error:', error)
+    showNotification('error', 'Hiba történt a mentés során')
+  }
+}
 
 const resetForm = () => {
     post.value = { title: '', content: '', kivonat: '' };
@@ -389,6 +404,37 @@ onMounted(() => {
 <style scoped>
 *, *::before, *::after {
   box-sizing: border-box;
+}
+
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--b-hatter);
+  color: var(--b-text-dark);
+  border: 1px solid white;
+  padding: 14px 24px;
+  border-radius: 12px;
+  font-weight: 500;
+  font-size: 18px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.back-btn:hover {
+  background: var(--b-gomb-hover);
+  color: var(--b-text-light);
+  transform: translateX(-4px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.btn-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
 }
 
 .image-preview-container {
@@ -606,7 +652,7 @@ onMounted(() => {
     min-height: 100vh;
     /*background: rgb(223, 220, 220);*/
     padding: 10px 20px;
-    text-align: center;
+    /*text-align: center;*/
 }
 
 .page-header {

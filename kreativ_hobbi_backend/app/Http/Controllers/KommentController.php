@@ -20,9 +20,9 @@ class KommentController extends Controller
             }
 
             $comments = Kommentek::with([
-                'kommentIro:id,felhasz_nev',
+                'kommentIro:id,felhasz_nev,profilKep_id',
                 'kommentIro.profilKep:id,url_Link',
-                'gyermekKommentek.kommentIro:id,felhasz_nev',
+                'gyermekKommentek.kommentIro:id,felhasz_nev,profilKep_id',
                 'gyermekKommentek.kommentIro.profilKep:id,url_Link'
             ])
                 ->where('poszt_id', $id)
@@ -77,7 +77,7 @@ class KommentController extends Controller
                 'letrehozas_datuma' => now(),
             ]);
 
-            $comment->load('kommentIro:id,felhasz_nev', 'kommentIro.profilKep:id,url_Link');
+            $comment->load('kommentIro:id,felhasz_nev,profilKep_id', 'kommentIro.profilKep:id,url_Link,profilKep_id');
 
             $user = $comment->kommentIro;
 
