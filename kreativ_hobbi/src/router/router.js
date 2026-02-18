@@ -8,7 +8,6 @@ import Fizetes from '../views/Fizetes.vue'
 import Kosar from '../views/Kosar.vue'
 import Mintakeszito from '../views/Mintakeszito.vue'
 import Profil from '../views/Profil.vue'
-import Regisztracio from '../views/Regisztracio.vue'
 import Rolunk from '../views/Rolunk.vue'
 import Index from '@/views/index.vue'
 import Adatvedelem from "@/views/Adatvedelem.vue";
@@ -42,11 +41,6 @@ const router = createRouter({
       path: '/belepes',
       name: 'Belepes',
       component: Belepes,
-    },
-    {
-      path: '/regisztracio',
-      name: 'Regisztracio',
-      component: Regisztracio,
     },
     {
       path: '/blog',

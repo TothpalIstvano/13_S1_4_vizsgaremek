@@ -7,7 +7,18 @@
         <label v-if="registerError !== ''" class="error-message">{{ registerError }}</label>
         <input class="form__input" autocomplete="username" name="username" type="text" placeholder="Felhasználónév" v-model="signUpForm.name" required>
         <input class="form__input" autocomplete="email" type="email" name="email" placeholder="Email" v-model="signUpForm.email" required>
-        <input class="form__input" autocomplete="new-password" name="password" type="password" placeholder="Jelszó" v-model="signUpForm.password" minlength="8" required>
+        
+        <div class="input-wrapper">
+          <input class="form__input" autocomplete="new-password" name="password" :type="showSignUpPassword ? 'text' : 'password'" placeholder="Jelszó" v-model="signUpForm.password" minlength="8" required>
+          <button type="button" class="eye-btn" @click="showSignUpPassword = !showSignUpPassword">
+            <svg class="eye-icon" :class="{ 'eye-open': showSignUpPassword, 'eye-closed': !showSignUpPassword }" viewBox="0 0 24 24" fill="none">
+              <path class="eye-outer" d="M1 12C1 12 5 4 12 4C19 4 23 12 23 12C23 12 19 20 12 20C5 20 1 12 1 12Z" stroke="#8b0404" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle class="eye-pupil" cx="12" cy="12" r="3" stroke="#8b0404" stroke-width="1.8"/>
+              <line class="eye-slash" x1="3" y1="3" x2="21" y2="21" stroke="#8b0404" stroke-width="1.8" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+
         <transition-group name="error">
         <label for="password" v-if="!isSignInMode && !passwordValid" v-for="error in errors" :key="error" :style="{}" class="error-message">{{ error }}</label>
         </transition-group>
@@ -29,7 +40,18 @@
         <h2 class="title">Lépj be a fiókodba</h2>
         <label v-if="loginError !== ''" class="error-message">{{ loginError }}</label>
         <input class="form__input" name="email" autocomplete="email" type="email" placeholder="Email" v-model="signInForm.email" required>
-        <input class="form__input" name="password" autocomplete="current-password" minlength="8" type="password" placeholder="Jelszó" v-model="signInForm.password" required>
+        
+        <div class="input-wrapper">
+          <input class="form__input" name="password" autocomplete="current-password" minlength="8" :type="showSignUpPassword ? 'text' : 'password'" placeholder="Jelszó" v-model="signInForm.password" required>
+          <button type="button" class="eye-btn" @click="showSignUpPassword = !showSignUpPassword">
+            <svg class="eye-icon" :class="{ 'eye-open': showSignUpPassword, 'eye-closed': !showSignUpPassword }" viewBox="0 0 24 24" fill="none">
+              <path class="eye-outer" d="M1 12C1 12 5 4 12 4C19 4 23 12 23 12C23 12 19 20 12 20C5 20 1 12 1 12Z" stroke="#8b0404" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle class="eye-pupil" cx="12" cy="12" r="3" stroke="#8b0404" stroke-width="1.8"/>
+              <line class="eye-slash" x1="3" y1="3" x2="21" y2="21" stroke="#8b0404" stroke-width="1.8" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+        
         <a class="form__link" href="#">Elfelejtetted a jelszavad?</a>
         <button class="button" type="submit">Bejelentkezés</button>
       </form>
@@ -81,6 +103,9 @@ const registerError = ref('')
 const errors = ref([])
 const passwordValid = ref(false)
 const buttonflag = ref(false)
+const showSignInPassword = ref(false)
+const showSignUpPassword = ref(false)
+const showSignUpPasswordConfirm = ref(false)
 const signUpForm = ref({
   name: '',
   email: '',
@@ -221,12 +246,7 @@ const handleSignUp = async () => {
 
     // backend returns noContent() (204) after registering and logging in the user
     if (response.status === 204 || response.status === 201) {
-      // user is logged in server-side, go to profile
-      console.log(      await axios.post('/email/verification-notification', {}, {
-        withCredentials: true
-      }))
       router.push('/Profil')
-      
       window.dispatchEvent(new Event('user-logged-in'));
     } else {
       throw new Error('Registration failed. Please try again.')
@@ -448,6 +468,48 @@ const handleSignUp = async () => {
     line-height: 2;
     text-decoration: none;
 }
+
+.input-wrapper { 
+  position: relative;
+  display: flex; 
+  align-items: center; 
+  width: 350px; 
+  margin: 4px 0; 
+}
+
+.input-wrapper .form__input { 
+  width: 100%; 
+  margin: 0; 
+  padding-right: 44px; 
+}
+
+.eye-btn { 
+  position: absolute; 
+  right: 10px; 
+  background: none; 
+  border: none; 
+  outline: none; 
+  cursor: pointer; 
+  padding: 4px; 
+  display: flex; 
+  align-items: center; 
+  border-radius: 50%; 
+  transition: background 0.2s; 
+}
+
+.eye-btn:hover { background: rgba(139,4,4,0.08); }
+.eye-icon { width: 20px; height: 20px; overflow: visible; }
+.eye-outer, .eye-pupil, .eye-slash { transition: opacity 0.3s ease, transform 0.35s ease; transform-origin: 12px 12px; }
+.eye-open .eye-slash { opacity: 0; transform: scaleX(0); }
+.eye-open .eye-outer { opacity: 1; }
+.eye-open .eye-pupil { opacity: 1; transform: scale(1); }
+.eye-closed .eye-slash { opacity: 1; }
+.eye-closed .eye-outer { opacity: 0.35; }
+.eye-closed .eye-pupil { opacity: 0; transform: scale(0); }
+.eye-open { animation: eyeOpen 0.35s ease forwards; }
+.eye-closed { animation: eyeClose 0.35s ease forwards; }
+@keyframes eyeOpen { 0% { transform: scaleY(0.1); } 60% { transform: scaleY(1.15); } 100% { transform: scaleY(1); } }
+@keyframes eyeClose { 0% { transform: scaleY(0.1); } 40% { transform: scaleY(1.1); } 100% { transform: scaleY(1); } }
 
 .title {
     font-size: 34px;
