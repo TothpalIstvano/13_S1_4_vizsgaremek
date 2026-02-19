@@ -34,6 +34,15 @@ Route::get('/user/check', function () {
     return response()->json(['loggedIn' => false], 200);
 });
 
+Route::post('/login', function (Request $request) {
+    if (!Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
+        return response()->json(['message' => 'Hibás adatok'], 401);
+    }
+    return response()->json([
+        'token' => $request->user()->createToken('postman')->plainTextToken
+    ]);
+});
+
 Route::middleware('auth:sanctum')->group(function () {
     // existing routes
     Route::get('/user', function (Request $request) {

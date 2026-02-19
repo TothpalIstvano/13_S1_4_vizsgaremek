@@ -77,7 +77,7 @@ class KommentController extends Controller
                 'letrehozas_datuma' => now(),
             ]);
 
-            $comment->load('kommentIro:id,felhasz_nev,profilKep_id', 'kommentIro.profilKep:id,url_Link,profilKep_id');
+            $comment->load('kommentIro:id,felhasz_nev,profilKep_id', 'kommentIro.profilKep:id,url_Link');
 
             $user = $comment->kommentIro;
 
