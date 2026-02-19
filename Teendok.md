@@ -46,3 +46,16 @@
 * \[ ] Az oldal dokumenálása
 * \[ ] Optimalizálás
 
+ha megakarjuk oldani azt hogy bejelentkezve maradok
+
+2. Vagy hozzáadni a táblához migráccióval:
+bashphp artisan make:migration add_remember_token_to_felhasznalok_table
+phppublic function up(): void
+{
+    Schema::table('felhasznalok', function (Blueprint $table) {
+        $table->rememberToken();
+    });
+}
+bashphp artisan migrate
+
+ja és a NewPasswordController törlöd ki a // hogy müköjön
