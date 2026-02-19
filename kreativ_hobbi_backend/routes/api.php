@@ -7,6 +7,7 @@ use App\Http\Controllers\BlogController;
 use App\Http\Controllers\KommentController;
 use App\Http\Controllers\ImageController;
 use App\Http\Controllers\FelhasznaloController;
+use App\Http\Controllers\PosztController;
 use App\Models\FelhasznaloAdatok;
 use App\Models\Posztok;
 use App\Models\Termekek;
@@ -16,6 +17,7 @@ use App\Models\Cimkek;
 use App\Models\Felhasznalok;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Kategoriak;
+use App\Models\Varosok;
 
 //User related API routes:
 
@@ -71,13 +73,15 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/user/profile-picture', [FelhasznaloController::class, 'updateProfilePicture']);
 
     Route::get('/cities', function () {
-        return App\Models\Varosok::select('id', 'varos_nev', 'iranyitoszam')
+        return Varosok::select('id', 'varos_nev', 'iranyitoszam')
             ->orderBy('varos_nev')
             ->get();
     });
+
+    Route::post('/posts', [PosztController::class, 'store']);
+    Route::get('/posts/{id}/edit', [PosztController::class, 'edit']);
+    Route::put('/posts/{id}', [PosztController::class, 'update']);
 });
-
-
 
 // Image upload routes
 Route::post('/upload-images', [ImageController::class, 'upload'])->middleware('auth:sanctum');
@@ -109,69 +113,6 @@ Route::get('/termekek/kategoriak', function () {
     return response()->json($kategoriak);
 });
 
-// Új poszt
-Route::post('/posts', function (Request $request) {
-    if (!Auth::check()) {
-        return response()->json(['error' => 'Unauthorized'], 401);
-    }
-
-    \Log::info('Post creation request:', $request->all());
-
-    $validated = $request->validate([
-        'title' => 'required|string|max:255',
-        'content' => 'required|string',
-        'kivonat' => 'nullable|string|max:255',
-        'tags' => 'nullable|array',
-        'images' => 'nullable|array',
-        'images.*.id' => 'nullable|integer|exists:kepek,id',
-        'images.*.alt' => 'nullable|string|max:255',
-        'images.*.description' => 'nullable|string|max:255',
-    ]);
-
-    $user = Auth::user();
-
-    $post = new Posztok();
-    $post->cim = $validated['title'];
-    $post->tartalom = $validated['content'];
-    $post->kivonat = $validated['kivonat'] ?? substr(strip_tags($validated['content']), 0, 200);
-    $post->szerzo_id = $user->id;
-    $post->statusz = 'közzétett';
-
-    $saved = $post->save();
-
-    if (!$saved) {
-        return response()->json(['error' => 'Failed to save post'], 500);
-    }
-
-    if ($request->has('tags') && is_array($request->tags) && count($request->tags) > 0) {
-        try {
-            $post->cimkek()->attach($request->tags);
-            \Log::info('Tags attached:', $request->tags);
-        } catch (\Exception $e) {
-            \Log::error('Failed to attach tags: ' . $e->getMessage());
-        }
-    }
-
-    if ($request->has('images') && is_array($request->images) && count($request->images) > 0) {
-        try {
-            $imageIds = array_column($request->images, 'id');
-            $post->kepek()->attach($imageIds);
-
-            if (!empty($imageIds)) {
-                $post->fo_kep_id = $imageIds[0];
-                $post->save();
-            }
-        } catch (\Exception $e) {
-            \Log::error('Failed to attach images: ' . $e->getMessage());
-        }
-    }
-
-    return response()->json([
-        'message' => 'Post created successfully',
-        'post' => $post->load('cimkek')
-    ], 201);
-})->middleware('auth:sanctum');
-
 Route::get('/termekek', function () {
     $termekek = Termekek::with('TermekKategoria', 'TermekFoKep', 'TermekSzinek', 'TermekKategoriak')
         ->get(['id', 'nev', 'ar', 'leiras', 'darab', 'meter', 'kategoria_id', 'fo_kep_id']);
@@ -199,10 +140,9 @@ Route::post('/rendeles', function (Request $request) {
         'termekek.*.mennyiseg' => 'required|integer|min:1',
         'termekek.*.szin_id' => 'nullable|integer|exists:szinek,id'
     ]);
-    if($validated == false) {
+    if ($validated == false) {
         return response()->json(['error' => 'Validation failed'], 422);
-    }
-    else {
+    } else {
         response()->json(['message' => 'Validation passed'], 200);
     }
 

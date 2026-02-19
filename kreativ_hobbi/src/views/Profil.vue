@@ -35,7 +35,7 @@ const user = reactive({
   username: '',
   avatar: '',
   cover: '',
-  stats: { posts: 0, followers: 0, following: 0 },
+  stats: { posts: 0},
   joined: ''
 });
 
@@ -113,9 +113,7 @@ onMounted(async () => {
 
     user.cover = 'https://images.unsplash.com/photo-1503264116251-35a269479413?w=1600&h=400&fit=crop';
     user.stats = {
-      posts: userData.value.posts_count || 12,
-      followers: userData.value.followers_count || 842,
-      following: userData.value.following_count || 134
+      posts: userData.value.posts_count || 12
     };
     user.joined = userData.value.letrehozas_Datuma || '2022-09-15';
 
@@ -289,6 +287,18 @@ async function uploadProfilePhoto() {
   }
 }
 
+const handleFileUpload = (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    // Create a blob from the file (reuse camera upload flow)
+    const blob = new Blob([e.target.result], { type: file.type });
+    capturedBlob.value = blob;
+  };
+  reader.readAsArrayBuffer(file);
+};
 
 function kijelentkezes() { showLogout.value = true; }
 function szerkesztes() { showSzerkesztes.value = true; }
@@ -321,8 +331,6 @@ function formatDate(d) { return new Date(d).toLocaleDateString(); }
             <p class="bio">Kreatív hobbi rajongó</p> <!--{{ user.bio }}-->
             <div class="meta">
               <span>{{ user.stats.posts }} bejegyzés</span>
-              <span>{{ user.stats.followers }} követő</span>
-              <span>{{ user.stats.following }} követés</span>
             </div>
           </div>
           <div class="profile-actions">
@@ -354,7 +362,7 @@ function formatDate(d) { return new Date(d).toLocaleDateString(); }
                   <label for="keresztnev">Keresztnév</label>
                   <input type="text" id="keresztnev" v-model="editForm.keresztnev">
                   <label for="telefon">Telefonszám</label>
-                  <input type="tel" id="telefon" v-model="editForm.telefonszam">
+                  <input input type="text" pattern="/(06|+36)\d{9}/" id="telefon" v-model="editForm.telefonszam"> <!--nem működik a regex-->
                   <!--<label for="bio">Bio</label>
                   <textarea id="bio" v-model="editForm.bio"></textarea>-->
                   <label for="utca">Utca</label>
@@ -387,8 +395,6 @@ function formatDate(d) { return new Date(d).toLocaleDateString(); }
                       <div>{{ slotProps.option.varos_nev }} ({{ slotProps.option.iranyitoszam }})</div>
                     </template>
                   </Dropdown>
-
-                  file input
                   <label for="avatar">Profilkép feltöltése:</label>
                   <input type="file" id="avatar" accept="image/*" @change="handleFileUpload">
                   <label for="profilkep">Kép kiválasztása/feltöltése</label>
@@ -430,8 +436,6 @@ function formatDate(d) { return new Date(d).toLocaleDateString(); }
             <h4>Információk</h4>
             <ul>
               <li><strong>{{ user.stats.posts }}</strong> bejegyzés</li>
-              <li><strong>{{ user.stats.followers }}</strong> követő</li>
-              <li><strong>{{ user.stats.following }}</strong> követés</li>
             </ul>
           </div>
         </aside>
@@ -459,23 +463,23 @@ function formatDate(d) { return new Date(d).toLocaleDateString(); }
 
 
           <div class="posts">
-            <article v-for="p in posts" :key="p" class="post-card">
+            <article v-for="p in posts" :key="p.id" class="post-card">
               <div class="post-cover">
-                <img 
-                  :src="p.fo_kep.url_Link "
-                  :alt="p.fo_kep.alt_szoveg" />
+                <img :src="p.fo_kep.url_Link" :alt="p.fo_kep.alt_szoveg" />
               </div>
               <div class="post-body">
-                <h3 class="post-title">{{ p.cim }}</h3>
                 <div class="post-meta">
                   <span>{{ formatDate(p.letrehozas_datuma) }}</span>
                   <span class="tags">
                     <small v-for="cimke in p.cimkek" :key="cimke.id" class="tag">#{{ cimke.nev }}</small>
                   </span>
+                  <span v-if="p.statusz === 'piszkozat'" class="draft-badge">Piszkozat</span>
                 </div>
+                <h3 class="post-title">{{ p.cim }}</h3>
                 <p class="post-excerpt">{{ p.kivonat }}</p>
                 <div class="post-actions">
                   <RouterLink :to="`/blog/${p.id}`" class="read">Olvasás</RouterLink>
+                  <RouterLink :to="`/editpost/${p.id}`" class="edit">Szerkesztés</RouterLink>
                 </div>
               </div>
             </article>
@@ -487,6 +491,23 @@ function formatDate(d) { return new Date(d).toLocaleDateString(); }
 </template>
 
 <style scoped> 
+
+.draft-badge {
+  background: #fbbf24;
+  color: #000;
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: 999px;
+  margin-left: 8px;
+}
+.edit {
+  background: #e5e7eb;
+  color: #111827;
+  padding: 8px 12px;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: 600;
+}
 
 /*#region Szerkesztés*/
 .szerkesztes {
@@ -528,11 +549,11 @@ label {
   width: 100%;
   max-width: 400px;
   min-height: 300px;
-  border: 2px solid blue; /* Temporary border to see if element renders */
+  border: 2px solid blue;
   object-fit: cover;
 }
 
-input[type=text], input[type=tel], textarea, input[type=file] {
+input[type=text], input[type=tel], textarea, input[type=file], input[type=number] {
   width: 100%;
   padding: 5px;
   margin: 6px 0;
@@ -541,7 +562,7 @@ input[type=text], input[type=tel], textarea, input[type=file] {
   border-radius: 4px;
 }
 
-input[type=text]:focus, input[type=tel]:focus, textarea:focus {
+input[type=text]:focus, input[type=tel]:focus, textarea:focus, input[type=number]:focus {
   background-color: #ddd;
 }
 

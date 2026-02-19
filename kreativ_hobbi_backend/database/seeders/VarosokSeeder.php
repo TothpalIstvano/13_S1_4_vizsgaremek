@@ -61,7 +61,6 @@ class VarosokSeeder extends Seeder
             }
 
             DB::commit();
-            $this->command->info("Successfully inserted $inserted rows from CSV.");
         } catch (\Exception $e) {
             DB::rollBack();
             $this->command->error('Import failed: ' . $e->getMessage());

@@ -1191,7 +1191,7 @@ onUnmounted(() => {
         <div v-else class="modositoContainer">
           <div class="modositas">
               <div class="valtoztatok">
-                <p>Pixel mérete: {{ pixelMeret }}px</p>
+                <p>Minta részletessége (pixel mérete): {{ pixelMeret }}px</p>
                 <div class="valtoztatok-input custom-slider-wrapper">
                   <label class="custom-slider">
                     <input 
