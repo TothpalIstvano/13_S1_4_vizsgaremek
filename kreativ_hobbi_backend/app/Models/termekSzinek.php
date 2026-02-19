@@ -17,7 +17,7 @@ class TermekSzinek extends Model
     {
         return $this->belongsTo(Termekek::class, 'termek_id', 'id');
     }
-    public function TermekSzinek()
+    public function szinek()
     {
         return $this->belongsToMany(Szinek::class, 'termekSzinek', 'termek_id', 'szin_id');
     }
