@@ -26,6 +26,12 @@
           </a>
         </li>
         <li class="nav-item">
+          <a class="nav-link" :class="{active: currentView === 'users'}" @click="currentView = 'users'">
+            <span class="nav-icon">👤</span>
+            Felhasznalok
+          </a>
+        </li>
+        <li class="nav-item">
           <a class="nav-link" :class="{active: currentView === 'analytics'}" @click="currentView = 'analytics'">
             <span class="nav-icon">📈</span>
             Analitika
@@ -113,7 +119,7 @@
 
           <div class="chart-card">
             <div class="chart-header">
-              <h3 class="chart-title">Legnépszerűbb Kategóriák</h3>
+              <h3 class="chart-title">Kategóriák szerinti termék megosztás</h3>
             </div>
             <canvas ref="categoryChart"></canvas>
           </div>
@@ -208,6 +214,73 @@
                       ✏️
                     </button>
                     <button class="btn btn-sm btn-danger" @click="deleteProduct(product.id)">
+                      🗑️
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Users View -->
+      <div v-if="currentView === 'users'">
+        <div class="header">
+          <h2>Termékek</h2>
+          <div class="header-actions">
+            <button class="btn btn-primary" @click="openUserModal()">
+              ➕ Új felhasználó
+            </button>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <div class="table-header">
+            <h3 class="table-title">Összes felhasználó</h3>
+            <div class="search-box">
+              <input 
+                type="text" 
+                class="search-input" 
+                placeholder="Keresés felhasználók között..."
+                v-model="userSearch"
+              >
+            </div>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Profilkép</th>
+                <th>Név</th>
+                <th>Szerepkör</th>
+                <th>Aktív</th>
+                <th>Email</th>
+                <th>Műveletek</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="user in filteredUsers" :key="user.id">
+                <td>
+                  <img :src="uesr.profileImage" :alt="user.name" class="avatar">
+                </td>
+                <td><strong>{{ user.name }}</strong></td>
+                <td>
+                  <span class="badge" :class="user.role === 'admin' ? 'badge-warning' : user.role === 'moderator' ? 'badge-danger' : 'badge-success'">
+                    {{user.role}}
+                  </span>
+                </td>
+                <td>
+                  <span class="badge" :class="user.aktiv ? 'badge-warning' : 'badge-success'">
+                    {{user.aktiv ? 'Igen' : 'Nem'}}
+                  </span>
+                </td>
+                <td>{{ user.email }}</td>
+                <td>
+                  <div class="action-buttons">
+                    <button class="btn btn-sm btn-warning" @click="openUserModal(user)">
+                      ✏️
+                    </button>
+                    <button class="btn btn-sm btn-danger" @click="deleteUser(user.id)">
                       🗑️
                     </button>
                   </div>
@@ -504,6 +577,7 @@ const API = '/api/admin';
 // Reactive state
 const currentView = ref('dashboard');
 const productSearch = ref('');
+const userSearch = ref('');
 const blogSearch = ref('');
 const showProductModal = ref(false);
 const showBlogModal = ref(false);
@@ -532,6 +606,7 @@ let revenueChartInstance = null;
 // Data
 const stats = ref({ totalSales: 0, totalOrders: 0, totalProducts: 0, totalCustomers: 0 });
 const products = ref([]);
+const users = ref([]);
 const blogPosts = ref([]);
 const recentOrders = ref([]);
 const analyticsData = ref({ monthlySales: [], monthlyOrders: [], categories: [] });
@@ -574,6 +649,17 @@ const fetchProducts = async () => {
   }));
 };
 
+const fetchUsers = async () => {
+  const { data } = await axios.get('/api/users');
+  products.value = data.map(p => ({
+    id: p.id,
+    name: p.nev,
+    image: p.profileImage?.url_Link
+      ? p.termek_fo_kep.url_Link
+      : 'https://placehold.co/100x100',
+  }));
+};
+
 const fetchTagsFromDatabase = async () => {
     try {
         const response = await axios.get('/api/cimkek'); // Same endpoint as new-post
@@ -598,7 +684,6 @@ const fetchBlogPosts = async () => {
     published: p.statusz === 'közzétett',
     content: p.tartalom ?? '',
     kivonat: p.kivonat || '',
-    // Store full tags and images objects for editing
     tagsData: p.cimkek || [],
     imagesData: p.kepek || []
   }));
@@ -790,6 +875,14 @@ const filteredBlogPosts = computed(() => {
   );
 });
 
+const filteredUsers = computed(() => {
+  if (!userSearch.value) return userSearch.value;
+  const s = userSearch.value.toLowerCase();
+  return userSearch.value.filter(p =>
+    p.name.toLowerCase().includes(s) || p.email.toLowerCase().includes(s) || p.role.toLowerCase().includes(s)
+  );
+});
+
 // --- Helpers ---
 
 const formatCurrency = (value) =>
@@ -890,7 +983,8 @@ onMounted(async () => {
       fetchStats(), 
       fetchOrders(), 
       fetchAnalytics(), 
-      fetchProducts(), 
+      fetchProducts(),
+      fetchUsers(),
       fetchBlogPosts(),
       fetchTagsFromDatabase() // Load tags for the blog modal
   ]);
@@ -1395,6 +1489,14 @@ tbody tr:hover {
   height: 50px;
   object-fit: cover;
   border-radius: 8px;
+}
+
+/* Avatar */
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
 }
 
 /* Action Buttons */

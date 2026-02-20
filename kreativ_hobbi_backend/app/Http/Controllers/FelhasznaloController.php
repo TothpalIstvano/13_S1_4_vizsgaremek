@@ -67,4 +67,34 @@ class FelhasznaloController
             'user' => $user->load('profilKep', 'adatok')
         ]);
     }
+    public function index()
+    {
+
+    }
+
+    public function show($id)
+    {
+    
+    }
+
+    public function main()
+    {
+    
+    }
+
+    public function destroy($id)
+    {
+
+    }
+
+    public function store(Request $request)
+    {
+    
+    }
+
+    
+    public function update(Request $request, $id)
+    {
+    
+    }
 }

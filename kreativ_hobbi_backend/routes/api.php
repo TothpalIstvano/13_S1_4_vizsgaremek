@@ -433,6 +433,13 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
             return response()->json(['error' => $e->getMessage()], 500);
         }
     });
+    //Users
+    Route::get('/users', [UserController::class, 'index']);
+    Route::get('/users/{id}', [UserController::class, 'show']);
+    Route::post('/users', [UserController::class, 'store']);
+    Route::put('/users/{id}', [UserController::class, 'update']);
+    Route::delete('/users/{id}', [UserController::class, 'destroy']);
+
     // Blog CRUD
     Route::post('/blog', [BlogController::class, 'store']);
     Route::put('/blog/{id}', [BlogController::class, 'update']);
