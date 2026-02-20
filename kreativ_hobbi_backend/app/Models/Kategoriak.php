@@ -21,5 +21,7 @@ class Kategoriak extends Model
     {
         return $this->hasMany(Kategoriak::class, 'fo_kategoria_id', 'id');
     }
-
+    public function termekek() {
+        return $this->hasMany(Termekek::class, 'kategoria_id');
+    }
 }

@@ -16,10 +16,12 @@ class Felhasznalok extends Authenticatable implements MustVerifyEmail
 
 
     protected $table = 'felhasznalok';
+    protected $authPasswordName = 'jelszo';
     protected $primaryKey = 'id';
 
     public $incrementing = true;
 
+    public $rememberTokenName = false;
     protected $keyType = 'int';
 
     protected $fillable = [
@@ -42,6 +44,11 @@ class Felhasznalok extends Authenticatable implements MustVerifyEmail
     public function setJelszoAttribute($value)
     {
         $this->attributes['jelszo'] = bcrypt($value);
+    }
+
+    public function setPasswordAttribute($value)
+    {
+        $this->attributes['jelszo'] = $value;
     }
 
     public function getAuthPassword()

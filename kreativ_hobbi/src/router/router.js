@@ -17,6 +17,7 @@ import NotFound from "@/views/NotFound.vue";
 import NewPost from '@/components/NewPost.vue'
 import EmailVerified from '@/components/EmailVerified.vue'
 import Dashboard from '@/views/Dashboard.vue'
+import ResetJelszo from '@/views/ResetJelszo.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -113,6 +114,11 @@ const router = createRouter({
       path: '/email-verified',
       name: 'EmailVerified',
       component: EmailVerified
+    },
+    {
+      path: '/reset-password',
+      name: 'ResetJelszo',
+      component: ResetJelszo
     },
     {
       path: '/:pathMatch(.*)*',

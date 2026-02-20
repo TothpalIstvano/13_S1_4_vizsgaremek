@@ -303,7 +303,7 @@
       </div>
     </main>
 
-    <!-- Product Modal -->
+    <!-- Product Modal (Simple - kept original) -->
     <div v-if="showProductModal" class="modal-overlay" @click.self="showProductModal = false">
       <div class="modal">
         <div class="modal-header">
@@ -350,45 +350,137 @@
       </div>
     </div>
 
-    <!-- Blog Modal -->
+    <!-- Blog Modal (Complex - similar to new-post.vue) -->
     <div v-if="showBlogModal" class="modal-overlay" @click.self="showBlogModal = false">
-      <div class="modal">
+      <div class="modal blog-modal-large">
         <div class="modal-header">
-          <h3 class="modal-title">{{ editingBlogPost.id ? 'Bejegyzés Szerkesztése' : 'Új Bejegyzés' }}</h3>
+          <h3 class="modal-title">{{ editingBlogPost.id ? 'Poszt szerkesztése' : 'Új poszt hozzáadása' }}</h3>
           <button class="btn btn-icon" @click="showBlogModal = false">✕</button>
         </div>
-        <div class="modal-body">
-          <div class="form-group">
-            <label class="form-label">Cím</label>
-            <input type="text" class="form-input" v-model="editingBlogPost.title" placeholder="Bejegyzés címe">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Kategória</label>
-            <select class="form-select" v-model="editingBlogPost.category">
-              <option>Tippek & Trükkök</option>
-              <option>Minták</option>
-              <option>Útmutatók</option>
-              <option>Inspiráció</option>
-              <option>Hírek</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Szerző</label>
-            <input type="text" class="form-input" v-model="editingBlogPost.author" placeholder="Szerző neve">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Tartalom</label>
-            <textarea class="form-textarea" v-model="editingBlogPost.content" placeholder="Bejegyzés tartalma..." style="min-height: 200px;"></textarea>
-          </div>
-          <div class="form-group">
-            <label class="form-label">
-              <input type="checkbox" v-model="editingBlogPost.published"> Publikálás
-            </label>
-          </div>
+        
+        <div class="modal-body-scrollable">
+          <form @submit.prevent="saveBlogPost" class="post-form">
+            
+            <div class="form-section">
+              <label for="postTitle" class="form-label">
+                Poszt címe
+                <span class="required-indicator">*</span>
+              </label>
+              <InputText 
+                id="postTitle" 
+                v-model="editingBlogPost.title" 
+                placeholder="Add meg a poszt címét..." 
+                class="w-full mb-2" 
+              />
+              <small class="form-hint">Adj egy rövid, informatív címet a posztodnak</small>
+            </div>
+
+            <div class="form-section">
+              <label for="postCimkek" class="form-label">
+                Címkék
+                <span class="required-indicator">*</span>
+              </label>
+              <MultiSelect
+                id="postCimkek"
+                v-model="selectedTags" 
+                :options="tagOptions" 
+                optionLabel="name" 
+                placeholder="Válassz címkét" 
+                display="chip" 
+                filter
+                class="w-full mb-2"
+              />
+              <small class="form-hint">Válassz témához kapcsolódó címkéket a jobb kereshetőségért</small>
+            </div>
+
+            <div class="form-section">
+              <label for="postSubtext" class="form-label">
+                Poszt rövid leírása
+              </label>
+              <InputText 
+                id="postSubtext"
+                placeholder="Add meg a poszt leírását..."
+                v-model="editingBlogPost.kivonat"
+                class="w-full mb-2" 
+              />
+              <small class="form-hint">Adj egy rövid, tömör leírást a posztod tartalmáról</small>
+            </div>
+
+            <div class="form-section">
+              <label class="form-label">
+                Tartalom
+                <span class="required-indicator">*</span>
+              </label>
+              <Editor 
+                v-model="editingBlogPost.content" 
+                editorStyle="height: 320px"
+                class="mb-2 editor-container"
+                :pt="{
+                  toolbar: { class: 'editor-toolbar' },
+                  content: { style: { 'min-height': '250px', 'font-family': 'inherit' } }
+                }"
+              />
+              <small class="form-hint">Használhatsz formázást és linkeket a tartalomban</small>
+            </div>
+
+            <div class="form-section">
+              <label class="form-label">
+                Képek feltöltése
+              </label>
+              <FileUpload
+                ref="fileUploadRef"
+                name="images[]"
+                @select="onFileSelect"
+                :multiple="true"
+                accept="image/avif,image/jpeg,image/png,image/gif,image/webp"
+                :maxFileSize="5000000"
+                :auto="false"
+                :showUploadButton="false"
+                :showCancelButton="false"
+                chooseLabel="Képek kiválasztása"
+                class="mb-2"
+              >
+                <template #empty>
+                  <div class="drag-drop-area">
+                    <i class="pi pi-cloud-upload" style="font-size: 3rem; color: #667eea; margin-bottom: 1rem;"></i>
+                    <p>Húzd ide a képeidet vagy kattints a feltöltéshez</p>
+                  </div>
+                </template>
+              </FileUpload>
+              <div v-if="uploadedImages.length > 0" class="image-preview-container">
+                <div v-for="(image, index) in uploadedImages" :key="index" class="image-preview">
+                  <img :src="image.preview" class="preview-image" />
+                  <button 
+                    type="button" 
+                    class="p-button-rounded p-button-danger image-remove-btn"
+                    @click="removeImage(index)">
+                    <i class="pi pi-times"></i>
+                  </button>
+                  <InputText 
+                    v-model="image.alt" 
+                    placeholder="Alt szöveg" 
+                    class="image-alt-input"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div class="form-section">
+                <label class="form-label">Státusz</label>
+                <div class="flex align-items-center">
+                    <Checkbox v-model="editingBlogPost.published" inputId="published" :binary="true" />
+                    <label for="published" class="ml-2">Közvetlenül közzététel</label>
+                </div>
+            </div>
+
+          </form>
         </div>
+
         <div class="modal-footer">
-          <button class="btn" @click="showBlogModal = false">Mégse</button>
-          <button class="btn btn-primary" @click="saveBlogPost">Mentés</button>
+          <button class="btn btn-secondary" @click="showBlogModal = false">Mégse</button>
+          <button class="btn btn-primary" @click="saveBlogPost">
+            {{ editingBlogPost.published ? 'Poszt feltöltése' : 'Mentés piszkozként' }}
+          </button>
         </div>
       </div>
     </div>
@@ -398,6 +490,16 @@
 <script setup>
 import { ref, computed, onMounted, nextTick, watch } from 'vue';
 import Chart from 'chart.js/auto';
+import axios from 'axios';
+// PrimeVue Imports necessary for the complex form
+import MultiSelect from 'primevue/multiselect';
+import Editor from 'primevue/editor';
+import FileUpload from 'primevue/fileupload';
+import InputText from 'primevue/inputtext';
+import Checkbox from 'primevue/checkbox';
+import Button from 'primevue/button';
+
+const API = '/api/admin';
 
 // Reactive state
 const currentView = ref('dashboard');
@@ -407,6 +509,13 @@ const showProductModal = ref(false);
 const showBlogModal = ref(false);
 const editingProduct = ref({});
 const editingBlogPost = ref({});
+const loading = ref(false);
+
+// Complex Form State (from new-post.vue)
+const selectedTags = ref([]); 
+const uploadedImages = ref([]);   // { file: File, preview: string, alt: string, id?: number }
+const tagOptions = ref([]);
+const fileUploadRef = ref(null);
 
 // Chart refs
 const salesChart = ref(null);
@@ -420,258 +529,377 @@ let categoryChartInstance = null;
 let productSalesChartInstance = null;
 let revenueChartInstance = null;
 
-// Stats data
-const stats = ref({
-  totalSales: 2847500,
-  totalOrders: 143,
-  totalProducts: 87,
-  totalCustomers: 456
-});
+// Data
+const stats = ref({ totalSales: 0, totalOrders: 0, totalProducts: 0, totalCustomers: 0 });
+const products = ref([]);
+const blogPosts = ref([]);
+const recentOrders = ref([]);
+const analyticsData = ref({ monthlySales: [], monthlyOrders: [], categories: [] });
 
-// Products data
-const products = ref([
-  { id: 1, name: 'Akril Fonál 100g - Piros', category: 'Fonalak', price: 1290, stock: 45, image: 'https://images.unsplash.com/photo-1608987825835-ed116c900875?w=100&h=100&fit=crop' },
-  { id: 2, name: 'Bambusz Kötőtű Szett', category: 'Kötőtűk', price: 3490, stock: 23, image: 'https://images.unsplash.com/photo-1611652022419-a9419f74343b?w=100&h=100&fit=crop' },
-  { id: 3, name: 'Gyapjú Fonál 50g - Kék', category: 'Fonalak', price: 1890, stock: 8, image: 'https://images.unsplash.com/photo-1598122541148-eb9e39ca1c35?w=100&h=100&fit=crop' },
-  { id: 4, name: 'Horgolótű Készlet', category: 'Horgolótűk', price: 2990, stock: 15, image: 'https://images.unsplash.com/photo-1618220179428-22790b461013?w=100&h=100&fit=crop' },
-  { id: 5, name: 'DMC Hímzőfonal Szett', category: 'Hímzőfonalak', price: 4500, stock: 0, image: 'https://images.unsplash.com/photo-1604242692219-da8e8b0d3366?w=100&h=100&fit=crop' },
-  { id: 6, name: 'Fonalvágó Olló', category: 'Kellékek', price: 890, stock: 67, image: 'https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?w=100&h=100&fit=crop' }
-]);
+// --- API hívások ---
 
-// Blog posts data
-const blogPosts = ref([
-  { id: 1, title: '10 Tipp Kezdő Kötőknek', author: 'Kovács Edit', category: 'Tippek & Trükkök', date: '2026-02-10', published: true },
-  { id: 2, title: 'Tavaszi Virágminták Horgoláshoz', author: 'Tóthpál István', category: 'Minták', date: '2026-02-08', published: true },
-  { id: 3, title: 'Hímzési Alapok Kezdőknek', author: 'Nagy Anna', category: 'Útmutatók', date: '2026-02-05', published: false },
-  { id: 4, title: 'Fonalválasztás Útmutató', author: 'Kovács Edit', category: 'Útmutatók', date: '2026-02-01', published: true }
-]);
+const fetchStats = async () => {
+  const { data } = await axios.get(`${API}/stats`);
+  stats.value = data;
+};
 
-// Recent orders data
-const recentOrders = ref([
-  { id: 'ORD-1234', customer: 'Kiss Mária', items: 3, total: 8970, status: 'Kiszállítva', date: '2026-02-15' },
-  { id: 'ORD-1233', customer: 'Nagy Péter', items: 1, total: 3490, status: 'Feldolgozás alatt', date: '2026-02-15' },
-  { id: 'ORD-1232', customer: 'Szabó Anna', items: 5, total: 12450, status: 'Kiszállítva', date: '2026-02-14' },
-  { id: 'ORD-1231', customer: 'Horváth Éva', items: 2, total: 5980, status: 'Csomagolás alatt', date: '2026-02-14' },
-  { id: 'ORD-1230', customer: 'Tóth István', items: 4, total: 9360, status: 'Kiszállítva', date: '2026-02-13' }
-]);
+const fetchOrders = async () => {
+  const { data } = await axios.get(`${API}/rendelesek`);
+  recentOrders.value = data.map(r => ({
+    id: r.id,
+    customer: r.felhasznalo?.nev ?? 'Vendég',
+    items: r.termekek_szama,
+    total: r.osszeg,
+    status: r.statusz,
+    date: r.rendeles_datuma?.split('T')[0] ?? '',
+  }));
+};
 
-// Computed properties
+const fetchAnalytics = async () => {
+  const { data } = await axios.get(`${API}/analytics`);
+  analyticsData.value = data;
+};
+
+const fetchProducts = async () => {
+  const { data } = await axios.get('/api/termekek');
+  products.value = data.map(p => ({
+    id: p.id,
+    name: p.nev,
+    category: p.termek_kategoria?.nev ?? '-',
+    price: p.ar,
+    stock: p.darab,
+    image: p.termek_fo_kep?.url_Link
+      ? p.termek_fo_kep.url_Link
+      : 'https://placehold.co/100x100',
+  }));
+};
+
+const fetchTagsFromDatabase = async () => {
+    try {
+        const response = await axios.get('/api/cimkek'); // Same endpoint as new-post
+        tagOptions.value = response.data.map(tag => ({
+            id: tag.id,
+            name: tag.nev,
+            code: tag.nev.toLowerCase().replace(/\s+/g, '_')
+        }));
+    } catch (error) {
+        console.error('Error fetching tags:', error);
+    }
+};
+
+const fetchBlogPosts = async () => {
+  const { data } = await axios.get('/api/blog');
+  blogPosts.value = data.map(p => ({
+    id: p.id,
+    title: p.cim,
+    author: p.szerzo ?? '-',
+    category: p.cimkek?.[0]?.nev ?? '-', // Adjust based on actual API structure
+    date: p.letrehozas_datuma ?? '',
+    published: p.statusz === 'közzétett',
+    content: p.tartalom ?? '',
+    kivonat: p.kivonat || '',
+    // Store full tags and images objects for editing
+    tagsData: p.cimkek || [],
+    imagesData: p.kepek || []
+  }));
+};
+
+// --- Image Handling Logic (from new-post.vue) ---
+const onFileSelect = (event) => {
+    const files = event.files.filter(file => 
+        file.type.startsWith('image/')
+    );
+    files.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            uploadedImages.value.push({
+                file: file,
+                preview: e.target.result,
+                alt: '',
+                id: null // New file, no server ID yet
+            });
+        };
+        reader.readAsDataURL(file);
+    });
+    
+    if (fileUploadRef.value) {
+        fileUploadRef.value.clear();
+    }
+};
+
+const removeImage = (index) => {
+  uploadedImages.value.splice(index, 1);
+};
+
+// --- CRUD ---
+
+const saveProduct = async () => {
+  const payload = {
+    nev: editingProduct.value.name,
+    kategoria_id: editingProduct.value.kategoria_id ?? 1,
+    ar: editingProduct.value.price,
+    darab: editingProduct.value.stock,
+    leiras: editingProduct.value.description ?? '',
+  };
+
+  if (editingProduct.value.id) {
+    await axios.put(`${API}/termekek/${editingProduct.value.id}`, payload);
+  } else {
+    await axios.post(`${API}/termekek`, payload);
+  }
+
+  showProductModal.value = false;
+  await fetchProducts();
+};
+
+const deleteProduct = async (id) => {
+  if (!confirm('Biztosan törölni szeretnéd ezt a terméket?')) return;
+  await axios.delete(`${API}/termekek/${id}`);
+  await fetchProducts();
+};
+
+const saveBlogPost = async () => {
+  // Reuse logic from new-post.vue's savePost
+  try {
+    // 1. Upload new images
+    const newImageIds = []
+    const newImages = uploadedImages.value.filter(img => img.file)
+    if (newImages.length > 0) {
+      const formData = new FormData()
+      newImages.forEach((img, index) => {
+        formData.append('images[]', img.file)
+        formData.append(`alt[${index}]`, img.alt || '')
+      })
+      const uploadRes = await axios.post('/api/upload-images', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+        withCredentials: true
+      })
+      uploadRes.data.images.forEach((uploaded) => {
+        newImageIds.push(uploaded.id)
+      })
+    }
+
+    // 2. Collect all image ids
+    const existingImageIds = uploadedImages.value
+      .filter(img => img.id && !img.file)
+      .map(img => img.id)
+    const allImageIds = [...existingImageIds, ...newImageIds]
+
+    const status = editingBlogPost.value.published ? 'közzétett' : 'piszkozat';
+
+    const payload = {
+      title: editingBlogPost.value.title,
+      content: editingBlogPost.value.content,
+      kivonat: editingBlogPost.value.kivonat || null,
+      status: status,
+      tags: selectedTags.value.map(tag => tag.id),
+      images: allImageIds.map(id => ({ id }))
+    };
+
+    if (editingBlogPost.value.id) {
+      await axios.put(`/api/posts/${editingBlogPost.value.id}`, payload);
+    } else {
+      await axios.post('/api/posts', payload);
+    }
+
+    showBlogModal.value = false;
+    await fetchBlogPosts();
+  } catch (error) {
+    console.error('Save error:', error);
+    alert('Hiba történt a mentés során');
+  }
+};
+
+const deleteBlogPost = async (id) => {
+  if (!confirm('Biztosan törölni szeretnéd ezt a bejegyzést?')) return;
+  await axios.delete(`/api/posts/${id}`);
+  await fetchBlogPosts();
+};
+
+const refreshData = async () => {
+  loading.value = true;
+  await Promise.all([fetchStats(), fetchOrders(), fetchAnalytics()]);
+  loading.value = false;
+};
+
+// --- Modals ---
+
+const openProductModal = (product = null) => {
+  editingProduct.value = product
+    ? { ...product }
+    : { name: '', category: 'Fonalak', price: 0, stock: 0, image: '', description: '' };
+  showProductModal.value = true;
+};
+
+const openBlogModal = (post = null) => {
+  // Reset complex form state
+  selectedTags.value = [];
+  uploadedImages.value = [];
+
+  if (post) {
+    // Edit mode
+    editingBlogPost.value = {
+        id: post.id,
+        title: post.title,
+        content: post.content,
+        kivonat: post.kivonat,
+        published: post.published
+    };
+    
+    // Populate tags
+    selectedTags.value = post.tagsData ? post.tagsData.map(tag => ({
+        id: tag.id,
+        name: tag.nev
+    })) : [];
+
+    // Populate images
+    uploadedImages.value = post.imagesData ? post.imagesData.map(img => ({
+        id: img.id,
+        file: null,
+        preview: img.url_Link,
+        alt: img.alt_Szoveg || ''
+    })) : [];
+
+  } else {
+    // New mode
+    editingBlogPost.value = {
+        title: '',
+        content: '',
+        kivonat: '',
+        published: false
+    };
+  }
+  showBlogModal.value = true;
+};
+
+// --- Computed ---
+
 const filteredProducts = computed(() => {
   if (!productSearch.value) return products.value;
-  const search = productSearch.value.toLowerCase();
-  return products.value.filter(p => 
-    p.name.toLowerCase().includes(search) || 
-    p.category.toLowerCase().includes(search)
+  const s = productSearch.value.toLowerCase();
+  return products.value.filter(p =>
+    p.name.toLowerCase().includes(s) || p.category.toLowerCase().includes(s)
   );
 });
 
 const filteredBlogPosts = computed(() => {
   if (!blogSearch.value) return blogPosts.value;
-  const search = blogSearch.value.toLowerCase();
-  return blogPosts.value.filter(p => 
-    p.title.toLowerCase().includes(search) || 
-    p.author.toLowerCase().includes(search)
+  const s = blogSearch.value.toLowerCase();
+  return blogPosts.value.filter(p =>
+    p.title.toLowerCase().includes(s) || p.author.toLowerCase().includes(s)
   );
 });
 
-// Methods
-const formatCurrency = (value) => {
-  return new Intl.NumberFormat('hu-HU', { 
-    style: 'currency', 
-    currency: 'HUF', 
-    minimumFractionDigits: 0 
-  }).format(value);
-};
+// --- Helpers ---
+
+const formatCurrency = (value) =>
+  new Intl.NumberFormat('hu-HU', { style: 'currency', currency: 'HUF', minimumFractionDigits: 0 }).format(value);
 
 const getOrderBadgeClass = (status) => {
-  if (status === 'Kiszállítva') return 'badge-success';
-  if (status === 'Feldolgozás alatt' || status === 'Csomagolás alatt') return 'badge-warning';
+  if (status === 'teljesítve') return 'badge-success';
+  if (['szállítás alatt', 'függőben'].includes(status)) return 'badge-warning';
   return 'badge-danger';
 };
 
-const openProductModal = (product = null) => {
-  editingProduct.value = product 
-    ? { ...product } 
-    : { name: '', category: 'Fonalak', price: 0, stock: 0, image: '', description: '' };
-  showProductModal.value = true;
+// --- Charts ---
+
+const destroyDashboardCharts = () => {
+  if (salesChartInstance) { salesChartInstance.destroy(); salesChartInstance = null; }
+  if (categoryChartInstance) { categoryChartInstance.destroy(); categoryChartInstance = null; }
 };
 
-const saveProduct = () => {
-  if (editingProduct.value.id) {
-    const index = products.value.findIndex(p => p.id === editingProduct.value.id);
-    products.value[index] = { ...editingProduct.value };
-  } else {
-    editingProduct.value.id = Date.now();
-    products.value.push({ ...editingProduct.value });
-  }
-  showProductModal.value = false;
+const destroyAnalyticsCharts = () => {
+  if (productSalesChartInstance) { productSalesChartInstance.destroy(); productSalesChartInstance = null; }
+  if (revenueChartInstance) { revenueChartInstance.destroy(); revenueChartInstance = null; }
 };
 
-const deleteProduct = (id) => {
-  if (confirm('Biztosan törölni szeretnéd ezt a terméket?')) {
-    products.value = products.value.filter(p => p.id !== id);
-  }
-};
-
-const openBlogModal = (post = null) => {
-  editingBlogPost.value = post 
-    ? { ...post } 
-    : { title: '', author: '', category: 'Tippek & Trükkök', content: '', published: false, date: new Date().toISOString().split('T')[0] };
-  showBlogModal.value = true;
-};
-
-const saveBlogPost = () => {
-  if (editingBlogPost.value.id) {
-    const index = blogPosts.value.findIndex(p => p.id === editingBlogPost.value.id);
-    blogPosts.value[index] = { ...editingBlogPost.value };
-  } else {
-    editingBlogPost.value.id = Date.now();
-    blogPosts.value.push({ ...editingBlogPost.value });
-  }
-  showBlogModal.value = false;
-};
-
-const deleteBlogPost = (id) => {
-  if (confirm('Biztosan törölni szeretnéd ezt a bejegyzést?')) {
-    blogPosts.value = blogPosts.value.filter(p => p.id !== id);
-  }
-};
-
-const refreshData = () => {
-  alert('Adatok frissítve!');
-};
+const MONTHS = ['Jan', 'Feb', 'Már', 'Ápr', 'Máj', 'Jún', 'Júl', 'Aug', 'Sze', 'Okt', 'Nov', 'Dec'];
 
 const initCharts = () => {
   nextTick(() => {
-    // Sales Chart
     if (salesChart.value && !salesChartInstance) {
       salesChartInstance = new Chart(salesChart.value, {
         type: 'line',
         data: {
-          labels: ['Jan', 'Feb', 'Már', 'Ápr', 'Máj', 'Jún', 'Júl'],
+          labels: MONTHS.slice(0, analyticsData.value.monthlySales.length),
           datasets: [{
             label: 'Értékesítés (Ft)',
-            data: [320000, 390000, 410000, 520000, 480000, 550000, 620000],
+            data: analyticsData.value.monthlySales,
             borderColor: '#6366f1',
             backgroundColor: 'rgba(99, 102, 241, 0.1)',
-            tension: 0.4,
-            fill: true
+            tension: 0.4, fill: true
           }]
         },
         options: {
           responsive: true,
-          plugins: {
-            legend: { display: false }
-          },
-          scales: {
-            y: {
-              beginAtZero: true,
-              ticks: {
-                callback: function(value) {
-                  return value.toLocaleString('hu-HU') + ' Ft';
-                }
-              }
-            }
-          }
+          plugins: { legend: { display: false } },
+          scales: { y: { beginAtZero: true, ticks: { callback: v => v.toLocaleString('hu-HU') + ' Ft' } } }
         }
       });
     }
 
-    // Category Chart
     if (categoryChart.value && !categoryChartInstance) {
       categoryChartInstance = new Chart(categoryChart.value, {
         type: 'doughnut',
         data: {
-          labels: ['Fonalak', 'Kötőtűk', 'Horgolótűk', 'Hímzőfonalak', 'Kellékek'],
-          datasets: [{
-            data: [35, 20, 18, 15, 12],
-            backgroundColor: [
-              '#6366f1',
-              '#8b5cf6',
-              '#ec4899',
-              '#f59e0b',
-              '#10b981'
-            ]
-          }]
+          labels: analyticsData.value.categories.map(c => c.nev),
+          datasets: [{ data: analyticsData.value.categories.map(c => c.db), backgroundColor: ['#6366f1','#8b5cf6','#ec4899','#f59e0b','#10b981'] }]
         },
-        options: {
-          responsive: true,
-          plugins: {
-            legend: {
-              position: 'bottom'
-            }
-          }
-        }
+        options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
       });
     }
 
-    // Product Sales Chart
     if (productSalesChart.value && !productSalesChartInstance) {
       productSalesChartInstance = new Chart(productSalesChart.value, {
         type: 'bar',
         data: {
-          labels: ['Jan', 'Feb', 'Már', 'Ápr', 'Máj', 'Jún'],
-          datasets: [{
-            label: 'Eladott Termékek',
-            data: [145, 178, 192, 234, 198, 256],
-            backgroundColor: '#10b981'
-          }]
+          labels: MONTHS.slice(0, analyticsData.value.monthlyOrders.length),
+          datasets: [{ label: 'Eladott Termékek', data: analyticsData.value.monthlyOrders, backgroundColor: '#10b981' }]
         },
-        options: {
-          responsive: true,
-          plugins: {
-            legend: { display: false }
-          },
-          scales: {
-            y: { beginAtZero: true }
-          }
-        }
+        options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
       });
     }
 
-    // Revenue Chart
     if (revenueChart.value && !revenueChartInstance) {
       revenueChartInstance = new Chart(revenueChart.value, {
         type: 'line',
         data: {
-          labels: ['Jan', 'Feb', 'Már', 'Ápr', 'Máj', 'Jún'],
+          labels: MONTHS.slice(0, analyticsData.value.monthlySales.length),
           datasets: [{
             label: 'Bevétel',
-            data: [320000, 390000, 410000, 520000, 480000, 550000],
+            data: analyticsData.value.monthlySales,
             borderColor: '#8b5cf6',
             backgroundColor: 'rgba(139, 92, 246, 0.1)',
-            tension: 0.4,
-            fill: true
+            tension: 0.4, fill: true
           }]
         },
         options: {
           responsive: true,
-          plugins: {
-            legend: { display: false }
-          },
-          scales: {
-            y: {
-              beginAtZero: true,
-              ticks: {
-                callback: function(value) {
-                  return value.toLocaleString('hu-HU') + ' Ft';
-                }
-              }
-            }
-          }
+          plugins: { legend: { display: false } },
+          scales: { y: { beginAtZero: true, ticks: { callback: v => v.toLocaleString('hu-HU') + ' Ft' } } }
         }
       });
     }
   });
 };
 
-// Lifecycle hooks
-onMounted(() => {
+// --- Lifecycle ---
+
+onMounted(async () => {
+  await Promise.all([
+      fetchStats(), 
+      fetchOrders(), 
+      fetchAnalytics(), 
+      fetchProducts(), 
+      fetchBlogPosts(),
+      fetchTagsFromDatabase() // Load tags for the blog modal
+  ]);
   initCharts();
 });
 
-// Watchers
-watch(currentView, () => {
+watch(currentView, (newView, oldView) => {
+  if (oldView === 'dashboard') destroyDashboardCharts();
+  if (oldView === 'analytics') destroyAnalyticsCharts();
   initCharts();
 });
 </script>
@@ -681,6 +909,7 @@ watch(currentView, () => {
   display: flex;
   min-height: calc(100vh - 160px);
   background: #f8fafc;
+  margin-top: 10px;
 }
 
 /* Sidebar */
@@ -960,8 +1189,17 @@ tbody tr:hover {
   background: #4f46e5;
 }
 
+.btn-secondary {
+    background: #e2e8f0;
+    color: #1e293b;
+}
+
+.btn-secondary:hover {
+    background: #cbd5e1;
+}
+
 .btn-warning {
-  background: #f59e0b;
+  background: #0094dbb5;
   color: white;
 }
 
@@ -997,6 +1235,7 @@ tbody tr:hover {
   justify-content: center;
   z-index: 1000;
   animation: fadeIn 0.2s;
+  padding: 20px;
 }
 
 @keyframes fadeIn {
@@ -1007,11 +1246,18 @@ tbody tr:hover {
 .modal {
   background: white;
   border-radius: 12px;
-  width: 90%;
+  width: 100%;
   max-width: 600px;
   max-height: 90vh;
   overflow-y: auto;
   animation: slideUp 0.3s;
+  display: flex;
+  flex-direction: column;
+}
+
+.blog-modal-large {
+    max-width: 1000px;
+    height: 90vh;
 }
 
 @keyframes slideUp {
@@ -1031,12 +1277,20 @@ tbody tr:hover {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  background: white;
+  z-index: 10;
 }
 
 .modal-title {
   font-size: 20px;
   font-weight: 600;
   color: #1e293b;
+}
+
+.modal-body-scrollable {
+    padding: 24px;
+    overflow-y: auto;
+    flex: 1;
 }
 
 .modal-body {
@@ -1049,11 +1303,17 @@ tbody tr:hover {
   display: flex;
   justify-content: flex-end;
   gap: 12px;
+  background: white;
+  z-index: 10;
 }
 
 /* Forms */
 .form-group {
   margin-bottom: 20px;
+}
+
+.form-section {
+    margin-bottom: 24px;
 }
 
 .form-label {
@@ -1062,6 +1322,24 @@ tbody tr:hover {
   font-size: 14px;
   font-weight: 600;
   color: #1e293b;
+}
+
+.required-indicator {
+    color: #f87171;
+    margin-left: 4px;
+}
+
+.form-hint {
+    display: block;
+    margin-top: 6px;
+    color: #718096;
+    font-size: 13px;
+}
+
+.post-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
 }
 
 .form-input,
@@ -1123,5 +1401,132 @@ tbody tr:hover {
 .action-buttons {
   display: flex;
   gap: 8px;
+}
+
+/* Styles specific to the Complex Blog Form (from new-post.vue) */
+.image-preview-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 15px;
+  margin-top: 15px;
+}
+.image-preview {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.preview-image {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  display: block;
+}
+.image-remove-btn {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  z-index: 10;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  background: #ef4444;
+  color: white;
+  cursor: pointer;
+}
+.image-alt-input {
+  width: 100%;
+  margin-top: 5px;
+  font-size: 12px;
+  padding: 4px 8px;
+}
+
+.drag-drop-area {
+    border: 2px dashed #cbd5e0;
+    border-radius: 10px;
+    padding: 30px 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background-color: #f8fafc;
+    margin-bottom: 1rem;
+}
+
+.drag-drop-area:hover {
+    border-color: #4d8af0;
+    background-color: #f0f7ff;
+}
+
+:deep(.p-fileupload) {
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 15px;
+}
+
+:deep() {
+    .p-inputtext {
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 12px 16px;
+        font-size: 16px;
+        transition: all 0.3s ease;
+        background-color: white;
+    }
+    
+    .p-inputtext:focus {
+        border-color: #4d8af0;
+        box-shadow: 0 0 0 3px rgba(77, 138, 240, 0.1);
+        outline: none;
+    }
+    
+    .p-multiselect {
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+        width: 100%;
+    }
+    
+    .p-multiselect:not(.p-disabled):hover {
+        border-color: #cbd5e0;
+    }
+    
+    .p-multiselect:not(.p-disabled).p-focus {
+        border-color: #4d8af0;
+        box-shadow: 0 0 0 3px rgba(77, 138, 240, 0.1);
+    }
+    
+    .p-multiselect-panel {
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+    
+    .p-multiselect-chip .p-chip {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 20px;
+        padding: 4px 10px;
+        font-weight: 500;
+    }
+    
+    .editor-toolbar {
+        border: 2px solid #e2e8f0;
+        border-bottom: none;
+        border-radius: 10px 10px 0 0;
+        padding: 12px;
+        background: #f8fafc;
+    }
+    
+    .p-editor-container .p-editor-content {
+        border: 2px solid #e2e8f0;
+        border-top: none;
+        border-radius: 0 0 10px 10px;
+        min-height: 250px;
+    }
 }
 </style>

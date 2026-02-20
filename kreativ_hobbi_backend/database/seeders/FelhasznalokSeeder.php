@@ -34,6 +34,16 @@ class FelhasznalokSeeder extends Seeder
             'utolso_Belepes' => now(),
         ]);
 
+        Felhasznalok::factory()->create([
+            'felhasz_nev' => 'Tóthpál István',
+            'email' => 'tothpal.istvan@diak.szbi-pg.hu',
+            'jelszo'=> 'Alma12345678.',
+            'profilKep_id'=> 2,
+            'statusz' => 'aktív',
+            'letrehozas_Datuma' => '2026-02-20',
+            'utolso_Belepes' => now(),
+        ]);
+
         // Create 20 random users
         Felhasznalok::factory()->count(30)->create();
         

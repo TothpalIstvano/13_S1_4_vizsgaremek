@@ -30,6 +30,7 @@
 * \[ ] kosár eltárolása
 * \[ ] Dashboard betöltése + valós input"" from database
 * \[ ] áruház loading 
+* \[ ] Dashboard szerző + modosítás javítás +/- jobb stilus
 * \[ ] kicsit akad az animáció a belépés oldalon a váltásnál 
 * \[X] resend ki cserélésre gmailre
 * \[X] verifikáld az emailed felszólitás
@@ -46,3 +47,16 @@
 * \[ ] Az oldal dokumenálása
 * \[ ] Optimalizálás
 
+ha megakarjuk oldani azt hogy bejelentkezve maradok
+
+2. Vagy hozzáadni a táblához migráccióval:
+bashphp artisan make:migration add_remember_token_to_felhasznalok_table
+phppublic function up(): void
+{
+    Schema::table('felhasznalok', function (Blueprint $table) {
+        $table->rememberToken();
+    });
+}
+bashphp artisan migrate
+
+ja és a NewPasswordController törlöd ki a // hogy müköjön

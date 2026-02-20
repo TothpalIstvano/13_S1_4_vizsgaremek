@@ -52,7 +52,7 @@
           </button>
         </div>
         
-        <a class="form__link" href="#">Elfelejtetted a jelszavad?</a>
+        <a class="form__link" href="#" @click.prevent="showForgotPassword = true">Elfelejtetted a jelszavad?</a>
         <button class="button" type="submit">Bejelentkezés</button>
       </form>
     </div>
@@ -73,6 +73,37 @@
       </div>
     </div>
   </div>
+  <!-- Elfelejtett jelszó modal -->
+  <transition name="fade">
+    <div v-if="showForgotPassword" class="modal-overlay" @click.self="showForgotPassword = false">
+      <div class="modal-box">
+        <h3 class="modal-title">Jelszó visszaállítása</h3>
+
+        <div v-if="!forgotSent">
+          <p class="modal-desc">Add meg az email címedet és küldünk egy visszaállító linket.</p>
+          <input
+            class="form__input"
+            type="email"
+            placeholder="Email cím"
+            v-model="forgotEmail"
+            style="width:100%; margin: 12px 0;"
+          />
+          <label v-if="forgotError" class="error-message">{{ forgotError }}</label>
+          <button class="button" style="margin-top:16px; width:100%;" @click="sendForgotPassword">
+            Link küldése
+          </button>
+        </div>
+
+        <div v-else>
+          <p class="modal-desc" style="color: #2ecc71; font-weight:600;">
+            ✓ Elküldtük a visszaállító linket! Ellenőrizd az emailedet.
+          </p>
+        </div>
+
+        <button class="close-btn" @click="showForgotPassword = false">✕</button>
+      </div>
+    </div>
+  </transition>
 </template>
 
 <script setup>
@@ -119,6 +150,26 @@ const signInForm = ref({
   email: '',
   password: '',
 })
+
+const showForgotPassword = ref(false)
+const forgotEmail = ref('')
+const forgotError = ref('')
+const forgotSent = ref(false)
+
+const sendForgotPassword = async () => {
+  forgotError.value = ''
+  if (!forgotEmail.value.includes('@')) {
+    forgotError.value = 'Kérjük, adj meg egy érvényes email címet.'
+    return
+  }
+  try {
+    await axios.get('/sanctum/csrf-cookie')
+    await axios.post('/forgot-password', { email: forgotEmail.value }, { withCredentials: true })
+    forgotSent.value = true
+  } catch (err) {
+    forgotError.value = err.response?.data?.message || 'Hiba történt, próbáld újra.'
+  }
+}
 
 const toggleForm = () => {
   document.documentElement.style.setProperty('--errorColor', isSignInMode.value ? 'green' : 'grey');
@@ -669,4 +720,22 @@ const handleSignUp = async () => {
 
 }
 
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.35);
+  display: flex; justify-content: center; align-items: center; z-index: 999;
+}
+.modal-box {
+  position: relative; background: #ecf0f3; border-radius: 12px;
+  padding: 40px 50px; width: 400px;
+  box-shadow: 10px 10px 10px #d1d9e6, -10px -10px 10px #f9f9f9;
+  display: flex; flex-direction: column; align-items: center;
+}
+.modal-title { font-size: 22px; font-weight: 700; color: #181818; margin-bottom: 8px; }
+.modal-desc { font-size: 13px; color: #555; text-align: center; }
+.close-btn {
+  position: absolute; top: 12px; right: 16px;
+  background: none; border: none; font-size: 18px; cursor: pointer; color: #8b0404;
+}
+.fade-enter-active, .fade-leave-active { transition: opacity 0.3s; }
+.fade-enter-from, .fade-leave-to { opacity: 0; }
 </style>

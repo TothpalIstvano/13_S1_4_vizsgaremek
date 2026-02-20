@@ -36,6 +36,7 @@ class BlogController extends Controller
                     'fo_kep' => $post->foKep ? $post->foKep->url_Link : null,
                     'cimkek' => $post->cimkek->pluck('nev')->toArray(),
                     'szerző' => $post->szerzo ? $post->szerzo->felhasz_nev : 'Ismeretlen',
+                    'statusz' => $post->statusz,
                     'likes_count' => $post->likes_count,
                     'dislikes_count' => $post->dislikes_count,
                     'userReaction' => $userReaction,
@@ -81,4 +82,71 @@ class BlogController extends Controller
             ->get();
         return response()->json(data: $posts);
     }
+
+    public function destroy($id)
+    {
+        try {
+            $poszt = Posztok::findOrFail($id);
+            \DB::table('posztcimkek')->where('poszt_id', $id)->delete();
+            \DB::table('posztkepek')->where('poszt_id', $id)->delete();
+            \DB::table('kommentek')->where('poszt_id', $id)->delete();
+            \DB::table('posztreakciok')->where('poszt_id', $id)->delete();
+            $poszt->delete();
+            return response()->json(['message' => 'Bejegyzés törölve']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function store(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'cim'      => 'required|string',
+                'tartalom' => 'required|string',
+                'kivonat'  => 'nullable|string',
+                'statusz'  => 'nullable|string',
+            ]);
+
+            $poszt = new Posztok();
+            $poszt->cim = $validated['cim'];
+            $poszt->tartalom = $validated['tartalom'];
+            $poszt->kivonat = $validated['kivonat'] ?? substr(strip_tags($validated['tartalom']), 0, 200);
+            $poszt->statusz = $validated['statusz'] ?? 'piszkozat';
+            $poszt->szerzo_id = auth()->id();
+            $poszt->letrehozas_datuma = now();
+            $poszt->save();
+
+            return response()->json($poszt, 201);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    
+    public function update(Request $request, $id)
+    {
+        try {
+            $validated = $request->validate([
+                'cim'      => 'required|string',
+                'tartalom' => 'required|string',
+                'kivonat'  => 'nullable|string',
+                'statusz'  => 'nullable|string',
+            ]);
+
+            $poszt = Posztok::findOrFail($id);
+            
+            $poszt->cim = $validated['cim'];
+            $poszt->tartalom = $validated['tartalom'];
+            $poszt->kivonat = $validated['kivonat'] ?? substr(strip_tags($validated['tartalom']), 0, 200);
+            $poszt->statusz = $validated['statusz'] ?? 'piszkozat';
+            
+            $poszt->save();
+
+            return response()->json($poszt, 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
 }
