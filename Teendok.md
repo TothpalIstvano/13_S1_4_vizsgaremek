@@ -30,6 +30,7 @@
 * \[ ] kosár eltárolása
 * \[ ] Dashboard betöltése + valós input"" from database
 * \[ ] áruház loading 
+* \[ ] Dashboard szerző + modosítás javítás +/- jobb stilus
 * \[ ] kicsit akad az animáció a belépés oldalon a váltásnál 
 * \[X] resend ki cserélésre gmailre
 * \[X] verifikáld az emailed felszólitás

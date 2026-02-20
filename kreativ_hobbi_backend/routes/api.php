@@ -317,3 +317,124 @@ Route::post('/kosar/hozzaad', function (Request $request) {
         return response()->json(['error' => $e->getMessage()], 500);
     }
 });
+
+// Admin routes
+Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
+
+    // Stats
+    Route::get('/stats', function () {
+        return response()->json([
+            'totalSales'     => Rendelesek::sum('osszeg'),
+            'totalOrders'    => Rendelesek::count(),
+            'totalProducts'  => Termekek::count(),
+            'totalCustomers' => Felhasznalok::count(),
+        ]);
+    });
+
+    // Analytics
+    Route::get('/analytics', function () {
+        try {
+            $monthlySales = Rendelesek::selectRaw('MONTH(rendeles_datuma) as honap, SUM(osszeg) as osszeg')
+                ->whereYear('rendeles_datuma', now()->year)
+                ->groupBy('honap')
+                ->orderBy('honap')
+                ->pluck('osszeg');
+
+            $monthlyOrders = Rendelesek::selectRaw('MONTH(rendeles_datuma) as honap, COUNT(*) as db')
+                ->whereYear('rendeles_datuma', now()->year)
+                ->groupBy('honap')
+                ->orderBy('honap')
+                ->pluck('db');
+
+            $categories = Kategoriak::withCount('termekek')->get()
+                ->map(fn($k) => ['nev' => $k->nev, 'db' => $k->termekek_count]);
+
+            return response()->json([
+                'monthlySales'  => $monthlySales,
+                'monthlyOrders' => $monthlyOrders,
+                'categories'    => $categories,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage(), 'line' => $e->getLine()], 500);
+        }
+    });
+
+    // Rendelések lista
+    Route::get('/rendelesek', function () {
+        $rendelesek = Rendelesek::with('felhasznalo:id,felhasz_nev')
+            ->withCount('rendeltTermekek')
+            ->orderBy('rendeles_datuma', 'desc')
+            ->get()
+            ->map(fn($r) => [
+                'id'              => 'ORD-' . $r->id,
+                'felhasznalo'     => ['nev' => $r->felhasznalo?->felhasz_nev ?? 'Vendég'],
+                'termekek_szama'  => $r->rendelt_termekek_count,
+                'osszeg'          => $r->osszeg,
+                'statusz'         => $r->statusz,
+                'rendeles_datuma' => $r->rendeles_datuma,
+            ]);
+
+        return response()->json($rendelesek);
+    });
+
+    // Rendelés státusz frissítés
+    Route::patch('/rendelesek/{id}/statusz', function (Request $request, $id) {
+        $request->validate(['statusz' => 'required|string']);
+
+        $rendeles = Rendelesek::findOrFail($id);
+        $rendeles->statusz = $request->statusz;
+        $rendeles->save();
+
+        return response()->json(['message' => 'Statusz frissítve', 'statusz' => $rendeles->statusz]);
+    });
+
+    // Termékek CRUD
+    Route::post('/termekek', function (Request $request) {
+        $validated = $request->validate([
+            'nev'          => 'required|string',
+            'kategoria_id' => 'required|integer|exists:kategoriak,id',
+            'ar'           => 'required|integer|min:0',
+            'darab'        => 'required|integer|min:0',
+            'leiras'       => 'nullable|string',
+            'fo_kep_id'    => 'nullable|integer',
+        ]);
+
+        $termek = Termekek::create($validated);
+        return response()->json($termek->load('TermekKategoria', 'TermekFoKep'), 201);
+    });
+
+    Route::put('/termekek/{id}', function (Request $request, $id) {
+        $termek = Termekek::findOrFail($id);
+
+        $validated = $request->validate([
+            'nev'          => 'sometimes|string',
+            'kategoria_id' => 'sometimes|integer|exists:kategoriak,id',
+            'ar'           => 'sometimes|integer|min:0',
+            'darab'        => 'sometimes|integer|min:0',
+            'leiras'       => 'nullable|string',
+            'fo_kep_id'    => 'nullable|integer',
+        ]);
+
+        $termek->update($validated);
+        return response()->json($termek->load('TermekKategoria', 'TermekFoKep'));
+    });
+
+    Route::delete('/termekek/{id}', function ($id) {
+        try {
+            \DB::table('kedvencek')->where('termek_id', $id)->delete();
+            \DB::table('rendelttermekek')->where('termek_id', $id)->delete();
+            \DB::table('termekkategoriak')->where('termek_id', $id)->delete();
+            \DB::table('termekszinek')->where('termek_id', $id)->delete();
+            \DB::table('termekkepek')->where('termek_id', $id)->delete();
+
+            Termekek::findOrFail($id)->delete();
+            return response()->json(['message' => 'Termék törölve']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    });
+    // Blog CRUD
+    Route::post('/blog', [BlogController::class, 'store']);
+    Route::put('/blog/{id}', [BlogController::class, 'update']);
+    Route::delete('/blog/{id}', [BlogController::class, 'destroy']);
+});

@@ -26,6 +26,20 @@ class FelhasznaloAdatokSeeder extends Seeder
                 'kartyaszam' => '1111222233334444',
             ]
         );
+        FelhasznaloAdatok::factory()->create(
+            [
+                'felhasznalo_id' => 2,
+                'szerepkor' => 'admin',
+                'vezeteknev' => 'Tóthpál',
+                'keresztnev' => 'István',
+                'varos' => 2,
+                'utca' => 'Idk Street',
+                'hazszam' => 5,
+                'emeletAjto' => '1/A',
+                'telefonszam' => '9876543210',
+                'kartyaszam' => '1111222253334444',
+            ]
+        );
 
         FelhasznaloAdatok::factory()->count(30)->create();
         $this->command->info('FelhasznaloAdatok table seeded successfully!');
