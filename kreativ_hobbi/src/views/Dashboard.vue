@@ -267,18 +267,18 @@
                 </td>
                 <td><strong>{{ user.name }}</strong></td>
                 <td>
-                  <span class="badge" :class="user.role === 'admin' ? 'badge-danger' : user.role === 'moderator' ? 'badge-warning' : 'badge-success'">
+                  <span class="badge" :class="user.role === 'admin' ? 'badge-blue' : user.role === 'moderator' ? 'badge-warning' : user.role === 'sima' ? 'badge-success' : 'badge-danger'">
                     {{user.role}}
                   </span>
                 </td>
                 <td>{{ user.email }}</td>
                 <td>
-                  <span class="badge" :class="user.active === 'aktív' ? 'badge-success' : 'badge-danger'">
-                    {{user.active}}
+                  <span class="badge" :class="user.active ? 'badge-success' : 'badge-danger'">
+                    {{ user.active ? 'Aktív' : 'Inaktív' }}
                   </span>
                 </td>
-                <td>{{ user.registrationDate ? user.registrationDate : '-' }}</td>
-                <td>{{ user.utolso_Belepes ? user.utolso_Belepes : '-' }}</td>
+                <td>{{ user.registrationDate ? formatDate(user.registrationDate) : '-' }}</td>
+                <td>{{ user.utolso_Belepes ? formatDate(user.utolso_Belepes) : '-' }}</td>
                 <td>
                   <div class="action-buttons">
                     <button class="btn btn-sm btn-warning" @click="openUserModal(user)">
@@ -580,11 +580,15 @@
           <div class="form-group">
             <label class="form-label">Szerepkör</label>
             <select class="form-select" v-model="editingUser.role">
-              <option value="user">Felhasználó</option>
-              <option value="moderator">Moderátor</option>
-              <option value="admin">Admin</option>
-              <option value="felfüggesztett">Felfüggesztett</option>
+              <option :value="'admin'">Admin</option>
+              <option :value="'moderator'">Moderátor</option>
+              <option :value="'sima'">Felhasználó</option>
+              <option :value="'felfuggesztett'">Felfüggesztett</option>
             </select>
+          </div>
+          <div class="form-group" v-if="!editingUser.id">
+            <label class="form-label">Jelszó</label>
+            <input type="password" class="form-input" v-model="editingUser.password" placeholder="•••••••••">
           </div>
           <!-- PROFILE PICTURE RESET -->
           <div class="form-group">
@@ -602,7 +606,7 @@
           <div class="form-group">
             <label class="form-label">Státusz</label>
             <select class="form-select" v-model="editingUser.active">
-              <option :value="true">Aktív</option>
+              <option :value="true" >Aktív</option>
               <option :value="false">Inaktív</option>
             </select>
           </div>
@@ -806,14 +810,14 @@ const deleteProduct = async (id) => {
 };
 
 const saveUser = async () => {
-  if(!editingUser.value.id || !editingUser.value.password) {
+  if(!editingUser.value.id && !editingUser.value.password) {
     alert('A jelszó meg kell adni a felhasznált felhasználoknak!');
     return;
   }
   const payload = {
     felhasz_nev: editingUser.value.name,
     email: editingUser.value.email,
-    role: editingUser.value.role,
+    szerepkor: editingUser.value.role,
     aktiv: editingUser.value.active,
   };
 
@@ -1014,6 +1018,20 @@ const filteredUsers = computed(() => {
 });
 
 // --- Helpers ---
+
+const formatDate = (dateString) => {
+  if (!dateString) return '-';
+  
+  const date = new Date(dateString);
+  
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+  const day = String(date.getDate()).padStart(2, '0');
+  const hours = String(date.getHours()).padStart(2, '0');   // Use getUTCHours() if you don't want timezone conversion
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+
+  return `${year}-${month}-${day} ${hours}:${minutes}`;
+};
 
 const formatCurrency = (value) =>
   new Intl.NumberFormat('hu-HU', { style: 'currency', currency: 'HUF', minimumFractionDigits: 0 }).format(value);
@@ -1613,6 +1631,11 @@ tbody tr:hover {
   color: #991b1b;
 }
 
+.badge-blue {
+  background: #1d4fd84d;
+  color: #0c004e;
+}
+
 /* Product Image */
 .product-img {
   width: 50px;
@@ -1693,6 +1716,8 @@ tbody tr:hover {
     border-color: #4d8af0;
     background-color: #f0f7ff;
 }
+
+
 
 :deep(.p-fileupload) {
   border: 2px solid #e2e8f0;

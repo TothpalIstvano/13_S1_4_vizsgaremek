@@ -14,17 +14,9 @@ class FelhasznaloAdatok extends Model
     use HasApiTokens;
     protected $table = 'felhasznaloAdatok';
     protected $primaryKey = 'felhasznalo_id';
-    protected $fillable = [
+    protected $guarded = [
         'felhasznalo_id',
         'szerepkor',
-        'vezeteknev',
-        'keresztnev',
-        'varos',
-        'utca',
-        'hazszam',
-        'emeletAjto',
-        'telefonszam',
-        'kartyaszam',
     ];
 
     public $timestamps = false;    
