@@ -14,7 +14,7 @@ class FelhasznaloAdatok extends Model
     use HasApiTokens;
     protected $table = 'felhasznaloAdatok';
     protected $primaryKey = 'felhasznalo_id';
-    protected $guarded = [
+    protected $fillable = [
         'felhasznalo_id',
         'szerepkor',
     ];

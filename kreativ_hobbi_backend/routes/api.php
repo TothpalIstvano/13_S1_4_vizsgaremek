@@ -27,7 +27,7 @@ Route::get('/user/check', function () {
     if (Auth::check()) {
         $adatok = FelhasznaloAdatok::find(auth()->user()->id);
         if (!$adatok) {
-            return response()->json(['loggedIn' => true, 'szerepkor' => null], 200);
+            return response()->json(['loggedIn' => true, 'szerepkor' => null, 'id' => auth()->user()->id], 200);
         }
         return response()->json(['loggedIn' => true, 'szerepkor' => $adatok->szerepkor], 200);
     }
@@ -55,7 +55,7 @@ Route::middleware('auth:sanctum')->group(function () {
                 ->where('szerzo_id', $user->id)
                 ->get()
                 ->map(function ($post) {
-                    $postArray = $post->toArray();
+                    $postArray = (array) $post;
 
                     if (!$post->foKep) {
                         $postArray['fo_kep'] = [

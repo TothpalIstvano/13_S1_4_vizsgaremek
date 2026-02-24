@@ -21,13 +21,16 @@ class Felhasznalok extends Authenticatable implements MustVerifyEmail
 
     public $incrementing = true;
 
-    public $rememberTokenName = false;
     protected $keyType = 'int';
 
     protected $fillable = [
         'felhasz_nev',
         'email',
         'jelszo',
+        'profilKep_id',
+        'statusz',
+        'letrehozas_Datuma',
+        'utolso_Belepes',
     ];
 
     protected $casts = [

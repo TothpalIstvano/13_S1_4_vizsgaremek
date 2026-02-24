@@ -12,6 +12,7 @@ return new class extends Migration {
     {
         Schema::create('felhasznaloAdatok', function (Blueprint $table) {
             $table->unsignedInteger('felhasznalo_id')->primary();
+            $table->rememberToken();
             $table->enum('szerepkor', ['admin', 'moderator', 'sima', 'felfuggesztett'])->default('sima');
             $table->string('vezeteknev', 100)->nullable();
             $table->string('keresztnev', 100)->nullable();
