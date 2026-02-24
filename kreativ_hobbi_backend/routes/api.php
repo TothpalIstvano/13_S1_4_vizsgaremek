@@ -434,11 +434,11 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
         }
     });
     //Users
-    Route::get('/users', [UserController::class, 'index']);
-    Route::get('/users/{id}', [UserController::class, 'show']);
-    Route::post('/users', [UserController::class, 'store']);
-    Route::put('/users/{id}', [UserController::class, 'update']);
-    Route::delete('/users/{id}', [UserController::class, 'destroy']);
+    Route::get('/users', [FelhasznaloController::class, 'index']);
+    Route::get('/users/{id}', [FelhasznaloController::class, 'show']);
+    Route::post('/users', [FelhasznaloController::class, 'store']);
+    Route::put('/users/{id}', [FelhasznaloController::class, 'update']);
+    Route::delete('/users/{id}', [FelhasznaloController::class, 'destroy']);
 
     // Blog CRUD
     Route::post('/blog', [BlogController::class, 'store']);
