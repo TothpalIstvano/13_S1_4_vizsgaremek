@@ -88,21 +88,18 @@ class PosztController extends Controller
             'images.*.id' => 'nullable|integer|exists:kepek,id',
         ]);
 
-        // Update post fields
         $post->cim = $validated['title'];
         $post->tartalom = $validated['content'];
         $post->kivonat = $validated['kivonat'] ?? substr(strip_tags($validated['content']), 0, 200);
         $post->statusz = $validated['status'];
         $post->save();
 
-        // Sync tags (replace existing with new list)
         if (isset($validated['tags'])) {
             $post->cimkek()->sync($validated['tags']);
         } else {
-            $post->cimkek()->detach(); // remove all if no tags sent
+            $post->cimkek()->detach();
         }
 
-        // Sync images
         if (isset($validated['images'])) {
             $imageIds = array_column($validated['images'], 'id');
             $post->kepek()->sync($imageIds);

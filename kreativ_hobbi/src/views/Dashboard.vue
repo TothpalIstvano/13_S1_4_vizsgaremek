@@ -26,6 +26,12 @@
           </a>
         </li>
         <li class="nav-item">
+          <a class="nav-link" :class="{active: currentView === 'users'}" @click="currentView = 'users'">
+            <span class="nav-icon">👤</span>
+            Felhasznalok
+          </a>
+        </li>
+        <li class="nav-item">
           <a class="nav-link" :class="{active: currentView === 'analytics'}" @click="currentView = 'analytics'">
             <span class="nav-icon">📈</span>
             Analitika
@@ -113,7 +119,7 @@
 
           <div class="chart-card">
             <div class="chart-header">
-              <h3 class="chart-title">Legnépszerűbb Kategóriák</h3>
+              <h3 class="chart-title">Kategóriák szerinti termék megosztás</h3>
             </div>
             <canvas ref="categoryChart"></canvas>
           </div>
@@ -208,6 +214,77 @@
                       ✏️
                     </button>
                     <button class="btn btn-sm btn-danger" @click="deleteProduct(product.id)">
+                      🗑️
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Users View -->
+      <div v-if="currentView === 'users'">
+        <div class="header">
+          <h2>Felhasználók</h2>
+          <div class="header-actions">
+            <button class="btn btn-primary" @click="openUserModal()">
+              ➕ Új felhasználó
+            </button>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <div class="table-header">
+            <h3 class="table-title">Összes felhasználó</h3>
+            <div class="search-box">
+              <input 
+                type="text" 
+                class="search-input" 
+                placeholder="Keresés felhasználók között..."
+                v-model="userSearch"
+              >
+            </div>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Profilkép</th>
+                <th>Név</th>
+                <th>Szerepkör</th>
+                <th>Email</th>
+                <th>Aktív</th>
+                <th>Regisztráció ideje</th>
+                <th>Útolsó bejelentkezés</th>
+                <th>Műveletek</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="user in filteredUsers" :key="user.id">
+                <td>
+                  <img :src="user.profileImage" :alt="user.name" class="avatar">
+                </td>
+                <td><strong>{{ user.name }}</strong></td>
+                <td>
+                  <span class="badge" :class="user.role === 'admin' ? 'badge-danger' : user.role === 'moderator' ? 'badge-warning' : 'badge-success'">
+                    {{user.role}}
+                  </span>
+                </td>
+                <td>{{ user.email }}</td>
+                <td>
+                  <span class="badge" :class="user.active === 'aktív' ? 'badge-success' : 'badge-danger'">
+                    {{user.active}}
+                  </span>
+                </td>
+                <td>{{ user.registrationDate ? user.registrationDate : '-' }}</td>
+                <td>{{ user.utolso_Belepes ? user.utolso_Belepes : '-' }}</td>
+                <td>
+                  <div class="action-buttons">
+                    <button class="btn btn-sm btn-warning" @click="openUserModal(user)">
+                      ✏️
+                    </button>
+                    <button class="btn btn-sm btn-danger" @click="deleteUser(user.id)">
                       🗑️
                     </button>
                   </div>
@@ -484,6 +561,58 @@
         </div>
       </div>
     </div>
+        <!-- User Modal -->
+    <div v-if="showUserModal" class="modal-overlay" @click.self="showUserModal = false">
+      <div class="modal">
+        <div class="modal-header">
+          <h3 class="modal-title">{{ editingUser.id ? 'Felhasználó Szerkesztése' : 'Új Felhasználó' }}</h3>
+          <button class="btn btn-icon" @click="showUserModal = false">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Felhasználónév</label>
+            <input type="text" class="form-input" v-model="editingUser.name" placeholder="pl. János">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-input" v-model="editingUser.email" placeholder="janos@pelda.hu">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Szerepkör</label>
+            <select class="form-select" v-model="editingUser.role">
+              <option value="user">Felhasználó</option>
+              <option value="moderator">Moderátor</option>
+              <option value="admin">Admin</option>
+              <option value="felfüggesztett">Felfüggesztett</option>
+            </select>
+          </div>
+          <!-- PROFILE PICTURE RESET -->
+          <div class="form-group">
+            <label class="form-label">Profilkép</label>
+            <div class="flex items-center gap-2">
+              <input type="checkbox" id="resetPic" v-model="editingUser.resetProfilePic">
+              <label for="resetPic" style="cursor: pointer; font-size: 14px; color: #4b5563;">
+                Visszaállítás alapértelmezett képre (default.jpg)
+              </label>
+            </div>
+            <small style="color: #6b7280; font-size: 12px; margin-top: 4px; display:block;">
+              Jelöld be, ha törölni akarod a jelenlegi profilképet.
+            </small>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Státusz</label>
+            <select class="form-select" v-model="editingUser.active">
+              <option :value="true">Aktív</option>
+              <option :value="false">Inaktív</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn" @click="showUserModal = false">Mégse</button>
+          <button class="btn btn-primary" @click="saveUser">Mentés</button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -504,10 +633,13 @@ const API = '/api/admin';
 // Reactive state
 const currentView = ref('dashboard');
 const productSearch = ref('');
+const userSearch = ref('');
 const blogSearch = ref('');
 const showProductModal = ref(false);
+const showUserModal = ref(false);
 const showBlogModal = ref(false);
 const editingProduct = ref({});
+const editingUser = ref({});
 const editingBlogPost = ref({});
 const loading = ref(false);
 
@@ -532,6 +664,7 @@ let revenueChartInstance = null;
 // Data
 const stats = ref({ totalSales: 0, totalOrders: 0, totalProducts: 0, totalCustomers: 0 });
 const products = ref([]);
+const users = ref([]);
 const blogPosts = ref([]);
 const recentOrders = ref([]);
 const analyticsData = ref({ monthlySales: [], monthlyOrders: [], categories: [] });
@@ -574,6 +707,21 @@ const fetchProducts = async () => {
   }));
 };
 
+const fetchUsers = async () => {
+  const { data } = await axios.get(`${API}/users`);
+  console.log(data);
+  users.value = data.map(u => ({
+    id: u.id,
+    name: u.name,
+    email: u.email,
+    role: u.role ?? 'user',
+    active: u.aktiv,
+    profileImage: u.profileImage,
+    registrationDate: u.created_at,
+    utolso_Belepes: u.utolso_Belepes,
+  }));
+};
+
 const fetchTagsFromDatabase = async () => {
     try {
         const response = await axios.get('/api/cimkek'); // Same endpoint as new-post
@@ -598,7 +746,6 @@ const fetchBlogPosts = async () => {
     published: p.statusz === 'közzétett',
     content: p.tartalom ?? '',
     kivonat: p.kivonat || '',
-    // Store full tags and images objects for editing
     tagsData: p.cimkek || [],
     imagesData: p.kepek || []
   }));
@@ -656,6 +803,58 @@ const deleteProduct = async (id) => {
   if (!confirm('Biztosan törölni szeretnéd ezt a terméket?')) return;
   await axios.delete(`${API}/termekek/${id}`);
   await fetchProducts();
+};
+
+const saveUser = async () => {
+  if(!editingUser.value.id || !editingUser.value.password) {
+    alert('A jelszó meg kell adni a felhasznált felhasználoknak!');
+    return;
+  }
+  const payload = {
+    felhasz_nev: editingUser.value.name,
+    email: editingUser.value.email,
+    role: editingUser.value.role,
+    aktiv: editingUser.value.active,
+  };
+
+  if (!editingUser.value.id) {
+    payload.password = editingUser.value.password;
+  }
+
+  if (editingUser.value.resetProfilePic) {
+    payload.resetProfilePic = true;
+  }
+
+  try{
+    if (editingUser.value.id) {
+      await axios.put(`${API}/users/${editingUser.value.id}`, payload);
+    } else {
+      await axios.post(`${API}/users`, payload);
+    }
+
+    showUserModal.value = false;
+    await fetchUsers();
+  } catch (error) {
+    alert('Hiba történt a felhasználók feltöltése:', error);
+  }
+
+};
+
+const deleteUser = async (id) => {
+  if (!confirm('Biztosan törölni szeretnéd ezt a felhasználót?')) return;
+  
+  try {
+    const response = await axios.delete(`${API}/users/${id}`);
+    
+    // If successful, refresh list and show success message
+    await fetchUsers();
+    alert(response.data.message || 'Sikeresen törölve!');
+    
+  } catch (error) {
+    // If error (like 403 for active orders), show the backend error message
+    const errorMessage = error.response?.data?.error || 'Ismeretlen hiba történt';
+    alert(errorMessage);
+  }
 };
 
 const saveBlogPost = async () => {
@@ -731,6 +930,22 @@ const openProductModal = (product = null) => {
   showProductModal.value = true;
 };
 
+const openUserModal = (user = null) => {
+  if (user) {
+    editingUser.value = { ...user, resetProfilePic: false };
+  } else {
+    editingUser.value = {
+      name: '',
+      email: '',
+      role: 'user',
+      active: true,
+      password: '',
+      resetProfilePic: false
+    };
+  }
+  showUserModal.value = true;
+}
+
 const openBlogModal = (post = null) => {
   // Reset complex form state
   selectedTags.value = [];
@@ -787,6 +1002,14 @@ const filteredBlogPosts = computed(() => {
   const s = blogSearch.value.toLowerCase();
   return blogPosts.value.filter(p =>
     p.title.toLowerCase().includes(s) || p.author.toLowerCase().includes(s)
+  );
+});
+
+const filteredUsers = computed(() => {
+  if (!userSearch.value) return users.value;
+  const s = userSearch.value.toLowerCase();
+  return users.value.filter(p =>
+    p.name.toLowerCase().includes(s) || p.email.toLowerCase().includes(s) || p.role.toLowerCase().includes(s)
   );
 });
 
@@ -890,7 +1113,8 @@ onMounted(async () => {
       fetchStats(), 
       fetchOrders(), 
       fetchAnalytics(), 
-      fetchProducts(), 
+      fetchProducts(),
+      fetchUsers(),
       fetchBlogPosts(),
       fetchTagsFromDatabase() // Load tags for the blog modal
   ]);
@@ -1395,6 +1619,14 @@ tbody tr:hover {
   height: 50px;
   object-fit: cover;
   border-radius: 8px;
+}
+
+/* Avatar */
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
 }
 
 /* Action Buttons */

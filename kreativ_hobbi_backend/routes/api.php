@@ -44,7 +44,6 @@ Route::post('/login', function (Request $request) {
 });
 
 Route::middleware('auth:sanctum')->group(function () {
-    // existing routes
     Route::get('/user', function (Request $request) {
         return $request->user()->load('profilKep:id,url_Link,alt_szoveg', 'adatok')->toArray();
     });
@@ -56,10 +55,8 @@ Route::middleware('auth:sanctum')->group(function () {
                 ->where('szerzo_id', $user->id)
                 ->get()
                 ->map(function ($post) {
-                    // Transform the post to ensure fo_kep has default values if null
                     $postArray = $post->toArray();
 
-                    // If fo_kep is null, set default values
                     if (!$post->foKep) {
                         $postArray['fo_kep'] = [
                             'url_Link' => 'profilKepek/default.jpg',
@@ -75,15 +72,16 @@ Route::middleware('auth:sanctum')->group(function () {
         }
     });
 
-    // Update user profile
     Route::put('/user/profile', [FelhasznaloController::class, 'updateProfile']);
 
-    // Update profile picture ID
     Route::put('/user/profile-picture', [FelhasznaloController::class, 'updateProfilePicture']);
 
     Route::post('/posts', [PosztController::class, 'store']);
     Route::get('/posts/{id}/edit', [PosztController::class, 'edit']);
     Route::put('/posts/{id}', [PosztController::class, 'update']);
+
+    Route::get('/user/reactions', [BlogController::class, 'userReactions']);
+    Route::post('/blog/{id}/reaction', [BlogController::class, 'reaction']);
 });
 
 Route::get('/cities', function () {
@@ -94,6 +92,7 @@ Route::get('/cities', function () {
 
 // Image upload routes
 Route::post('/upload-images', [ImageController::class, 'upload'])->middleware('auth:sanctum');
+Route::post('/upload-profile-picture', [ImageController::class, 'uploadProfilePicture'])->middleware('auth:sanctum');
 
 // API routes for blog and comments:
 
@@ -442,6 +441,13 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
             return response()->json(['error' => $e->getMessage()], 500);
         }
     });
+    //Users
+    Route::get('/users', [FelhasznaloController::class, 'index']);
+    Route::get('/users/{id}', [FelhasznaloController::class, 'show']);
+    Route::post('/users', [FelhasznaloController::class, 'store']);
+    Route::put('/users/{id}', [FelhasznaloController::class, 'update']);
+    Route::delete('/users/{id}', [FelhasznaloController::class, 'destroy']);
+
     // Blog CRUD
     Route::post('/blog', [BlogController::class, 'store']);
     Route::put('/blog/{id}', [BlogController::class, 'update']);
