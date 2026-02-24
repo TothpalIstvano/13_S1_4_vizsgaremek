@@ -29,7 +29,7 @@ class FelhasznalokSeeder extends Seeder
             'email' => 'test@example.com',
             'jelszo'=> 'Alma12345678.',
             'profilKep_id'=> 2,
-            'statusz' => 'aktív',
+            'statusz' => true,
             'letrehozas_Datuma' => '2023-01-01',
             'utolso_Belepes' => now(),
         ]);
@@ -39,7 +39,7 @@ class FelhasznalokSeeder extends Seeder
             'email' => 'tothpal.istvan@diak.szbi-pg.hu',
             'jelszo'=> 'Alma12345678.',
             'profilKep_id'=> 2,
-            'statusz' => 'aktív',
+            'statusz' => true,
             'letrehozas_Datuma' => '2026-02-20',
             'utolso_Belepes' => now(),
         ]);

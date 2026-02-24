@@ -25,7 +25,7 @@ class FelhasznalokFactory extends Factory
             // Get a random ID from the existing 'kepek' table
             'profilKep_id' => $this->faker->numberBetween(1,3),
             // Randomly pick from the enum values
-            'statusz' => fake()->randomElement(['aktív', 'inaktív']),
+            'statusz' => fake()->boolean(),
             // Set a creation date within the last year
             'letrehozas_Datuma' => fake()->dateTimeThisYear(),
         ];
