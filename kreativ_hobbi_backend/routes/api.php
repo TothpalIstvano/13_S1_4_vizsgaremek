@@ -81,15 +81,15 @@ Route::middleware('auth:sanctum')->group(function () {
     // Update profile picture ID
     Route::put('/user/profile-picture', [FelhasznaloController::class, 'updateProfilePicture']);
 
-    Route::get('/cities', function () {
-        return Varosok::select('id', 'varos_nev', 'iranyitoszam')
-            ->orderBy('varos_nev')
-            ->get();
-    });
-
     Route::post('/posts', [PosztController::class, 'store']);
     Route::get('/posts/{id}/edit', [PosztController::class, 'edit']);
     Route::put('/posts/{id}', [PosztController::class, 'update']);
+});
+
+Route::get('/cities', function () {
+    return Varosok::select('id', 'varos_nev', 'iranyitoszam')
+        ->orderBy('varos_nev')
+        ->get();
 });
 
 // Image upload routes
@@ -333,9 +333,9 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
     // Stats
     Route::get('/stats', function () {
         return response()->json([
-            'totalSales'     => Rendelesek::sum('osszeg'),
-            'totalOrders'    => Rendelesek::count(),
-            'totalProducts'  => Termekek::count(),
+            'totalSales' => Rendelesek::sum('osszeg'),
+            'totalOrders' => Rendelesek::count(),
+            'totalProducts' => Termekek::count(),
             'totalCustomers' => Felhasznalok::count(),
         ]);
     });
@@ -359,9 +359,9 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
                 ->map(fn($k) => ['nev' => $k->nev, 'db' => $k->termekek_count]);
 
             return response()->json([
-                'monthlySales'  => $monthlySales,
+                'monthlySales' => $monthlySales,
                 'monthlyOrders' => $monthlyOrders,
-                'categories'    => $categories,
+                'categories' => $categories,
             ]);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage(), 'line' => $e->getLine()], 500);
@@ -375,11 +375,11 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
             ->orderBy('rendeles_datuma', 'desc')
             ->get()
             ->map(fn($r) => [
-                'id'              => 'ORD-' . $r->id,
-                'felhasznalo'     => ['nev' => $r->felhasznalo?->felhasz_nev ?? 'Vendég'],
-                'termekek_szama'  => $r->rendelt_termekek_count,
-                'osszeg'          => $r->osszeg,
-                'statusz'         => $r->statusz,
+                'id' => 'ORD-' . $r->id,
+                'felhasznalo' => ['nev' => $r->felhasznalo?->felhasz_nev ?? 'Vendég'],
+                'termekek_szama' => $r->rendelt_termekek_count,
+                'osszeg' => $r->osszeg,
+                'statusz' => $r->statusz,
                 'rendeles_datuma' => $r->rendeles_datuma,
             ]);
 
@@ -400,12 +400,12 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
     // Termékek CRUD
     Route::post('/termekek', function (Request $request) {
         $validated = $request->validate([
-            'nev'          => 'required|string',
+            'nev' => 'required|string',
             'kategoria_id' => 'required|integer|exists:kategoriak,id',
-            'ar'           => 'required|integer|min:0',
-            'darab'        => 'required|integer|min:0',
-            'leiras'       => 'nullable|string',
-            'fo_kep_id'    => 'nullable|integer',
+            'ar' => 'required|integer|min:0',
+            'darab' => 'required|integer|min:0',
+            'leiras' => 'nullable|string',
+            'fo_kep_id' => 'nullable|integer',
         ]);
 
         $termek = Termekek::create($validated);
@@ -416,12 +416,12 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
         $termek = Termekek::findOrFail($id);
 
         $validated = $request->validate([
-            'nev'          => 'sometimes|string',
+            'nev' => 'sometimes|string',
             'kategoria_id' => 'sometimes|integer|exists:kategoriak,id',
-            'ar'           => 'sometimes|integer|min:0',
-            'darab'        => 'sometimes|integer|min:0',
-            'leiras'       => 'nullable|string',
-            'fo_kep_id'    => 'nullable|integer',
+            'ar' => 'sometimes|integer|min:0',
+            'darab' => 'sometimes|integer|min:0',
+            'leiras' => 'nullable|string',
+            'fo_kep_id' => 'nullable|integer',
         ]);
 
         $termek->update($validated);
