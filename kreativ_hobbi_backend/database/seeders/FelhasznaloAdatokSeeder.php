@@ -29,7 +29,7 @@ class FelhasznaloAdatokSeeder extends Seeder
         FelhasznaloAdatok::factory()->create(
             [
                 'felhasznalo_id' => 2,
-                'szerepkor' => 'admin',
+                'szerepkor' => 'moderator',
                 'vezeteknev' => 'Tóthpál',
                 'keresztnev' => 'István',
                 'varos' => 2,
