@@ -26,10 +26,17 @@
 * \[ ] email verifikáció
 * \[ ] vásárol email
 * \[ ] jelszó reset
-* \[ ] rendelés pending
 * \[ ] kosár eltárolása
+* \[ ] rendelés pending
 * \[ ] Dashboard betöltése + valós input"" from database
-* \[ ] áruház loading 
+* \[ ] áruház loading
+* \[ ] Rendelések javtása
+* \[ ] Analitika fixelés
+* \[ ] Sorba rendezés admin felületen
+* \[ ] Admin oldalak alsó oldalakra bontása a számos cucc
+* \[ ] Admin oldal blogok javítása
+* \[ ] Admin oldal kategoria megoszlás csere to fokategoriak és az alá tartozok szám
+
 * \[ ] Dashboard szerző + modosítás javítás +/- jobb stilus
 * \[ ] kicsit akad az animáció a belépés oldalon a váltásnál 
 * \[X] resend ki cserélésre gmailre

@@ -68,28 +68,48 @@ class FelhasznaloController
             'user' => $user->load('profilKep', 'adatok')
         ]);
     }
-    public function index()
-    {
-        // Load users with their profile picture and details
-        $users = Felhasznalok::with('profilKep:id,url_Link,alt_szoveg', 'adatok')
-            ->get()
-            ->map(function ($user) {
-                // Format data to match the Vue component structure
-                return [
-                    'id' => $user->id,
-                    'name' => $user->felhasz_nev, // Maps to 'Név' in table
-                    'email' => $user->email,
-                    'role' => $user->adatok->szerepkor ?? 'sima', // Maps to 'Szerepkör'
-                    'aktiv' => (bool) $user->statusz, 
-                    'profileImage' => $user->profilKep ? $user->profilKep->url_Link :'localhost:8000/storage/profilkepek/default.jpg',
-                    'created_at' => $user->created_at,
-                    'utolso_Belepes' => $user->utolso_Belepes,
-                ];
-            });
 
-        return response()->json($users);
-    }
+public function index(){
+    $users = Felhasznalok::with('profilKep:id,url_Link,alt_szoveg', 'adatok')
+        ->get()
+        ->map(function ($user) {
+            $lastOrder = \DB::table('rendelesek')
+                ->where('felhasznalo_id', $user->id)
+                ->orderBy('rendeles_datuma', 'desc')
+                ->first();
 
+            $completedOrders = \DB::table('rendelesek')
+                ->where('felhasznalo_id', $user->id)
+                ->where('statusz', 'teljesítve')
+                ->count();
+
+            $activeOrders = \DB::table('rendelesek')
+                ->where('felhasznalo_id', $user->id)
+                ->whereNotIn('statusz', ['teljesítve', 'törölve'])
+                ->count();
+
+            return [
+                'id' => $user->id,
+                'name' => $user->felhasz_nev,
+                'email' => $user->email,
+                'role' => $user->adatok->szerepkor ?? 'sima',
+                'statusz' => (bool) $user->statusz,
+                'profileImage' => $user->profilKep 
+                    ? $user->profilKep->url_Link 
+                    : 'localhost:8000/storage/profilkepek/default.jpg',
+                'created_at' => $user->created_at,
+                'utolso_Belepes' => $user->utolso_Belepes,
+                'orderStats' => [
+                    'completed' => $completedOrders,
+                    'active' => $activeOrders,
+                    'total' => $completedOrders + $activeOrders,
+                    'lastStatus' => $lastOrder?->statusz ?? null,
+                ],
+            ];
+        });
+
+    return response()->json($users);
+}
     /**
      * Store a newly created user in storage.
      */
@@ -100,7 +120,7 @@ class FelhasznaloController
             'password' => 'required|string|min:6',
             'felhasz_nev' => 'required|string|max:100|unique:felhasznalok,felhasz_nev',
             'szerepkor' => 'required|in:admin,moderator,sima,felfuggesztett',
-            'aktiv' => 'boolean',
+            'statusz' => 'boolean',
         ]);
 
         if ($validator->fails()) {
@@ -115,7 +135,7 @@ class FelhasznaloController
                 'email' => $request->email,
                 'jelszo' => Hash::make($request->password), // Assuming 'jelszo' is the password column
                 'felhasz_nev' => $request->felhasz_nev,
-                'aktiv' => $request-> has('aktiv') ? 1 : 0,
+                'statusz' => $request-> boolean('statusz') ? 1 : 0,
             ]);
 
             // Create User Details (FelhasznaloAdatok)
@@ -132,7 +152,7 @@ class FelhasznaloController
                 'name' => $user->felhasz_nev,
                 'email' => $user->email,
                 'role' => $request->szerepkor,
-                'aktiv' => (bool) $user->aktiv,
+                'statusz' => (bool) $user->statusz,
                 'profileImage' => null
             ], 201);
 
@@ -158,7 +178,7 @@ class FelhasznaloController
             'name' => $user->felhasz_nev,
             'email' => $user->email,
             'role' => $user->adatok->szerepkor ?? 'user',
-            'aktiv' => (bool) $user->aktiv,
+            'statusz' => (bool) $user->statusz,
             'profileImage' => $user->profilKep ? $user->profilKep->url_Link : null,
             'details' => $user->adatok
         ]);
@@ -170,13 +190,19 @@ class FelhasznaloController
 
     public function update(Request $request, $id)
     {
+        \Log::info('Update request data:', $request->all());
+
+        if (auth()->check() && auth()->id() == $id) {
+            return response()->json(['error' => 'Saját fiókodat nem módosíthatod az admin felületen!'], 403);
+        }
+
         $user = Felhasznalok::findOrFail($id);
 
         $validator = Validator::make($request->all(), [
             'email' => ['sometimes', 'email', Rule::unique('felhasznalok')->ignore($user->id)],
             'felhasz_nev' => ['sometimes', 'string', 'max:100', Rule::unique('felhasznalok')->ignore($user->id)],
             'szerepkor' => 'required|in:admin,moderator,sima,felfuggesztett',
-            'aktiv' => 'boolean',
+            'statusz' => 'boolean',
         ]);
 
         if ($validator->fails()) {
@@ -190,19 +216,17 @@ class FelhasznaloController
             $userData = [
                 'email' => $request->email ?? $user->email,
                 'felhasz_nev' => $request->felhasz_nev ?? $user->felhasz_nev,
-                'aktiv' => $request->has('aktiv') ? 1 : 0,
+                'statusz' => $request->boolean('statusz') ? 1 : 0,
             ];
 
-            // Handle Password Reset (NOT allowed in update via this admin dashboard usually, 
-            // but if you wanted to allow it, you would check $request->filled('password') here.
-            // Based on your request, we skip password updates entirely for existing users.
-
             // Handle Profile Picture Reset
-            if ($request->has('reset_profile_pic') && $request->reset_profile_pic) {
-                $userData['profilKep_id'] = null; // Set to null so frontend uses default
+            if ($request->has('resetProfilePic') && $request->resetProfilePic ) {
+                $userData['profilKep_id'] = 1; 
             }
 
             $user->update($userData);
+
+            $user = $user->fresh('profilKep', 'adatok');
 
             // Update FelhasznaloAdatok
             FelhasznaloAdatok::updateOrCreate(
@@ -221,7 +245,7 @@ class FelhasznaloController
                 'name' => $user->felhasz_nev,
                 'email' => $user->email,
                 'role' => $user->adatok->szerepkor,
-                'aktiv' => (bool) $user->statusz,
+                'statusz' => (bool) $user->statusz,
                 'profileImage' => $user->profilKep ? $user->profilKep->url_Link : null
             ]);
 
@@ -253,7 +277,7 @@ class FelhasznaloController
             // --- CHECK: Only delete if ALL orders are completed ---
             $hasActiveOrders = \DB::table('rendelesek')
                 ->where('felhasznalo_id', $id)
-                ->where('statusz', '!=', 'teljesítve') 
+                ->whereNotIn('statusz', ['teljesítve', 'törölve'])
                 ->exists();
 
             if ($hasActiveOrders) {
@@ -263,9 +287,6 @@ class FelhasznaloController
                 ], 403);
             }
 
-            // --- DELETE: Orders ---
-            // Note: We are NOT deleting 'rendelt_termekek' because that table does not exist in your DB.
-            // Since we can only delete completed orders here, this is safe.
             \DB::table('rendelesek')->where('felhasznalo_id', $id)->delete();
 
             // --- DELETE: Posts ---
@@ -274,14 +295,6 @@ class FelhasznaloController
             // --- DELETE: Favorites ---
             \DB::table('kedvencek')->where('felhasznalo_id', $id)->delete();
 
-            // --- DELETE: Comments ---
-            // REMOVED: We are skipping comments because 'felhasznalo_id' column is missing.
-            // If you want to delete comments later, check if the column is named 'user_id' instead.
-
-            // --- DELETE: User Details ---
-            // REMOVED: Table 'felhasznalo_adatok' does not exist.
-
-            // --- FINAL: Delete the User ---
             $user->delete();
 
             \DB::commit();

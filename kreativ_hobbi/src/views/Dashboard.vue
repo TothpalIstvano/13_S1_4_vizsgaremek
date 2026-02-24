@@ -255,6 +255,7 @@
                 <th>Szerepkör</th>
                 <th>Email</th>
                 <th>Aktív</th>
+                <th>Rendelések</th>
                 <th>Regisztráció ideje</th>
                 <th>Útolsó bejelentkezés</th>
                 <th>Műveletek</th>
@@ -277,14 +278,44 @@
                     {{ user.active ? 'Aktív' : 'Inaktív' }}
                   </span>
                 </td>
+                <td>
+                  <div v-if="user.orderStats?.total > 0" style="display:flex; flex-direction:column; gap:4px;">
+                    <span class="badge" :class="user.orderStats.active > 0 ? 'badge-warning' : 'badge-success'">
+                      {{ user.orderStats.active > 0 ? `⚠️ ${user.orderStats.active} aktív` : '✅ Mind teljesítve' }}
+                    </span>
+                    <small style="color:#6b7280; font-size:11px;">
+                      Utolsó: <strong>{{ 
+                        user.orderStats.lastStatus === 'törölve' ? '🚫 Törölve' :
+                        user.orderStats.lastStatus === 'teljesítve' ? '✅ Teljesítve' :
+                        user.orderStats.lastStatus === 'függőben' ? '⏳ Függőben' :
+                        user.orderStats.lastStatus === 'szállítás alatt' ? '🚚 Szállítás alatt' :
+                        user.orderStats.lastStatus ?? '-'
+                      }}</strong>
+                    </small>
+                    <small style="color:#94a3b8; font-size:11px;">  
+                      Összesen: {{ user.orderStats.total }} db
+                    </small>
+                  </div>
+                  <span v-else style="color:#94a3b8; font-size:13px;">Nincs rendelés</span>
+                </td>
                 <td>{{ user.registrationDate ? formatDate(user.registrationDate) : '-' }}</td>
                 <td>{{ user.utolso_Belepes ? formatDate(user.utolso_Belepes) : '-' }}</td>
                 <td>
                   <div class="action-buttons">
-                    <button class="btn btn-sm btn-warning" @click="openUserModal(user)">
+                    <button class="btn btn-sm btn-warning" 
+                      @click="openUserModal(user)"       
+                      :disabled="user.id === currentUserId"
+                      :style="user.id === currentUserId ? 'opacity: 0.4; cursor: not-allowed;' : ''"
+                      :title="user.id === currentUserId ? 'Saját fiókod nem módosíthatod' : ''"
+                    >
                       ✏️
                     </button>
-                    <button class="btn btn-sm btn-danger" @click="deleteUser(user.id)">
+                    <button class="btn btn-sm btn-danger" 
+                      @click="deleteUser(user.id)"
+                      :disabled="user.id === currentUserId || user.orderStats.active > 0"
+                      :style="user.id === currentUserId || user.orderStats.active > 0 ? 'opacity: 0.4; cursor: not-allowed;' : ''"
+                      :title="user.id === currentUserId || user.orderStats.active > 0 ? 'Saját fiókod nem törölheted' : ''"
+                    >
                       🗑️
                     </button>
                   </div>
@@ -594,7 +625,7 @@
           <div class="form-group">
             <label class="form-label">Profilkép</label>
             <div class="flex items-center gap-2">
-              <input type="checkbox" id="resetPic" v-model="editingUser.resetProfilePic">
+              <input type="checkbox" id="resetPic" v-model="editingUser.resetProfilePic" :disabled="editingUser.profileImage?.includes('default.jpg')" :checked="editingUser.profileImage?.includes('default.jpg')">
               <label for="resetPic" style="cursor: pointer; font-size: 14px; color: #4b5563;">
                 Visszaállítás alapértelmezett képre (default.jpg)
               </label>
@@ -630,6 +661,7 @@ import Editor from 'primevue/editor';
 import FileUpload from 'primevue/fileupload';
 import InputText from 'primevue/inputtext';
 import Checkbox from 'primevue/checkbox';
+import { useAuthStore } from '@/stores/auth.js';
 import Button from 'primevue/button';
 
 const API = '/api/admin';
@@ -711,6 +743,9 @@ const fetchProducts = async () => {
   }));
 };
 
+const authStore = useAuthStore();
+const currentUserId = computed(() => authStore.user?.id ?? null);
+
 const fetchUsers = async () => {
   const { data } = await axios.get(`${API}/users`);
   console.log(data);
@@ -719,10 +754,11 @@ const fetchUsers = async () => {
     name: u.name,
     email: u.email,
     role: u.role ?? 'user',
-    active: u.aktiv,
+    active: u.statusz,
     profileImage: u.profileImage,
     registrationDate: u.created_at,
     utolso_Belepes: u.utolso_Belepes,
+    orderStats: u.orderStats ?? null,
   }));
 };
 
@@ -810,6 +846,10 @@ const deleteProduct = async (id) => {
 };
 
 const saveUser = async () => {
+  if (editingUser.value.id && editingUser.value.id === currentUserId.value) {
+    alert('Saját fiókodat nem módosíthatod az admin felületen!');
+    return;
+  }
   if(!editingUser.value.id && !editingUser.value.password) {
     alert('A jelszó meg kell adni a felhasznált felhasználoknak!');
     return;
@@ -818,7 +858,8 @@ const saveUser = async () => {
     felhasz_nev: editingUser.value.name,
     email: editingUser.value.email,
     szerepkor: editingUser.value.role,
-    aktiv: editingUser.value.active,
+    statusz: editingUser.value.active,
+    password: editingUser.value.password,
   };
 
   if (!editingUser.value.id) {
@@ -936,15 +977,17 @@ const openProductModal = (product = null) => {
 
 const openUserModal = (user = null) => {
   if (user) {
-    editingUser.value = { ...user, resetProfilePic: false };
+    const isDefault = !user.profileImage || user  .profileImage?.includes('default.jpg');
+    editingUser.value = { ...user, resetProfilePic: isDefault, isSelf: user.id === currentUserId.value };
   } else {
     editingUser.value = {
       name: '',
       email: '',
-      role: 'user',
+      role: 'sima',
       active: true,
       password: '',
-      resetProfilePic: false
+      resetProfilePic: false,
+      isSelf: false
     };
   }
   showUserModal.value = true;
@@ -1384,7 +1427,7 @@ thead {
 }
 
 th {
-  padding: 14px 24px;
+  padding: 10px 16px;
   text-align: left;
   font-size: 13px;
   font-weight: 600;
