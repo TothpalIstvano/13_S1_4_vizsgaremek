@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('email', 150)->unique()->nullable(false);
             $table->string('jelszo')->nullable(false);
             $table->unsignedInteger('profilKep_id')->default(1);
-            $table->enum('statusz', ['aktív', 'inaktív']);
+            $table->boolean('statusz')->default(1);
             $table->timestamp('letrehozas_Datuma')->useCurrent();
             $table->timestamp('utolso_Belepes')->nullable()->useCurrent()->useCurrentOnUpdate();
             $table->foreign('profilKep_id')->references('id')->on('kepek')->default(1);

@@ -80,7 +80,7 @@ class FelhasznaloController
                     'name' => $user->felhasz_nev, // Maps to 'Név' in table
                     'email' => $user->email,
                     'role' => $user->adatok->szerepkor ?? 'sima', // Maps to 'Szerepkör'
-                    'aktiv' => $user->statusz, 
+                    'aktiv' => (bool) $user->statusz, 
                     'profileImage' => $user->profilKep ? $user->profilKep->url_Link :'localhost:8000/storage/profilkepek/default.jpg',
                     'created_at' => $user->created_at,
                     'utolso_Belepes' => $user->utolso_Belepes,
@@ -99,7 +99,7 @@ class FelhasznaloController
             'email' => 'required|email|unique:felhasznalok,email',
             'password' => 'required|string|min:6',
             'felhasz_nev' => 'required|string|max:100|unique:felhasznalok,felhasz_nev',
-            'szerepkor' => 'required|in:admin,moderator,user',
+            'szerepkor' => 'required|in:admin,moderator,sima,felfuggesztett',
             'aktiv' => 'boolean',
         ]);
 
@@ -115,16 +115,13 @@ class FelhasznaloController
                 'email' => $request->email,
                 'jelszo' => Hash::make($request->password), // Assuming 'jelszo' is the password column
                 'felhasz_nev' => $request->felhasz_nev,
-                'aktiv' => $request->has('aktiv') ? 1 : 0,
+                'aktiv' => $request-> has('aktiv') ? 1 : 0,
             ]);
 
             // Create User Details (FelhasznaloAdatok)
             FelhasznaloAdatok::create([
                 'felhasznalo_id' => $user->id,
                 'szerepkor' => $request->szerepkor,
-                // Set defaults for other fields if necessary
-                'vezeteknev' => '',
-                'keresztnev' => '',
             ]);
 
             \DB::commit();
@@ -170,18 +167,15 @@ class FelhasznaloController
     /**
      * Update the specified user in storage.
      */
-    /**
-     * Update the specified user in storage.
-     */
+
     public function update(Request $request, $id)
     {
         $user = Felhasznalok::findOrFail($id);
 
         $validator = Validator::make($request->all(), [
             'email' => ['sometimes', 'email', Rule::unique('felhasznalok')->ignore($user->id)],
-            // Password is not required in update validation anymore
             'felhasz_nev' => ['sometimes', 'string', 'max:100', Rule::unique('felhasznalok')->ignore($user->id)],
-            'szerepkor' => 'sometimes|required|in:admin,moderator,user',
+            'szerepkor' => 'required|in:admin,moderator,sima,felfuggesztett',
             'aktiv' => 'boolean',
         ]);
 
@@ -214,9 +208,7 @@ class FelhasznaloController
             FelhasznaloAdatok::updateOrCreate(
                 ['felhasznalo_id' => $user->id],
                 [
-                    'szerepkor' => $request->szerepkor ?? $user->adatok->szerepkor ?? 'user',
-                    'vezeteknev' => $user->adatok->vezeteknev ?? '',
-                    'keresztnev' => $user->adatok->keresztnev ?? '',
+                    'szerepkor' => $request->szerepkor ?? $user->adatok->szerepkor ?? 'sima',
                 ]
             );
 
@@ -229,8 +221,7 @@ class FelhasznaloController
                 'name' => $user->felhasz_nev,
                 'email' => $user->email,
                 'role' => $user->adatok->szerepkor,
-                'aktiv' => (bool) $user->aktiv,
-                // Return null for profileImage so frontend picks up default
+                'aktiv' => (bool) $user->statusz,
                 'profileImage' => $user->profilKep ? $user->profilKep->url_Link : null
             ]);
 

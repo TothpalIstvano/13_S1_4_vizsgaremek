@@ -12,14 +12,14 @@ return new class extends Migration {
     {
         Schema::create('felhasznaloAdatok', function (Blueprint $table) {
             $table->unsignedInteger('felhasznalo_id')->primary();
-            $table->enum('szerepkor', ['admin', 'moderator', 'sima', 'felfüggesztett'])->default('sima');
-            $table->string('vezeteknev', 100);
-            $table->string('keresztnev', 100);
+            $table->enum('szerepkor', ['admin', 'moderator', 'sima', 'felfuggesztett'])->default('sima');
+            $table->string('vezeteknev', 100)->nullable();
+            $table->string('keresztnev', 100)->nullable();
             $table->unsignedInteger('varos')->nullable();
-            $table->string('utca', 255);
-            $table->integer('hazszam');
-            $table->string('emeletAjto', 10);
-            $table->string('telefonszam', 20);
+            $table->string('utca', 255)->nullable();
+            $table->integer('hazszam')->nullable();
+            $table->string('emeletAjto', 10)->nullable();
+            $table->string('telefonszam', 20)->nullable();
             $table->string('kartyaszam')->nullable();
             $table->foreign('felhasznalo_id')->references('id')->on('felhasznalok')->onDelete('cascade');
             $table->foreign('varos')->references('id')->on('varosok')->onDelete('set null');
