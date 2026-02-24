@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Posztok;
+use App\Models\PosztReakciok;
 use App\Models\Kommentek;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -102,10 +103,10 @@ class BlogController extends Controller
     {
         try {
             $validated = $request->validate([
-                'cim'      => 'required|string',
+                'cim' => 'required|string',
                 'tartalom' => 'required|string',
-                'kivonat'  => 'nullable|string',
-                'statusz'  => 'nullable|string',
+                'kivonat' => 'nullable|string',
+                'statusz' => 'nullable|string',
             ]);
 
             $poszt = new Posztok();
@@ -123,30 +124,78 @@ class BlogController extends Controller
         }
     }
 
-    
+
     public function update(Request $request, $id)
     {
         try {
             $validated = $request->validate([
-                'cim'      => 'required|string',
+                'cim' => 'required|string',
                 'tartalom' => 'required|string',
-                'kivonat'  => 'nullable|string',
-                'statusz'  => 'nullable|string',
+                'kivonat' => 'nullable|string',
+                'statusz' => 'nullable|string',
             ]);
 
             $poszt = Posztok::findOrFail($id);
-            
+
             $poszt->cim = $validated['cim'];
             $poszt->tartalom = $validated['tartalom'];
             $poszt->kivonat = $validated['kivonat'] ?? substr(strip_tags($validated['tartalom']), 0, 200);
             $poszt->statusz = $validated['statusz'] ?? 'piszkozat';
-            
+
             $poszt->save();
 
             return response()->json($poszt, 200);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
+    }
+
+    public function userReactions(Request $request)
+    {
+        $userId = auth()->id();
+        $reactions = PosztReakciok::where('felhasznalo_id', $userId)
+            ->get(['poszt_id', 'reakcio']);
+
+        return response()->json(
+            $reactions->pluck('reakcio', 'poszt_id')
+        );
+    }
+
+    public function reaction(Request $request, $id)
+    {
+        $request->validate([
+            'reaction' => 'required|in:like,dislike'
+        ]);
+
+        $userId = auth()->id();
+        $post = Posztok::findOrFail($id);
+
+        $reaction = PosztReakciok::updateOrCreate(
+            [
+                'poszt_id' => $post->id,
+                'felhasznalo_id' => $userId,
+            ],
+            [
+                'reakcio' => $request->reaction
+            ]
+        );
+
+        $likesCount = PosztReakciok::where('poszt_id', $post->id)
+            ->where('reakcio', 'like')
+            ->count();
+        $dislikesCount = PosztReakciok::where('poszt_id', $post->id)
+            ->where('reakcio', 'dislike')
+            ->count();
+
+        $userReaction = PosztReakciok::where('poszt_id', $post->id)
+            ->where('felhasznalo_id', $userId)
+            ->value('reakcio');
+
+        return response()->json([
+            'likes_count' => $likesCount,
+            'dislikes_count' => $dislikesCount,
+            'user_reaction' => $userReaction,
+        ]);
     }
 
 }

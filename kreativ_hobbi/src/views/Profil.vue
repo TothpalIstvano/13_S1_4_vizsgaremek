@@ -89,21 +89,28 @@ function getCityPostal(id) {
   return city ? city.iranyitoszam : '';
 }
 
+function applyAvatar(profilKep) {
+  if (profilKep?.url_Link) {
+    const url = profilKep.url_Link;
+    user.avatar = (url.startsWith('http') ? url : `${baseUrl}/${url}`) + '?t=' + Date.now();
+  } else {
+    user.avatar = defaultAvatar;
+  }
+}
+
 onMounted(async () => {
   userData.value = await fetchUserData();
   await fetchCities();
   if (userData.value) {
-    // Display data
     user.name = userData.value.felhasz_nev;
     user.username = userData.value.felhasz_nev;
     posts.value = await fetchUserBlogPosts();
 
-    // Profile picture
     const hasProfileImage = userData.value.profilKep_id;
     if (hasProfileImage) {
         if (userData.value.profilKep?.url_Link) {
             const url = userData.value.profilKep.url_Link;
-            user.avatar = url.startsWith('http') ? url : `${baseUrl}/${url}`;
+            applyAvatar(userData.value.profilKep);
         } else {
             user.avatar = `${baseUrl}/profilKepek/kep_${hasProfileImage}.jpg`;
         }
@@ -117,7 +124,6 @@ onMounted(async () => {
     };
     user.joined = userData.value.letrehozas_Datuma || '2022-09-15';
 
-    // Populate edit form
     const adat = userData.value.adatok || {};
     editForm.vezeteknev = adat.vezeteknev || '';
     editForm.keresztnev = adat.keresztnev || '';
@@ -177,7 +183,7 @@ async function startCamera() {
     });
 
     cameraStream.value = stream;
-    showCamera.value = true;  // This triggers Vue to render the video element
+    showCamera.value = true;
 
     await nextTick();
     console.log('After nextTick, videoRef.value:', videoRef.value);
@@ -261,22 +267,18 @@ async function uploadProfilePhoto() {
   uploading.value = true;
   const file = new File([capturedBlob.value], 'profile-photo.jpg', { type: 'image/jpeg' });
   const formData = new FormData();
-  formData.append('images[]', file);
-  formData.append('alt[]', 'Profilkép');
-  formData.append('description[]', 'Fénykép a profilhoz');
+  formData.append('image', file);
 
   try {
-    const uploadRes = await axios.post('/api/upload-images', formData, {
+    const uploadRes = await axios.post('/api/upload-profile-picture', formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     });
-    const imageId = uploadRes.data.images[0].id;
+    const imageId = uploadRes.data.image.id;
 
     await axios.put('/api/user/profile-picture', { profilKep_id: imageId });
 
     userData.value = await fetchUserData();
-    if (userData.value.profilKep) {
-      user.avatar = userData.value.profilKep.url_Link;
-    }
+    applyAvatar(userData.value.profilKep);
 
     stopCamera();
   } catch (error) {
@@ -287,17 +289,14 @@ async function uploadProfilePhoto() {
   }
 }
 
-const handleFileUpload = (event) => {
+const handleFileUpload = async (event) => {
   const file = event.target.files[0];
   if (!file) return;
-
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    // Create a blob from the file (reuse camera upload flow)
-    const blob = new Blob([e.target.result], { type: file.type });
-    capturedBlob.value = blob;
-  };
-  reader.readAsArrayBuffer(file);
+  console.log('File selected:', file.name, file.size);
+  capturedBlob.value = file;
+  console.log('capturedBlob set, now uploading...');
+  await uploadProfilePhoto();
+  event.target.value = ''; 
 };
 
 function kijelentkezes() { showLogout.value = true; }
