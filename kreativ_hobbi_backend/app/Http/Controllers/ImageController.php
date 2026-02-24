@@ -63,4 +63,54 @@ class ImageController extends Controller
             return response()->json(['error' => 'Failed to upload images', 'message' => $e->getMessage()], 500);
         }
     }
+
+    public function uploadProfilePicture(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'image' => 'required|file|max:5120',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json(['error' => 'Validation failed', 'messages' => $validator->errors()], 422);
+            }
+
+            $allowedMimes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/avif'];
+            $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'avif'];
+
+            $file = $request->file('image');
+            $ext = strtolower($file->getClientOriginalExtension());
+            $mime = $file->getMimeType();
+
+            if (!in_array($mime, $allowedMimes) && !in_array($ext, $allowedExtensions)) {
+                return response()->json(['error' => 'Invalid file type: ' . $file->getClientOriginalName()], 422);
+            }
+
+            $filename = time() . '_' . uniqid() . '.' . ($ext ?: 'jpg');
+
+            $file->move(public_path('uploads/profilkepek'), $filename);
+
+            $fullUrl = asset('uploads/profilkepek/' . $filename);
+
+            $image = Kepek::create([
+                'url_Link' => $fullUrl,
+                'alt_Szoveg' => 'Profilkép',
+                'leiras' => 'Profilkép – ' . (Auth::check() ? Auth::user()->felhasz_nev : 'Ismeretlen'),
+            ]);
+
+            return response()->json([
+                'message' => 'Profile picture uploaded successfully',
+                'image' => [
+                    'id' => $image->id,
+                    'url' => $fullUrl,
+                    'alt' => $image->alt_Szoveg,
+                    'description' => $image->leiras,
+                ],
+            ], 201);
+
+        } catch (\Exception $e) {
+            \Log::error('Profile picture upload error: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to upload profile picture', 'message' => $e->getMessage()], 500);
+        }
+    }
 }

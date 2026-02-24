@@ -1,10 +1,10 @@
 - kommentek saját törléssel, ellenőrzéssel (csúnya beszéd szűrés)
-- profil szerkesztése, profilkép szelfi feltöltése - félig (profilképet nem tölt fel csak) - visszaigazoló üzi kellene: adatok sikeresen mentve (vagy nem)
+- profilkép szelfi feltöltése - a profilon nem jelenik csak meg, err_blocked_by_corb van - visszaigazoló üzi kellene: adatok sikeresen mentve (vagy nem)
 - mintakészítő letöltés, néhány megnevezés/szöveg átírása ÉS A CSÚSZKA ÉS A NUMBERINPUT IZÉ ÖSSZEHANGOLÁSA
 - blogba oldalak (hogyha sok van alul számok meg minden) + szólj pistinek hogycsinálja meg ezt a termékeknél is, mert ott sincs, mert elfelejtette :(
 - newpost notifications magyarul/jobban
 - poszt mentése vázlatként - már csak a tartalom nem loadol
-- reakciók poszthoz
+- reakciók poszthoz - helyesen írja a seeder adatait, de nem működik h lehessen reagálni
 - rólunk oldal rendes szöveg
 - reszponzívitás
 - rip dino

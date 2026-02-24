@@ -34,8 +34,16 @@ Route::get('/user/check', function () {
     return response()->json(['loggedIn' => false], 200);
 });
 
+Route::post('/login', function (Request $request) {
+    if (!Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
+        return response()->json(['message' => 'Hibás adatok'], 401);
+    }
+    return response()->json([
+        'token' => $request->user()->createToken('postman')->plainTextToken
+    ]);
+});
+
 Route::middleware('auth:sanctum')->group(function () {
-    // existing routes
     Route::get('/user', function (Request $request) {
         return $request->user()->load('profilKep:id,url_Link,alt_szoveg', 'adatok')->toArray();
     });
@@ -47,10 +55,8 @@ Route::middleware('auth:sanctum')->group(function () {
                 ->where('szerzo_id', $user->id)
                 ->get()
                 ->map(function ($post) {
-                    // Transform the post to ensure fo_kep has default values if null
                     $postArray = $post->toArray();
 
-                    // If fo_kep is null, set default values
                     if (!$post->foKep) {
                         $postArray['fo_kep'] = [
                             'url_Link' => 'profilKepek/default.jpg',
@@ -66,10 +72,8 @@ Route::middleware('auth:sanctum')->group(function () {
         }
     });
 
-    // Update user profile
     Route::put('/user/profile', [FelhasznaloController::class, 'updateProfile']);
 
-    // Update profile picture ID
     Route::put('/user/profile-picture', [FelhasznaloController::class, 'updateProfilePicture']);
 
     Route::get('/cities', function () {
@@ -81,10 +85,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/posts', [PosztController::class, 'store']);
     Route::get('/posts/{id}/edit', [PosztController::class, 'edit']);
     Route::put('/posts/{id}', [PosztController::class, 'update']);
+
+    Route::get('/user/reactions', [BlogController::class, 'userReactions']);
+    Route::post('/blog/{id}/reaction', [BlogController::class, 'reaction']);
 });
 
 // Image upload routes
 Route::post('/upload-images', [ImageController::class, 'upload'])->middleware('auth:sanctum');
+Route::post('/upload-profile-picture', [ImageController::class, 'uploadProfilePicture'])->middleware('auth:sanctum');
 
 // API routes for blog and comments:
 
@@ -324,9 +332,9 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
     // Stats
     Route::get('/stats', function () {
         return response()->json([
-            'totalSales'     => Rendelesek::sum('osszeg'),
-            'totalOrders'    => Rendelesek::count(),
-            'totalProducts'  => Termekek::count(),
+            'totalSales' => Rendelesek::sum('osszeg'),
+            'totalOrders' => Rendelesek::count(),
+            'totalProducts' => Termekek::count(),
             'totalCustomers' => Felhasznalok::count(),
         ]);
     });
@@ -350,9 +358,9 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
                 ->map(fn($k) => ['nev' => $k->nev, 'db' => $k->termekek_count]);
 
             return response()->json([
-                'monthlySales'  => $monthlySales,
+                'monthlySales' => $monthlySales,
                 'monthlyOrders' => $monthlyOrders,
-                'categories'    => $categories,
+                'categories' => $categories,
             ]);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage(), 'line' => $e->getLine()], 500);
@@ -366,11 +374,11 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
             ->orderBy('rendeles_datuma', 'desc')
             ->get()
             ->map(fn($r) => [
-                'id'              => 'ORD-' . $r->id,
-                'felhasznalo'     => ['nev' => $r->felhasznalo?->felhasz_nev ?? 'Vendég'],
-                'termekek_szama'  => $r->rendelt_termekek_count,
-                'osszeg'          => $r->osszeg,
-                'statusz'         => $r->statusz,
+                'id' => 'ORD-' . $r->id,
+                'felhasznalo' => ['nev' => $r->felhasznalo?->felhasz_nev ?? 'Vendég'],
+                'termekek_szama' => $r->rendelt_termekek_count,
+                'osszeg' => $r->osszeg,
+                'statusz' => $r->statusz,
                 'rendeles_datuma' => $r->rendeles_datuma,
             ]);
 
@@ -391,12 +399,12 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
     // Termékek CRUD
     Route::post('/termekek', function (Request $request) {
         $validated = $request->validate([
-            'nev'          => 'required|string',
+            'nev' => 'required|string',
             'kategoria_id' => 'required|integer|exists:kategoriak,id',
-            'ar'           => 'required|integer|min:0',
-            'darab'        => 'required|integer|min:0',
-            'leiras'       => 'nullable|string',
-            'fo_kep_id'    => 'nullable|integer',
+            'ar' => 'required|integer|min:0',
+            'darab' => 'required|integer|min:0',
+            'leiras' => 'nullable|string',
+            'fo_kep_id' => 'nullable|integer',
         ]);
 
         $termek = Termekek::create($validated);
@@ -407,12 +415,12 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
         $termek = Termekek::findOrFail($id);
 
         $validated = $request->validate([
-            'nev'          => 'sometimes|string',
+            'nev' => 'sometimes|string',
             'kategoria_id' => 'sometimes|integer|exists:kategoriak,id',
-            'ar'           => 'sometimes|integer|min:0',
-            'darab'        => 'sometimes|integer|min:0',
-            'leiras'       => 'nullable|string',
-            'fo_kep_id'    => 'nullable|integer',
+            'ar' => 'sometimes|integer|min:0',
+            'darab' => 'sometimes|integer|min:0',
+            'leiras' => 'nullable|string',
+            'fo_kep_id' => 'nullable|integer',
         ]);
 
         $termek->update($validated);
