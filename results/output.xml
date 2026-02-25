@@ -1,420 +1,111 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<robot generator="Robot 7.4.1 (Python 3.13.5 on win32)" generated="2026-02-25T14:03:26.504045" rpa="false" schemaversion="5">
-<suite id="s1" name="13 S1 4 vizsgaremek" source="C:\Users\tothpalistvan\Documents\GitHub\13_S1_4_vizsgaremek">
-<suite id="s1-s1" name="Tesztesetek" source="C:\Users\tothpalistvan\Documents\GitHub\13_S1_4_vizsgaremek\Tesztesetek">
-<suite id="s1-s1-s1" name="Regisztracio Tesztek" source="C:\Users\tothpalistvan\Documents\GitHub\13_S1_4_vizsgaremek\Tesztesetek\regisztracio_tesztek.robot">
-<test id="s1-s1-s1-t1" name="Successful Registration" line="8">
-<kw name="Open Registration Page" owner="resources" type="SETUP">
-<kw name="Open Browser" owner="SeleniumLibrary">
-<msg time="2026-02-25T14:03:26.885203" level="INFO">Opening browser 'Chrome' to base url 'http://localhost:5173'.</msg>
+<robot generator="Robot 7.4.1 (Python 3.14.3 on win32)" generated="2026-02-26T00:01:21.480101" rpa="false" schemaversion="5">
+<suite id="s1" name="13 S1 4 vizsgaremek" source="C:\Users\redne\Documents\GitHub\13_S1_4_vizsgaremek">
+<suite id="s1-s1" name="Tesztesetek" source="C:\Users\redne\Documents\GitHub\13_S1_4_vizsgaremek\Tesztesetek">
+<suite id="s1-s1-s1" name="Mintakeszito" source="C:\Users\redne\Documents\GitHub\13_S1_4_vizsgaremek\Tesztesetek\mintakeszito.robot">
+<test id="s1-s1-s1-t1" name="TC01 Progress Bar Labels Are Displayed" line="7">
+<kw name="Open Mintakeszito Page" owner="resources" type="SETUP">
+<kw name="Evaluate" owner="BuiltIn">
+<msg time="2026-02-26T00:01:21.741901" level="INFO">${options} = &lt;selenium.webdriver.chrome.options.Options object at 0x000001FEE1351FD0&gt;</msg>
+<var>${options}</var>
+<arg>sys.modules['selenium.webdriver'].ChromeOptions()</arg>
+<arg>sys</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="PASS" start="2026-02-26T00:01:21.739050" elapsed="0.003057"/>
+</kw>
+<kw name="Call Method" owner="BuiltIn">
+<arg>${options}</arg>
+<arg>add_argument</arg>
+<arg>--disable-extensions</arg>
+<doc>Calls the named method of the given object with the provided arguments.</doc>
+<status status="PASS" start="2026-02-26T00:01:21.742356" elapsed="0.000602"/>
+</kw>
+<kw name="Create Webdriver" owner="SeleniumLibrary">
+<msg time="2026-02-26T00:01:21.747445" level="INFO">Creating an instance of the Chrome WebDriver.</msg>
+<arg>Chrome</arg>
+<arg>options=${options}</arg>
+<doc>Creates an instance of Selenium WebDriver.</doc>
+<status status="PASS" start="2026-02-26T00:01:21.743144" elapsed="0.736477"/>
+</kw>
+<kw name="Go To" owner="SeleniumLibrary">
+<msg time="2026-02-26T00:01:22.480338" level="INFO">Opening url 'http://localhost:5173'</msg>
 <arg>${URL}</arg>
-<arg>${BROWSER}</arg>
-<doc>Opens a new browser instance to the optional ``url``.</doc>
-<status status="PASS" start="2026-02-25T14:03:26.884854" elapsed="3.520275"/>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<status status="PASS" start="2026-02-26T00:01:22.479916" elapsed="2.282432"/>
 </kw>
 <kw name="Maximize Browser Window" owner="SeleniumLibrary">
 <doc>Maximizes current browser window.</doc>
-<status status="PASS" start="2026-02-25T14:03:30.405463" elapsed="0.096138"/>
+<status status="PASS" start="2026-02-26T00:01:24.762620" elapsed="0.045237"/>
 </kw>
 <kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
-<msg time="2026-02-25T14:03:35.806295" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="selenium-screenshot-5.png"&gt;&lt;img src="selenium-screenshot-5.png" width="800px"&gt;&lt;/a&gt;</msg>
-<msg time="2026-02-25T14:03:35.807057" level="FAIL">Element 'css:.main' not visible after 5 seconds.</msg>
-<arg>css:.main</arg>
+<arg>xpath://header//nav//a[contains(.,"Mintakészítő")]</arg>
+<arg>timeout=10s</arg>
 <doc>Waits until the element ``locator`` is visible.</doc>
-<status status="FAIL" start="2026-02-25T14:03:30.501871" elapsed="5.319267">Element 'css:.main' not visible after 5 seconds.</status>
+<status status="PASS" start="2026-02-26T00:01:24.808434" elapsed="0.026530"/>
 </kw>
-<status status="FAIL" start="2026-02-25T14:03:26.884050" elapsed="8.937417">Element 'css:.main' not visible after 5 seconds.</status>
-</kw>
-<kw name="Close Browser" owner="SeleniumLibrary" type="TEARDOWN">
-<doc>Closes the current browser.</doc>
-<status status="PASS" start="2026-02-25T14:03:35.822131" elapsed="2.177107"/>
-</kw>
-<status status="FAIL" start="2026-02-25T14:03:26.880864" elapsed="11.118748">Setup failed:
-Element 'css:.main' not visible after 5 seconds.</status>
-</test>
-<test id="s1-s1-s1-t2" name="Registration Fails With Weak Password" line="18">
-<kw name="Open Registration Page" owner="resources" type="SETUP">
-<kw name="Open Browser" owner="SeleniumLibrary">
-<msg time="2026-02-25T14:03:38.011747" level="INFO">Opening browser 'Chrome' to base url 'http://localhost:5173'.</msg>
-<arg>${URL}</arg>
-<arg>${BROWSER}</arg>
-<doc>Opens a new browser instance to the optional ``url``.</doc>
-<status status="PASS" start="2026-02-25T14:03:38.011351" elapsed="2.615485"/>
-</kw>
-<kw name="Maximize Browser Window" owner="SeleniumLibrary">
-<msg time="2026-02-25T14:03:40.632314" level="WARN">Keyword 'Capture Page Screenshot' could not be run on failure: Message: no such window: target window already closed
-from unknown error: web view not found
-  (Session info: chrome=145.0.7632.111)
-Stacktrace:
-Symbols not available. Dumping unresolved backtrace:
-	0x7ff643dfaa55
-	0x7ff643b58630
-	0x7ff6438ed75d
-	0x7ff6438c42a2
-	0x7ff643978e86
-	0x7ff643995282
-	0x7ff643939098
-	0x7ff643939f83
-	0x7ff643e27810
-	0x7ff643e21afd
-	0x7ff643e42c1a
-	0x7ff643b73345
-	0x7ff643b7b81c
-	0x7ff643b61924
-	0x7ff643b61ad6
-	0x7ff643b47e47
-	0x7fff6a01e8d7
-	0x7fff6af9c34c
-</msg>
-<msg time="2026-02-25T14:03:40.703948" level="FAIL">NoSuchWindowException: Message: no such window: target window already closed
-from unknown error: web view not found
-  (Session info: chrome=145.0.7632.111)
-Stacktrace:
-Symbols not available. Dumping unresolved backtrace:
-	0x7ff643dfaa55
-	0x7ff643b58630
-	0x7ff6438ed75d
-	0x7ff6438c42a2
-	0x7ff643978e86
-	0x7ff643995282
-	0x7ff643939098
-	0x7ff643939f83
-	0x7ff643e27810
-	0x7ff643e21afd
-	0x7ff643e42c1a
-	0x7ff643b73345
-	0x7ff643b7b81c
-	0x7ff643b61924
-	0x7ff643b61ad6
-	0x7ff643b47e47
-	0x7fff6a01e8d7
-	0x7fff6af9c34c
-</msg>
-<doc>Maximizes current browser window.</doc>
-<status status="FAIL" start="2026-02-25T14:03:40.627211" elapsed="0.085250">NoSuchWindowException: Message: no such window: target window already closed
-from unknown error: web view not found
-  (Session info: chrome=145.0.7632.111)
-Stacktrace:
-Symbols not available. Dumping unresolved backtrace:
-	0x7ff643dfaa55
-	0x7ff643b58630
-	0x7ff6438ed75d
-	0x7ff6438c42a2
-	0x7ff643978e86
-	0x7ff643995282
-	0x7ff643939098
-	0x7ff643939f83
-	0x7ff643e27810
-	0x7ff643e21afd
-	0x7ff643e42c1a
-	0x7ff643b73345
-	0x7ff643b7b81c
-	0x7ff643b61924
-	0x7ff643b61ad6
-	0x7ff643b47e47
-	0x7fff6a01e8d7
-	0x7fff6af9c34c
-</status>
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-02-26T00:01:24.835683" level="INFO">Clicking element 'xpath://header//nav//a[contains(.,"Mintakészítő")]'.</msg>
+<arg>xpath://header//nav//a[contains(.,"Mintakészítő")]</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-02-26T00:01:24.835226" elapsed="0.123262"/>
 </kw>
 <kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
-<arg>css:.main</arg>
+<arg>id:adatok</arg>
+<arg>timeout=10s</arg>
 <doc>Waits until the element ``locator`` is visible.</doc>
-<status status="NOT RUN" start="2026-02-25T14:03:40.712696" elapsed="0.000128"/>
+<status status="PASS" start="2026-02-26T00:01:24.958915" elapsed="0.027433"/>
 </kw>
-<status status="FAIL" start="2026-02-25T14:03:38.010852" elapsed="2.702117">NoSuchWindowException: Message: no such window: target window already closed
-from unknown error: web view not found
-  (Session info: chrome=145.0.7632.111)
-Stacktrace:
-Symbols not available. Dumping unresolved backtrace:
-	0x7ff643dfaa55
-	0x7ff643b58630
-	0x7ff6438ed75d
-	0x7ff6438c42a2
-	0x7ff643978e86
-	0x7ff643995282
-	0x7ff643939098
-	0x7ff643939f83
-	0x7ff643e27810
-	0x7ff643e21afd
-	0x7ff643e42c1a
-	0x7ff643b73345
-	0x7ff643b7b81c
-	0x7ff643b61924
-	0x7ff643b61ad6
-	0x7ff643b47e47
-	0x7fff6a01e8d7
-	0x7fff6af9c34c
-</status>
+<status status="PASS" start="2026-02-26T00:01:21.738178" elapsed="3.248434"/>
 </kw>
-<kw name="Close Browser" owner="SeleniumLibrary" type="TEARDOWN">
+<kw name="Page Should Contain" owner="SeleniumLibrary">
+<msg time="2026-02-26T00:01:25.003379" level="INFO">Current page contains text 'Típus'.</msg>
+<arg>Típus</arg>
+<doc>Verifies that current page contains ``text``.</doc>
+<status status="PASS" start="2026-02-26T00:01:24.987082" elapsed="0.016574"/>
+</kw>
+<kw name="Page Should Contain" owner="SeleniumLibrary">
+<msg time="2026-02-26T00:01:25.025604" level="INFO">Current page contains text 'Fonal'.</msg>
+<arg>Fonal</arg>
+<doc>Verifies that current page contains ``text``.</doc>
+<status status="PASS" start="2026-02-26T00:01:25.004190" elapsed="0.021760"/>
+</kw>
+<kw name="Page Should Contain" owner="SeleniumLibrary">
+<msg time="2026-02-26T00:01:25.056078" level="INFO">Current page contains text 'Fájl'.</msg>
+<arg>Fájl</arg>
+<doc>Verifies that current page contains ``text``.</doc>
+<status status="PASS" start="2026-02-26T00:01:25.026592" elapsed="0.029988"/>
+</kw>
+<kw name="Close Browser Session" owner="resources" type="TEARDOWN">
+<kw name="Close Browser" owner="SeleniumLibrary">
 <doc>Closes the current browser.</doc>
-<status status="PASS" start="2026-02-25T14:03:40.713310" elapsed="2.116953"/>
+<status status="PASS" start="2026-02-26T00:01:25.059332" elapsed="2.238278"/>
 </kw>
-<status status="FAIL" start="2026-02-25T14:03:38.006485" elapsed="4.824231">Setup failed:
-NoSuchWindowException: Message: no such window: target window already closed
-from unknown error: web view not found
-  (Session info: chrome=145.0.7632.111)
-Stacktrace:
-Symbols not available. Dumping unresolved backtrace:
-	0x7ff643dfaa55
-	0x7ff643b58630
-	0x7ff6438ed75d
-	0x7ff6438c42a2
-	0x7ff643978e86
-	0x7ff643995282
-	0x7ff643939098
-	0x7ff643939f83
-	0x7ff643e27810
-	0x7ff643e21afd
-	0x7ff643e42c1a
-	0x7ff643b73345
-	0x7ff643b7b81c
-	0x7ff643b61924
-	0x7ff643b61ad6
-	0x7ff643b47e47
-	0x7fff6a01e8d7
-	0x7fff6af9c34c
-</status>
+<status status="PASS" start="2026-02-26T00:01:25.057680" elapsed="2.240123"/>
+</kw>
+<tag>progress</tag>
+<tag>smoke</tag>
+<status status="PASS" start="2026-02-26T00:01:21.731930" elapsed="5.566237"/>
 </test>
-<test id="s1-s1-s1-t3" name="Registration Fails With Mismatched Passwords" line="28">
-<kw name="Open Registration Page" owner="resources" type="SETUP">
-<kw name="Open Browser" owner="SeleniumLibrary">
-<msg time="2026-02-25T14:03:42.851322" level="INFO">Opening browser 'Chrome' to base url 'http://localhost:5173'.</msg>
-<arg>${URL}</arg>
-<arg>${BROWSER}</arg>
-<doc>Opens a new browser instance to the optional ``url``.</doc>
-<status status="PASS" start="2026-02-25T14:03:42.851032" elapsed="1.848024"/>
-</kw>
-<kw name="Maximize Browser Window" owner="SeleniumLibrary">
-<msg time="2026-02-25T14:03:44.714406" level="WARN">Keyword 'Capture Page Screenshot' could not be run on failure: Message: no such window: target window already closed
-from unknown error: web view not found
-  (Session info: chrome=145.0.7632.111)
-Stacktrace:
-Symbols not available. Dumping unresolved backtrace:
-	0x7ff643dfaa55
-	0x7ff643b58630
-	0x7ff6438ed75d
-	0x7ff6438c42a2
-	0x7ff643978e86
-	0x7ff643995282
-	0x7ff643939098
-	0x7ff643939f83
-	0x7ff643e27810
-	0x7ff643e21afd
-	0x7ff643e42c1a
-	0x7ff643b73345
-	0x7ff643b7b81c
-	0x7ff643b61924
-	0x7ff643b61ad6
-	0x7ff643b47e47
-	0x7fff6a01e8d7
-	0x7fff6af9c34c
-</msg>
-<msg time="2026-02-25T14:03:44.757631" level="FAIL">NoSuchWindowException: Message: no such window: target window already closed
-from unknown error: web view not found
-  (Session info: chrome=145.0.7632.111)
-Stacktrace:
-Symbols not available. Dumping unresolved backtrace:
-	0x7ff643dfaa55
-	0x7ff643b58630
-	0x7ff6438ed75d
-	0x7ff6438c42a2
-	0x7ff643978e86
-	0x7ff643995282
-	0x7ff643939098
-	0x7ff643939f83
-	0x7ff643e27810
-	0x7ff643e21afd
-	0x7ff643e42c1a
-	0x7ff643b73345
-	0x7ff643b7b81c
-	0x7ff643b61924
-	0x7ff643b61ad6
-	0x7ff643b47e47
-	0x7fff6a01e8d7
-	0x7fff6af9c34c
-</msg>
-<doc>Maximizes current browser window.</doc>
-<status status="FAIL" start="2026-02-25T14:03:44.699667" elapsed="0.065673">NoSuchWindowException: Message: no such window: target window already closed
-from unknown error: web view not found
-  (Session info: chrome=145.0.7632.111)
-Stacktrace:
-Symbols not available. Dumping unresolved backtrace:
-	0x7ff643dfaa55
-	0x7ff643b58630
-	0x7ff6438ed75d
-	0x7ff6438c42a2
-	0x7ff643978e86
-	0x7ff643995282
-	0x7ff643939098
-	0x7ff643939f83
-	0x7ff643e27810
-	0x7ff643e21afd
-	0x7ff643e42c1a
-	0x7ff643b73345
-	0x7ff643b7b81c
-	0x7ff643b61924
-	0x7ff643b61ad6
-	0x7ff643b47e47
-	0x7fff6a01e8d7
-	0x7fff6af9c34c
-</status>
-</kw>
-<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
-<arg>css:.main</arg>
-<doc>Waits until the element ``locator`` is visible.</doc>
-<status status="NOT RUN" start="2026-02-25T14:03:44.765623" elapsed="0.000146"/>
-</kw>
-<status status="FAIL" start="2026-02-25T14:03:42.850655" elapsed="1.915294">NoSuchWindowException: Message: no such window: target window already closed
-from unknown error: web view not found
-  (Session info: chrome=145.0.7632.111)
-Stacktrace:
-Symbols not available. Dumping unresolved backtrace:
-	0x7ff643dfaa55
-	0x7ff643b58630
-	0x7ff6438ed75d
-	0x7ff6438c42a2
-	0x7ff643978e86
-	0x7ff643995282
-	0x7ff643939098
-	0x7ff643939f83
-	0x7ff643e27810
-	0x7ff643e21afd
-	0x7ff643e42c1a
-	0x7ff643b73345
-	0x7ff643b7b81c
-	0x7ff643b61924
-	0x7ff643b61ad6
-	0x7ff643b47e47
-	0x7fff6a01e8d7
-	0x7fff6af9c34c
-</status>
-</kw>
-<kw name="Close Browser" owner="SeleniumLibrary" type="TEARDOWN">
-<doc>Closes the current browser.</doc>
-<status status="PASS" start="2026-02-25T14:03:44.766337" elapsed="2.116322"/>
-</kw>
-<status status="FAIL" start="2026-02-25T14:03:42.846657" elapsed="4.036997">Setup failed:
-NoSuchWindowException: Message: no such window: target window already closed
-from unknown error: web view not found
-  (Session info: chrome=145.0.7632.111)
-Stacktrace:
-Symbols not available. Dumping unresolved backtrace:
-	0x7ff643dfaa55
-	0x7ff643b58630
-	0x7ff6438ed75d
-	0x7ff6438c42a2
-	0x7ff643978e86
-	0x7ff643995282
-	0x7ff643939098
-	0x7ff643939f83
-	0x7ff643e27810
-	0x7ff643e21afd
-	0x7ff643e42c1a
-	0x7ff643b73345
-	0x7ff643b7b81c
-	0x7ff643b61924
-	0x7ff643b61ad6
-	0x7ff643b47e47
-	0x7fff6a01e8d7
-	0x7fff6af9c34c
-</status>
-</test>
-<test id="s1-s1-s1-t4" name="Registration Fails Without Terms" line="38">
-<kw name="Open Registration Page" owner="resources" type="SETUP">
-<kw name="Open Browser" owner="SeleniumLibrary">
-<msg time="2026-02-25T14:03:46.930263" level="INFO">Opening browser 'Chrome' to base url 'http://localhost:5173'.</msg>
-<arg>${URL}</arg>
-<arg>${BROWSER}</arg>
-<doc>Opens a new browser instance to the optional ``url``.</doc>
-<status status="PASS" start="2026-02-25T14:03:46.929607" elapsed="2.639229"/>
-</kw>
-<kw name="Maximize Browser Window" owner="SeleniumLibrary">
-<doc>Maximizes current browser window.</doc>
-<status status="PASS" start="2026-02-25T14:03:49.569035" elapsed="0.032998"/>
-</kw>
-<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
-<msg time="2026-02-25T14:03:54.927033" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="selenium-screenshot-7.png"&gt;&lt;img src="selenium-screenshot-7.png" width="800px"&gt;&lt;/a&gt;</msg>
-<msg time="2026-02-25T14:03:54.927298" level="FAIL">Element 'css:.main' not visible after 5 seconds.</msg>
-<arg>css:.main</arg>
-<doc>Waits until the element ``locator`` is visible.</doc>
-<status status="FAIL" start="2026-02-25T14:03:49.602228" elapsed="5.332389">Element 'css:.main' not visible after 5 seconds.</status>
-</kw>
-<status status="FAIL" start="2026-02-25T14:03:46.928721" elapsed="8.006126">Element 'css:.main' not visible after 5 seconds.</status>
-</kw>
-<kw name="Close Browser" owner="SeleniumLibrary" type="TEARDOWN">
-<doc>Closes the current browser.</doc>
-<status status="PASS" start="2026-02-25T14:03:54.935288" elapsed="2.183670"/>
-</kw>
-<status status="FAIL" start="2026-02-25T14:03:46.908031" elapsed="10.211396">Setup failed:
-Element 'css:.main' not visible after 5 seconds.</status>
-</test>
-<status status="FAIL" start="2026-02-25T14:03:26.609027" elapsed="30.520173"/>
+<status status="PASS" start="2026-02-26T00:01:21.533653" elapsed="5.771412"/>
 </suite>
-<status status="FAIL" start="2026-02-25T14:03:26.601577" elapsed="30.541599"/>
+<status status="PASS" start="2026-02-26T00:01:21.529320" elapsed="5.784193"/>
 </suite>
-<status status="FAIL" start="2026-02-25T14:03:26.518783" elapsed="30.628970"/>
+<status status="PASS" start="2026-02-26T00:01:21.487991" elapsed="5.830548"/>
 </suite>
 <statistics>
 <total>
-<stat pass="0" fail="4" skip="0">All Tests</stat>
+<stat pass="1" fail="0" skip="0">All Tests</stat>
 </total>
 <tag>
+<stat pass="1" fail="0" skip="0">progress</stat>
+<stat pass="1" fail="0" skip="0">smoke</stat>
 </tag>
 <suite>
-<stat name="13 S1 4 vizsgaremek" id="s1" pass="0" fail="4" skip="0">13 S1 4 vizsgaremek</stat>
-<stat name="Tesztesetek" id="s1-s1" pass="0" fail="4" skip="0">13 S1 4 vizsgaremek.Tesztesetek</stat>
-<stat name="Regisztracio Tesztek" id="s1-s1-s1" pass="0" fail="4" skip="0">13 S1 4 vizsgaremek.Tesztesetek.Regisztracio Tesztek</stat>
+<stat name="13 S1 4 vizsgaremek" id="s1" pass="1" fail="0" skip="0">13 S1 4 vizsgaremek</stat>
+<stat name="Tesztesetek" id="s1-s1" pass="1" fail="0" skip="0">13 S1 4 vizsgaremek.Tesztesetek</stat>
+<stat name="Mintakeszito" id="s1-s1-s1" pass="1" fail="0" skip="0">13 S1 4 vizsgaremek.Tesztesetek.Mintakeszito</stat>
 </suite>
 </statistics>
 <errors>
-<msg time="2026-02-25T14:03:40.632314" level="WARN">Keyword 'Capture Page Screenshot' could not be run on failure: Message: no such window: target window already closed
-from unknown error: web view not found
-  (Session info: chrome=145.0.7632.111)
-Stacktrace:
-Symbols not available. Dumping unresolved backtrace:
-	0x7ff643dfaa55
-	0x7ff643b58630
-	0x7ff6438ed75d
-	0x7ff6438c42a2
-	0x7ff643978e86
-	0x7ff643995282
-	0x7ff643939098
-	0x7ff643939f83
-	0x7ff643e27810
-	0x7ff643e21afd
-	0x7ff643e42c1a
-	0x7ff643b73345
-	0x7ff643b7b81c
-	0x7ff643b61924
-	0x7ff643b61ad6
-	0x7ff643b47e47
-	0x7fff6a01e8d7
-	0x7fff6af9c34c
-</msg>
-<msg time="2026-02-25T14:03:44.714406" level="WARN">Keyword 'Capture Page Screenshot' could not be run on failure: Message: no such window: target window already closed
-from unknown error: web view not found
-  (Session info: chrome=145.0.7632.111)
-Stacktrace:
-Symbols not available. Dumping unresolved backtrace:
-	0x7ff643dfaa55
-	0x7ff643b58630
-	0x7ff6438ed75d
-	0x7ff6438c42a2
-	0x7ff643978e86
-	0x7ff643995282
-	0x7ff643939098
-	0x7ff643939f83
-	0x7ff643e27810
-	0x7ff643e21afd
-	0x7ff643e42c1a
-	0x7ff643b73345
-	0x7ff643b7b81c
-	0x7ff643b61924
-	0x7ff643b61ad6
-	0x7ff643b47e47
-	0x7fff6a01e8d7
-	0x7fff6af9c34c
-</msg>
 </errors>
 </robot>
