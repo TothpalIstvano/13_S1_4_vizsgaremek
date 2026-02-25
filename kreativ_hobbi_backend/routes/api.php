@@ -21,7 +21,6 @@ use App\Models\Varosok;
 
 //User related API routes:
 
-
 // Check if user is logged in and return szerepkor
 Route::get('/user/check', function () {
     if (Auth::check()) {
@@ -43,7 +42,20 @@ Route::post('/login', function (Request $request) {
     ]);
 });
 
+Route::middleware('auth:sanctum')->post('/logout', function (Request $request) {
+    $request->user()->currentAccessToken()->delete();
+    return response()->json(['message' => 'Kijelentkezve']);
+});
+
 Route::middleware('auth:sanctum')->group(function () {
+    /*Route::get('/user/check', function () {
+        $adatok = FelhasznaloAdatok::find(auth()->user()->id);
+        if (!$adatok) {
+            return response()->json(['loggedIn' => true, 'szerepkor' => null], 200);
+        }
+        return response()->json(['loggedIn' => true, 'szerepkor' => $adatok->szerepkor], 200);
+    });*/
+
     Route::get('/user', function (Request $request) {
         return $request->user()->load('profilKep:id,url_Link,alt_szoveg', 'adatok')->toArray();
     });
@@ -76,18 +88,18 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::put('/user/profile-picture', [FelhasznaloController::class, 'updateProfilePicture']);
 
-    Route::get('/cities', function () {
-        return Varosok::select('id', 'varos_nev', 'iranyitoszam')
-            ->orderBy('varos_nev')
-            ->get();
-    });
-
     Route::post('/posts', [PosztController::class, 'store']);
     Route::get('/posts/{id}/edit', [PosztController::class, 'edit']);
     Route::put('/posts/{id}', [PosztController::class, 'update']);
 
     Route::get('/user/reactions', [BlogController::class, 'userReactions']);
     Route::post('/blog/{id}/reaction', [BlogController::class, 'reaction']);
+});
+
+Route::get('/cities', function () {
+    return Varosok::select('id', 'varos_nev', 'iranyitoszam')
+        ->orderBy('varos_nev')
+        ->get();
 });
 
 // Image upload routes
