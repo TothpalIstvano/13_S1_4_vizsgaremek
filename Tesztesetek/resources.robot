@@ -5,6 +5,45 @@ Library    SeleniumLibrary
 ${URL}    http://localhost:5173
 ${BROWSER}    Chrome
 
+# Step buttons
+${NEXT_BTN}             xpath://button[contains(@class,"tovabbGomb")]
+${BACK_BTN}             xpath://button[contains(@class,"visszaGomb")]
+
+# Step containers
+${STEP1_CONTAINER}      id:elsoResz
+${STEP2_CONTAINER}      id:masodikResz
+${STEP3_CONTAINER}      id:harmadikResz
+
+# Progress steps
+${PROGRESS_STEP_1}      xpath:(//div[contains(@class,"progress-step")])[1]
+${PROGRESS_STEP_2}      xpath:(//div[contains(@class,"progress-step")])[2]
+${PROGRESS_STEP_3}      xpath:(//div[contains(@class,"progress-step")])[3]
+
+# Step 1 - Type selection radios
+${RADIO_HORGOLAS}       xpath://input[@id="Horgolás"]
+${RADIO_KOTES}          xpath://input[@id="Kötés"]
+${RADIO_HIMZES}         xpath://input[@id="Hímzés"]
+${LABEL_HORGOLAS}       xpath://label[@for="Horgolás"]
+${LABEL_KOTES}          xpath://label[@for="Kötés"]
+${LABEL_HIMZES}         xpath://label[@for="Hímzés"]
+
+# Step 2 - Yarn type radios
+${RADIO_FONAL_A}        xpath://input[@id="A fonal csoport"]
+${RADIO_FONAL_B}        xpath://input[@id="B fonal csoport"]
+${RADIO_FONAL_C}        xpath://input[@id="C fonal csoport"]
+${RADIO_FONAL_D}        xpath://input[@id="D fonal csoport"]
+${RADIO_FONAL_E}        xpath://input[@id="E fonal csoport"]
+${LABEL_FONAL_A}        xpath://label[@for="A fonal csoport"]
+${LABEL_FONAL_B}        xpath://label[@for="B fonal csoport"]
+${LABEL_FONAL_C}        xpath://label[@for="C fonal csoport"]
+${LABEL_FONAL_D}        xpath://label[@for="D fonal csoport"]
+${LABEL_FONAL_E}        xpath://label[@for="E fonal csoport"]
+
+# Step 3 - File upload
+${FILE_UPLOAD_INPUT}    id:file-upload
+${FILE_UPLOAD_LABEL}    xpath://label[@for="file-upload"]
+${MINTA_BTN}            xpath://button[contains(.,"Minta készítése")]
+
 *** Keywords ***
 Open Registration Page
     Open Browser    ${URL}    ${BROWSER}
@@ -101,3 +140,97 @@ Login Error Should Contain
 Open Forgot Password Modal
     Click Element    xpath://a[contains(.,"Elfelejtetted a jelszavad?")]
     Wait Until Element Is Visible    xpath://h3[contains(.,"Jelszó visszaállítása")]    timeout=5s
+
+#mintakészítő
+Open Mintakeszito Page
+    ${options}=    Evaluate    sys.modules['selenium.webdriver'].ChromeOptions()    sys
+    Call Method    ${options}    add_argument    --disable-extensions
+    Create Webdriver    Chrome    options=${options}
+    Go To    ${URL}
+    Maximize Browser Window
+    Wait Until Element Is Visible    xpath://header//nav//a[contains(.,"Mintakészítő")]    timeout=10s
+    Click Element    xpath://header//nav//a[contains(.,"Mintakészítő")]
+    Wait Until Element Is Visible    id:adatok    timeout=10s
+
+Step 1 Should Be Visible
+    Element Should Be Visible       ${STEP1_CONTAINER}
+    Element Should Not Be Visible   ${STEP2_CONTAINER}
+    Element Should Not Be Visible   ${STEP3_CONTAINER}
+
+Step 2 Should Be Visible
+    Element Should Not Be Visible   ${STEP1_CONTAINER}
+    Element Should Be Visible       ${STEP2_CONTAINER}
+    Element Should Not Be Visible   ${STEP3_CONTAINER}
+    Sleep    0.5s
+
+Step 3 Should Be Visible
+    Element Should Not Be Visible   ${STEP1_CONTAINER}
+    Element Should Not Be Visible   ${STEP2_CONTAINER}
+    Element Should Be Visible       ${STEP3_CONTAINER}
+
+Next Button Should Be Disabled
+    Element Should Be Disabled    ${NEXT_BTN}
+
+Next Button Should Be Enabled
+    Element Should Be Enabled    ${NEXT_BTN}
+
+Click Next
+    Execute JavaScript    document.querySelector('button.tovabbGomb:not([disabled])').click()
+
+
+Select Type
+    [Arguments]    ${type}
+    Run Keyword If    '${type}' == 'Horgolás'    Execute JavaScript    document.querySelector('label[for="Horgolás"]').click()
+    Run Keyword If    '${type}' == 'Kötés'       Execute JavaScript    document.querySelector('label[for="Kötés"]').click()
+    Run Keyword If    '${type}' == 'Hímzés'      Execute JavaScript    document.querySelector('label[for="Hímzés"]').click()
+
+Select Yarn Type
+    [Arguments]    ${yarn}
+    Run Keyword If    '${yarn}' == 'A'    Execute JavaScript    document.querySelector('label[for="A fonal csoport"]').click()
+    Run Keyword If    '${yarn}' == 'B'    Execute JavaScript    document.querySelector('label[for="B fonal csoport"]').click()
+    Run Keyword If    '${yarn}' == 'C'    Execute JavaScript    document.querySelector('label[for="C fonal csoport"]').click()
+    Run Keyword If    '${yarn}' == 'D'    Execute JavaScript    document.querySelector('label[for="D fonal csoport"]').click()
+    Run Keyword If    '${yarn}' == 'E'    Execute JavaScript    document.querySelector('label[for="E fonal csoport"]').click()
+
+Progress Step N Should Be Active
+    [Arguments]    ${n}
+    ${classes}=    Get Element Attribute    xpath:(//div[contains(@class,"progress-step")])[${n}]    class
+    Should Contain    ${classes}    active
+
+Progress Step N Should Not Be Active
+    [Arguments]    ${n}
+    ${classes}=    Get Element Attribute    xpath:(//div[contains(@class,"progress-step")])[${n}]    class
+    Should Not Contain    ${classes}    active
+
+Upload Image File
+    [Arguments]    ${filepath}
+    Choose File    ${FILE_UPLOAD_INPUT}    ${filepath}
+    Wait Until Element Is Visible    xpath://div[contains(@class,"file-preview-container")]    timeout=5s
+
+Go Back From Step 2
+    Execute JavaScript    document.querySelector('#masodikResz button.visszaGomb').click()
+    Wait Until Element Is Visible    ${STEP1_CONTAINER}    timeout=5s
+
+Go Back From Step 3 To Step 1
+    Execute JavaScript    document.querySelectorAll('#harmadikResz button.visszaGomb')[0].click()
+    Wait Until Element Is Visible    ${STEP1_CONTAINER}    timeout=5s
+
+Go Back From Step 3 To Step 2
+    Execute JavaScript    document.querySelectorAll('#harmadikResz button.visszaGomb')[1].click()
+    Wait Until Element Is Visible    ${STEP2_CONTAINER}    timeout=5s
+
+Radio Should Be Checked
+    [Arguments]    ${id}
+    ${checked}=    Execute JavaScript    return document.getElementById("${id}").checked
+    Should Be True    ${checked}
+
+Radio Should Not Be Checked
+    [Arguments]    ${id}
+    ${checked}=    Execute JavaScript    return document.getElementById("${id}").checked
+    Should Not Be True    ${checked}
+
+Click Minta Button
+    Execute JavaScript    [...document.querySelectorAll('button')].find(b => b.textContent.includes('Minta készítése')).click()
+
+Close Browser Session
+    Close Browser

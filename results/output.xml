@@ -1,147 +1,109 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<robot generator="Robot 7.4.1 (Python 3.14.3 on win32)" generated="2026-02-25T20:56:54.335807" rpa="false" schemaversion="5">
+<robot generator="Robot 7.4.1 (Python 3.14.3 on win32)" generated="2026-02-26T00:01:21.480101" rpa="false" schemaversion="5">
 <suite id="s1" name="13 S1 4 vizsgaremek" source="C:\Users\redne\Documents\GitHub\13_S1_4_vizsgaremek">
 <suite id="s1-s1" name="Tesztesetek" source="C:\Users\redne\Documents\GitHub\13_S1_4_vizsgaremek\Tesztesetek">
-<suite id="s1-s1-s1" name="Regisztracio" source="C:\Users\redne\Documents\GitHub\13_S1_4_vizsgaremek\Tesztesetek\regisztracio.robot">
-<test id="s1-s1-s1-t1" name="Registration Fails With Invalid Email Format" line="67">
-<kw name="Open Registration Page" owner="resources" type="SETUP">
-<kw name="Open Browser" owner="SeleniumLibrary">
-<msg time="2026-02-25T20:56:54.607914" level="INFO">Opening browser 'Chrome' to base url 'http://localhost:5173'.</msg>
+<suite id="s1-s1-s1" name="Mintakeszito" source="C:\Users\redne\Documents\GitHub\13_S1_4_vizsgaremek\Tesztesetek\mintakeszito.robot">
+<test id="s1-s1-s1-t1" name="TC01 Progress Bar Labels Are Displayed" line="7">
+<kw name="Open Mintakeszito Page" owner="resources" type="SETUP">
+<kw name="Evaluate" owner="BuiltIn">
+<msg time="2026-02-26T00:01:21.741901" level="INFO">${options} = &lt;selenium.webdriver.chrome.options.Options object at 0x000001FEE1351FD0&gt;</msg>
+<var>${options}</var>
+<arg>sys.modules['selenium.webdriver'].ChromeOptions()</arg>
+<arg>sys</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="PASS" start="2026-02-26T00:01:21.739050" elapsed="0.003057"/>
+</kw>
+<kw name="Call Method" owner="BuiltIn">
+<arg>${options}</arg>
+<arg>add_argument</arg>
+<arg>--disable-extensions</arg>
+<doc>Calls the named method of the given object with the provided arguments.</doc>
+<status status="PASS" start="2026-02-26T00:01:21.742356" elapsed="0.000602"/>
+</kw>
+<kw name="Create Webdriver" owner="SeleniumLibrary">
+<msg time="2026-02-26T00:01:21.747445" level="INFO">Creating an instance of the Chrome WebDriver.</msg>
+<arg>Chrome</arg>
+<arg>options=${options}</arg>
+<doc>Creates an instance of Selenium WebDriver.</doc>
+<status status="PASS" start="2026-02-26T00:01:21.743144" elapsed="0.736477"/>
+</kw>
+<kw name="Go To" owner="SeleniumLibrary">
+<msg time="2026-02-26T00:01:22.480338" level="INFO">Opening url 'http://localhost:5173'</msg>
 <arg>${URL}</arg>
-<arg>${BROWSER}</arg>
-<doc>Opens a new browser instance to the optional ``url``.</doc>
-<status status="PASS" start="2026-02-25T20:56:54.607425" elapsed="2.902792"/>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<status status="PASS" start="2026-02-26T00:01:22.479916" elapsed="2.282432"/>
 </kw>
 <kw name="Maximize Browser Window" owner="SeleniumLibrary">
 <doc>Maximizes current browser window.</doc>
-<status status="PASS" start="2026-02-25T20:56:57.510639" elapsed="0.036306"/>
+<status status="PASS" start="2026-02-26T00:01:24.762620" elapsed="0.045237"/>
 </kw>
 <kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
-<arg>//header//nav//a[7]</arg>
-<doc>Waits until the element ``locator`` is visible.</doc>
-<status status="PASS" start="2026-02-25T20:56:57.547355" elapsed="0.028146"/>
-</kw>
-<kw name="Click Element" owner="SeleniumLibrary">
-<msg time="2026-02-25T20:56:57.576298" level="INFO">Clicking element '//header//nav//a[7]'.</msg>
-<arg>//header//nav//a[7]</arg>
-<doc>Click the element identified by ``locator``.</doc>
-<status status="PASS" start="2026-02-25T20:56:57.575781" elapsed="0.141648"/>
-</kw>
-<status status="PASS" start="2026-02-25T20:56:54.606606" elapsed="3.111639"/>
-</kw>
-<kw name="Switch To Registration" owner="resources">
-<kw name="Click Button" owner="SeleniumLibrary">
-<msg time="2026-02-25T20:56:57.721313" level="INFO">Clicking button '//*[@id="app"]/main/div/div[3]/div[4]/button'.</msg>
-<arg>//*[@id="app"]/main/div/div[3]/div[4]/button</arg>
-<doc>Clicks the button identified by ``locator``.</doc>
-<status status="PASS" start="2026-02-25T20:56:57.720549" elapsed="0.087371"/>
-</kw>
-<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
-<arg>xpath://h2[contains(.,"Fiók készítése")]</arg>
-<arg>timeout=5s</arg>
-<doc>Waits until the element ``locator`` is visible.</doc>
-<status status="PASS" start="2026-02-25T20:56:57.808149" elapsed="0.022199"/>
-</kw>
-<status status="PASS" start="2026-02-25T20:56:57.719406" elapsed="0.111211"/>
-</kw>
-<kw name="Fill Registration Form" owner="resources">
-<kw name="Input Text" owner="SeleniumLibrary">
-<msg time="2026-02-25T20:56:57.832691" level="INFO">Typing text 'tesztuser123' into text field 'name:username'.</msg>
-<arg>name:username</arg>
-<arg>${username}</arg>
-<doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
-<status status="PASS" start="2026-02-25T20:56:57.832257" elapsed="0.148790"/>
-</kw>
-<kw name="Input Text" owner="SeleniumLibrary">
-<msg time="2026-02-25T20:56:57.981892" level="INFO">Typing text 'notanemail' into text field 'name:email'.</msg>
-<arg>name:email</arg>
-<arg>${email}</arg>
-<doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
-<status status="PASS" start="2026-02-25T20:56:57.981320" elapsed="0.135563"/>
-</kw>
-<kw name="Input Password" owner="SeleniumLibrary">
-<msg time="2026-02-25T20:56:58.117733" level="INFO">Typing password into text field 'name:password'.</msg>
-<msg time="2026-02-25T20:56:58.171571" level="INFO">Temporally setting log level to: NONE</msg>
-<arg>name:password</arg>
-<arg>${password}</arg>
-<doc>Types the given password into the text field identified by ``locator``.</doc>
-<status status="PASS" start="2026-02-25T20:56:58.117194" elapsed="0.149204"/>
-</kw>
-<kw name="Input Password" owner="SeleniumLibrary">
-<msg time="2026-02-25T20:56:58.269153" level="INFO">Typing password into text field 'name:password_confirmation'.</msg>
-<msg time="2026-02-25T20:56:58.320213" level="INFO">Temporally setting log level to: NONE</msg>
-<arg>name:password_confirmation</arg>
-<arg>${confirm}</arg>
-<doc>Types the given password into the text field identified by ``locator``.</doc>
-<status status="PASS" start="2026-02-25T20:56:58.266884" elapsed="0.114156"/>
-</kw>
-<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
-<arg>xpath=//input[@name="terms"]</arg>
+<arg>xpath://header//nav//a[contains(.,"Mintakészítő")]</arg>
 <arg>timeout=10s</arg>
 <doc>Waits until the element ``locator`` is visible.</doc>
-<status status="PASS" start="2026-02-25T20:56:58.381296" elapsed="0.021586"/>
+<status status="PASS" start="2026-02-26T00:01:24.808434" elapsed="0.026530"/>
 </kw>
-<kw name="Execute Javascript" owner="SeleniumLibrary">
-<msg time="2026-02-25T20:56:58.403784" level="INFO">Executing JavaScript:
-document.querySelector('input[name="terms"]').click()
-Without any arguments.</msg>
-<arg>document.querySelector('input[name="terms"]').click()</arg>
-<doc>Executes the given JavaScript code with possible arguments.</doc>
-<status status="PASS" start="2026-02-25T20:56:58.403140" elapsed="0.010688"/>
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-02-26T00:01:24.835683" level="INFO">Clicking element 'xpath://header//nav//a[contains(.,"Mintakészítő")]'.</msg>
+<arg>xpath://header//nav//a[contains(.,"Mintakészítő")]</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-02-26T00:01:24.835226" elapsed="0.123262"/>
 </kw>
-<kw name="Execute Javascript" owner="SeleniumLibrary">
-<msg time="2026-02-25T20:56:58.415367" level="INFO">Executing JavaScript:
-document.querySelector('input[name="checkbox"]').click()
-Without any arguments.</msg>
-<arg>document.querySelector('input[name="checkbox"]').click()</arg>
-<doc>Executes the given JavaScript code with possible arguments.</doc>
-<status status="PASS" start="2026-02-25T20:56:58.414273" elapsed="0.010195"/>
-</kw>
-<arg>tesztuser123</arg>
-<arg>notanemail</arg>
-<arg>Teszt123!</arg>
-<arg>Teszt123!</arg>
-<status status="PASS" start="2026-02-25T20:56:57.831324" elapsed="0.593397"/>
-</kw>
-<kw name="Execute Javascript" owner="SeleniumLibrary">
-<msg time="2026-02-25T20:56:58.425984" level="INFO">Executing JavaScript:
-document.querySelector('button[type="submit"]').click()
-Without any arguments.</msg>
-<arg>document.querySelector('button[type="submit"]').click()</arg>
-<doc>Executes the given JavaScript code with possible arguments.</doc>
-<status status="PASS" start="2026-02-25T20:56:58.425139" elapsed="0.019837"/>
-</kw>
-<kw name="Registration Should Fail" owner="resources">
 <kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
-<arg>css:.error-message</arg>
-<arg>timeout=5s</arg>
+<arg>id:adatok</arg>
+<arg>timeout=10s</arg>
 <doc>Waits until the element ``locator`` is visible.</doc>
-<status status="PASS" start="2026-02-25T20:56:58.446377" elapsed="0.041835"/>
+<status status="PASS" start="2026-02-26T00:01:24.958915" elapsed="0.027433"/>
 </kw>
-<status status="PASS" start="2026-02-25T20:56:58.445689" elapsed="0.042898"/>
+<status status="PASS" start="2026-02-26T00:01:21.738178" elapsed="3.248434"/>
 </kw>
-<kw name="Close Browser" owner="SeleniumLibrary" type="TEARDOWN">
+<kw name="Page Should Contain" owner="SeleniumLibrary">
+<msg time="2026-02-26T00:01:25.003379" level="INFO">Current page contains text 'Típus'.</msg>
+<arg>Típus</arg>
+<doc>Verifies that current page contains ``text``.</doc>
+<status status="PASS" start="2026-02-26T00:01:24.987082" elapsed="0.016574"/>
+</kw>
+<kw name="Page Should Contain" owner="SeleniumLibrary">
+<msg time="2026-02-26T00:01:25.025604" level="INFO">Current page contains text 'Fonal'.</msg>
+<arg>Fonal</arg>
+<doc>Verifies that current page contains ``text``.</doc>
+<status status="PASS" start="2026-02-26T00:01:25.004190" elapsed="0.021760"/>
+</kw>
+<kw name="Page Should Contain" owner="SeleniumLibrary">
+<msg time="2026-02-26T00:01:25.056078" level="INFO">Current page contains text 'Fájl'.</msg>
+<arg>Fájl</arg>
+<doc>Verifies that current page contains ``text``.</doc>
+<status status="PASS" start="2026-02-26T00:01:25.026592" elapsed="0.029988"/>
+</kw>
+<kw name="Close Browser Session" owner="resources" type="TEARDOWN">
+<kw name="Close Browser" owner="SeleniumLibrary">
 <doc>Closes the current browser.</doc>
-<status status="PASS" start="2026-02-25T20:56:58.490244" elapsed="2.288158"/>
+<status status="PASS" start="2026-02-26T00:01:25.059332" elapsed="2.238278"/>
 </kw>
-<status status="PASS" start="2026-02-25T20:56:54.599908" elapsed="6.178910"/>
+<status status="PASS" start="2026-02-26T00:01:25.057680" elapsed="2.240123"/>
+</kw>
+<tag>progress</tag>
+<tag>smoke</tag>
+<status status="PASS" start="2026-02-26T00:01:21.731930" elapsed="5.566237"/>
 </test>
-<status status="PASS" start="2026-02-25T20:56:54.390525" elapsed="6.395803"/>
+<status status="PASS" start="2026-02-26T00:01:21.533653" elapsed="5.771412"/>
 </suite>
-<status status="PASS" start="2026-02-25T20:56:54.385827" elapsed="6.403776"/>
+<status status="PASS" start="2026-02-26T00:01:21.529320" elapsed="5.784193"/>
 </suite>
-<status status="PASS" start="2026-02-25T20:56:54.343006" elapsed="6.450324"/>
+<status status="PASS" start="2026-02-26T00:01:21.487991" elapsed="5.830548"/>
 </suite>
 <statistics>
 <total>
 <stat pass="1" fail="0" skip="0">All Tests</stat>
 </total>
 <tag>
+<stat pass="1" fail="0" skip="0">progress</stat>
+<stat pass="1" fail="0" skip="0">smoke</stat>
 </tag>
 <suite>
 <stat name="13 S1 4 vizsgaremek" id="s1" pass="1" fail="0" skip="0">13 S1 4 vizsgaremek</stat>
 <stat name="Tesztesetek" id="s1-s1" pass="1" fail="0" skip="0">13 S1 4 vizsgaremek.Tesztesetek</stat>
-<stat name="Regisztracio" id="s1-s1-s1" pass="1" fail="0" skip="0">13 S1 4 vizsgaremek.Tesztesetek.Regisztracio</stat>
+<stat name="Mintakeszito" id="s1-s1-s1" pass="1" fail="0" skip="0">13 S1 4 vizsgaremek.Tesztesetek.Mintakeszito</stat>
 </suite>
 </statistics>
 <errors>
