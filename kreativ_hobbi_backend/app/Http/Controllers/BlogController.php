@@ -88,11 +88,8 @@ class BlogController extends Controller
     {
         try {
             $poszt = Posztok::findOrFail($id);
-            \DB::table('posztcimkek')->where('poszt_id', $id)->delete();
-            \DB::table('posztkepek')->where('poszt_id', $id)->delete();
-            \DB::table('kommentek')->where('poszt_id', $id)->delete();
-            \DB::table('posztreakciok')->where('poszt_id', $id)->delete();
-            $poszt->delete();
+            $poszt->statusz = 'törölt';
+            $poszt->save();
             return response()->json(['message' => 'Bejegyzés törölve']);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
@@ -198,4 +195,40 @@ class BlogController extends Controller
         ]);
     }
 
+    public function AdminIndex()
+    {
+        $user = Auth::user();
+        $userId = $user ? $user->id : null;
+
+        $posztok = Posztok::with(['foKep', 'cimkek'])
+            ->where('statusz', '!=', 'piszkozat')
+            ->orderBy('letrehozas_datuma', 'desc')
+            ->withCount(['likedBy as likes_count', 'dislikedBy as dislikes_count'])
+            ->get()
+            ->map(function ($post) use ($userId) {
+                $userReaction = null;
+                if ($userId) {
+                    $reaction = $post->reakciok()
+                        ->where('felhasznalo_id', $userId)
+                        ->first();
+                    $userReaction = $reaction ? $reaction->reakcio : null;
+                }
+
+                return [
+                    'id' => $post->id,
+                    'cim' => $post->cim,
+                    'kivonat' => $post->kivonat,
+                    'letrehozas_datuma' => $post->letrehozas_datuma ? $post->letrehozas_datuma->format('d M Y') : 'N/A',
+                    'fo_kep' => $post->foKep ? $post->foKep->url_Link : null,
+                    'cimkek' => $post->cimkek->pluck('nev')->toArray(),
+                    'szerző' => $post->szerzo ? $post->szerzo->felhasz_nev : 'Ismeretlen',
+                    'statusz' => $post->statusz,
+                    'likes_count' => $post->likes_count,
+                    'dislikes_count' => $post->dislikes_count,
+                    'userReaction' => $userReaction,
+                ];
+            });
+
+        return response()->json($posztok);
+    }
 }

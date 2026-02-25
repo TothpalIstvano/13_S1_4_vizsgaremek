@@ -66,4 +66,72 @@ phppublic function up(): void
 }
 bashphp artisan migrate
 
-ja és a NewPasswordController törlöd ki a // hogy müköjön
+ja és a NewPasswordController törlöd ki a // hogy müköjön->néz utána 
+
+
+lehet old meg
+
+router.js-ben az admin route-hoz nem kell változtatni, de a Dashboard komponensben:
+jsimport { useRouter, useRoute } from 'vue-router';
+
+const router = useRouter();
+const route = useRoute();
+
+// currentView inicializálása URL-ből
+const currentView = ref(route.query.view ?? 'dashboard');
+const currentPage = ref(Number(route.query.page) ?? 1);
+const currentProductPage = ref(Number(route.query.page) ?? 1);
+const currentBlogPage = ref(Number(route.query.page) ?? 1);
+A currentView watch-hoz add hozzá az URL frissítést:
+jswatch(currentView, (newView) => {
+  if (oldView === 'dashboard') destroyDashboardCharts();
+  if (oldView === 'analytics') destroyAnalyticsCharts();
+  
+  // URL frissítése
+  router.replace({ query: { view: newView, page: 1 } });
+  
+  // Oldal reset nézet váltáskor
+  currentPage.value = 1;
+  currentProductPage.value = 1;
+  currentBlogPage.value = 1;
+  
+  initCharts();
+});
+Az oldalszám változásakor is frissítsd az URL-t — add hozzá mindhárom paginált nézethez:
+jswatch(currentPage, (val) => {
+  router.replace({ query: { view: currentView.value, page: val } });
+});
+
+watch(currentProductPage, (val) => {
+  router.replace({ query: { view: currentView.value, page: val } });
+});
+
+watch(currentBlogPage, (val) => {
+  router.replace({ query: { view: currentView.value, page: val } });
+});
+Az onMounted-ban olvasd vissza az URL-t:
+jsonMounted(async () => {
+  // URL-ből visszaállítás
+  if (route.query.view) currentView.value = route.query.view;
+  if (route.query.page) {
+    const page = Number(route.query.page);
+    currentPage.value = page;
+    currentProductPage.value = page;
+    currentBlogPage.value = page;
+  }
+
+  const { data } = await axios.get('/api/user');
+  currentUserId.value = data.id;
+
+  await Promise.all([
+    fetchStats(), 
+    fetchOrders(), 
+    fetchAnalytics(), 
+    fetchProducts(),
+    fetchUsers(),
+    fetchBlogPosts(),
+    fetchTagsFromDatabase()
+  ]);
+  initCharts();
+});
+Így például http://localhost:5173/dashboard?view=products&page=3 — F5 után pontosan ugyanoda tölt vissza.

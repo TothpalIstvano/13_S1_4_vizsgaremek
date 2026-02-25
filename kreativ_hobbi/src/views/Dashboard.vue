@@ -195,7 +195,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="product in filteredProducts" :key="product.id">
+              <tr v-for="product in paginatedProducts" :key="product.id">
                 <td>
                   <img :src="product.image" :alt="product.name" class="product-img">
                 </td>
@@ -221,6 +221,34 @@
               </tr>
             </tbody>
           </table>
+          <!-- Users pagináció -->
+          <div v-if="totalProductPages > 1" style="display:flex; justify-content:center; align-items:center; gap:8px; padding:16px; border-top:1px solid #e2e8f0;">
+            <button 
+              class="btn btn-sm" 
+              @click="currentProductPage--" 
+              :disabled="currentProductPage === 1"
+              style="background:#f1f5f9;"
+            >← Előző</button>
+            
+            <template v-for="page in totalProductPages" :key="page">
+              <button 
+                class="btn btn-sm"
+                @click="currentProductPage = page"
+                :style="currentProductPage === page ? 'background:#6366f1; color:white;' : 'background:#f1f5f9;'"
+              >{{ page }}</button>
+            </template>
+            
+            <button 
+              class="btn btn-sm" 
+              @click="currentProductPage++" 
+              :disabled="currentProductPage === totalProductPages"
+              style="background:#f1f5f9;"
+            >Következő →</button>
+            
+            <span style="color:#64748b; font-size:13px; margin-left:8px;">
+              {{ filteredProducts.length }} felhasználó / {{ currentProductPage }}.oldal
+            </span>
+          </div>
         </div>
       </div>
 
@@ -262,7 +290,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="user in filteredUsers" :key="user.id">
+              <tr v-for="user in paginatedUsers" :key="user.id">
                 <td>
                   <img :src="user.profileImage" :alt="user.name" class="avatar">
                 </td>
@@ -323,6 +351,34 @@
               </tr>
             </tbody>
           </table>
+          <!-- Users pagináció -->
+          <div v-if="totalPages > 1" style="display:flex; justify-content:center; align-items:center; gap:8px; padding:16px; border-top:1px solid #e2e8f0;">
+            <button 
+              class="btn btn-sm" 
+              @click="currentPage--" 
+              :disabled="currentPage === 1"
+              style="background:#f1f5f9;"
+            >← Előző</button>
+            
+            <template v-for="page in totalPages" :key="page">
+              <button 
+                class="btn btn-sm"
+                @click="currentPage = page"
+                :style="currentPage === page ? 'background:#6366f1; color:white;' : 'background:#f1f5f9;'"
+              >{{ page }}</button>
+            </template>
+            
+            <button 
+              class="btn btn-sm" 
+              @click="currentPage++" 
+              :disabled="currentPage === totalPages"
+              style="background:#f1f5f9;"
+            >Következő →</button>
+            
+            <span style="color:#64748b; font-size:13px; margin-left:8px;">
+              {{ filteredUsers.length }} felhasználó / {{ currentPage }}.oldal
+            </span>
+          </div>
         </div>
       </div>
 
@@ -361,14 +417,34 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="post in filteredBlogPosts" :key="post.id">
+              <tr v-for="post in paginatedBlogPosts" :key="post.id">
                 <td><strong>{{ post.title }}</strong></td>
                 <td>{{ post.author }}</td>
-                <td>{{ post.category }}</td>
-                <td>{{ post.date }}</td>
                 <td>
-                  <span class="badge" :class="post.published ? 'badge-success' : 'badge-warning'">
-                    {{ post.published ? 'Publikálva' : 'Piszkozat' }}
+                  <div style="display:flex; flex-wrap:wrap; gap:4px; align-items:center;">
+                    <span 
+                      v-for="tag in post.tags.slice(0, 2)" 
+                      :key="tag.id"
+                      class="badge badge-blue"
+                      style="font-size:11px; padding:2px 8px;"
+                    >
+                      {{ tag }}
+                    </span>
+                    <span 
+                      v-if="post.tags.length > 2"
+                      class="badge"
+                      style="background:#e2e8f0; color:#475569; font-size:11px; padding:2px 8px; cursor:default;"
+                      :title="post.tags.slice(2).map(t => t.nev).join(', ')"
+                    >
+                      +{{ post.tags.length - 2 }}
+                    </span>
+                    <span v-if="post.tags.length === 0" style="color:#94a3b8; font-size:13px;">-</span>
+                  </div>
+                </td>
+                <td>{{ post.date }}</td>
+                <td style="text-align: center;">
+                  <span class="badge" :class="post.published ? 'badge-success' : 'badge-danger'">
+                    {{ post.published ? 'Publikálva' : 'törölt' }}
                   </span>
                 </td>
                 <td>
@@ -384,6 +460,34 @@
               </tr>
             </tbody>
           </table>
+          <!-- Users pagináció -->
+          <div v-if="totalBlogPages > 1" style="display:flex; justify-content:center; align-items:center; gap:8px; padding:16px; border-top:1px solid #e2e8f0;">
+            <button 
+              class="btn btn-sm" 
+              @click="currentBlogPage--" 
+              :disabled="currentBlogPage === 1"
+              style="background:#f1f5f9;"
+            >← Előző</button>
+            
+            <template v-for="page in totalBlogPages" :key="page">
+              <button 
+                class="btn btn-sm"
+                @click="currentBlogPage = page"
+                :style="currentBlogPage === page ? 'background:#6366f1; color:white;' : 'background:#f1f5f9;'"
+              >{{ page }}</button>
+            </template>
+            
+            <button 
+              class="btn btn-sm" 
+              @click="currentBlogPage++" 
+              :disabled="currentBlogPage === totalBlogPages"
+              style="background:#f1f5f9;"
+            >Következő →</button>
+            
+            <span style="color:#64748b; font-size:13px; margin-left:8px;">
+              {{ filteredBlogPosts.length }} bejegyzés / {{ currentBlogPage }}.oldal
+            </span>
+          </div>
         </div>
       </div>
 
@@ -619,13 +723,13 @@
           </div>
           <div class="form-group" v-if="!editingUser.id">
             <label class="form-label">Jelszó</label>
-            <input type="password" class="form-input" v-model="editingUser.password" placeholder="•••••••••">
+            <input type="text" class="form-input" v-model="editingUser.password" placeholder="•••••••••">
           </div>
           <!-- PROFILE PICTURE RESET -->
           <div class="form-group">
             <label class="form-label">Profilkép</label>
             <div class="flex items-center gap-2">
-              <input type="checkbox" id="resetPic" v-model="editingUser.resetProfilePic" :disabled="editingUser.profileImage?.includes('default.jpg')" :checked="editingUser.profileImage?.includes('default.jpg')">
+              <input type="checkbox" id="resetPic" v-model="editingUser.resetProfilePic" :disabled="editingUser.profileImage?.includes('default.jpg') || !editingUser.id" :checked="editingUser.profileImage?.includes('default.jpg') || !editingUser.id">
               <label for="resetPic" style="cursor: pointer; font-size: 14px; color: #4b5563;">
                 Visszaállítás alapértelmezett képre (default.jpg)
               </label>
@@ -661,8 +765,6 @@ import Editor from 'primevue/editor';
 import FileUpload from 'primevue/fileupload';
 import InputText from 'primevue/inputtext';
 import Checkbox from 'primevue/checkbox';
-import { useAuthStore } from '@/stores/auth.js';
-import Button from 'primevue/button';
 
 const API = '/api/admin';
 
@@ -743,12 +845,9 @@ const fetchProducts = async () => {
   }));
 };
 
-const authStore = useAuthStore();
-const currentUserId = computed(() => authStore.user?.id ?? null);
-
+const currentUserId = ref(null);
 const fetchUsers = async () => {
   const { data } = await axios.get(`${API}/users`);
-  console.log(data);
   users.value = data.map(u => ({
     id: u.id,
     name: u.name,
@@ -776,18 +875,19 @@ const fetchTagsFromDatabase = async () => {
 };
 
 const fetchBlogPosts = async () => {
-  const { data } = await axios.get('/api/blog');
+  const { data } = await axios.get('/api/admin/blog');
+  console.log(data);
   blogPosts.value = data.map(p => ({
     id: p.id,
     title: p.cim,
-    author: p.szerzo ?? '-',
-    category: p.cimkek?.[0]?.nev ?? '-', // Adjust based on actual API structure
+    author: p.szerző ?? '-',
+    tags: p.cimkek || [],
     date: p.letrehozas_datuma ?? '',
     published: p.statusz === 'közzétett',
     content: p.tartalom ?? '',
     kivonat: p.kivonat || '',
-    tagsData: p.cimkek || [],
-    imagesData: p.kepek || []
+    imagesData: p.kepek || [],
+    foKep: p.fo_kep ?? '',
   }));
 };
 
@@ -993,10 +1093,13 @@ const openUserModal = (user = null) => {
   showUserModal.value = true;
 }
 
-const openBlogModal = (post = null) => {
+const openBlogModal = async (post = null) => {
   // Reset complex form state
   selectedTags.value = [];
   uploadedImages.value = [];
+  if (tagOptions.value.length === 0) {
+    await fetchTagsFromDatabase();
+  }
 
   if (post) {
     // Edit mode
@@ -1009,10 +1112,11 @@ const openBlogModal = (post = null) => {
     };
     
     // Populate tags
-    selectedTags.value = post.tagsData ? post.tagsData.map(tag => ({
-        id: tag.id,
-        name: tag.nev
-    })) : [];
+    selectedTags.value = post.tagsData 
+      ? post.tagsData.map(tag => 
+          tagOptions.value.find(opt => opt.id === tag.id)
+        ).filter(Boolean)
+      : [];
 
     // Populate images
     uploadedImages.value = post.imagesData ? post.imagesData.map(img => ({
@@ -1034,6 +1138,36 @@ const openBlogModal = (post = null) => {
   showBlogModal.value = true;
 };
 
+// --- Oldalbontas ---
+const ITEMS_PER_PAGE = 10;
+const currentPage = ref(1);
+const currentProductPage = ref(1);
+const currentBlogPage = ref(1);
+const totalPages = computed(() => Math.ceil(filteredUsers.value.length / ITEMS_PER_PAGE));
+
+const paginatedUsers = computed(() => {
+  const start = (currentPage.value - 1) * ITEMS_PER_PAGE;
+  return filteredUsers.value.slice(start, start + ITEMS_PER_PAGE);
+});
+
+const paginatedProducts = computed(() => {
+  const start = (currentProductPage.value - 1) * ITEMS_PER_PAGE;
+  return filteredProducts.value.slice(start, start + ITEMS_PER_PAGE);
+});
+
+const totalProductPages = computed(() => Math.ceil(filteredProducts.value.length / ITEMS_PER_PAGE));
+
+const paginatedBlogPosts = computed(() => {
+  const start = (currentBlogPage.value - 1) * ITEMS_PER_PAGE;
+  return filteredBlogPosts.value.slice(start, start + ITEMS_PER_PAGE);
+});
+
+const totalBlogPages = computed(() => Math.ceil(filteredBlogPosts.value.length / ITEMS_PER_PAGE));
+
+// --- Watchers ---
+watch(userSearch, () => { currentPage.value = 1; });
+watch(productSearch, () => { currentProductPage.value = 1; });
+watch(blogSearch, () => { currentBlogPage.value = 1; });
 // --- Computed ---
 
 const filteredProducts = computed(() => {
@@ -1170,6 +1304,9 @@ const initCharts = () => {
 // --- Lifecycle ---
 
 onMounted(async () => {
+  const { data } = await axios.get('/api/user');
+  currentUserId.value = data.id;
+
   await Promise.all([
       fetchStats(), 
       fetchOrders(), 

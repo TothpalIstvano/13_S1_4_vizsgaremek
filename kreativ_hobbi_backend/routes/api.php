@@ -55,7 +55,7 @@ Route::middleware('auth:sanctum')->group(function () {
                 ->where('szerzo_id', $user->id)
                 ->get()
                 ->map(function ($post) {
-                    $postArray = (array) $post;
+                    $postArray = $post->toArray();
 
                     if (!$post->foKep) {
                         $postArray['fo_kep'] = [
@@ -449,6 +449,7 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
     Route::delete('/users/{id}', [FelhasznaloController::class, 'destroy']);
 
     // Blog CRUD
+    Route::get('/blog', [BlogController::class, 'AdminIndex']);
     Route::post('/blog', [BlogController::class, 'store']);
     Route::put('/blog/{id}', [BlogController::class, 'update']);
     Route::delete('/blog/{id}', [BlogController::class, 'destroy']);
