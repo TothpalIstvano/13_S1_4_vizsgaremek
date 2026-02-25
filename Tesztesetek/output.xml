@@ -1,0 +1,549 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot generator="Robot 7.4.1 (Python 3.13.5 on win32)" generated="2026-02-25T14:54:38.553088" rpa="false" schemaversion="5">
+<suite id="s1" name="Regisztracio" source="C:\Users\tothpalistvan\Documents\GitHub\13_S1_4_vizsgaremek\Tesztesetek\regisztracio.robot">
+<test id="s1-t1" name="Successful Registration" line="8">
+<kw name="Open Registration Page" owner="resources" type="SETUP">
+<kw name="Open Browser" owner="SeleniumLibrary">
+<msg time="2026-02-25T14:54:38.756085" level="INFO">Opening browser 'Chrome' to base url 'http://localhost:5173'.</msg>
+<arg>${URL}</arg>
+<arg>${BROWSER}</arg>
+<doc>Opens a new browser instance to the optional ``url``.</doc>
+<status status="PASS" start="2026-02-25T14:54:38.755870" elapsed="2.537818"/>
+</kw>
+<kw name="Maximize Browser Window" owner="SeleniumLibrary">
+<doc>Maximizes current browser window.</doc>
+<status status="PASS" start="2026-02-25T14:54:41.293873" elapsed="0.036616"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>//header//nav//a[7]</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-02-25T14:54:41.330673" elapsed="0.025207"/>
+</kw>
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-02-25T14:54:41.356191" level="INFO">Clicking element '//header//nav//a[7]'.</msg>
+<arg>//header//nav//a[7]</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-02-25T14:54:41.356029" elapsed="0.091258"/>
+</kw>
+<status status="PASS" start="2026-02-25T14:54:38.755319" elapsed="2.692133"/>
+</kw>
+<kw name="Switch To Registration" owner="resources">
+<kw name="Click Button" owner="SeleniumLibrary">
+<msg time="2026-02-25T14:54:41.448479" level="INFO">Clicking button '//*[@id="app"]/main/div/div[3]/div[4]/button'.</msg>
+<arg>//*[@id="app"]/main/div/div[3]/div[4]/button</arg>
+<doc>Clicks the button identified by ``locator``.</doc>
+<status status="PASS" start="2026-02-25T14:54:41.448264" elapsed="0.103107"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>xpath://h2[contains(.,"Fiók készítése")]</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-02-25T14:54:41.551519" elapsed="0.019294"/>
+</kw>
+<status status="PASS" start="2026-02-25T14:54:41.447946" elapsed="0.122994"/>
+</kw>
+<kw name="Fill Registration Form" owner="resources">
+<kw name="Input Text" owner="SeleniumLibrary">
+<msg time="2026-02-25T14:54:41.571819" level="INFO">Typing text 'tesztuser123' into text field 'name:username'.</msg>
+<arg>name:username</arg>
+<arg>${username}</arg>
+<doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
+<status status="PASS" start="2026-02-25T14:54:41.571607" elapsed="0.119986"/>
+</kw>
+<kw name="Input Text" owner="SeleniumLibrary">
+<msg time="2026-02-25T14:54:41.691945" level="INFO">Typing text 'teszt123@example.com' into text field 'name:email'.</msg>
+<arg>name:email</arg>
+<arg>${email}</arg>
+<doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
+<status status="PASS" start="2026-02-25T14:54:41.691744" elapsed="0.112874"/>
+</kw>
+<kw name="Input Password" owner="SeleniumLibrary">
+<msg time="2026-02-25T14:54:41.804984" level="INFO">Typing password into text field 'name:password'.</msg>
+<msg time="2026-02-25T14:54:41.845606" level="INFO">Temporally setting log level to: NONE</msg>
+<arg>name:password</arg>
+<arg>${password}</arg>
+<doc>Types the given password into the text field identified by ``locator``.</doc>
+<status status="PASS" start="2026-02-25T14:54:41.804775" elapsed="0.118973"/>
+</kw>
+<kw name="Input Password" owner="SeleniumLibrary">
+<msg time="2026-02-25T14:54:41.924604" level="INFO">Typing password into text field 'name:password_confirmation'.</msg>
+<msg time="2026-02-25T14:54:41.957706" level="INFO">Temporally setting log level to: NONE</msg>
+<arg>name:password_confirmation</arg>
+<arg>${confirm}</arg>
+<doc>Types the given password into the text field identified by ``locator``.</doc>
+<status status="PASS" start="2026-02-25T14:54:41.924116" elapsed="0.074812"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>xpath=//form//label[1]/input</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-02-25T14:54:41.999190" elapsed="0.657915"/>
+</kw>
+<kw name="Select Checkbox" owner="SeleniumLibrary">
+<msg time="2026-02-25T14:54:42.657407" level="INFO">Selecting checkbox 'xpath=//form//label[1]/input'.</msg>
+<arg>xpath=//form//label[1]/input</arg>
+<doc>Selects the checkbox identified by ``locator``.</doc>
+<status status="PASS" start="2026-02-25T14:54:42.657243" elapsed="0.067438"/>
+</kw>
+<kw name="Select Checkbox" owner="SeleniumLibrary">
+<msg time="2026-02-25T14:54:42.724976" level="INFO">Selecting checkbox 'xpath=//form//label[2]/input'.</msg>
+<arg>xpath=//form//label[2]/input</arg>
+<doc>Selects the checkbox identified by ``locator``.</doc>
+<status status="PASS" start="2026-02-25T14:54:42.724817" elapsed="0.060131"/>
+</kw>
+<arg>tesztuser123</arg>
+<arg>teszt123@example.com</arg>
+<arg>Teszt123!</arg>
+<arg>Teszt123!</arg>
+<status status="PASS" start="2026-02-25T14:54:41.571257" elapsed="1.213797"/>
+</kw>
+<kw name="Submit Registration" owner="resources">
+<kw name="Click Button" owner="SeleniumLibrary">
+<msg time="2026-02-25T14:54:42.785758" level="INFO">Clicking button 'xpath://button[contains(.,"Fiók létrehozása")]'.</msg>
+<arg>xpath://button[contains(.,"Fiók létrehozása")]</arg>
+<doc>Clicks the button identified by ``locator``.</doc>
+<status status="PASS" start="2026-02-25T14:54:42.785611" elapsed="0.068834"/>
+</kw>
+<status status="PASS" start="2026-02-25T14:54:42.785364" elapsed="0.069201"/>
+</kw>
+<kw name="Registration Should Succeed" owner="resources">
+<kw name="Wait Until Location Contains" owner="SeleniumLibrary">
+<arg>/Profil</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until the current URL contains ``expected``.</doc>
+<status status="PASS" start="2026-02-25T14:54:42.855182" elapsed="3.722515"/>
+</kw>
+<status status="PASS" start="2026-02-25T14:54:42.854927" elapsed="3.722873"/>
+</kw>
+<kw name="Close Browser" owner="SeleniumLibrary" type="TEARDOWN">
+<doc>Closes the current browser.</doc>
+<status status="PASS" start="2026-02-25T14:54:46.578146" elapsed="2.182366"/>
+</kw>
+<status status="PASS" start="2026-02-25T14:54:38.754680" elapsed="10.006114"/>
+</test>
+<test id="s1-t2" name="Registration Fails With Weak Password" line="18">
+<kw name="Open Registration Page" owner="resources" type="SETUP">
+<kw name="Open Browser" owner="SeleniumLibrary">
+<msg time="2026-02-25T14:54:48.762835" level="INFO">Opening browser 'Chrome' to base url 'http://localhost:5173'.</msg>
+<arg>${URL}</arg>
+<arg>${BROWSER}</arg>
+<doc>Opens a new browser instance to the optional ``url``.</doc>
+<status status="PASS" start="2026-02-25T14:54:48.762590" elapsed="5.140531"/>
+</kw>
+<kw name="Maximize Browser Window" owner="SeleniumLibrary">
+<doc>Maximizes current browser window.</doc>
+<status status="PASS" start="2026-02-25T14:54:53.903367" elapsed="0.034900"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>//header//nav//a[7]</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-02-25T14:54:53.938413" elapsed="0.022682"/>
+</kw>
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-02-25T14:54:53.961391" level="INFO">Clicking element '//header//nav//a[7]'.</msg>
+<arg>//header//nav//a[7]</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-02-25T14:54:53.961233" elapsed="0.087703"/>
+</kw>
+<status status="PASS" start="2026-02-25T14:54:48.762242" elapsed="5.286818"/>
+</kw>
+<kw name="Switch To Registration" owner="resources">
+<kw name="Click Button" owner="SeleniumLibrary">
+<msg time="2026-02-25T14:54:54.050541" level="INFO">Clicking button '//*[@id="app"]/main/div/div[3]/div[4]/button'.</msg>
+<arg>//*[@id="app"]/main/div/div[3]/div[4]/button</arg>
+<doc>Clicks the button identified by ``locator``.</doc>
+<status status="PASS" start="2026-02-25T14:54:54.050201" elapsed="0.118580"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>xpath://h2[contains(.,"Fiók készítése")]</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-02-25T14:54:54.169051" elapsed="0.017945"/>
+</kw>
+<status status="PASS" start="2026-02-25T14:54:54.049582" elapsed="0.137512"/>
+</kw>
+<kw name="Fill Registration Form" owner="resources">
+<kw name="Input Text" owner="SeleniumLibrary">
+<msg time="2026-02-25T14:54:54.187902" level="INFO">Typing text 'tesztuser123' into text field 'name:username'.</msg>
+<arg>name:username</arg>
+<arg>${username}</arg>
+<doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
+<status status="PASS" start="2026-02-25T14:54:54.187727" elapsed="0.109016"/>
+</kw>
+<kw name="Input Text" owner="SeleniumLibrary">
+<msg time="2026-02-25T14:54:54.297312" level="INFO">Typing text 'teszt123@example.com' into text field 'name:email'.</msg>
+<arg>name:email</arg>
+<arg>${email}</arg>
+<doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
+<status status="PASS" start="2026-02-25T14:54:54.297008" elapsed="0.122998"/>
+</kw>
+<kw name="Input Password" owner="SeleniumLibrary">
+<msg time="2026-02-25T14:54:54.420625" level="INFO">Typing password into text field 'name:password'.</msg>
+<msg time="2026-02-25T14:54:54.467537" level="INFO">Temporally setting log level to: NONE</msg>
+<arg>name:password</arg>
+<arg>${password}</arg>
+<doc>Types the given password into the text field identified by ``locator``.</doc>
+<status status="PASS" start="2026-02-25T14:54:54.420276" elapsed="0.095061"/>
+</kw>
+<kw name="Input Password" owner="SeleniumLibrary">
+<msg time="2026-02-25T14:54:54.515856" level="INFO">Typing password into text field 'name:password_confirmation'.</msg>
+<msg time="2026-02-25T14:54:54.556575" level="INFO">Temporally setting log level to: NONE</msg>
+<arg>name:password_confirmation</arg>
+<arg>${confirm}</arg>
+<doc>Types the given password into the text field identified by ``locator``.</doc>
+<status status="PASS" start="2026-02-25T14:54:54.515612" elapsed="0.072529"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<msg time="2026-02-25T14:55:04.922521" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="selenium-screenshot-27.png"&gt;&lt;img src="selenium-screenshot-27.png" width="800px"&gt;&lt;/a&gt;</msg>
+<msg time="2026-02-25T14:55:04.922682" level="FAIL">Element 'xpath=//form//label[1]/input' not visible after 10 seconds.</msg>
+<arg>xpath=//form//label[1]/input</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="FAIL" start="2026-02-25T14:54:54.588278" elapsed="10.336457">Element 'xpath=//form//label[1]/input' not visible after 10 seconds.</status>
+</kw>
+<kw name="Select Checkbox" owner="SeleniumLibrary">
+<arg>xpath=//form//label[1]/input</arg>
+<doc>Selects the checkbox identified by ``locator``.</doc>
+<status status="NOT RUN" start="2026-02-25T14:55:04.924892" elapsed="0.000032"/>
+</kw>
+<kw name="Select Checkbox" owner="SeleniumLibrary">
+<arg>xpath=//form//label[2]/input</arg>
+<doc>Selects the checkbox identified by ``locator``.</doc>
+<status status="NOT RUN" start="2026-02-25T14:55:04.925004" elapsed="0.000023"/>
+</kw>
+<arg>tesztuser123</arg>
+<arg>teszt123@example.com</arg>
+<arg>123</arg>
+<arg>123</arg>
+<status status="FAIL" start="2026-02-25T14:54:54.187409" elapsed="10.737726">Element 'xpath=//form//label[1]/input' not visible after 10 seconds.</status>
+</kw>
+<kw name="Submit Registration" owner="resources">
+<status status="NOT RUN" start="2026-02-25T14:55:04.925436" elapsed="0.000038"/>
+</kw>
+<kw name="Registration Should Fail" owner="resources">
+<status status="NOT RUN" start="2026-02-25T14:55:04.925706" elapsed="0.000033"/>
+</kw>
+<kw name="Close Browser" owner="SeleniumLibrary" type="TEARDOWN">
+<doc>Closes the current browser.</doc>
+<status status="PASS" start="2026-02-25T14:55:04.926110" elapsed="2.230559"/>
+</kw>
+<status status="FAIL" start="2026-02-25T14:54:48.761663" elapsed="18.395430">Element 'xpath=//form//label[1]/input' not visible after 10 seconds.</status>
+</test>
+<test id="s1-t3" name="Registration Fails With Mismatched Passwords" line="28">
+<kw name="Open Registration Page" owner="resources" type="SETUP">
+<kw name="Open Browser" owner="SeleniumLibrary">
+<msg time="2026-02-25T14:55:07.160512" level="INFO">Opening browser 'Chrome' to base url 'http://localhost:5173'.</msg>
+<arg>${URL}</arg>
+<arg>${BROWSER}</arg>
+<doc>Opens a new browser instance to the optional ``url``.</doc>
+<status status="PASS" start="2026-02-25T14:55:07.160063" elapsed="2.550111"/>
+</kw>
+<kw name="Maximize Browser Window" owner="SeleniumLibrary">
+<doc>Maximizes current browser window.</doc>
+<status status="PASS" start="2026-02-25T14:55:09.710344" elapsed="0.024000"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>//header//nav//a[7]</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-02-25T14:55:09.734520" elapsed="0.028710"/>
+</kw>
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-02-25T14:55:09.763522" level="INFO">Clicking element '//header//nav//a[7]'.</msg>
+<arg>//header//nav//a[7]</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-02-25T14:55:09.763369" elapsed="0.096336"/>
+</kw>
+<status status="PASS" start="2026-02-25T14:55:07.159501" elapsed="2.700342"/>
+</kw>
+<kw name="Switch To Registration" owner="resources">
+<kw name="Click Button" owner="SeleniumLibrary">
+<msg time="2026-02-25T14:55:09.861045" level="INFO">Clicking button '//*[@id="app"]/main/div/div[3]/div[4]/button'.</msg>
+<arg>//*[@id="app"]/main/div/div[3]/div[4]/button</arg>
+<doc>Clicks the button identified by ``locator``.</doc>
+<status status="PASS" start="2026-02-25T14:55:09.860818" elapsed="0.116177"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>xpath://h2[contains(.,"Fiók készítése")]</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-02-25T14:55:09.977344" elapsed="0.021063"/>
+</kw>
+<status status="PASS" start="2026-02-25T14:55:09.860342" elapsed="0.138177"/>
+</kw>
+<kw name="Fill Registration Form" owner="resources">
+<kw name="Input Text" owner="SeleniumLibrary">
+<msg time="2026-02-25T14:55:09.999358" level="INFO">Typing text 'tesztuser123' into text field 'name:username'.</msg>
+<arg>name:username</arg>
+<arg>${username}</arg>
+<doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
+<status status="PASS" start="2026-02-25T14:55:09.999194" elapsed="0.115598"/>
+</kw>
+<kw name="Input Text" owner="SeleniumLibrary">
+<msg time="2026-02-25T14:55:10.115176" level="INFO">Typing text 'teszt123@example.com' into text field 'name:email'.</msg>
+<arg>name:email</arg>
+<arg>${email}</arg>
+<doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
+<status status="PASS" start="2026-02-25T14:55:10.114952" elapsed="0.136125"/>
+</kw>
+<kw name="Input Password" owner="SeleniumLibrary">
+<msg time="2026-02-25T14:55:10.251451" level="INFO">Typing password into text field 'name:password'.</msg>
+<msg time="2026-02-25T14:55:10.286068" level="INFO">Temporally setting log level to: NONE</msg>
+<arg>name:password</arg>
+<arg>${password}</arg>
+<doc>Types the given password into the text field identified by ``locator``.</doc>
+<status status="PASS" start="2026-02-25T14:55:10.251229" elapsed="0.119321"/>
+</kw>
+<kw name="Input Password" owner="SeleniumLibrary">
+<msg time="2026-02-25T14:55:10.370898" level="INFO">Typing password into text field 'name:password_confirmation'.</msg>
+<msg time="2026-02-25T14:55:10.404864" level="INFO">Temporally setting log level to: NONE</msg>
+<arg>name:password_confirmation</arg>
+<arg>${confirm}</arg>
+<doc>Types the given password into the text field identified by ``locator``.</doc>
+<status status="PASS" start="2026-02-25T14:55:10.370699" elapsed="0.072258"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<msg time="2026-02-25T14:55:20.630487" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="selenium-screenshot-28.png"&gt;&lt;img src="selenium-screenshot-28.png" width="800px"&gt;&lt;/a&gt;</msg>
+<msg time="2026-02-25T14:55:20.630623" level="FAIL">Element 'xpath=//form//label[1]/input' not visible after 10 seconds.</msg>
+<arg>xpath=//form//label[1]/input</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="FAIL" start="2026-02-25T14:55:10.443325" elapsed="10.188619">Element 'xpath=//form//label[1]/input' not visible after 10 seconds.</status>
+</kw>
+<kw name="Select Checkbox" owner="SeleniumLibrary">
+<arg>xpath=//form//label[1]/input</arg>
+<doc>Selects the checkbox identified by ``locator``.</doc>
+<status status="NOT RUN" start="2026-02-25T14:55:20.632266" elapsed="0.000050"/>
+</kw>
+<kw name="Select Checkbox" owner="SeleniumLibrary">
+<arg>xpath=//form//label[2]/input</arg>
+<doc>Selects the checkbox identified by ``locator``.</doc>
+<status status="NOT RUN" start="2026-02-25T14:55:20.632419" elapsed="0.000026"/>
+</kw>
+<arg>tesztuser123</arg>
+<arg>teszt123@example.com</arg>
+<arg>Teszt123!</arg>
+<arg>Masik123!</arg>
+<status status="FAIL" start="2026-02-25T14:55:09.998891" elapsed="10.633774">Element 'xpath=//form//label[1]/input' not visible after 10 seconds.</status>
+</kw>
+<kw name="Submit Registration" owner="resources">
+<status status="NOT RUN" start="2026-02-25T14:55:20.634251" elapsed="0.000129"/>
+</kw>
+<kw name="Registration Should Fail" owner="resources">
+<status status="NOT RUN" start="2026-02-25T14:55:20.634759" elapsed="0.000073"/>
+</kw>
+<kw name="Close Browser" owner="SeleniumLibrary" type="TEARDOWN">
+<doc>Closes the current browser.</doc>
+<status status="PASS" start="2026-02-25T14:55:20.635327" elapsed="2.171253"/>
+</kw>
+<status status="FAIL" start="2026-02-25T14:55:07.158633" elapsed="15.648203">Element 'xpath=//form//label[1]/input' not visible after 10 seconds.</status>
+</test>
+<test id="s1-t4" name="Registration Fails Without Terms" line="38">
+<kw name="Open Registration Page" owner="resources" type="SETUP">
+<kw name="Open Browser" owner="SeleniumLibrary">
+<msg time="2026-02-25T14:55:22.808611" level="INFO">Opening browser 'Chrome' to base url 'http://localhost:5173'.</msg>
+<arg>${URL}</arg>
+<arg>${BROWSER}</arg>
+<doc>Opens a new browser instance to the optional ``url``.</doc>
+<status status="PASS" start="2026-02-25T14:55:22.808403" elapsed="2.596377"/>
+</kw>
+<kw name="Maximize Browser Window" owner="SeleniumLibrary">
+<doc>Maximizes current browser window.</doc>
+<status status="PASS" start="2026-02-25T14:55:25.404953" elapsed="0.031649"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>//header//nav//a[7]</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-02-25T14:55:25.436752" elapsed="0.023548"/>
+</kw>
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-02-25T14:55:25.460603" level="INFO">Clicking element '//header//nav//a[7]'.</msg>
+<arg>//header//nav//a[7]</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-02-25T14:55:25.460445" elapsed="0.090053"/>
+</kw>
+<status status="PASS" start="2026-02-25T14:55:22.808134" elapsed="2.742468"/>
+</kw>
+<kw name="Switch To Registration" owner="resources">
+<kw name="Click Button" owner="SeleniumLibrary">
+<msg time="2026-02-25T14:55:25.561072" level="INFO">Clicking button '//*[@id="app"]/main/div/div[3]/div[4]/button'.</msg>
+<arg>//*[@id="app"]/main/div/div[3]/div[4]/button</arg>
+<doc>Clicks the button identified by ``locator``.</doc>
+<status status="PASS" start="2026-02-25T14:55:25.551296" elapsed="0.096458"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>xpath://h2[contains(.,"Fiók készítése")]</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-02-25T14:55:25.647904" elapsed="0.019727"/>
+</kw>
+<status status="PASS" start="2026-02-25T14:55:25.550996" elapsed="0.116732"/>
+</kw>
+<kw name="Input Text" owner="SeleniumLibrary">
+<msg time="2026-02-25T14:55:25.668127" level="INFO">Typing text 'tesztuser123' into text field 'name:username'.</msg>
+<arg>name:username</arg>
+<arg>tesztuser123</arg>
+<doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
+<status status="PASS" start="2026-02-25T14:55:25.667931" elapsed="0.120893"/>
+</kw>
+<kw name="Input Text" owner="SeleniumLibrary">
+<msg time="2026-02-25T14:55:25.789915" level="INFO">Typing text 'teszt123@example.com' into text field 'name:email'.</msg>
+<arg>name:email</arg>
+<arg>teszt123@example.com</arg>
+<doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
+<status status="PASS" start="2026-02-25T14:55:25.789492" elapsed="0.124389"/>
+</kw>
+<kw name="Input Password" owner="SeleniumLibrary">
+<msg time="2026-02-25T14:55:25.914696" level="INFO">Typing password into text field 'name:password'.</msg>
+<msg time="2026-02-25T14:55:25.949475" level="INFO">Temporally setting log level to: NONE</msg>
+<arg>name:password</arg>
+<arg>Teszt123!</arg>
+<doc>Types the given password into the text field identified by ``locator``.</doc>
+<status status="PASS" start="2026-02-25T14:55:25.914417" elapsed="0.104146"/>
+</kw>
+<kw name="Input Password" owner="SeleniumLibrary">
+<msg time="2026-02-25T14:55:26.018972" level="INFO">Typing password into text field 'name:password_confirmation'.</msg>
+<msg time="2026-02-25T14:55:26.053259" level="INFO">Temporally setting log level to: NONE</msg>
+<arg>name:password_confirmation</arg>
+<arg>Teszt123!</arg>
+<doc>Types the given password into the text field identified by ``locator``.</doc>
+<status status="PASS" start="2026-02-25T14:55:26.018800" elapsed="0.080372"/>
+</kw>
+<kw name="Submit Registration" owner="resources">
+<kw name="Click Button" owner="SeleniumLibrary">
+<msg time="2026-02-25T14:55:26.099855" level="INFO">Clicking button 'xpath://button[contains(.,"Fiók létrehozása")]'.</msg>
+<msg time="2026-02-25T14:55:27.398567" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="selenium-screenshot-29.png"&gt;&lt;img src="selenium-screenshot-29.png" width="800px"&gt;&lt;/a&gt;</msg>
+<msg time="2026-02-25T14:55:27.398721" level="FAIL">ElementClickInterceptedException: Message: element click intercepted: Element &lt;button data-v-59103084="" class="button" type="submit" disabled=""&gt;...&lt;/button&gt; is not clickable at point (1009, 797). Other element would receive the click: &lt;form data-v-59103084="" class="form"&gt;...&lt;/form&gt;
+  (Session info: chrome=145.0.7632.111); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#elementclickinterceptedexception
+Stacktrace:
+Symbols not available. Dumping unresolved backtrace:
+	0x7ff643dfaa55
+	0x7ff643b58630
+	0x7ff6438ed75d
+	0x7ff643950b65
+	0x7ff64394e27a
+	0x7ff64394b115
+	0x7ff643949fc7
+	0x7ff64393b426
+	0x7ff6439719da
+	0x7ff64393aca6
+	0x7ff64399591c
+	0x7ff643939098
+	0x7ff643939f83
+	0x7ff643e27810
+	0x7ff643e21afd
+	0x7ff643e42c1a
+	0x7ff643b73345
+	0x7ff643b7b81c
+	0x7ff643b61924
+	0x7ff643b61ad6
+	0x7ff643b47e47
+	0x7fff6a01e8d7
+	0x7fff6af9c34c
+</msg>
+<arg>xpath://button[contains(.,"Fiók létrehozása")]</arg>
+<doc>Clicks the button identified by ``locator``.</doc>
+<status status="FAIL" start="2026-02-25T14:55:26.099716" elapsed="1.301045">ElementClickInterceptedException: Message: element click intercepted: Element &lt;button data-v-59103084="" class="button" type="submit" disabled=""&gt;...&lt;/button&gt; is not clickable at point (1009, 797). Other element would receive the click: &lt;form data-v-59103084="" class="form"&gt;...&lt;/form&gt;
+  (Session info: chrome=145.0.7632.111); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#elementclickinterceptedexception
+Stacktrace:
+Symbols not available. Dumping unresolved backtrace:
+	0x7ff643dfaa55
+	0x7ff643b58630
+	0x7ff6438ed75d
+	0x7ff643950b65
+	0x7ff64394e27a
+	0x7ff64394b115
+	0x7ff643949fc7
+	0x7ff64393b426
+	0x7ff6439719da
+	0x7ff64393aca6
+	0x7ff64399591c
+	0x7ff643939098
+	0x7ff643939f83
+	0x7ff643e27810
+	0x7ff643e21afd
+	0x7ff643e42c1a
+	0x7ff643b73345
+	0x7ff643b7b81c
+	0x7ff643b61924
+	0x7ff643b61ad6
+	0x7ff643b47e47
+	0x7fff6a01e8d7
+	0x7fff6af9c34c
+</status>
+</kw>
+<status status="FAIL" start="2026-02-25T14:55:26.099477" elapsed="1.301486">ElementClickInterceptedException: Message: element click intercepted: Element &lt;button data-v-59103084="" class="button" type="submit" disabled=""&gt;...&lt;/button&gt; is not clickable at point (1009, 797). Other element would receive the click: &lt;form data-v-59103084="" class="form"&gt;...&lt;/form&gt;
+  (Session info: chrome=145.0.7632.111); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#elementclickinterceptedexception
+Stacktrace:
+Symbols not available. Dumping unresolved backtrace:
+	0x7ff643dfaa55
+	0x7ff643b58630
+	0x7ff6438ed75d
+	0x7ff643950b65
+	0x7ff64394e27a
+	0x7ff64394b115
+	0x7ff643949fc7
+	0x7ff64393b426
+	0x7ff6439719da
+	0x7ff64393aca6
+	0x7ff64399591c
+	0x7ff643939098
+	0x7ff643939f83
+	0x7ff643e27810
+	0x7ff643e21afd
+	0x7ff643e42c1a
+	0x7ff643b73345
+	0x7ff643b7b81c
+	0x7ff643b61924
+	0x7ff643b61ad6
+	0x7ff643b47e47
+	0x7fff6a01e8d7
+	0x7fff6af9c34c
+</status>
+</kw>
+<kw name="Registration Should Fail" owner="resources">
+<status status="NOT RUN" start="2026-02-25T14:55:27.401253" elapsed="0.000037"/>
+</kw>
+<kw name="Close Browser" owner="SeleniumLibrary" type="TEARDOWN">
+<doc>Closes the current browser.</doc>
+<status status="PASS" start="2026-02-25T14:55:27.401577" elapsed="2.169709"/>
+</kw>
+<status status="FAIL" start="2026-02-25T14:55:22.807694" elapsed="6.764025">ElementClickInterceptedException: Message: element click intercepted: Element &lt;button data-v-59103084="" class="button" type="submit" disabled=""&gt;...&lt;/button&gt; is not clickable at point (1009, 797). Other element would receive the click: &lt;form data-v-59103084="" class="form"&gt;...&lt;/form&gt;
+  (Session info: chrome=145.0.7632.111); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#elementclickinterceptedexception
+Stacktrace:
+Symbols not available. Dumping unresolved backtrace:
+	0x7ff643dfaa55
+	0x7ff643b58630
+	0x7ff6438ed75d
+	0x7ff643950b65
+	0x7ff64394e27a
+	0x7ff64394b115
+	0x7ff643949fc7
+	0x7ff64393b426
+	0x7ff6439719da
+	0x7ff64393aca6
+	0x7ff64399591c
+	0x7ff643939098
+	0x7ff643939f83
+	0x7ff643e27810
+	0x7ff643e21afd
+	0x7ff643e42c1a
+	0x7ff643b73345
+	0x7ff643b7b81c
+	0x7ff643b61924
+	0x7ff643b61ad6
+	0x7ff643b47e47
+	0x7fff6a01e8d7
+	0x7fff6af9c34c
+</status>
+</test>
+<status status="FAIL" start="2026-02-25T14:54:38.554563" elapsed="51.018431"/>
+</suite>
+<statistics>
+<total>
+<stat pass="1" fail="3" skip="0">All Tests</stat>
+</total>
+<tag>
+</tag>
+<suite>
+<stat name="Regisztracio" id="s1" pass="1" fail="3" skip="0">Regisztracio</stat>
+</suite>
+</statistics>
+<errors>
+</errors>
+</robot>
