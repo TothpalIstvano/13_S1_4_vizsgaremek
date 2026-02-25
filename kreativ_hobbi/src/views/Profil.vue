@@ -476,10 +476,10 @@ function formatDate(d) { return new Date(d).toLocaleDateString(); }
                 </div>
                 <h3 class="post-title">{{ p.cim }}</h3>
                 <p class="post-excerpt">{{ p.kivonat }}</p>
-                <div class="post-actions">
-                  <RouterLink :to="`/blog/${p.id}`" class="read">Olvasás</RouterLink>
-                  <RouterLink :to="`/editpost/${p.id}`" class="edit">Szerkesztés</RouterLink>
-                </div>
+              </div>
+              <div class="post-actions">
+                <p><RouterLink :to="`/blog/${p.id}`" class="read">Olvasás</RouterLink></p>
+                <p><RouterLink :to="`/editpost/${p.id}`" class="modify">Szerkesztés</RouterLink></p>
               </div>
             </article>
           </div>
@@ -696,9 +696,20 @@ input[type=text]:focus, input[type=tel]:focus, textarea:focus, input[type=number
   font-weight: 600;
   text-decoration: none;
 }
-.btn.edit { background: #eef2ff; }
-.btn.logout { background: #fee2e2; color: #991b1b; }
-.btn.follow { background: #111827; color: #fff; }
+
+.btn.edit { 
+  background: #eef2ff; 
+}
+
+.btn.logout { 
+  background: #fee2e2; 
+  color: #991b1b; 
+}
+
+.btn.follow { 
+  background: #111827; 
+  color: #fff; 
+}
 
 .btn.create-post {
   display: inline-block;
@@ -728,14 +739,22 @@ input[type=text]:focus, input[type=tel]:focus, textarea:focus, input[type=number
   width: 100%;
 }
 .modal h3 { margin-top: 0; }
+
 .modal-actions {
   display: flex;
   justify-content: flex-end;
   gap: 12px;
   margin-top: 18px;
 }
-.btn.confirm { background: #dc2626; color: #fff; }
-.btn.cancel { background: #e5e7eb; color: #374151; }
+.btn.confirm { 
+  background: #dc2626; 
+  color: #fff; 
+}
+
+.btn.cancel { 
+  background: #e5e7eb; 
+  color: #374151; 
+}
 
 /* content layout */
 .content {
@@ -758,19 +777,40 @@ input[type=text]:focus, input[type=tel]:focus, textarea:focus, input[type=number
   box-shadow: 0 6px 20px rgba(12,12,12,0.06);
   border: 1px solid rgba(0,0,0,0.04);
 }
-.about-card h3 { margin: 0 0 8px 0; }
-.about-card hr { border: none; border-top: 1px solid #efefef; margin: 12px 0; }
-.about-card ul { list-style: none; padding: 0; margin: 0; color: #444; }
+.about-card h3 { 
+margin: 0 0 8px 0; 
+}
+
+.about-card hr { 
+border: none; 
+border-top: 1px solid #efefef; 
+margin: 12px 0; 
+}
+
+.about-card ul { 
+list-style: none; 
+padding: 0; 
+margin: 0; 
+color: #444; 
+}
 
 /* main column */
-.section-header h2 { margin: 0; font-size: 1.25rem; }
-.section-header .sub { margin: 6px 0 18px; color: #6b7280; }
+.section-header h2 { 
+margin: 0; 
+font-size: 1.25rem; 
+}
+
+.section-header .sub { 
+margin: 6px 0 18px; 
+color: #6b7280; 
+}
 
 .posts {
   display: grid;
   grid-template-columns: 1fr;
   gap: 18px;
 }
+
 .post-card {
   display: flex;
   gap: 16px;
@@ -780,6 +820,7 @@ input[type=text]:focus, input[type=tel]:focus, textarea:focus, input[type=number
   border: 1px solid rgba(0,0,0,0.04);
   box-shadow: 0 6px 20px rgba(12,12,12,0.05);
 }
+
 .post-cover {
   width: 240px;
   min-width: 240px;
@@ -790,23 +831,49 @@ input[type=text]:focus, input[type=tel]:focus, textarea:focus, input[type=number
   flex-shrink: 0;
   */
 }
+
 .post-cover img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
+
 .post-body {
   padding: 14px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 }
-.post-title { margin: 0 0 6px 0; font-size: 1.05rem; }
-.post-meta { color: #6b7280; font-size: 0.85rem; display: flex; gap: 10px; align-items: center; }
-.tag { margin-left: 6px; background: #f1f5f9; padding: 4px 8px; border-radius: 999px; font-size: 0.75rem; color: #374151; }
-.post-excerpt { margin: 10px 0; color: #374151; }
-.post-actions .read {
-  background: #111827;
+
+.post-title {
+ margin: 0 0 6px 0; 
+ font-size: 1.05rem; 
+ }
+
+.post-meta { 
+color: #6b7280; 
+font-size: 0.85rem; 
+display: flex; 
+gap: 10px; 
+align-items: center; 
+}
+
+.tag { 
+margin-left: 6px; 
+background: #f1f5f9; 
+padding: 4px 8px; 
+border-radius: 999px; 
+font-size: 0.75rem; 
+color: #374151; 
+}
+
+.post-excerpt { 
+margin: 10px 0; 
+color: #374151; 
+}
+
+.post-actions .read, .modify {
+  background: #0f1c3a;
   color: #fff;
   padding: 8px 12px;
   border-radius: 10px;
@@ -816,10 +883,25 @@ input[type=text]:focus, input[type=tel]:focus, textarea:focus, input[type=number
 
 /* responsive */
 @media (max-width: 900px) {
-  .content-grid { grid-template-columns: 1fr; }
-  .post-cover { display: none; }
-  .profile-card { flex-direction: column; align-items: flex-start; transform: translateY(40px); }
-  .profile-actions { flex-direction: row; width: 100%; justify-content: space-between; }
+  .content-grid { 
+    grid-template-columns: 1fr; 
+  }
+
+  .post-cover { 
+    display: none; 
+  }
+
+  .profile-card { 
+    flex-direction: column; 
+    align-items: flex-start; 
+    transform: translateY(40px); 
+  }
+
+  .profile-actions { 
+    flex-direction: row; 
+    width: 100%; 
+    justify-content: space-between; 
+  }
 }
 
 @media (max-width: 390px) {

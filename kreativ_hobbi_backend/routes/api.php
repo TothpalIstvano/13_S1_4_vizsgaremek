@@ -67,7 +67,7 @@ Route::middleware('auth:sanctum')->group(function () {
                 ->where('szerzo_id', $user->id)
                 ->get()
                 ->map(function ($post) {
-                    $postArray = (array) $post;
+                    $postArray = $post->toArray();
 
                     if (!$post->foKep) {
                         $postArray['fo_kep'] = [

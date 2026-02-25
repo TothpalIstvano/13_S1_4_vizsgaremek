@@ -2932,6 +2932,7 @@ input[type="file"] {
   .oldalsav {
     width: 100%;
     margin-top: 20px;
+    flex: 100%;
   }
 }
 
