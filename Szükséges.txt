@@ -1,8 +1,10 @@
+!!- admin blog poszt módosítása, úgy mint a főoldalról !!
 - kommentek saját törléssel, ellenőrzéssel (csúnya beszéd szűrés)
 - profilkép szelfi feltöltése - a profilon nem jelenik csak meg, err_blocked_by_corb van - visszaigazoló üzi kellene: adatok sikeresen mentve (vagy nem)
 - mintakészítő letöltés, néhány megnevezés/szöveg átírása ÉS A CSÚSZKA ÉS A NUMBERINPUT IZÉ ÖSSZEHANGOLÁSA
 - blogba oldalak (hogyha sok van alul számok meg minden) + szólj pistinek hogycsinálja meg ezt a termékeknél is, mert ott sincs, mert elfelejtette :(
 - newpost notifications magyarul/jobban
+- profilon a posztoknál limitet a tartalomra, ha túl hosszú és befolyásolná a képet ... legyen, + gombok szépen legyenek és reszponzivitás
 - poszt mentése vázlatként - már csak a tartalom nem loadol
 - reakciók poszthoz - helyesen írja a seeder adatait, de nem működik h lehessen reagálni
 - rólunk oldal rendes szöveg

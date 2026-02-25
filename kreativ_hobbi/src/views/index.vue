@@ -36,11 +36,7 @@ onUnmounted(() => {
   if (io) io.disconnect();
 });
 
-watch(blogPosts, async () => {
-  setTimeout(() => {
-    BlogCardequalizer();
-  }, 550);
-});
+
 // blog data
 async function fetchBlogPosts() {
   try {
@@ -55,25 +51,6 @@ async function fetchBlogPosts() {
     console.error('Error fetching blog posts:', error);
   }
 }
-
-function BlogCardequalizer() {
-  let maxHeight = 0;
-    const blogCards = document.querySelectorAll('.blog-card');
-    // Find the tallest card
-    blogCards.forEach(card => {
-      const cardHeight = card.offsetHeight;
-      if (cardHeight > maxHeight) {
-        maxHeight = cardHeight;
-      }
-    });
-
-    // Apply the maximum height to all cards
-    if (maxHeight > 0) {
-      blogCards.forEach(card => {
-        card.style.height = `${maxHeight}px`;
-      });
-    };
-};
 
 function formatDate(dateString) {
   const datePart = dateString.split('T')[0]; 
@@ -521,7 +498,7 @@ function formatDate(dateString) {
 }
 
 .content-wrapper {
-    max-width: 1800px;
+  max-width: 1800px;
   margin: 0 auto;
   padding: 0 32px;
 }
@@ -744,38 +721,18 @@ function formatDate(dateString) {
 /*#endregion*/
 
 /* MEDIA QUERIES */
-@media screen and (max-width: 1660px) {
-  .blog-section {
-    grid-template-columns: 1fr 1fr;
-  }
-  .blog-card {
-    width: 30rem;
-  }
-}
+
 @media screen and (max-width: 1100px) {
-  .blog-card {
-    width: 25rem;
-  }
-  .content-wrapper {
+
+  .cards-wrapper {
     grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
     gap: 24px;
   }
 }
 
-@media screen and (max-width: 945px) {
-  .blog-section {
-    grid-template-columns: 1fr;
-  }
-  .blog-card {
-    width: 26rem;
-  }
-}
 
 @media screen and (max-width: 768px) {
-  .blog-card {
-    font-size: 15px;
-  }
-  .content-wrapper {
+  .cards-wrapper {
     grid-template-columns: 1fr;
     gap: 24px;
     padding: 32px 0;
@@ -783,23 +740,12 @@ function formatDate(dateString) {
 }
 
 @media screen and (max-width: 500px) {
-  .blog-section {
-    padding: 4rem 2rem;
-  }
-  .blog-card {
-    max-width: calc(90vw - 4rem);
-  }
-  .content-wrapper {
+
+  .cards-wrapper {
     grid-template-columns: 1fr;
   }
   .card {
     max-width: 100%;
-  }
-}
-
-@media screen and (max-width: 465px) {
-  .blog-card {
-    font-size: 14px;
   }
 }
 /*#endregion*/
