@@ -21,7 +21,6 @@ use App\Models\Varosok;
 
 //User related API routes:
 
-
 // Check if user is logged in and return szerepkor
 Route::get('/user/check', function () {
     if (Auth::check()) {
@@ -43,7 +42,20 @@ Route::post('/login', function (Request $request) {
     ]);
 });
 
+Route::middleware('auth:sanctum')->post('/logout', function (Request $request) {
+    $request->user()->currentAccessToken()->delete();
+    return response()->json(['message' => 'Kijelentkezve']);
+});
+
 Route::middleware('auth:sanctum')->group(function () {
+    /*Route::get('/user/check', function () {
+        $adatok = FelhasznaloAdatok::find(auth()->user()->id);
+        if (!$adatok) {
+            return response()->json(['loggedIn' => true, 'szerepkor' => null], 200);
+        }
+        return response()->json(['loggedIn' => true, 'szerepkor' => $adatok->szerepkor], 200);
+    });*/
+
     Route::get('/user', function (Request $request) {
         return $request->user()->load('profilKep:id,url_Link,alt_szoveg', 'adatok')->toArray();
     });
