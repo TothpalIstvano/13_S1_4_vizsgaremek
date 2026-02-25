@@ -1,14 +1,14 @@
 <template>
 <main class="new-post-page">
     <div class="page-header">
-        <h1 class="title">Új poszt hozzáadása</h1>
-        <p class="subtitle">Töltsd ki az alábbi mezőket egy új blogposzt létrehozásához</p>
-    </div>
-
-    <button @click="$router.go(-1)" class="back-btn error-back-btn">
-        <div class="btn-icon">↩</div>
+    <h1 class="title">Új poszt hozzáadása</h1>
+    <div class="header-row">
+        <button @click="$router.go(-1)" class="back-btn">
+        <span class="btn-icon">↩</span>
         Vissza a profilra
-    </button>
+        </button>
+    </div>
+    </div>
     
     <div v-if="notification.show" 
          :class="['notification', notification.type]"
@@ -75,7 +75,9 @@
                     Tartalom
                     <span class="required-indicator">*</span>
                 </label>
-                <Editor 
+                <Editor
+                    :key="editorKey"
+                    ref="editorRef"
                     v-model="post.content" 
                     editorStyle="height: 400px"
                     class="mb-6 editor-container"
@@ -168,7 +170,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, nextTick } from "vue";
 import { useRoute, useRouter } from 'vue-router';
 import MultiSelect from 'primevue/multiselect';
 import Editor from 'primevue/editor';
@@ -187,7 +189,9 @@ const props = defineProps({
 const route = useRoute()
 const router = useRouter()
 
-const isEditMode = computed(() => !!props.postId)
+const editId = computed(() => props.postId || route.params.id || null)
+const isEditMode = computed(() => !!editId.value)
+const editorRef = ref(null)
 
 const post = ref({
   title: '',
@@ -198,6 +202,7 @@ const selectedTags = ref([])
 const uploadedImages = ref([])   // each item: { id: null|number, file: File|null, preview: string, alt: string, description: string }
 
 const formTouched = ref(false);
+const editorKey = ref(0);
 const tagOptions = ref([]);
 const fileUploadRef = ref(null);
 
@@ -277,7 +282,7 @@ const removeImage = (index) => {
 
 const fetchPostForEdit = async () => {
   try {
-    const response = await axios.get(`/api/posts/${props.postId}/edit`, {
+    const response = await axios.get(`/api/posts/${editId.value}/edit`, {
       withCredentials: true
     })
     const data = response.data
@@ -286,21 +291,26 @@ const fetchPostForEdit = async () => {
     post.value.content = data.tartalom
     post.value.kivonat = data.kivonat || ''
 
-    // populate tags
     selectedTags.value = data.cimkek.map(tag => ({
       id: tag.id,
       name: tag.nev,
       code: tag.nev.toLowerCase().replace(/\s+/g, '_')
     }))
 
-    // populate images
     uploadedImages.value = data.kepek.map(img => ({
       id: img.id,
       file: null,
-      preview: img.url_Link,   // assume full URL is stored
+      preview: img.url_Link,
       alt: img.alt_Szoveg || '',
       description: img.leiras || ''
     }))
+
+    await nextTick()
+    editorKey.value++
+    await nextTick()
+    if (editorRef.value?.quill) {
+        editorRef.value.quill.clipboard.dangerouslyPasteHTML(post.value.content)
+    }
   } catch (error) {
     console.error('Failed to fetch post for edit:', error)
     showNotification('error', 'Nem sikerült betölteni a posztot')
@@ -366,7 +376,7 @@ const savePost = async (status) => {
     // 4. Send request (POST or PUT)
     let response
     if (isEditMode.value) {
-      response = await axios.put(`/api/posts/${props.postId}`, postData, {
+      response = await axios.put(`/api/posts/${editId.value}`, postData, {
         withCredentials: true,
         headers: { 'Content-Type': 'application/json' }
       })
@@ -392,13 +402,6 @@ const resetForm = () => {
     showNotification('info', 'Űrlap visszaállítva');
 };
 
-const vissza = () => {
-    showNotification('info', 'Piszkozat mentve (feature fejlesztés alatt)');
-};
-
-onMounted(() => {
-    fetchTagsFromDatabase();
-});
 </script>
 
 <style scoped>
@@ -420,6 +423,8 @@ onMounted(() => {
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  white-space: nowrap;
+  margin-left: 200px;
 }
 
 .back-btn:hover {
@@ -660,21 +665,20 @@ onMounted(() => {
     text-align: center;
 }
 
+.header-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin-bottom: 8px;
+}
+
 .title {
     font-weight: 800;
     font-size: 48px;
     -webkit-background-clip: text;
     background-clip: text;
     color: black;
-    margin-bottom: 12px;
-}
-
-.subtitle {
-    font-size: 18px;
-    color: #718096;
-    max-width: 600px;
-    margin: 0 auto;
-    line-height: 1.6;
+    margin-bottom: 8px;
 }
 
 .notification {

@@ -64,6 +64,12 @@ async function fetchUserBlogPosts() {
   }
 }
 
+function truncateText(text, limit) {
+  if (!text) return ''
+  if (text.length <= limit) return text
+  return text.substring(0, limit) + '…'
+}
+
 function setAvatarDefault(event) {
   event.target.src = defaultAvatar;
 }
@@ -462,26 +468,27 @@ function formatDate(d) { return new Date(d).toLocaleDateString(); }
 
 
           <div class="posts">
-            <article v-for="p in posts" :key="p.id" class="post-card">
-              <div class="post-cover">
-                <img :src="p.fo_kep.url_Link" :alt="p.fo_kep.alt_szoveg" />
-              </div>
-              <div class="post-body">
-                <div class="post-meta">
-                  <span>{{ formatDate(p.letrehozas_datuma) }}</span>
-                  <span class="tags">
-                    <small v-for="cimke in p.cimkek" :key="cimke.id" class="tag">#{{ cimke.nev }}</small>
-                  </span>
-                  <span v-if="p.statusz === 'piszkozat'" class="draft-badge">Piszkozat</span>
-                </div>
-                <h3 class="post-title">{{ p.cim }}</h3>
-                <p class="post-excerpt">{{ p.kivonat }}</p>
-              </div>
-              <div class="post-actions">
-                <p><RouterLink :to="`/blog/${p.id}`" class="read">Olvasás</RouterLink></p>
-                <p><RouterLink :to="`/editpost/${p.id}`" class="modify">Szerkesztés</RouterLink></p>
-              </div>
-            </article>
+<article v-for="p in posts" :key="p.id" class="post-card">
+  <div class="post-cover">
+    <img :src="p.fo_kep.url_Link" :alt="p.fo_kep.alt_szoveg" />
+  </div>
+  <div class="post-body">
+    <div class="post-meta">
+      <span>{{ formatDate(p.letrehozas_datuma) }}</span>
+      <span class="tags">
+        <small v-for="cimke in p.cimkek" :key="cimke.id" class="tag">#{{ cimke.nev }}</small>
+      </span>
+      <span v-if="p.statusz === 'piszkozat'" class="draft-badge">Piszkozat</span>
+    </div>
+    <h3 class="post-title">{{ p.cim }}</h3>
+    <p class="post-excerpt">{{ truncateText(p.kivonat || p.tartalom, 150) }}</p>
+    <div class="post-actions">
+      <RouterLink :to="`/blog/${p.id}`" class="read">Olvasás</RouterLink>
+      <RouterLink v-if="p.sajat" :to="`/editpost/${p.id}`" class="modify">Szerkesztés</RouterLink>
+      <RouterLink v-else :to="`/editpost/${p.id}`" class="modify">Szerkesztés</RouterLink>
+    </div>
+  </div>
+</article>
           </div>
         </section>
       </div>
@@ -872,13 +879,55 @@ margin: 10px 0;
 color: #374151; 
 }
 
-.post-actions .read, .modify {
-  background: #0f1c3a;
-  color: #fff;
-  padding: 8px 12px;
-  border-radius: 10px;
-  text-decoration: none;
+.post-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.post-actions .read,
+.post-actions .modify {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 12px;
+  border-radius: 20px;
   font-weight: 600;
+  font-size: 0.8rem;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+
+.post-actions .read {
+  background: #eef2ff;
+  color: #1e3a8a;
+}
+
+.post-actions .read:hover {
+  background: #dbeafe;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+  transform: translateY(-1px);
+}
+
+.post-actions .modify {
+  background: #f1f5f9;
+  color: #334155;
+}
+
+.post-actions .modify:hover {
+  background: #e2e8f0;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+  transform: translateY(-1px);
+}
+
+.post-actions .read::before {
+  content: "↗";
+  font-size: 0.95rem;
+}
+
+.post-actions .modify::before {
+  content: "✎";
+  font-size: 0.95rem;
 }
 
 /* responsive */
