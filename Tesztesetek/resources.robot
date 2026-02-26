@@ -78,6 +78,10 @@ ${MEGSE_KAMERA_BTN}         xpath://div[contains(@class,"camera-controls")]//but
 ${PROFIL_BEALLITAS_BTN}     xpath://button[contains(.,"Profilkép beállítása")]
 ${VIDEO_ELEM}               xpath://div[contains(@class,"camera-preview")]//video
 
+# Admin
+${ADMIN_EMAIL}      test@example.com
+${ADMIN_PASS}       Alma12345678.
+${DASHBOARD_URL}    http://localhost:5173/dashboard
 *** Keywords ***
 Open Registration Page
     Open Browser    ${URL}    ${BROWSER}
@@ -360,3 +364,17 @@ Open Camera Browser And Login
     Click Element    //header//nav//a[7]
     Login As Test User
     Navigate To Profile Page
+
+Login As Admin And Go To Dashboard
+    Switch To Login
+    Fill Login Form    ${ADMIN_EMAIL}    ${ADMIN_PASS}
+    Submit Login
+    Login Should Succeed
+    Go To    ${DASHBOARD_URL}
+    Wait Until Element Is Visible    xpath://h2[contains(.,"Dashboard")]    timeout=10s
+
+Dashboard Sidebar Link Should Be Active
+    [Arguments]    ${view_name}
+    ${active}=    Get Element Attribute
+    ...    xpath://a[contains(@class,"nav-link") and contains(.,"${view_name}")]    class
+    Should Contain    ${active}    active
