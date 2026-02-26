@@ -48,14 +48,6 @@ Route::middleware('auth:sanctum')->post('/logout', function (Request $request) {
 });
 
 Route::middleware('auth:sanctum')->group(function () {
-    /*Route::get('/user/check', function () {
-        $adatok = FelhasznaloAdatok::find(auth()->user()->id);
-        if (!$adatok) {
-            return response()->json(['loggedIn' => true, 'szerepkor' => null], 200);
-        }
-        return response()->json(['loggedIn' => true, 'szerepkor' => $adatok->szerepkor], 200);
-    });*/
-
     Route::get('/user', function (Request $request) {
         return $request->user()->load('profilKep:id,url_Link,alt_szoveg', 'adatok')->toArray();
     });
