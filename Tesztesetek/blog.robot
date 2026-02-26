@@ -341,6 +341,8 @@ New Post Reset Button Clears Title
     Sleep    5s
     Fill Post Title    Törlendő cím
     Click Element    ${RESET_BTN}
+    Click Element    ${RESET_BTN}
+    Sleep    5s
     ${title_value}=    Execute JavaScript    return document.getElementById('postTitle').value
     Sleep    5s
     Should Be Empty    ${title_value}
@@ -416,7 +418,7 @@ Edit Post Save Redirects To Profile
     Wait Until Element Is Visible    ${SUBMIT_BTN}    timeout=10s
     Wait Until Element Is Enabled    ${SUBMIT_BTN}    timeout=5s
     Click Element    ${SUBMIT_BTN}
-    Wait Until Location Contains    /Profil   timeout=15s
+    Wait Until Location Contains    /profil   timeout=15s
 
 Edit Post Draft Save Works
     [Documentation]    Szerkesztés közben piszkozatként is menthető a poszt
@@ -433,7 +435,7 @@ Edit Post Draft Save Works
     Sleep    2s
     Click Element    ${DRAFT_BTN}
     Sleep    2s
-    Wait Until Location Contains    /Profil   timeout=30s
+    Wait Until Location Contains    /profil   timeout=30s
 
 Edit Post Page Has Back Button
     [Documentation]    A szerkesztési oldalon megjelenik a Vissza gomb
