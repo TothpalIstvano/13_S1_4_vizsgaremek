@@ -305,11 +305,23 @@ const fetchPostForEdit = async () => {
       description: img.leiras || ''
     }))
 
-    await nextTick()
-    editorKey.value++
-    await nextTick()
+    editorKey.value++;
+    await nextTick();
+
+    // Poll until Quill is ready (it initializes async after mount)
+    await new Promise(resolve => {
+        const interval = setInterval(() => {
+            if (editorRef.value?.quill) {
+                clearInterval(interval);
+                resolve();
+            }
+        }, 20);
+        // Safety timeout after 2s
+        setTimeout(() => { clearInterval(interval); resolve(); }, 2000);
+    });
+
     if (editorRef.value?.quill) {
-        editorRef.value.quill.clipboard.dangerouslyPasteHTML(post.value.content)
+        editorRef.value.quill.clipboard.dangerouslyPasteHTML(post.value.content);
     }
   } catch (error) {
     console.error('Failed to fetch post for edit:', error)

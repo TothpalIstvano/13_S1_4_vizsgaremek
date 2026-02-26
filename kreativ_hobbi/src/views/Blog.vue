@@ -45,6 +45,16 @@
               class="multiselect-stilus"
             />
           </div>
+
+          <div class="oldal-meret">
+            <label for="perPage">Megjelenítés:</label>
+            <select id="perPage" v-model="oldalMeret" @change="oldalra(1)">
+              <option :value="6">6</option>
+              <option :value="9">9</option>
+              <option :value="12">12</option>
+              <option :value="24">24</option>
+            </select>
+          </div>
           
           <div class="dropdown" ref="dropdown">
             <div class="dropdown_opciok" @click="toggle">
@@ -91,7 +101,7 @@
         </div>
         
         <!-- Blog poszt -->
-        <div class="kartya-oszlop"  v-for="post in szurtPosztok"  :key="post.id">
+        <div class="kartya-oszlop"  v-for="post in lapozottPosztok"  :key="post.id">
           <div class="kartya">
             <div class="kartya-glow"></div>
             <div class="kartya-kep">
@@ -171,6 +181,27 @@
           </div>
         </div>
       </section>
+      <div class="lapozas" v-if="osszesenLap > 1">
+        <button class="lap-gomb" @click="oldalra(aktualisOldal - 1)" :disabled="aktualisOldal === 1">
+          <font-awesome-icon icon="fa-solid fa-chevron-left" />
+        </button>
+
+        <template v-for="lap in lathatolapok" :key="lap">
+          <span v-if="lap === '...'" class="lapozas-ellipsis">…</span>
+          <button
+            v-else
+            class="lap-gomb"
+            :class="{ 'aktiv-lap': lap === aktualisOldal }"
+            @click="oldalra(lap)"
+          >
+            {{ lap }}
+          </button>
+        </template>
+
+        <button class="lap-gomb" @click="oldalra(aktualisOldal + 1)" :disabled="aktualisOldal === osszesenLap">
+          <font-awesome-icon icon="fa-solid fa-chevron-right" />
+        </button>
+      </div>
     </div>
   </main>
 </template>
@@ -189,14 +220,14 @@ import {
   faArrowCircleUp, faThumbsUp, faThumbsDown,
   faMagnifyingGlass, faChevronDown, faArrowDown,
   faArrowUp, faSortAlphaUp, faSortAlphaDown,
-  faFilter
+  faFilter, faChevronLeft, faChevronRight
 } from '@fortawesome/free-solid-svg-icons'
 
 library.add(faCalendar, faHeart, faArrowRight,
   faArrowCircleUp, faThumbsUp, faThumbsDown,
   faMagnifyingGlass, faChevronDown, faArrowDown,
   faArrowUp, faSortAlphaUp, faSortAlphaDown,
-  faFilter)
+  faFilter, faChevronLeft, faChevronRight)
 
 import potKep from '@/assets/Public/b-pl1.jpg'
 
@@ -209,6 +240,8 @@ const error = ref(null)
 const keresett = ref('')
 const valasztottCimkek = ref([]);
 const cimkeOpciok = ref([]);
+const aktualisOldal = ref(1)
+const oldalMeret = ref(9)
 
 const isAuthenticated = computed(() => authStore.isAuthenticated)
 
@@ -257,6 +290,44 @@ const szurtPosztok = computed(() => {
   
   return filtered;
 });
+
+const osszesenLap = computed(() => 
+  Math.ceil(szurtPosztok.value.length / oldalMeret.value)
+)
+
+const lapozottPosztok = computed(() => {
+  const start = (aktualisOldal.value - 1) * oldalMeret.value
+  return szurtPosztok.value.slice(start, start + oldalMeret.value)
+})
+
+// Shows page numbers with "..." for long ranges, like Google
+const lathatolapok = computed(() => {
+  const total = osszesenLap.value
+  const current = aktualisOldal.value
+  const pages = []
+
+  if (total <= 7) {
+    for (let i = 1; i <= total; i++) pages.push(i)
+  } else {
+    pages.push(1)
+    if (current > 3) pages.push('...')
+    
+    for (let i = Math.max(2, current - 1); i <= Math.min(total - 1, current + 1); i++) {
+      pages.push(i)
+    }
+    
+    if (current < total - 2) pages.push('...')
+    pages.push(total)
+  }
+
+  return pages
+})
+
+const oldalra = (lap) => {
+  if (lap < 1 || lap > osszesenLap.value) return
+  aktualisOldal.value = lap
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+}
 
 const opciok = [
   {
@@ -378,7 +449,7 @@ const fetchReakcio = async () => {
     
     mindenPoszt.value = mindenPoszt.value.map(post => ({
       ...post,
-      reakcio: userReactions[post.id] || null
+      reakcio: reakcios[post.id] || null
     }))
     posztok.value = [...mindenPoszt.value];
     
@@ -388,12 +459,6 @@ const fetchReakcio = async () => {
 }
 
 const reakcioKezeles = async (postId, reactionType) => {
-  if (!isAuthenticated.value) {
-    alert('Kérjük, jelentkezzen be a reakciókhoz!')
-    router.push('/Belepes')
-    return
-  }
-  
   try {
     const response = await api.post(`/api/blog/${postId}/reaction`, {
       reaction: reactionType
@@ -406,12 +471,13 @@ const reakcioKezeles = async (postId, reactionType) => {
       mindenPoszt.value[postIndex].likes_count = likes_count
       mindenPoszt.value[postIndex].dislikes_count = dislikes_count
       mindenPoszt.value[postIndex].reakcio = user_reaction
-      posztok.value = [...mindenPoszt.value];
+      posztok.value = [...mindenPoszt.value]
     }
     
   } catch (err) {
     if (err.response?.status === 401) {
-      alert('Hitelesítési hiba. Kérjük, jelentkezzen be újra.')
+      alert('Kérjük, jelentkezzen be a reakciókhoz!')
+      router.push('/Belepes')
     }
   }
 }
@@ -448,6 +514,10 @@ onMounted(() => {
 onBeforeUnmount(() => {
   document.removeEventListener('click', kiKattintas);
 });
+
+watch([keresett, valasztottCimkek], () => {
+  aktualisOldal.value = 1
+})
 
 const isVisible = ref(false);
 
@@ -643,6 +713,81 @@ main {
   border-color: #d49535 !important;
   box-shadow: 0 0 0 3px rgba(77, 138, 240, 0.1) !important;
   outline: none !important;
+}
+
+.lapozas {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  padding: 32px 0 16px;
+  flex-wrap: wrap;
+}
+
+.lap-gomb {
+  min-width: 40px;
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid #e5e7eb;
+  background: #f8f9fa;
+  color: #494d55;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lap-gomb:hover:not(:disabled) {
+  background: var(--b-gomb);
+  color: white;
+  border-color: var(--b-gomb);
+  transform: translateY(-2px);
+}
+
+.lap-gomb:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.aktiv-lap {
+  background: var(--b-gomb) !important;
+  color: white !important;
+  border-color: var(--b-gomb) !important;
+  box-shadow: 0 4px 6px -1px rgba(237, 58, 58, 0.3);
+}
+
+.lapozas-ellipsis {
+  padding: 0 6px;
+  color: #9ca3af;
+  font-size: 18px;
+  line-height: 40px;
+}
+
+.oldal-meret {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #494d55;
+}
+
+.oldal-meret select {
+  padding: 8px 10px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #f8f9fa;
+  font-size: 14px;
+  cursor: pointer;
+  color: #494d55;
+}
+
+.oldal-meret select:focus {
+  outline: none;
+  border-color: var(--b-gomb);
 }
 
 .dropdown {

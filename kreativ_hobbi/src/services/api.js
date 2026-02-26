@@ -10,18 +10,28 @@ const api = axios.create({
     }
 });
 
-// Request interceptor to add CSRF token
+const getCookie = (name) => {
+    const match = document.cookie
+        .split('; ')
+        .find(row => row.startsWith(name + '='));
+    return match ? decodeURIComponent(match.split('=')[1]) : null;
+};
+
 api.interceptors.request.use(async (config) => {
-    // For GET requests, we don't need CSRF token
     if (config.method.toLowerCase() !== 'get') {
         try {
-            // Get CSRF token from Laravel Sanctum
-            await axios.get('http://localhost:8000/sanctum/csrf-cookie', {
-                withCredentials: true
-            });
-            
-            // The token is automatically set in the cookie by Laravel
-            // Axios will send it automatically with withCredentials: true
+            // Only fetch if we don't already have the cookie
+            if (!getCookie('XSRF-TOKEN')) {
+                await axios.get('http://localhost:8000/sanctum/csrf-cookie', {
+                    withCredentials: true
+                });
+            }
+
+            // Explicitly set the token as a header — Axios doesn't always do this automatically
+            const token = getCookie('XSRF-TOKEN');
+            if (token) {
+                config.headers['X-XSRF-TOKEN'] = token;
+            }
         } catch (error) {
             console.error('Error fetching CSRF token:', error);
         }
