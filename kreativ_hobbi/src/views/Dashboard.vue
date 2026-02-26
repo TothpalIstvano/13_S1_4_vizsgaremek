@@ -410,7 +410,7 @@
               <tr>
                 <th>Cím</th>
                 <th>Szerző</th>
-                <th>Kategória</th>
+                <th>Címkék</th>
                 <th>Dátum</th>
                 <th>Státusz</th>
                 <th>Műveletek</th>
@@ -428,7 +428,7 @@
                       class="badge badge-blue"
                       style="font-size:11px; padding:2px 8px;"
                     >
-                      {{ tag }}
+                      {{ tag.nev }}
                     </span>
                     <span 
                       v-if="post.tags.length > 2"
@@ -625,6 +625,8 @@
               </label>
               <Editor 
                 v-model="editingBlogPost.content" 
+                :key="editorKey"
+                ref="editorRef"
                 editorStyle="height: 320px"
                 class="mb-2 editor-container"
                 :pt="{
@@ -779,6 +781,8 @@ const showBlogModal = ref(false);
 const editingProduct = ref({});
 const editingUser = ref({});
 const editingBlogPost = ref({});
+const editorKey = ref(0);
+const editorRef = ref(null);
 const loading = ref(false);
 
 // Complex Form State (from new-post.vue)
@@ -1112,8 +1116,8 @@ const openBlogModal = async (post = null) => {
     };
     
     // Populate tags
-    selectedTags.value = post.tagsData 
-      ? post.tagsData.map(tag => 
+    selectedTags.value = post.tags
+      ? post.tags.map(tag => 
           tagOptions.value.find(opt => opt.id === tag.id)
         ).filter(Boolean)
       : [];
@@ -1136,6 +1140,25 @@ const openBlogModal = async (post = null) => {
     };
   }
   showBlogModal.value = true;
+
+  editorKey.value++;
+await nextTick();
+
+// Poll until Quill is ready (it initializes async after mount)
+await new Promise(resolve => {
+    const interval = setInterval(() => {
+        if (editorRef.value?.quill) {
+            clearInterval(interval);
+            resolve();
+        }
+    }, 20);
+    // Safety timeout after 2s
+    setTimeout(() => { clearInterval(interval); resolve(); }, 2000);
+});
+
+if (editorRef.value?.quill) {
+    editorRef.value.quill.clipboard.dangerouslyPasteHTML(editingBlogPost.value.content);
+}
 };
 
 // --- Oldalbontas ---

@@ -208,7 +208,7 @@
 
         <!-- PRODUCT GRID -->
         <div id="products">
-          <div v-for="item in filteredItems" :key="item.id" class="product-card" @click="router.push(`/aruhaz/${item.id}`)" style="cursor: pointer;">
+          <div v-for="item in lapozottTermekek" :key="item.id" class="product-card" @click="router.push(`/aruhaz/${item.id}`)" style="cursor: pointer;">
             <img :src="item.termek_fo_kep.url_Link" :alt="item.termek_fo_kep.alt_szoveg" class="product-image" />
 
             <div class="product-body">
@@ -236,6 +236,39 @@
           <div v-if="filteredItems.length == 0" style="grid-column: 1/-1; text-align: center; color: #555; font-size: 24px; padding: 2rem 0;">
             Nincs találat
           </div>
+          <div class="lapozas-sor" v-if="osszesenLap > 0">
+            <div class="oldal-meret">
+              <label for="perPage">Megjelenítés:</label>
+              <select id="perPage" v-model="oldalMeret" @change="oldalra(1)">
+                <option :value="9">9</option>
+                <option :value="12">12</option>
+                <option :value="24">24</option>
+                <option :value="48">48</option>
+              </select>
+            </div>
+
+            <div class="lapozas" v-if="osszesenLap > 1">
+              <button class="lap-gomb" @click="oldalra(aktualisOldal - 1)" :disabled="aktualisOldal === 1">
+                <font-awesome-icon icon="fa-solid fa-chevron-left" />
+              </button>
+
+              <template v-for="lap in lathatolapok" :key="lap">
+                <span v-if="lap === '...'" class="lapozas-ellipsis">…</span>
+                <button
+                  v-else
+                  class="lap-gomb"
+                  :class="{ 'aktiv-lap': lap === aktualisOldal }"
+                  @click="oldalra(lap)"
+                >
+                  {{ lap }}
+                </button>
+              </template>
+
+              <button class="lap-gomb" @click="oldalra(aktualisOldal + 1)" :disabled="aktualisOldal === osszesenLap">
+                <font-awesome-icon icon="fa-solid fa-chevron-right" />
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -258,7 +291,9 @@
     faSortAlphaDown,
     faChevronDown,
     faFilter,
-    faMagnifyingGlass
+    faMagnifyingGlass,
+    faChevronLeft,
+    faChevronRight
   } from '@fortawesome/free-solid-svg-icons'
 
 
@@ -269,7 +304,9 @@
     faSortAlphaDown,
     faChevronDown,
     faFilter,
-    faMagnifyingGlass 
+    faMagnifyingGlass,
+    faChevronLeft,
+    faChevronRight
   )
   
   const router = useRouter()
@@ -309,6 +346,8 @@
     })
   const open = ref(false)
   const dropdown = ref(null)
+  const aktualisOldal = ref(1)
+  const oldalMeret = ref(9)
 
   function toggle() {
     open.value = !open.value
@@ -495,6 +534,41 @@ function toggleCategoryDropdown(id) {
   }
 }
 
+const osszesenLap = computed(() =>
+  Math.ceil(filteredItems.value.length / oldalMeret.value)
+)
+
+const lapozottTermekek = computed(() => {
+  const start = (aktualisOldal.value - 1) * oldalMeret.value
+  return filteredItems.value.slice(start, start + oldalMeret.value)
+})
+
+const lathatolapok = computed(() => {
+  const total = osszesenLap.value
+  const current = aktualisOldal.value
+  const pages = []
+
+  if (total <= 7) {
+    for (let i = 1; i <= total; i++) pages.push(i)
+  } else {
+    pages.push(1)
+    if (current > 3) pages.push('...')
+    for (let i = Math.max(2, current - 1); i <= Math.min(total - 1, current + 1); i++) {
+      pages.push(i)
+    }
+    if (current < total - 2) pages.push('...')
+    pages.push(total)
+  }
+
+  return pages
+})
+
+const oldalra = (lap) => {
+  if (lap < 1 || lap > osszesenLap.value) return
+  aktualisOldal.value = lap
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+}
+
 // calculate slider fill
 const rangeStyle = computed(() => {
   const minPercent = ((tempMin.value - absMin.value) / (absMax.value - absMin.value)) * 100
@@ -521,6 +595,9 @@ watch(tempMax, val => {
   if (val < tempMin.value) tempMax.value = tempMin.value
 })
 
+watch([searchTerm, selectedkategoriak, appliedMin, appliedMax], () => {
+  aktualisOldal.value = 1
+})
 
 onMounted(async () => {
   const data = await fetchTermek()
@@ -881,6 +958,99 @@ margin-left: 10px;
   transform: rotate(180deg);
 }
 
+.termek-oszlop {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  min-width: 0;
+}
+
+.lapozas-sor {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 8px 0 16px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.lapozas {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.lap-gomb {
+  min-width: 40px;
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid #d0d0d0;
+  background: #f8f9fa;
+  color: #494d55;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lap-gomb:hover:not(:disabled) {
+  background: #3f51b5;
+  color: white;
+  border-color: #3f51b5;
+  transform: translateY(-2px);
+}
+
+.lap-gomb:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.aktiv-lap {
+  background: #3f51b5 !important;
+  color: white !important;
+  border-color: #3f51b5 !important;
+  box-shadow: 0 4px 6px -1px rgba(63, 81, 181, 0.3);
+}
+
+.lapozas-ellipsis {
+  padding: 0 6px;
+  color: #9ca3af;
+  font-size: 18px;
+  line-height: 40px;
+}
+
+.oldal-meret {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #494d55;
+  position: absolute;
+  right: 15px;
+}
+
+.oldal-meret select {
+  padding: 8px 10px;
+  border: 1px solid #d0d0d0;
+  border-radius: 8px;
+  background: #f8f9fa;
+  font-size: 14px;
+  cursor: pointer;
+  color: #494d55;
+}
+
+.oldal-meret select:focus {
+  outline: none;
+  border-color: #3f51b5;
+}
 /*#endregion*/
 
 /*#region ===== Price Filter ===== */
