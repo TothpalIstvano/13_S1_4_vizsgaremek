@@ -53,7 +53,19 @@
 * \[ ] Az oldal tesztelése
 * \[ ] Az oldal dokumenálása
 * \[ ] Optimalizálás
-* \[ ] Mintakészitő✅, regisztráció✅, regisztráció rossz adattal✅, bejelentekezés✅, bejelentekezés rossz adattal✅, jelszó reset(egy része done), új felhasználó admin siteon, új item admin siteon, rendelés, bankkártya, poszthozáadása profilról + modósítás, profil modositás
+* \[ ] Tesztek:
+              - Mintakészitő✅
+              - regisztráció✅
+              - regisztráció rossz adattal✅
+              - bejelentekezés✅
+              - bejelentekezés rossz adattal✅
+              - jelszó reset (egy része done)
+              - új felhasználó admin siteon
+              - új item admin siteon
+              - rendelés
+              - bankkártya
+              - poszthozáadása profilról + modósítás✅
+              - profil modositás✅
 
 ha megakarjuk oldani azt hogy bejelentkezve maradok
 

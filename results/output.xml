@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot generator="Robot 7.4.1 (Python 3.14.3 on win32)" generated="2026-02-26T21:56:57.055267" rpa="false" schemaversion="5">
+<suite id="s1" name="13 S1 4 vizsgaremek" source="C:\Users\redne\Documents\GitHub\13_S1_4_vizsgaremek">
+<suite id="s1-s1" name="Tesztesetek" source="C:\Users\redne\Documents\GitHub\13_S1_4_vizsgaremek\Tesztesetek">
+<suite id="s1-s1-s1" name="Profil" source="C:\Users\redne\Documents\GitHub\13_S1_4_vizsgaremek\Tesztesetek\profil.robot">
+<test id="s1-s1-s1-t1" name="Szerkesztes City Dropdown Selects A City" line="77">
+<kw name="Open Registration Page" owner="resources" type="SETUP">
+<kw name="Open Browser" owner="SeleniumLibrary">
+<msg time="2026-02-26T21:56:57.437400" level="INFO">Opening browser 'Chrome' to base url 'http://localhost:5173'.</msg>
+<arg>${URL}</arg>
+<arg>${BROWSER}</arg>
+<doc>Opens a new browser instance to the optional ``url``.</doc>
+<status status="PASS" start="2026-02-26T21:56:57.436428" elapsed="3.318105"/>
+</kw>
+<kw name="Maximize Browser Window" owner="SeleniumLibrary">
+<doc>Maximizes current browser window.</doc>
+<status status="PASS" start="2026-02-26T21:57:00.755085" elapsed="0.041354"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>//header//nav//a[7]</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-02-26T21:57:00.796860" elapsed="0.023022"/>
+</kw>
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-02-26T21:57:00.820464" level="INFO">Clicking element '//header//nav//a[7]'.</msg>
+<arg>//header//nav//a[7]</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-02-26T21:57:00.820119" elapsed="0.104554"/>
+</kw>
+<status status="PASS" start="2026-02-26T21:56:57.434808" elapsed="3.490251"/>
+</kw>
+<kw name="Login As Test User" owner="resources">
+<kw name="Switch To Login" owner="resources">
+<kw name="Run Keyword And Return Status" owner="BuiltIn">
+<kw name="Element Should Be Visible" owner="SeleniumLibrary">
+<msg time="2026-02-26T21:57:00.955669" level="INFO">Element 'xpath://h2[contains(.,"Fiók készítése")]' is displayed.</msg>
+<arg>xpath://h2[contains(.,"Fiók készítése")]</arg>
+<doc>Verifies that the element identified by ``locator`` is visible.</doc>
+<status status="PASS" start="2026-02-26T21:57:00.927676" elapsed="0.028836"/>
+</kw>
+<msg time="2026-02-26T21:57:00.956997" level="INFO">${reg_visible} = True</msg>
+<var>${reg_visible}</var>
+<arg>Element Should Be Visible</arg>
+<arg>xpath://h2[contains(.,"Fiók készítése")]</arg>
+<doc>Runs the specified keyword and returns the status as a Boolean value.</doc>
+<status status="PASS" start="2026-02-26T21:57:00.926941" elapsed="0.030639"/>
+</kw>
+<kw name="Run Keyword If" owner="BuiltIn">
+<kw name="Click Button" owner="SeleniumLibrary">
+<msg time="2026-02-26T21:57:00.959669" level="INFO">Clicking button 'xpath://button[contains(.,"Bejelentkezés")]'.</msg>
+<arg>xpath://button[contains(.,"Bejelentkezés")]</arg>
+<doc>Clicks the button identified by ``locator``.</doc>
+<status status="PASS" start="2026-02-26T21:57:00.959292" elapsed="0.111113"/>
+</kw>
+<arg>${reg_visible}</arg>
+<arg>Click Button</arg>
+<arg>xpath://button[contains(.,"Bejelentkezés")]</arg>
+<doc>Runs the given keyword with the given arguments, if ``condition`` is true.</doc>
+<status status="PASS" start="2026-02-26T21:57:00.958208" elapsed="0.112476"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>xpath://h2[contains(.,"Lépj be a fiókodba")]</arg>
+<arg>timeout=5s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-02-26T21:57:01.070922" elapsed="0.029383"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>name:email</arg>
+<arg>timeout=5s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-02-26T21:57:01.100622" elapsed="0.015050"/>
+</kw>
+<status status="PASS" start="2026-02-26T21:57:00.926502" elapsed="0.189543"/>
+</kw>
+<kw name="Fill Login Form" owner="resources">
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>xpath=//div[contains(@class,"b-container")]//input[@name="email"]</arg>
+<arg>timeout=5s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-02-26T21:57:01.117025" elapsed="0.014507"/>
+</kw>
+<kw name="Input Text" owner="SeleniumLibrary">
+<msg time="2026-02-26T21:57:01.132094" level="INFO">Typing text 'test@example.com' into text field 'xpath=//div[contains(@class,"b-container")]//input[@name="email"]'.</msg>
+<arg>xpath=//div[contains(@class,"b-container")]//input[@name="email"]</arg>
+<arg>${email}</arg>
+<doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
+<status status="PASS" start="2026-02-26T21:57:01.131745" elapsed="0.153462"/>
+</kw>
+<kw name="Input Password" owner="SeleniumLibrary">
+<msg time="2026-02-26T21:57:01.286585" level="INFO">Typing password into text field 'xpath=//div[contains(@class,"b-container")]//input[@name="password"]'.</msg>
+<msg time="2026-02-26T21:57:01.341066" level="INFO">Temporally setting log level to: NONE</msg>
+<arg>xpath=//div[contains(@class,"b-container")]//input[@name="password"]</arg>
+<arg>${password}</arg>
+<doc>Types the given password into the text field identified by ``locator``.</doc>
+<status status="PASS" start="2026-02-26T21:57:01.285671" elapsed="0.122471"/>
+</kw>
+<arg>test@example.com</arg>
+<arg>Alma12345678.</arg>
+<status status="PASS" start="2026-02-26T21:57:01.116403" elapsed="0.292075"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2026-02-26T21:57:01.409414" level="INFO">Executing JavaScript:
+document.querySelector('.b-container button[type="submit"]').click()
+Without any arguments.</msg>
+<arg>document.querySelector('.b-container button[type="submit"]').click()</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2026-02-26T21:57:01.408699" elapsed="0.011888"/>
+</kw>
+<kw name="Wait Until Location Contains" owner="SeleniumLibrary">
+<arg>/Profil</arg>
+<arg>timeout=20s</arg>
+<doc>Waits until the current URL contains ``expected``.</doc>
+<status status="PASS" start="2026-02-26T21:57:01.420962" elapsed="1.654200"/>
+</kw>
+<status status="PASS" start="2026-02-26T21:57:00.925738" elapsed="2.149615"/>
+</kw>
+<kw name="Navigate To Profile Page" owner="resources">
+<kw name="Go To" owner="SeleniumLibrary">
+<msg time="2026-02-26T21:57:03.076870" level="INFO">Opening url 'http://localhost:5173/Profil'</msg>
+<arg>${URL}/Profil</arg>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<status status="PASS" start="2026-02-26T21:57:03.076543" elapsed="1.023236"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-02-26T21:57:05.101158" level="INFO">Slept 1 second.</msg>
+<arg>1s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-02-26T21:57:04.100111" elapsed="1.001409"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>xpath://h2[contains(.,"profilhoz tartozó cikkek")]</arg>
+<arg>timeout=15s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-02-26T21:57:05.101876" elapsed="0.016765"/>
+</kw>
+<status status="PASS" start="2026-02-26T21:57:03.075920" elapsed="2.042901"/>
+</kw>
+<kw name="Open Modal" owner="resources">
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-02-26T21:57:05.119822" level="INFO">Clicking element 'xpath://button[contains(@class,"btn edit") and contains(.,"Szerkesztés")]'.</msg>
+<arg>${SZERK_BTN}</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-02-26T21:57:05.119568" elapsed="0.068059"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${SZERK_MODAL}</arg>
+<arg>timeout=5s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-02-26T21:57:05.187891" elapsed="0.017474"/>
+</kw>
+<status status="PASS" start="2026-02-26T21:57:05.119184" elapsed="0.086562"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>id:varos</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-02-26T21:57:05.206174" elapsed="0.016865"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2026-02-26T21:57:05.224214" level="INFO">Executing JavaScript:
+document.getElementById("varos").scrollIntoView({block:'center'});
+Without any arguments.</msg>
+<arg>document.getElementById("varos").scrollIntoView({block:'center'});</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2026-02-26T21:57:05.223570" elapsed="0.006243"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-02-26T21:57:10.231125" level="INFO">Slept 5 seconds.</msg>
+<arg>5s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-02-26T21:57:05.230159" elapsed="5.001507"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2026-02-26T21:57:10.232990" level="INFO">Executing JavaScript:
+document.querySelector('.p-dropdown-trigger').click();
+Without any arguments.</msg>
+<arg>document.querySelector('.p-dropdown-trigger').click();</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2026-02-26T21:57:10.232150" elapsed="0.632057"/>
+</kw>
+<kw name="Wait Until Page Contains Element" owner="SeleniumLibrary">
+<arg>css:.p-dropdown-panel</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until the element ``locator`` appears on the current page.</doc>
+<status status="PASS" start="2026-02-26T21:57:10.865071" elapsed="0.029693"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>css:.p-dropdown-panel input</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-02-26T21:57:10.895415" elapsed="0.029100"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2026-02-26T21:57:10.925687" level="INFO">Executing JavaScript:
+const input = document.querySelector('.p-dropdown-panel input');input.value = 'Budapest';input.dispatchEvent(new Event('input', { bubbles: true }));
+Without any arguments.</msg>
+<arg>const input = document.querySelector('.p-dropdown-panel input');</arg>
+<arg>input.value = 'Budapest';</arg>
+<arg>input.dispatchEvent(new Event('input', { bubbles: true }));</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2026-02-26T21:57:10.924994" elapsed="0.191729"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>xpath://li[contains(@class,"p-dropdown-item") and contains(.,"Budapest")]</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-02-26T21:57:11.117297" elapsed="0.037785"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2026-02-26T21:57:11.157076" level="INFO">Executing JavaScript:
+[...document.querySelectorAll('.p-dropdown-item')].find(el =&gt; el.textContent.includes('Budapest')).click();
+Without any arguments.</msg>
+<arg>[...document.querySelectorAll('.p-dropdown-item')]</arg>
+<arg>.find(el =&gt; el.textContent.includes('Budapest'))</arg>
+<arg>.click();</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2026-02-26T21:57:11.155787" elapsed="0.032669"/>
+</kw>
+<kw name="Wait Until Element Contains" owner="SeleniumLibrary">
+<arg>xpath://*[@id="varos"]//*[contains(@class,"p-dropdown-label")]</arg>
+<arg>Budapest</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until the element ``locator`` contains ``text``.</doc>
+<status status="PASS" start="2026-02-26T21:57:11.188918" elapsed="0.023102"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>xpath://button[contains(.,"Mentés")]</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-02-26T21:57:11.212861" elapsed="0.018037"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-02-26T21:57:11.532527" level="INFO">Slept 300 milliseconds.</msg>
+<arg>0.3s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-02-26T21:57:11.231311" elapsed="0.301698"/>
+</kw>
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-02-26T21:57:11.533912" level="INFO">Clicking element 'xpath://button[contains(.,"Mentés")]'.</msg>
+<arg>xpath://button[contains(.,"Mentés")]</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-02-26T21:57:11.533462" elapsed="0.053005"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-02-26T21:57:14.589400" level="INFO">Slept 3 seconds.</msg>
+<arg>3s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-02-26T21:57:11.587551" elapsed="3.002689"/>
+</kw>
+<kw name="Element Should Not Be Visible" owner="SeleniumLibrary">
+<msg time="2026-02-26T21:57:14.606148" level="INFO">Element 'xpath://button[contains(.,"Mentés")]' did not exist.</msg>
+<arg>xpath://button[contains(.,"Mentés")]</arg>
+<doc>Verifies that the element identified by ``locator`` is NOT visible.</doc>
+<status status="PASS" start="2026-02-26T21:57:14.591162" elapsed="0.015256"/>
+</kw>
+<kw name="Close Browser Session" owner="resources" type="TEARDOWN">
+<kw name="Close Browser" owner="SeleniumLibrary">
+<doc>Closes the current browser.</doc>
+<status status="PASS" start="2026-02-26T21:57:14.607656" elapsed="2.326158"/>
+</kw>
+<status status="PASS" start="2026-02-26T21:57:14.607087" elapsed="2.326934"/>
+</kw>
+<status status="PASS" start="2026-02-26T21:56:57.431205" elapsed="19.503136"/>
+</test>
+<status status="PASS" start="2026-02-26T21:56:57.177133" elapsed="19.762767"/>
+</suite>
+<status status="PASS" start="2026-02-26T21:56:57.161741" elapsed="19.781842"/>
+</suite>
+<status status="PASS" start="2026-02-26T21:56:57.069827" elapsed="19.877675"/>
+</suite>
+<statistics>
+<total>
+<stat pass="1" fail="0" skip="0">All Tests</stat>
+</total>
+<tag>
+</tag>
+<suite>
+<stat name="13 S1 4 vizsgaremek" id="s1" pass="1" fail="0" skip="0">13 S1 4 vizsgaremek</stat>
+<stat name="Tesztesetek" id="s1-s1" pass="1" fail="0" skip="0">13 S1 4 vizsgaremek.Tesztesetek</stat>
+<stat name="Profil" id="s1-s1-s1" pass="1" fail="0" skip="0">13 S1 4 vizsgaremek.Tesztesetek.Profil</stat>
+</suite>
+</statistics>
+<errors>
+</errors>
+</robot>

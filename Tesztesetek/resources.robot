@@ -44,6 +44,40 @@ ${FILE_UPLOAD_INPUT}    id:file-upload
 ${FILE_UPLOAD_LABEL}    xpath://label[@for="file-upload"]
 ${MINTA_BTN}            xpath://button[contains(.,"Minta készítése")]
 
+${BLOG_NAV_LINK}        xpath://header//nav//a[contains(.,"Blog")]
+${POST_TITLE_INPUT}     id:postTitle
+${POST_CONTENT_EDITOR}  xpath://div[contains(@class,"ql-editor")]
+${POST_SUBTEXT_INPUT}   id:postSubtext
+${SUBMIT_BTN}           xpath://button[@type='submit' and contains(@class, 'submit-button')]
+${DRAFT_BTN}            xpath://button[contains(.,"Mentés piszkozatként")]
+${RESET_BTN}            xpath://button[contains(.,"Visszaállítás")]
+${NOTIFICATION}         xpath://div[contains(@class,"notification")]
+${BLOG_PAGE_TITLE}      xpath://h1[contains(@class,"title") and contains(.,"Blog")]
+${BLOG_CARDS}           xpath://div[contains(@class,"kartya-oszlop")]
+${KERESES_INPUT}        xpath://input[contains(@placeholder,"Keresés")]
+${MEGTEKINTES_BTN}      xpath:(//button[contains(.,"Megtekintés")])[1]
+
+# Szerkesztés modal
+${SZERK_BTN}                xpath://button[contains(@class,"btn edit") and contains(.,"Szerkesztés")]
+${SZERK_MODAL}              xpath://div[contains(@class,"szerk-modal")]
+${MEGSE_BTN}                xpath://button[contains(@class,"megse")]
+${MENTES_BTN}               xpath://button[contains(@class,"mentes")]
+
+# Form fields
+${VEZETEKNEV_INPUT}         id:vezeteknev
+${KERESZTNEV_INPUT}         id:keresztnev
+${TELEFON_INPUT}            id:telefon
+${UTCA_INPUT}               id:utca
+${HAZSZAM_INPUT}            id:hazszam
+${EMELETAJTO_INPUT}         id:emeletAjto
+
+# Camera
+${KAMERA_BTN}               xpath://button[contains(.,"Kamera használata")]
+${FOTOZAS_BTN}              xpath://button[contains(.,"Fotózás")]
+${MEGSE_KAMERA_BTN}         xpath://div[contains(@class,"camera-controls")]//button[contains(.,"Mégse")]
+${PROFIL_BEALLITAS_BTN}     xpath://button[contains(.,"Profilkép beállítása")]
+${VIDEO_ELEM}               xpath://div[contains(@class,"camera-preview")]//video
+
 *** Keywords ***
 Open Registration Page
     Open Browser    ${URL}    ${BROWSER}
@@ -234,3 +268,95 @@ Click Minta Button
 
 Close Browser Session
     Close Browser
+
+Login As Test User
+    Switch To Login
+    Fill Login Form    test@example.com    Alma12345678.
+    Execute JavaScript    document.querySelector('.b-container button[type="submit"]').click()
+    Wait Until Location Contains    /Profil   timeout=20s
+
+Navigate To New Post Page
+    Go To    ${URL}/newpost
+    Wait Until Element Is Visible    ${POST_TITLE_INPUT}    timeout=10s
+
+Fill Post Title
+    [Arguments]    ${title}
+    Clear Element Text    ${POST_TITLE_INPUT}
+    Input Text    ${POST_TITLE_INPUT}    ${title}
+
+Fill Post Content
+    [Arguments]    ${content}
+    Wait Until Element Is Visible    ${POST_CONTENT_EDITOR}    timeout=5s
+    Click Element    ${POST_CONTENT_EDITOR}
+    Input Text    ${POST_CONTENT_EDITOR}    ${content}
+
+Fill Post Subtext
+    [Arguments]    ${subtext}
+    Input Text    ${POST_SUBTEXT_INPUT}    ${subtext}
+
+Notification Should Contain
+    [Arguments]    ${text}
+    Wait Until Element Is Visible    ${NOTIFICATION}    timeout=8s
+    Element Should Contain    ${NOTIFICATION}    ${text}
+
+Notification Should Be Warning
+    Wait Until Element Is Visible    ${NOTIFICATION}    timeout=8s
+    ${classes}=    Get Element Attribute    ${NOTIFICATION}    class
+    Should Contain    ${classes}    warn
+
+Navigate To Blog Page
+    Wait Until Element Is Visible    ${BLOG_NAV_LINK}    timeout=10s
+    Click Element    ${BLOG_NAV_LINK}
+    Wait Until Element Is Visible    ${BLOG_PAGE_TITLE}    timeout=10s
+
+Navigate To Profile Page
+    Go To    ${URL}/Profil
+    Sleep    1s
+    Wait Until Element Is Visible    xpath://h2[contains(.,"profilhoz tartozó cikkek")]    timeout=15s
+
+Get First Post Edit Href
+    ${href}=    Execute JavaScript
+    ...    return document.querySelector('a[href*="/editpost/"]')?.getAttribute('href') || ''
+    RETURN    ${href}
+
+Check Count Changed
+    [Arguments]    ${locator}    ${original_value}
+    ${current_value} =    Get Text    ${locator}
+    Should Not Be Equal    ${current_value}    ${original_value}
+
+Open Browser With Camera Permission
+    ${options}=    Evaluate    sys.modules['selenium.webdriver'].ChromeOptions()    sys
+    Call Method    ${options}    add_argument    --use-fake-ui-for-media-stream
+    Call Method    ${options}    add_argument    --use-fake-device-for-media-stream
+    Create Webdriver    Chrome    options=${options}
+
+    Go To    ${URL}
+
+Open Modal
+    Click Element    ${SZERK_BTN}
+    Wait Until Element Is Visible    ${SZERK_MODAL}    timeout=5s
+
+Fill Required Name Fields
+    [Arguments]    ${vez}=Teszt    ${ker}=Elek
+    Clear Element Text    ${VEZETEKNEV_INPUT}
+    Input Text    ${VEZETEKNEV_INPUT}    ${vez}
+    Clear Element Text    ${KERESZTNEV_INPUT}
+    Input Text    ${KERESZTNEV_INPUT}    ${ker}
+
+Save And Wait For Modal To Close
+    Click Element    ${MENTES_BTN}
+    Wait Until Element Is Not Visible    ${SZERK_MODAL}    timeout=10s
+
+Open Camera Browser And Login
+    # Override the default Test Setup — open Chrome with fake camera, then log in and navigate
+    ${options}=    Evaluate    sys.modules['selenium.webdriver'].ChromeOptions()    sys
+    Call Method    ${options}    add_argument    --use-fake-ui-for-media-stream
+    Call Method    ${options}    add_argument    --use-fake-device-for-media-stream
+    Create Webdriver    Chrome    options=${options}
+    Maximize Browser Window
+    Go To    ${URL}
+    # The login page is at the same URL — navigate there via nav link
+    Wait Until Element Is Visible    //header//nav//a[7]    timeout=10s
+    Click Element    //header//nav//a[7]
+    Login As Test User
+    Navigate To Profile Page
