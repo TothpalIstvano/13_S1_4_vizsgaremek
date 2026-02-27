@@ -1,5 +1,6 @@
 *** Settings ***
 Library    SeleniumLibrary
+Library    Collections
 
 *** Variables ***
 ${URL}    http://localhost:5173
@@ -82,6 +83,56 @@ ${VIDEO_ELEM}               xpath://div[contains(@class,"camera-preview")]//vide
 ${ADMIN_EMAIL}      test@example.com
 ${ADMIN_PASS}       Alma12345678.
 ${DASHBOARD_URL}    http://localhost:5173/dashboard
+
+#áruház
+${ARUHAZ_URL}       ${URL}/aruhaz
+${KOSAR_URL}        ${URL}/kosar
+${FIZETES_URL}      ${URL}/kosar/fizetes
+
+# Selectors – Áruház (shop)
+${PRODUCT_CARD}         xpath:(//div[contains(@class,"product-card")])[1]
+${FIRST_ADD_BTN}        xpath:(//button[contains(@class,"add-btn")])[1]
+${FIRST_PRODUCT_TITLE}  xpath:(//h3[contains(@class,"product-title")])[1]
+${FIRST_PRODUCT_PRICE}  xpath:(//p[contains(@class,"product-price")])[1]
+${SEARCH_INPUT}         xpath://input[contains(@class,"search-input")]
+${APPLY_PRICE_BTN}      xpath://button[contains(@class,"apply-btn")]
+${PRICE_MIN_INPUT}      id:minTextIn
+${PRICE_MAX_INPUT}      id:maxTextIn
+${CART_MODAL}           xpath://div[contains(@class,"modal-content")]
+${MODAL_CONTINUE_BTN}   xpath://button[contains(@class,"btn-continue")]
+${MODAL_CART_BTN}       xpath://a[contains(@class,"btn-checkout")]
+${PRODUCT_COUNT_LABEL}  xpath://div[contains(@class,"items-header")]/span
+
+# Selectors – Kosár (cart)
+${CART_HEADER}          xpath://h1[contains(.,"kosarad")]
+${EMPTY_CART_MSG}       xpath://h2[contains(.,"A kosárod üres")]
+${REMOVE_BTN}           xpath:(//button[contains(@class,"remove-btn")])[1]
+${QTY_MINUS}            xpath:(//button[contains(@class,"qty-btn minus")])[1]
+${QTY_PLUS}             xpath:(//button[contains(@class,"qty-btn plus")])[1]
+${QTY_INPUT}            xpath:(//input[contains(@class,"qty-input")])[1]
+${CART_TOTAL}           xpath://span[contains(@class,"summary-value-total")]
+${EMPTY_CART_BTN}       id:emptyCart
+${CHECKOUT_BTN}         id:checkout
+
+# Selectors – Szállítási adatok
+${FIELD_NAME}       id:fullName
+${FIELD_EMAIL}      id:email
+${FIELD_ADDRESS}    id:address
+${FIELD_CITY}       id:city
+${FIELD_ZIP}        id:zipCode
+${FIELD_PHONE}      id:phone
+
+# Selectors – Fizetés (payment)
+${CARD_NUMBER_INPUT}    xpath://input[contains(@placeholder,"0000 0000 0000 0000")]
+${CARD_NAME_INPUT}      xpath://input[contains(@placeholder,"FULL NAME")]
+${CARD_MONTH_SELECT}    xpath:(//select)[1]
+${CARD_YEAR_SELECT}     xpath:(//select)[2]
+${CARD_CVV_INPUT}       xpath://input[@maxlength="3" or @maxlength="4"][contains(@class,"card-input__input")]
+${SUBMIT_BTN_PAYMENT}           xpath://button[contains(@class,"card-form__button")]
+${OVERLAY}              xpath://div[contains(@class,"overlay")]
+${OVERLAY_MSG}          xpath://div[contains(@class,"overlay-content")]/p
+${OVERLAY_CLOSE}        xpath://button[contains(@class,"overlay-button")]
+
 *** Keywords ***
 Open Registration Page
     Open Browser    ${URL}    ${BROWSER}
@@ -378,3 +429,81 @@ Dashboard Sidebar Link Should Be Active
     ${active}=    Get Element Attribute
     ...    xpath://a[contains(@class,"nav-link") and contains(.,"${view_name}")]    class
     Should Contain    ${active}    active
+
+Open Aruhaz Page
+    Open Browser    ${URL}    ${BROWSER}
+    Maximize Browser Window
+    Wait Until Element Is Visible    //header//nav//a[2]
+    Click Element    //header//nav//a[2]    
+
+Navigate To Aruhaz
+    Go To    ${ARUHAZ_URL}
+    Wait Until Element Is Visible    ${PRODUCT_CARD}    timeout=10s
+
+Navigate To Kosar
+    Go To    ${KOSAR_URL}
+    Wait Until Element Is Visible    xpath://h1[contains(.,"kosarad") or .//h2[contains(.,"üres")]]    timeout=10s
+
+Add First Product To Cart
+    Navigate To Aruhaz
+    ${title}=    Get Text    ${FIRST_PRODUCT_TITLE}
+    Click Element    ${FIRST_ADD_BTN}
+    Wait Until Element Is Visible    ${CART_MODAL}    timeout=5s
+    RETURN    ${title}
+
+Close Cart Modal
+    Click Element    ${MODAL_CONTINUE_BTN}
+    Wait Until Element Is Not Visible    ${CART_MODAL}    timeout=5s
+
+Fill Delivery Form
+    [Arguments]
+    ...    ${name}=Teszt Elek
+    ...    ${email}=teszt@example.com
+    ...    ${address}=Fő utca 1.
+    ...    ${city}=Budapest
+    ...    ${zip}=1051
+    ...    ${phone}=+36301234567
+    Input Text    ${FIELD_NAME}      ${name}
+    Input Text    ${FIELD_EMAIL}     ${email}
+    Input Text    ${FIELD_ADDRESS}   ${address}
+    Input Text    ${FIELD_CITY}      ${city}
+    Input Text    ${FIELD_ZIP}       ${zip}
+    Press Keys    ${FIELD_ZIP}       TAB
+    Sleep    0.3s
+    Input Text    ${FIELD_PHONE}     ${phone}
+
+Fill Payment Form
+    [Arguments]
+    ...    ${number}=4111 1111 1111 1111
+    ...    ${name}=TESZT ELEK
+    ...    ${cvv}=123
+    Sleep    0.5s
+    Execute JavaScript
+    ...    const el = document.querySelector('.card-input__input[placeholder="0000 0000 0000 0000"]');
+    ...    el.focus();
+    ...    el.value = '${number}';
+    ...    el.dispatchEvent(new Event('input', {bubbles: true}));
+    Execute JavaScript
+    ...    const el = document.querySelector('.card-input__input[placeholder="FULL NAME"]');
+    ...    el.focus();
+    ...    el.value = '${name}';
+    ...    el.dispatchEvent(new Event('input', {bubbles: true}));
+    Select From List By Index    ${CARD_MONTH_SELECT}    1
+    Select From List By Index    ${CARD_YEAR_SELECT}     1
+    Execute JavaScript
+    ...    const el = document.querySelector('.card-input__input[placeholder="123"]');
+    ...    el.focus();
+    ...    el.value = '${cvv}';
+    ...    el.dispatchEvent(new Event('input', {bubbles: true}));
+    Sleep    0.3s
+
+Cart Should Be Empty
+    Navigate To Kosar
+    Element Should Be Visible    ${EMPTY_CART_MSG}
+
+Assert Overlay Message Contains
+    [Arguments]    ${expected}
+    Wait Until Element Is Visible    ${OVERLAY}    timeout=10s
+    ${msg}=    Get Text    ${OVERLAY_MSG}
+    Should Contain    ${msg}    ${expected}
+    Click Element    ${OVERLAY_CLOSE}
