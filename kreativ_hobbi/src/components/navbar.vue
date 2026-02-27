@@ -4,7 +4,9 @@ import logo_kalapacs from '@/components/icons/logo_kalapacs.png'
 import logo_reszelo from '@/components/icons/logo_reszelo.png'
 import { ref, onMounted, onUnmounted, inject } from 'vue';
 import axios from 'axios';
+import { useCartStore } from '@/stores/cartStore'
 
+const cartStore = useCartStore()
 const router = useRouter();
 const latszik = ref(false);
 const logoKalapacs = logo_kalapacs
@@ -170,13 +172,19 @@ onUnmounted(() => {
           style="float: right;" 
           to="/kosar"
           :class="{ hamburgerElem: !latszik }"
-          ><img
-            alt="Kosár"
-            class="kosarLogo"
-            src="@/components/icons/Cart.png"
-            width="50"
-            height="50"
-        /></RouterLink>
+          ><div class="cart-icon-wrapper">
+            <img
+              alt="Kosár"
+              class="kosarLogo"
+              src="@/components/icons/Cart.png"
+              width="50"
+              height="50"
+            />
+            <span v-if="cartStore.cartItems.reduce((t, i) => t + i.quantity, 0) > 0" class="cart-badge">
+              {{ cartStore.cartItems.reduce((t, i) => t + i.quantity, 0) }}
+            </span>
+          </div>
+        </RouterLink>
 
         <RouterLink
           class="menu_link" 
@@ -322,6 +330,32 @@ onUnmounted(() => {
   object-fit: cover;
   position: relative;
   top: 5px;
+}
+
+.cart-icon-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.cart-badge {
+  position: absolute;
+  top: -4px;
+  right: -6px;
+  background: #e53935;
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 3px;
+  line-height: 1;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  pointer-events: none;
 }
 /*#endregion*/
 

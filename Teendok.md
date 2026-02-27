@@ -20,15 +20,15 @@
 * \[ ] termek cimkek termékeken katinthatók legyenek
 * \[X] cimke kategoriára való csere✅
 * \[ ] szöveg röviditése ha overflow van és ... hozááadása
-* \[ ] cimkeék az itemen való mennyiség kiírás + + jel oda írása + enyitható legyen
-* \[ ] kosár mennyiség írása
-* \[ ] Carouselbe itemek berakása kedvenc alapján
-* \[ ] email verifikáció
+* \[X] cimkeék az itemen való mennyiség kiírás + + jel oda írása + enyitható legyen✅
+* \[X] kosár mennyiség írása✅
+* \[ ] Carouselbe itemek berakása kedvenc alapján ->IMPLEMENTÁCIÓRA VÁRÓ NEM LEHETSÉGES FEATURE
+* \[X] email verifikáció✅
 * \[ ] vásárol email
 * \[ ] jelszó reset
 * \[ ] kosár eltárolása
 * \[ ] rendelés pending
-* \[ ] Dashboard betöltése + valós input"" from database
+* \[X] Dashboard betöltése + valós input"" from database
 * \[ ] áruház loading
 * \[ ] Rendelések javtása
 * \[ ] Analitika fixelés
