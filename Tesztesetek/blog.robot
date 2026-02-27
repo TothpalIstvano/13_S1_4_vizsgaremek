@@ -29,7 +29,7 @@ Blog Page Search Filters Posts
     Sleep    1s
     Wait Until Element Is Visible    xpath://h3[contains(.,"Nincsenek találatok")]    timeout=5s
 
-Blog Page Shows Empty State When No Search Results
+B02 - Blog Page Shows Empty State When No Search Results
     [Documentation]    Nincs találat esetén megjelenik az üres állapot üzenet
     Navigate To Blog Page
     Wait Until Element Is Visible    ${BLOG_CARDS}    timeout=10s
