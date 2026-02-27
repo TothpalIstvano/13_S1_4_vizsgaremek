@@ -5,7 +5,7 @@ Test Teardown    Close Browser
 
 *** Test Cases ***
 
-L1 - Successful Login
+L01 - Successful Login
     Switch To Login
     Fill Login Form
     ...    teszt1231@example.com
@@ -13,7 +13,7 @@ L1 - Successful Login
     Submit Login
     Login Should Succeed
 
-L2 - Login Fails With Wrong Password
+L02 - Login Fails With Wrong Password
     Switch To Login
     Fill Login Form
     ...    teszt1231@example.com
@@ -88,7 +88,7 @@ Forgot Password Fails With Invalid Email
     Wait Until Element Is Visible    css:.error-message    timeout=5s
     Element Should Contain    css:.error-message    érvényes email
 
-L3 - Forgot Password Succeeds With Valid Email
+L03 - Forgot Password Succeeds With Valid Email
     Switch To Login
     Open Forgot Password Modal
     Input Text    xpath://input[@placeholder="Email cím"]    teszt1231@example.com
