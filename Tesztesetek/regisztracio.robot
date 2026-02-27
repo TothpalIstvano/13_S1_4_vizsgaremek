@@ -5,7 +5,7 @@ Test Teardown    Close Browser
 
 *** Test Cases ***
 
-R1 - Successful Registration
+R01 - Successful Registration
     Switch To Registration
     Fill Registration Form
     ...    tesztuser1232
@@ -15,7 +15,7 @@ R1 - Successful Registration
     Submit Registration
     Registration Should Succeed
 
-R2 - Registration Fails With Weak Password
+R02 - Registration Fails With Weak Password
     Switch To Registration
     Fill Registration Form
     ...    tesztuser1231
@@ -25,7 +25,7 @@ R2 - Registration Fails With Weak Password
     Submit Registration
     Registration Should Fail At Short Password
 
-R3 - Registration Fails With Mismatched Passwords
+R03 - Registration Fails With Mismatched Passwords
     Switch To Registration
     Fill Registration Form
     ...    tesztuser123
