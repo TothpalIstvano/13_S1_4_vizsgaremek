@@ -8,8 +8,8 @@ Test Teardown    Close Browser
 L01 - Successful Login
     Switch To Login
     Fill Login Form
-    ...    teszt1231@example.com
-    ...    Teszt123!
+    ...    test@example.com
+    ...    Alma12345678.
     Submit Login
     Login Should Succeed
 
