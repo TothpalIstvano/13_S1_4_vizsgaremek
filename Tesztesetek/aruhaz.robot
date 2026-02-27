@@ -8,14 +8,14 @@ Test Teardown    Close Browser Session
 # ÁRUHÁZ TESZTEK
 # ─────────────────────────────────────────────
 
-TC01 – Áruház oldal betöltődik és termékek megjelennek
+A01 – Áruház oldal betöltődik és termékek megjelennek
     [Tags]    aruhaz    smoke
     Navigate To Aruhaz
     Element Should Be Visible    ${PRODUCT_CARD}
     Element Should Be Visible    ${FIRST_PRODUCT_TITLE}
     Element Should Be Visible    ${FIRST_PRODUCT_PRICE}
 
-TC02 – Termék keresése szöveggel
+A02 – Termék keresése szöveggel
     [Tags]    aruhaz    search
     Navigate To Aruhaz
     ${first_title}=    Get Text    ${FIRST_PRODUCT_TITLE}
@@ -25,14 +25,14 @@ TC02 – Termék keresése szöveggel
     ${visible_cards}=    Get Element Count    xpath://div[contains(@class,"product-card")]
     Should Be True    ${visible_cards} >= 1
 
-TC03 – Üres keresésre nincs találat visszajelzés
+A03 – Üres keresésre nincs találat visszajelzés
     [Tags]    aruhaz    search
     Navigate To Aruhaz
     Input Text    ${SEARCH_INPUT}    xyzxyzxyznemletezik999
     Sleep    0.5s
     Element Should Be Visible    xpath://div[contains(text(),"Nincs találat")]
 
-TC04 – Kosárba gomb megnyomása megnyitja a modalt
+A04 – Kosárba gomb megnyomása megnyitja a modalt
     [Tags]    aruhaz    cart
     Add First Product To Cart
     Element Should Be Visible    xpath://h2[contains(.,"Sikeresen hozzáadva")]
@@ -66,7 +66,7 @@ TC08 – Részletes oldalon „Vissza" gomb visszanavigál
     Click Element    xpath://button[contains(@class,"back-btn")]
     Wait Until Element Is Visible    ${PRODUCT_CARD}    timeout=10s
 
-TC09 – Ár szűrő alkalmazás szűri a termékeket
+A09 – Ár szűrő alkalmazás szűri a termékeket
     [Tags]    aruhaz    filter
     Navigate To Aruhaz
     ${count_before}=    Get Element Count    xpath://div[contains(@class,"product-card")]
@@ -90,7 +90,7 @@ TC10 – Kategória szűrő megjelenik és kattintható
 # KOSÁR TESZTEK
 # ─────────────────────────────────────────────
 
-TC11 – Üres kosár üzenete megjelenik
+K01 – Üres kosár üzenete megjelenik
     [Tags]    kosar    smoke
     # Clear cart via navigation with no items
     Go To    ${KOSAR_URL}
@@ -112,7 +112,7 @@ TC12 – Üres kosár „Vissza az Áruházba" linkje működik
     Execute JavaScript    document.querySelector('a[href*="/aruhaz"]').click()
     Wait Until Element Is Visible    ${PRODUCT_CARD}    timeout=10s
 
-TC13 – Termék hozzáadása után megjelenik a kosárban
+K02 – Termék hozzáadása után megjelenik a kosárban
     [Tags]    kosar    cart
     Add First Product To Cart
     Click Element    ${MODAL_CART_BTN}
@@ -150,7 +150,7 @@ TC15 – Mennyiség csökkentése a „−" gombbal
     ${after}=    Get Value    ${QTY_INPUT}
     Run Keyword If    ${minus_enabled}    Should Be True    ${after} < ${before}
 
-TC16 – Termék eltávolítása a kosárból
+K04 – Termék eltávolítása a kosárból
     [Tags]    kosar    cart
     Add First Product To Cart
     Click Element    ${MODAL_CART_BTN}
@@ -188,7 +188,7 @@ TC19 – Végösszeg helyesen számítódik
     ${total_text}=    Get Text    ${CART_TOTAL}
     Should Contain    ${total_text}    Ft
 
-TC20 – Checkout gomb validálja az üres szállítási adatokat
+K05 – Checkout gomb validálja az üres szállítási adatokat
     [Tags]    kosar    validation
     Add First Product To Cart
     Click Element    ${MODAL_CART_BTN}
@@ -198,7 +198,7 @@ TC20 – Checkout gomb validálja az üres szállítási adatokat
     ${alert_present}=    Run Keyword And Return Status    Handle Alert    ACCEPT
     Should Be True    ${alert_present}
 
-TC21 – Érvénytelen irányítószám hibaüzenetet mutat
+K06 – Érvénytelen irányítószám hibaüzenetet mutat
     [Tags]    kosar    validation
     Add First Product To Cart
     Click Element    ${MODAL_CART_BTN}
@@ -232,7 +232,7 @@ TC23 – Teljes szállítási adatok kitöltésével a checkout továbblép a fi
 # FIZETÉS TESZTEK
 # ─────────────────────────────────────────────
 
-TC24 – Fizetési oldal betöltődik
+F01 – Fizetési oldal betöltődik
     [Tags]    fizetes    smoke
     # Setup: add product and navigate to checkout
     Add First Product To Cart
@@ -243,7 +243,7 @@ TC24 – Fizetési oldal betöltődik
     Wait Until Location Contains    /kosar/fizetes    timeout=10s
     Element Should Be Visible    ${CARD_NUMBER_INPUT}
 
-TC25 – Fizetési form Submit üres mezőkkel hibaüzenetet ad
+F02 – Fizetési form Submit üres mezőkkel hibaüzenetet ad
     [Tags]    fizetes    validation
     Add First Product To Cart
     Click Element    ${MODAL_CART_BTN}
@@ -253,7 +253,7 @@ TC25 – Fizetési form Submit üres mezőkkel hibaüzenetet ad
     Click Element    ${SUBMIT_BTN_PAYMENT}
     Assert Overlay Message Contains    Please fill all fields correctly
 
-TC26 – Kártya szám formázás szóközöket illeszt be
+F03 – Kártya szám formázás szóközöket illeszt be
     [Tags]    fizetes    ui
     Add First Product To Cart
     Click Element    ${MODAL_CART_BTN}
@@ -264,7 +264,7 @@ TC26 – Kártya szám formázás szóközöket illeszt be
     ${val}=    Get Value    ${CARD_NUMBER_INPUT}
     Should Contain    ${val}    ${SPACE}
 
-TC27 – CVV mező csak számokat fogad el
+F04 – CVV mező csak számokat fogad el
     [Tags]    fizetes    validation
     Add First Product To Cart
     Click Element    ${MODAL_CART_BTN}
@@ -290,7 +290,7 @@ TC28 – Kártya megfordítása CVV fókusznál
     ${classes}=    Execute JavaScript    return document.querySelector('.card-item').className
     Should Contain    ${classes}    -active
 
-TC29 – Helyes kártyaadatokkal sikeres fizetés overlay jelenik meg
+F06 – Helyes kártyaadatokkal sikeres fizetés overlay jelenik meg
     [Tags]    fizetes    e2e
     Add First Product To Cart
     Click Element    ${MODAL_CART_BTN}
@@ -301,7 +301,7 @@ TC29 – Helyes kártyaadatokkal sikeres fizetés overlay jelenik meg
     Click Element    ${SUBMIT_BTN_PAYMENT}
     Assert Overlay Message Contains    accepted
 
-TC30 – Visa kártya ikon megjelenik a kártyán
+F05 – Visa kártya ikon megjelenik a kártyán
     [Tags]    fizetes    ui
     Add First Product To Cart
     Click Element    ${MODAL_CART_BTN}
