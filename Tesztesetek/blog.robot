@@ -3,71 +3,6 @@ Resource    resources.robot
 Test Setup    Open Registration Page
 Test Teardown    Close Browser Session
 
-*** Variables ***
-${BLOG_NAV_LINK}        xpath://header//nav//a[contains(.,"Blog")]
-${POST_TITLE_INPUT}     id:postTitle
-${POST_CONTENT_EDITOR}  xpath://div[contains(@class,"ql-editor")]
-${POST_SUBTEXT_INPUT}   id:postSubtext
-${SUBMIT_BTN}           xpath://button[@type='submit' and contains(@class, 'submit-button')]
-${DRAFT_BTN}            xpath://button[contains(.,"Mentés piszkozatként")]
-${RESET_BTN}            xpath://button[contains(.,"Visszaállítás")]
-${NOTIFICATION}         xpath://div[contains(@class,"notification")]
-${BLOG_PAGE_TITLE}      xpath://h1[contains(@class,"title") and contains(.,"Blog")]
-${BLOG_CARDS}           xpath://div[contains(@class,"kartya-oszlop")]
-${KERESES_INPUT}        xpath://input[contains(@placeholder,"Keresés")]
-${MEGTEKINTES_BTN}      xpath:(//button[contains(.,"Megtekintés")])[1]
-
-*** Keywords ***
-Login As Test User
-    Switch To Login
-    Fill Login Form    test@example.com    Alma12345678.
-    Execute JavaScript    document.querySelector('.b-container button[type="submit"]').click()
-    Wait Until Location Contains    /Profil   timeout=20s
-
-Navigate To New Post Page
-    Go To    ${URL}/newpost
-    Wait Until Element Is Visible    ${POST_TITLE_INPUT}    timeout=10s
-
-Fill Post Title
-    [Arguments]    ${title}
-    Clear Element Text    ${POST_TITLE_INPUT}
-    Input Text    ${POST_TITLE_INPUT}    ${title}
-
-Fill Post Content
-    [Arguments]    ${content}
-    Wait Until Element Is Visible    ${POST_CONTENT_EDITOR}    timeout=5s
-    Click Element    ${POST_CONTENT_EDITOR}
-    Input Text    ${POST_CONTENT_EDITOR}    ${content}
-
-Fill Post Subtext
-    [Arguments]    ${subtext}
-    Input Text    ${POST_SUBTEXT_INPUT}    ${subtext}
-
-Notification Should Contain
-    [Arguments]    ${text}
-    Wait Until Element Is Visible    ${NOTIFICATION}    timeout=8s
-    Element Should Contain    ${NOTIFICATION}    ${text}
-
-Notification Should Be Warning
-    Wait Until Element Is Visible    ${NOTIFICATION}    timeout=8s
-    ${classes}=    Get Element Attribute    ${NOTIFICATION}    class
-    Should Contain    ${classes}    warn
-
-Navigate To Blog Page
-    Wait Until Element Is Visible    ${BLOG_NAV_LINK}    timeout=10s
-    Click Element    ${BLOG_NAV_LINK}
-    Wait Until Element Is Visible    ${BLOG_PAGE_TITLE}    timeout=10s
-
-Navigate To Profile Page
-    Go To    ${URL}/Profil
-    Sleep    1s
-    Wait Until Element Is Visible    xpath://h2[contains(.,"profilhoz tartozó cikkek")]    timeout=15s
-
-Get First Post Edit Href
-    ${href}=    Execute JavaScript
-    ...    return document.querySelector('a[href*="/editpost/"]')?.getAttribute('href') || ''
-    RETURN    ${href}
-
 *** Test Cases ***
 
 
@@ -341,6 +276,8 @@ New Post Reset Button Clears Title
     Sleep    5s
     Fill Post Title    Törlendő cím
     Click Element    ${RESET_BTN}
+    Click Element    ${RESET_BTN}
+    Sleep    5s
     ${title_value}=    Execute JavaScript    return document.getElementById('postTitle').value
     Sleep    5s
     Should Be Empty    ${title_value}
@@ -416,7 +353,7 @@ Edit Post Save Redirects To Profile
     Wait Until Element Is Visible    ${SUBMIT_BTN}    timeout=10s
     Wait Until Element Is Enabled    ${SUBMIT_BTN}    timeout=5s
     Click Element    ${SUBMIT_BTN}
-    Wait Until Location Contains    /Profil   timeout=15s
+    Wait Until Location Contains    /profil   timeout=15s
 
 Edit Post Draft Save Works
     [Documentation]    Szerkesztés közben piszkozatként is menthető a poszt
@@ -433,7 +370,7 @@ Edit Post Draft Save Works
     Sleep    2s
     Click Element    ${DRAFT_BTN}
     Sleep    2s
-    Wait Until Location Contains    /Profil   timeout=30s
+    Wait Until Location Contains    /profil   timeout=30s
 
 Edit Post Page Has Back Button
     [Documentation]    A szerkesztési oldalon megjelenik a Vissza gomb
@@ -474,15 +411,29 @@ Logged In User Can Access New Post Page
     Should Contain    ${current_url}    newpost
 
 Logged In User Like Button Is Clickable
-    [Documentation]    Bejelentkezett felhasználó megnyomhatja a like gombot
+    [Documentation]    Bejelentkezett felhasználó megnyomhatja a like gombot és a számláló megváltozik.
     Login As Test User
     Navigate To Blog Page
-    Sleep    5s
-    Wait Until Element Is Visible    xpath:(//button[contains(@class,"like-gomb")])[1]    timeout=10s
-    Click Element    xpath:(//button[contains(@class,"like-gomb")])[1]
-    Handle Alert    timeout=2s    action=DISMISS
-    Sleep    1.5s
-    Element Should Be Visible    xpath:(//button[contains(@class,"like-gomb")])[1]
+    
+    # Lokátorok kiszervezése (könnyebb karbantartani)
+    ${LIKE_BUTTON}     Set Variable    xpath:(//button[contains(@class,"like-gomb")])[1]
+    ${COUNT_SPAN}      Set Variable    xpath:(//button[contains(@class,"like-gomb")])[1]//span[@class="reakciok-szama"]
+
+    # 1. Megvárjuk, amíg az oldal betölt és a gomb látható lesz
+    Wait Until Element Is Visible    ${LIKE_BUTTON}    timeout=15s
+    
+    # 2. Elmentjük az aktuális értéket
+    ${old_count} =    Get Text    ${COUNT_SPAN}
+    
+    # 3. Kattintás a gombra
+    Click Element    ${LIKE_BUTTON}
+
+    Wait Until Keyword Succeeds    5s    0.5s    Check Count Changed    ${COUNT_SPAN}    ${old_count}
+
+    # 5. Új érték lekérése és végső ellenőrzés
+    ${new_count} =    Get Text    ${COUNT_SPAN}
+    Should Not Be Equal As Integers    ${old_count}    ${new_count}
+    Log    Sikeres változás: ${old_count} -> ${new_count}
 
 Logged In User Can Submit Comment
     [Documentation]    Bejelentkezett felhasználó hozzászólhat blogposzthoz

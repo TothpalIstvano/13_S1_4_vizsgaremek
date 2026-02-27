@@ -1,5 +1,6 @@
 *** Settings ***
 Library    SeleniumLibrary
+Library    Collections
 
 *** Variables ***
 ${URL}    http://localhost:5173
@@ -43,6 +44,94 @@ ${LABEL_FONAL_E}        xpath://label[@for="E fonal csoport"]
 ${FILE_UPLOAD_INPUT}    id:file-upload
 ${FILE_UPLOAD_LABEL}    xpath://label[@for="file-upload"]
 ${MINTA_BTN}            xpath://button[contains(.,"Minta készítése")]
+
+${BLOG_NAV_LINK}        xpath://header//nav//a[contains(.,"Blog")]
+${POST_TITLE_INPUT}     id:postTitle
+${POST_CONTENT_EDITOR}  xpath://div[contains(@class,"ql-editor")]
+${POST_SUBTEXT_INPUT}   id:postSubtext
+${SUBMIT_BTN}           xpath://button[@type='submit' and contains(@class, 'submit-button')]
+${DRAFT_BTN}            xpath://button[contains(.,"Mentés piszkozatként")]
+${RESET_BTN}            xpath://button[contains(.,"Visszaállítás")]
+${NOTIFICATION}         xpath://div[contains(@class,"notification")]
+${BLOG_PAGE_TITLE}      xpath://h1[contains(@class,"title") and contains(.,"Blog")]
+${BLOG_CARDS}           xpath://div[contains(@class,"kartya-oszlop")]
+${KERESES_INPUT}        xpath://input[contains(@placeholder,"Keresés")]
+${MEGTEKINTES_BTN}      xpath:(//button[contains(.,"Megtekintés")])[1]
+
+# Szerkesztés modal
+${SZERK_BTN}                xpath://button[contains(@class,"btn edit") and contains(.,"Szerkesztés")]
+${SZERK_MODAL}              xpath://div[contains(@class,"szerk-modal")]
+${MEGSE_BTN}                xpath://button[contains(@class,"megse")]
+${MENTES_BTN}               xpath://button[contains(@class,"mentes")]
+
+# Form fields
+${VEZETEKNEV_INPUT}         id:vezeteknev
+${KERESZTNEV_INPUT}         id:keresztnev
+${TELEFON_INPUT}            id:telefon
+${UTCA_INPUT}               id:utca
+${HAZSZAM_INPUT}            id:hazszam
+${EMELETAJTO_INPUT}         id:emeletAjto
+
+# Camera
+${KAMERA_BTN}               xpath://button[contains(.,"Kamera használata")]
+${FOTOZAS_BTN}              xpath://button[contains(.,"Fotózás")]
+${MEGSE_KAMERA_BTN}         xpath://div[contains(@class,"camera-controls")]//button[contains(.,"Mégse")]
+${PROFIL_BEALLITAS_BTN}     xpath://button[contains(.,"Profilkép beállítása")]
+${VIDEO_ELEM}               xpath://div[contains(@class,"camera-preview")]//video
+
+# Admin
+${ADMIN_EMAIL}      test@example.com
+${ADMIN_PASS}       Alma12345678.
+${DASHBOARD_URL}    http://localhost:5173/dashboard
+
+#áruház
+${ARUHAZ_URL}       ${URL}/aruhaz
+${KOSAR_URL}        ${URL}/kosar
+${FIZETES_URL}      ${URL}/kosar/fizetes
+
+# Selectors – Áruház (shop)
+${PRODUCT_CARD}         xpath:(//div[contains(@class,"product-card")])[1]
+${FIRST_ADD_BTN}        xpath:(//button[contains(@class,"add-btn")])[1]
+${FIRST_PRODUCT_TITLE}  xpath:(//h3[contains(@class,"product-title")])[1]
+${FIRST_PRODUCT_PRICE}  xpath:(//p[contains(@class,"product-price")])[1]
+${SEARCH_INPUT}         xpath://input[contains(@class,"search-input")]
+${APPLY_PRICE_BTN}      xpath://button[contains(@class,"apply-btn")]
+${PRICE_MIN_INPUT}      id:minTextIn
+${PRICE_MAX_INPUT}      id:maxTextIn
+${CART_MODAL}           xpath://div[contains(@class,"modal-content")]
+${MODAL_CONTINUE_BTN}   xpath://button[contains(@class,"btn-continue")]
+${MODAL_CART_BTN}       xpath://a[contains(@class,"btn-checkout")]
+${PRODUCT_COUNT_LABEL}  xpath://div[contains(@class,"items-header")]/span
+
+# Selectors – Kosár (cart)
+${CART_HEADER}          xpath://h1[contains(.,"kosarad")]
+${EMPTY_CART_MSG}       xpath://h2[contains(.,"A kosárod üres")]
+${REMOVE_BTN}           xpath:(//button[contains(@class,"remove-btn")])[1]
+${QTY_MINUS}            xpath:(//button[contains(@class,"qty-btn minus")])[1]
+${QTY_PLUS}             xpath:(//button[contains(@class,"qty-btn plus")])[1]
+${QTY_INPUT}            xpath:(//input[contains(@class,"qty-input")])[1]
+${CART_TOTAL}           xpath://span[contains(@class,"summary-value-total")]
+${EMPTY_CART_BTN}       id:emptyCart
+${CHECKOUT_BTN}         id:checkout
+
+# Selectors – Szállítási adatok
+${FIELD_NAME}       id:fullName
+${FIELD_EMAIL}      id:email
+${FIELD_ADDRESS}    id:address
+${FIELD_CITY}       id:city
+${FIELD_ZIP}        id:zipCode
+${FIELD_PHONE}      id:phone
+
+# Selectors – Fizetés (payment)
+${CARD_NUMBER_INPUT}    xpath://input[contains(@placeholder,"0000 0000 0000 0000")]
+${CARD_NAME_INPUT}      xpath://input[contains(@placeholder,"FULL NAME")]
+${CARD_MONTH_SELECT}    xpath:(//select)[1]
+${CARD_YEAR_SELECT}     xpath:(//select)[2]
+${CARD_CVV_INPUT}       xpath://input[@maxlength="3" or @maxlength="4"][contains(@class,"card-input__input")]
+${SUBMIT_BTN_PAYMENT}           xpath://button[contains(@class,"card-form__button")]
+${OVERLAY}              xpath://div[contains(@class,"overlay")]
+${OVERLAY_MSG}          xpath://div[contains(@class,"overlay-content")]/p
+${OVERLAY_CLOSE}        xpath://button[contains(@class,"overlay-button")]
 
 *** Keywords ***
 Open Registration Page
@@ -234,3 +323,187 @@ Click Minta Button
 
 Close Browser Session
     Close Browser
+
+Login As Test User
+    Switch To Login
+    Fill Login Form    test@example.com    Alma12345678.
+    Execute JavaScript    document.querySelector('.b-container button[type="submit"]').click()
+    Wait Until Location Contains    /Profil   timeout=20s
+
+Navigate To New Post Page
+    Go To    ${URL}/newpost
+    Wait Until Element Is Visible    ${POST_TITLE_INPUT}    timeout=10s
+
+Fill Post Title
+    [Arguments]    ${title}
+    Clear Element Text    ${POST_TITLE_INPUT}
+    Input Text    ${POST_TITLE_INPUT}    ${title}
+
+Fill Post Content
+    [Arguments]    ${content}
+    Wait Until Element Is Visible    ${POST_CONTENT_EDITOR}    timeout=5s
+    Click Element    ${POST_CONTENT_EDITOR}
+    Input Text    ${POST_CONTENT_EDITOR}    ${content}
+
+Fill Post Subtext
+    [Arguments]    ${subtext}
+    Input Text    ${POST_SUBTEXT_INPUT}    ${subtext}
+
+Notification Should Contain
+    [Arguments]    ${text}
+    Wait Until Element Is Visible    ${NOTIFICATION}    timeout=8s
+    Element Should Contain    ${NOTIFICATION}    ${text}
+
+Notification Should Be Warning
+    Wait Until Element Is Visible    ${NOTIFICATION}    timeout=8s
+    ${classes}=    Get Element Attribute    ${NOTIFICATION}    class
+    Should Contain    ${classes}    warn
+
+Navigate To Blog Page
+    Wait Until Element Is Visible    ${BLOG_NAV_LINK}    timeout=10s
+    Click Element    ${BLOG_NAV_LINK}
+    Wait Until Element Is Visible    ${BLOG_PAGE_TITLE}    timeout=10s
+
+Navigate To Profile Page
+    Go To    ${URL}/Profil
+    Sleep    1s
+    Wait Until Element Is Visible    xpath://h2[contains(.,"profilhoz tartozó cikkek")]    timeout=15s
+
+Get First Post Edit Href
+    ${href}=    Execute JavaScript
+    ...    return document.querySelector('a[href*="/editpost/"]')?.getAttribute('href') || ''
+    RETURN    ${href}
+
+Check Count Changed
+    [Arguments]    ${locator}    ${original_value}
+    ${current_value} =    Get Text    ${locator}
+    Should Not Be Equal    ${current_value}    ${original_value}
+
+Open Browser With Camera Permission
+    ${options}=    Evaluate    sys.modules['selenium.webdriver'].ChromeOptions()    sys
+    Call Method    ${options}    add_argument    --use-fake-ui-for-media-stream
+    Call Method    ${options}    add_argument    --use-fake-device-for-media-stream
+    Create Webdriver    Chrome    options=${options}
+
+    Go To    ${URL}
+
+Open Modal
+    Click Element    ${SZERK_BTN}
+    Wait Until Element Is Visible    ${SZERK_MODAL}    timeout=5s
+
+Fill Required Name Fields
+    [Arguments]    ${vez}=Teszt    ${ker}=Elek
+    Clear Element Text    ${VEZETEKNEV_INPUT}
+    Input Text    ${VEZETEKNEV_INPUT}    ${vez}
+    Clear Element Text    ${KERESZTNEV_INPUT}
+    Input Text    ${KERESZTNEV_INPUT}    ${ker}
+
+Save And Wait For Modal To Close
+    Click Element    ${MENTES_BTN}
+    Wait Until Element Is Not Visible    ${SZERK_MODAL}    timeout=10s
+
+Open Camera Browser And Login
+    # Override the default Test Setup — open Chrome with fake camera, then log in and navigate
+    ${options}=    Evaluate    sys.modules['selenium.webdriver'].ChromeOptions()    sys
+    Call Method    ${options}    add_argument    --use-fake-ui-for-media-stream
+    Call Method    ${options}    add_argument    --use-fake-device-for-media-stream
+    Create Webdriver    Chrome    options=${options}
+    Maximize Browser Window
+    Go To    ${URL}
+    # The login page is at the same URL — navigate there via nav link
+    Wait Until Element Is Visible    //header//nav//a[7]    timeout=10s
+    Click Element    //header//nav//a[7]
+    Login As Test User
+    Navigate To Profile Page
+
+Login As Admin And Go To Dashboard
+    Switch To Login
+    Fill Login Form    ${ADMIN_EMAIL}    ${ADMIN_PASS}
+    Submit Login
+    Login Should Succeed
+    Go To    ${DASHBOARD_URL}
+    Wait Until Element Is Visible    xpath://h2[contains(.,"Dashboard")]    timeout=10s
+
+Dashboard Sidebar Link Should Be Active
+    [Arguments]    ${view_name}
+    ${active}=    Get Element Attribute
+    ...    xpath://a[contains(@class,"nav-link") and contains(.,"${view_name}")]    class
+    Should Contain    ${active}    active
+
+Open Aruhaz Page
+    Open Browser    ${URL}    ${BROWSER}
+    Maximize Browser Window
+    Wait Until Element Is Visible    //header//nav//a[2]
+    Click Element    //header//nav//a[2]    
+
+Navigate To Aruhaz
+    Go To    ${ARUHAZ_URL}
+    Wait Until Element Is Visible    ${PRODUCT_CARD}    timeout=10s
+
+Navigate To Kosar
+    Go To    ${KOSAR_URL}
+    Wait Until Element Is Visible    xpath://h1[contains(.,"kosarad") or .//h2[contains(.,"üres")]]    timeout=10s
+
+Add First Product To Cart
+    Navigate To Aruhaz
+    ${title}=    Get Text    ${FIRST_PRODUCT_TITLE}
+    Click Element    ${FIRST_ADD_BTN}
+    Wait Until Element Is Visible    ${CART_MODAL}    timeout=5s
+    RETURN    ${title}
+
+Close Cart Modal
+    Click Element    ${MODAL_CONTINUE_BTN}
+    Wait Until Element Is Not Visible    ${CART_MODAL}    timeout=5s
+
+Fill Delivery Form
+    [Arguments]
+    ...    ${name}=Teszt Elek
+    ...    ${email}=teszt@example.com
+    ...    ${address}=Fő utca 1.
+    ...    ${city}=Budapest
+    ...    ${zip}=1051
+    ...    ${phone}=+36301234567
+    Input Text    ${FIELD_NAME}      ${name}
+    Input Text    ${FIELD_EMAIL}     ${email}
+    Input Text    ${FIELD_ADDRESS}   ${address}
+    Input Text    ${FIELD_CITY}      ${city}
+    Input Text    ${FIELD_ZIP}       ${zip}
+    Press Keys    ${FIELD_ZIP}       TAB
+    Sleep    0.3s
+    Input Text    ${FIELD_PHONE}     ${phone}
+
+Fill Payment Form
+    [Arguments]
+    ...    ${number}=4111 1111 1111 1111
+    ...    ${name}=TESZT ELEK
+    ...    ${cvv}=123
+    Sleep    0.5s
+    Execute JavaScript
+    ...    const el = document.querySelector('.card-input__input[placeholder="0000 0000 0000 0000"]');
+    ...    el.focus();
+    ...    el.value = '${number}';
+    ...    el.dispatchEvent(new Event('input', {bubbles: true}));
+    Execute JavaScript
+    ...    const el = document.querySelector('.card-input__input[placeholder="FULL NAME"]');
+    ...    el.focus();
+    ...    el.value = '${name}';
+    ...    el.dispatchEvent(new Event('input', {bubbles: true}));
+    Select From List By Index    ${CARD_MONTH_SELECT}    1
+    Select From List By Index    ${CARD_YEAR_SELECT}     1
+    Execute JavaScript
+    ...    const el = document.querySelector('.card-input__input[placeholder="123"]');
+    ...    el.focus();
+    ...    el.value = '${cvv}';
+    ...    el.dispatchEvent(new Event('input', {bubbles: true}));
+    Sleep    0.3s
+
+Cart Should Be Empty
+    Navigate To Kosar
+    Element Should Be Visible    ${EMPTY_CART_MSG}
+
+Assert Overlay Message Contains
+    [Arguments]    ${expected}
+    Wait Until Element Is Visible    ${OVERLAY}    timeout=10s
+    ${msg}=    Get Text    ${OVERLAY_MSG}
+    Should Contain    ${msg}    ${expected}
+    Click Element    ${OVERLAY_CLOSE}

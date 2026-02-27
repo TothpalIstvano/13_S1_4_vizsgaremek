@@ -173,7 +173,7 @@ import { useCartStore } from '@/stores/cartStore'
 
 const router = useRouter()
 const cartStore = useCartStore()
-const cartItems = cartStore.cartItems
+const cartItems = computed(() => cartStore.cartItems)
 
 const deliveryDetails = ref({
   fullName: '',
@@ -188,7 +188,7 @@ const zipCodeError = ref('')
 const zipCodeValid = ref(false)
 
 const cartTotal = computed(() => {
-  return cartItems.reduce((s, i) => s + (Number(i.ar || i.price) * Number(i.quantity || 0)), 0)
+  return cartItems.value.reduce((s, i) => s + (Number(i.ar || i.price) * Number(i.quantity || 0)), 0)
 })
 
 function addOne(id) {
