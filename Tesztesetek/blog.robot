@@ -14,7 +14,7 @@ Blog Page Loads Successfully
     Navigate To Blog Page
     Element Should Be Visible    ${BLOG_PAGE_TITLE}
 
-Blog Page Shows Post Cards
+B01 - Blog Page Shows Post Cards
     [Documentation]    Legalább egy blogposzt kártya látható
     Navigate To Blog Page
     Wait Until Element Is Visible    ${BLOG_CARDS}    timeout=10s
