@@ -14,26 +14,26 @@
 * \[/] Webshop
 * \[ ] cimke szűrés + ha itemen katintás akkkor hozzá adás
 * \[X] active cimkek✅
-* \[ ] active termékeknél cimkek
+* \[X] active termékeknél cimkek✅
 * \[ ] active cimkek megtartása sessionstorage
-* \[/] active cimkek stilus
+* \[X] active cimkek stilus✅
 * \[ ] termek cimkek termékeken katinthatók legyenek
 * \[X] cimke kategoriára való csere✅
-* \[ ] szöveg röviditése ha overflow van és ... hozááadása
+* \[X] szöveg röviditése ha overflow van és ... hozááadása
 * \[X] cimkeék az itemen való mennyiség kiírás + + jel oda írása + enyitható legyen✅
 * \[X] kosár mennyiség írása✅
-* \[ ] Carouselbe itemek berakása kedvenc alapján ->IMPLEMENTÁCIÓRA VÁRÓ NEM LEHETSÉGES FEATURE
+* \[ ] Carouselbe itemek berakása kedvenc alapján ->IMPLEMENTÁCIÓRA VÁRÓ NEM LEHETSÉGES FEATURE✅
 * \[X] email verifikáció✅
 * \[ ] vásárol email
-* \[ ] jelszó reset
-* \[ ] kosár eltárolása
+* \[ ] jelszó reset✅
+* \[ ] kosár eltárolása✅
 * \[ ] rendelés pending
-* \[X] Dashboard betöltése + valós input"" from database
+* \[X] Dashboard betöltése + valós input"" from database✅
 * \[ ] áruház loading
 * \[ ] Rendelések javtása
 * \[ ] Analitika fixelés
-* \[ ] Sorba rendezés admin felületen
-* \[ ] Admin oldalak alsó oldalakra bontása a számos cucc
+* \[X] Sorba rendezés admin felületen✅
+* \[X] Admin oldalak alsó oldalakra bontása a számos cucc✅
 * \[ ] Admin oldal blogok javítása
 * \[ ] Admin oldal kategoria megoszlás csere to fokategoriak és az alá tartozok szám
 
@@ -45,8 +45,8 @@
 * \[ ] Táblák egységesítése ez alat azt értve hogy a táblákban lévő adatok megegyezenek 
 * \[ ] különböző roleok hozzá adása
 * \[ ] Admin site
-* \[ ] Posztok és további backend helyekből kivenni a létrehozás dátuma nevű felesleges taget, mivel a created_at egyszerűbb és alap 
-* \[ ] Elfeljtette a jelszót + email 
+* \[ ] Posztok és további backend helyekből kivenni a letrehozas_datuma nevű felesleges taget, mivel a created_at egyszerűbb és alap 
+* \[X] Elfeljtette a jelszót + email✅
 * \[ ] Térkép javítása
 
 * \[ ] Az oldal kódjának tisztázás
@@ -54,18 +54,25 @@
 * \[ ] Az oldal dokumenálása
 * \[ ] Optimalizálás
 * \[ ] Tesztek:
-              - Mintakészitő✅
-              - regisztráció✅
-              - regisztráció rossz adattal✅
-              - bejelentekezés✅
-              - bejelentekezés rossz adattal✅
-              - jelszó reset (egy része done)✅
-              - új felhasználó admin siteon✅
-              - új item admin siteon✅
-              - rendelés✅
-              - bankkártya✅
-              - poszthozáadása profilról + modósítás✅
-              - profil modositás✅
+  - Mintakészitő✅
+  - regisztráció✅
+  - regisztráció rossz adattal✅
+  - bejelentekezés✅
+  - bejelentekezés rossz adattal✅
+  - jelszó reset (egy része done)✅
+  - új felhasználó admin siteon✅
+  - új item admin siteon✅
+  - rendelés✅
+  - bankkártya✅
+  - poszthozáadása profilról + modósítás✅
+  - profil modositás✅
+  
+##
+
+
+
+
+# IMPLEMENTÁLHATÓ KÓD RÉSZLETEK A JÖVÖBBEN FUNKCIÓ BŐVÍTÉS KAPCSÁN
 
 ha megakarjuk oldani azt hogy bejelentkezve maradok
 
@@ -147,4 +154,3 @@ jsonMounted(async () => {
   ]);
   initCharts();
 });
-Így például http://localhost:5173/dashboard?view=products&page=3 — F5 után pontosan ugyanoda tölt vissza.
