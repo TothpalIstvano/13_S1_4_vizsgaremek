@@ -69,8 +69,18 @@
   
 ##
 
-
-
+$request->validate([
+    'delivery.name'    => ['required', 'string', 'regex:/^[\p{L}]+([\s\-][\p{L}]+)+$/u'],
+    'delivery.email'   => ['required', 'email:rfc,dns'],
+    'delivery.phone'   => ['required', 'regex:/^[+]?[\d\s\-()]{9,15}$/'],
+    'delivery.zip'     => ['required', 'digits_between:4,5'],
+    'delivery.city'    => ['required', 'string', 'min:2'],
+    'delivery.address' => ['required', 'string', 'min:5'],
+    'termekek'         => ['required', 'array', 'min:1'],
+    'termekek.*.termek_id' => ['required', 'integer', 'exists:termekek,id'],
+    'termekek.*.mennyiseg' => ['required', 'integer', 'min:1'],
+    'termekek.*.szin_id'   => ['nullable', 'integer', 'exists:szinek,id'],
+]);
 
 # IMPLEMENTÁLHATÓ KÓD RÉSZLETEK A JÖVÖBBEN FUNKCIÓ BŐVÍTÉS KAPCSÁN
 

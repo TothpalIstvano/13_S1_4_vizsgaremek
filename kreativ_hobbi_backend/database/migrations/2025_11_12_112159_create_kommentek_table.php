@@ -12,9 +12,9 @@ return new class extends Migration {
     {
         Schema::create('kommentek', function (Blueprint $table) {
             $table->unsignedInteger('id')->primary()->autoIncrement();
-            $table->text('komment')->nullable(false);
-            $table->unsignedInteger('poszt_id')->nullable(false);
-            $table->unsignedInteger('kommentelo')->nullable(false);
+            $table->text('komment');
+            $table->unsignedInteger('poszt_id');
+            $table->unsignedInteger('kommentelo');
             $table->unsignedInteger('elozetes_komment_id')->nullable();
             $table->timestamp('letrehozas_datuma')->useCurrent();
             $table->foreign('poszt_id')->references('id')->on('posztok')->onDelete('cascade');

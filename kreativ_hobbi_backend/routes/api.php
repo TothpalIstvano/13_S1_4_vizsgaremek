@@ -30,7 +30,7 @@ Route::get('/user/check', function () {
         }
         return response()->json(['loggedIn' => true, 'szerepkor' => $adatok->szerepkor], 200);
     }
-    return response()->json(['loggedIn' => false], 400);
+    return response()->json(['loggedIn' => false], 200);
 });
 
 Route::post('/login', function (Request $request) {
@@ -88,7 +88,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/blog/{id}/reaction', [BlogController::class, 'reaction']);
 });
 
-Route::get('/cities', function () {
+Route::get('/varosok', function () {
     return Varosok::select('id', 'varos_nev', 'iranyitoszam')
         ->orderBy('varos_nev')
         ->get();

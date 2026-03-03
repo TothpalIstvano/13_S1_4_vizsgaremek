@@ -13,10 +13,10 @@ return new class extends Migration {
     {
         Schema::create('termekek', function (Blueprint $table) {
             $table->unsignedInteger('id')->primary()->autoIncrement();
-            $table->string('nev', 255)->nullable(false);
+            $table->string('nev', 255);
             $table->text('leiras')->nullable();
-            $table->decimal('ar', 10, 0)->nullable(false);
-            $table->integer('darab')->nullable(false)->default(0);
+            $table->decimal('ar', 10, 0);
+            $table->integer('darab')->default(0);
             $table->integer('meter')->nullable();
             $table->unsignedInteger('kategoria_id');
             $table->unsignedInteger('fo_kep_id')->nullable();

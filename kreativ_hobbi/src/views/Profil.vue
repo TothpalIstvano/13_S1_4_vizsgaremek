@@ -77,7 +77,7 @@ function setAvatarDefault(event) {
 async function fetchCities() {
   loadingCities.value = true;
   try {
-    const response = await axios.get('/api/cities');
+    const response = await axios.get('/api/varosok');
     cities.value = response.data;
   } catch (error) {
     console.error('Failed to load cities', error);

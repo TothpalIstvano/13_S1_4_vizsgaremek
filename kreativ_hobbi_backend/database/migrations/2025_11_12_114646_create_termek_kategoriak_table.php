@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('termekKategoriak', function (Blueprint $table) {
-            $table->unsignedInteger('termek_id')->nullable(false);
-            $table->unsignedInteger('kategoria_id')->nullable(false);
+            $table->unsignedInteger('termek_id');
+            $table->unsignedInteger('kategoria_id');
             $table->primary(['termek_id', 'kategoria_id']);
             $table->foreign('termek_id')->references('id')->on('termekek')->onDelete('cascade');
             $table->foreign('kategoria_id')->references('id')->on('kategoriak')->onDelete('cascade');
