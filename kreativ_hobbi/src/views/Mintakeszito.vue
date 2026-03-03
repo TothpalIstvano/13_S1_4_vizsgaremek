@@ -74,7 +74,6 @@ async function fonalTermekBetoltese() {
         if (data.length > 0) {
             fonalTermek.value = data[0]
             
-            // Extract yarn colors from the product
             if (fonalTermek.value.TermekSzinek && fonalTermek.value.TermekSzinek.length > 0) {
                 yarnColors.value = fonalTermek.value.TermekSzinek.map(szin => ({
                     hex: szin.hex_kod,
@@ -86,13 +85,11 @@ async function fonalTermekBetoltese() {
                 yarnColors.value = []
             }
             
-            // Calculate necessary gombolyagok
             if (fonalTermek.value && fonalTermek.value.meter && fonalHossz.value > 0) {
                 const fonalMeterben = fonalHossz.value / 100
                 szuksegesGombolyagok.value = Math.ceil(fonalMeterben / fonalTermek.value.meter)
             }
             
-            // Check color matching
             if (szinPaletta.value && szinPaletta.value.length > 0) {
                 checkColorMatching()
             }

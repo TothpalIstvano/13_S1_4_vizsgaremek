@@ -2,6 +2,8 @@
 - profilkép szelfi feltöltése - a profilon nem jelenik csak meg, err_blocked_by_corb van - visszaigazoló üzi kellene: adatok sikeresen mentve (vagy nem), szebbítés
 - mintakészítő kosárhoz adás szebbítés
 - mintakészítő letöltés, néhány megnevezés/szöveg átírása ÉS A CSÚSZKA ÉS A NUMBERINPUT IZÉ ÖSSZEHANGOLÁSA
+- blog posztoknál a seederbe írtaknak szép főképe legyen
+- címkék és kategóriák felvétele (ne legyen ennyi latin hablaty)
 - newpost notifications magyarul/jobban
 - profilon a posztoknál reszponzivitás
 - reakciók poszthoz - tartsa meg a színt frissítés után
