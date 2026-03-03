@@ -1,9 +1,9 @@
 - kommentek saját törléssel, ellenőrzéssel (csúnya beszéd szűrés)
-- profilkép szelfi feltöltése - a profilon nem jelenik csak meg, err_blocked_by_corb van - visszaigazoló üzi kellene: adatok sikeresen mentve (vagy nem)
+- profilkép szelfi feltöltése - a profilon nem jelenik csak meg, err_blocked_by_corb van - visszaigazoló üzi kellene: adatok sikeresen mentve (vagy nem), szebbítés
+- mintakészítő kosárhoz adás szebbítés
 - mintakészítő letöltés, néhány megnevezés/szöveg átírása ÉS A CSÚSZKA ÉS A NUMBERINPUT IZÉ ÖSSZEHANGOLÁSA
 - newpost notifications magyarul/jobban
 - profilon a posztoknál reszponzivitás
-- poszt mentése vázlatként - már csak a tartalom nem loadol
 - reakciók poszthoz - tartsa meg a színt frissítés után
 - rólunk oldal rendes szöveg
 - reszponzívitás
