@@ -4,7 +4,7 @@
     <div class="sidebar">
       <div class="sidebar-header">
         <h1>🎨 Kreatív Hobbi</h1>
-        <p>Admin Dashboard</p>
+        <p>Adminisztrációs felület</p>
       </div>
       <ul class="nav-menu">
         <li class="nav-item">
@@ -22,13 +22,13 @@
         <li class="nav-item">
           <a class="nav-link" :class="{active: currentView === 'blog'}" @click="currentView = 'blog'">
             <span class="nav-icon">📝</span>
-            Blog Bejegyzések
+            Blogbejegyzések
           </a>
         </li>
         <li class="nav-item">
           <a class="nav-link" :class="{active: currentView === 'users'}" @click="currentView = 'users'">
             <span class="nav-icon">👤</span>
-            Felhasznalok
+            Felhasználók
           </a>
         </li>
         <li class="nav-item">
@@ -58,7 +58,7 @@
           <div class="stat-card">
             <div class="stat-header">
               <div>
-                <div class="stat-title">Összes Értékesítés</div>
+                <div class="stat-title">Összes értékesítés</div>
               </div>
               <div class="stat-icon" style="background: #dbeafe; color: #1e40af;">
                 💰
@@ -112,7 +112,7 @@
         <div class="charts-grid">
           <div class="chart-card">
             <div class="chart-header">
-              <h3 class="chart-title">Havi Értékesítés</h3>
+              <h3 class="chart-title">Havi értékesítés</h3>
             </div>
             <canvas ref="salesChart"></canvas>
           </div>
@@ -128,7 +128,7 @@
         <!-- Recent Orders -->
         <div class="table-container">
           <div class="table-header">
-            <h3 class="table-title">Legújabb Rendelések</h3>
+            <h3 class="table-title">Legújabb rendelések</h3>
           </div>
           <table>
             <thead>
@@ -165,14 +165,14 @@
           <h2>Termékek</h2>
           <div class="header-actions">
             <button class="btn btn-primary" @click="openProductModal()">
-              ➕ Új Termék
+              ➕ Új termék
             </button>
           </div>
         </div>
 
         <div class="table-container">
           <div class="table-header">
-            <h3 class="table-title">Összes Termék</h3>
+            <h3 class="table-title">Összes termék</h3>
             <div class="search-box">
               <input 
                 type="text" 
@@ -285,7 +285,7 @@
                 <th>Aktív</th>
                 <th>Rendelések</th>
                 <th>Regisztráció ideje</th>
-                <th>Útolsó bejelentkezés</th>
+                <th>Utolsó bejelentkezés</th>
                 <th>Műveletek</th>
               </tr>
             </thead>
@@ -385,17 +385,17 @@
       <!-- Blog View -->
       <div v-if="currentView === 'blog'">
         <div class="header">
-          <h2>Blog Bejegyzések</h2>
+          <h2>Blogbejegyzések</h2>
           <div class="header-actions">
             <button class="btn btn-primary" @click="openBlogModal()">
-              ➕ Új Bejegyzés
+              ➕ Új bejegyzés
             </button>
           </div>
         </div>
 
         <div class="table-container">
           <div class="table-header">
-            <h3 class="table-title">Összes Bejegyzés</h3>
+            <h3 class="table-title">Összes bejegyzés</h3>
             <div class="search-box">
               <input 
                 type="text" 
@@ -500,14 +500,14 @@
         <div class="charts-grid" style="grid-template-columns: 1fr;">
           <div class="chart-card">
             <div class="chart-header">
-              <h3 class="chart-title">Eladott Termékek Havi Bontásban</h3>
+              <h3 class="chart-title">Eladott termékek havi bontásban</h3>
             </div>
             <canvas ref="productSalesChart"></canvas>
           </div>
 
           <div class="chart-card">
             <div class="chart-header">
-              <h3 class="chart-title">Bevétel Havi Trendje</h3>
+              <h3 class="chart-title">Bevétel havi megoszlása</h3>
             </div>
             <canvas ref="revenueChart"></canvas>
           </div>
@@ -524,7 +524,7 @@
         </div>
         <div class="modal-body">
           <div class="form-group">
-            <label class="form-label">Termék Neve</label>
+            <label class="form-label">Termék neve</label>
             <input type="text" class="form-input" v-model="editingProduct.name" placeholder="pl. Kötőfonal 100g">
           </div>
           <div class="form-group">

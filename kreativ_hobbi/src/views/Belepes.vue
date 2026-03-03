@@ -25,10 +25,10 @@
         <input class="form__input" autocomplete="new-password" name="password_confirmation" type="password" placeholder="Jelszó megerositése" v-model="signUpForm.password_confirmation" minlength="8" required>
         <label for="password_confirmation" v-if="signUpForm.password && signUpForm.password_confirmation && signUpForm.password !== signUpForm.password_confirmation" class="error-message">A két jelszó nem egyezik!</label>
         <label class='form__checkbox'>
-        <input type='checkbox' name='terms' v-model="signUpForm.terms" required/> Elolvastam és elfogadom a Felhasználási feltételeket
+        <input type='checkbox' name='terms' v-model="signUpForm.terms" required/> Elolvastam és elfogadom a Felhasználási feltételeket <span style="color: #a63030;">*</span>
         </label>
         <label class='form__checkbox'>
-          <input type="checkbox" required name="checkbox" v-model="signUpForm.privacy" /> Elolvastam és elfogadom a Adatvédelmi irányelveket
+          <input type="checkbox" required name="checkbox" v-model="signUpForm.privacy" /> Elolvastam és elfogadom a Adatvédelmi irányelveket <span style="color: #a63030;">*</span>
         </label>
         <button class="button" type="submit" :disabled="buttonflag  ">Fiók létrehozása</button>
       </form>
