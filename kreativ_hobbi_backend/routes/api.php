@@ -30,7 +30,7 @@ Route::get('/user/check', function () {
         }
         return response()->json(['loggedIn' => true, 'szerepkor' => $adatok->szerepkor], 200);
     }
-    return response()->json(['loggedIn' => false], 200);
+    return response()->json(['loggedIn' => false], 400);
 });
 
 Route::post('/login', function (Request $request) {

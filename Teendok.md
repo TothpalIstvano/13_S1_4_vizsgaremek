@@ -1,34 +1,34 @@
-* \[x] Navbar alapok
-* \[x] Navbar
-* \[x] Regsiztráció / Belépés
-* \[x] Profil
-* \[x] Nav animációk
-* \[x] Carousel
-* \[x] Képek
-* \[x] Szövegek
-* \[x] Blog kártyák
-* \[x] Footer
-* \[x] Jelszó(regisztráció)
-* \[x] Jelszó(megtekintés)
+* \[x] Navbar alapok✅
+* \[x] Navbar✅
+* \[x] Regsiztráció / Belépés✅
+* \[x] Profil✅
+* \[x] Nav animációk✅
+* \[x] Carousel✅
+* \[x] Képek✅
+* \[x] Szövegek✅
+* \[x] Blog kártyák✅
+* \[x] Footer✅
+* \[x] Jelszó(regisztráció)✅
+* \[x] Jelszó(megtekintés)✅
 
 * \[/] Webshop
 * \[ ] cimke szűrés + ha itemen katintás akkkor hozzá adás
-* \[X] active cimkek
+* \[X] active cimkek✅
 * \[ ] active termékeknél cimkek
 * \[ ] active cimkek megtartása sessionstorage
 * \[/] active cimkek stilus
 * \[ ] termek cimkek termékeken katinthatók legyenek
-* \[X] cimke kategoriára való csere
+* \[X] cimke kategoriára való csere✅
 * \[ ] szöveg röviditése ha overflow van és ... hozááadása
-* \[ ] cimkeék az itemen való mennyiség kiírás + + jel oda írása + enyitható legyen
-* \[ ] kosár mennyiség írása
-* \[ ] Carouselbe itemek berakása kedvenc alapján
-* \[ ] email verifikáció
+* \[X] cimkeék az itemen való mennyiség kiírás + + jel oda írása + enyitható legyen✅
+* \[X] kosár mennyiség írása✅
+* \[ ] Carouselbe itemek berakása kedvenc alapján ->IMPLEMENTÁCIÓRA VÁRÓ NEM LEHETSÉGES FEATURE
+* \[X] email verifikáció✅
 * \[ ] vásárol email
 * \[ ] jelszó reset
 * \[ ] kosár eltárolása
 * \[ ] rendelés pending
-* \[ ] Dashboard betöltése + valós input"" from database
+* \[X] Dashboard betöltése + valós input"" from database
 * \[ ] áruház loading
 * \[ ] Rendelések javtása
 * \[ ] Analitika fixelés
@@ -39,8 +39,8 @@
 
 * \[ ] Dashboard szerző + modosítás javítás +/- jobb stilus
 * \[ ] kicsit akad az animáció a belépés oldalon a váltásnál 
-* \[X] resend ki cserélésre gmailre
-* \[X] verifikáld az emailed felszólitás
+* \[X] resend ki cserélésre gmailre✅
+* \[X] verifikáld az emailed felszólitás✅
 
 * \[ ] Táblák egységesítése ez alat azt értve hogy a táblákban lévő adatok megegyezenek 
 * \[ ] különböző roleok hozzá adása
@@ -59,11 +59,11 @@
               - regisztráció rossz adattal✅
               - bejelentekezés✅
               - bejelentekezés rossz adattal✅
-              - jelszó reset (egy része done)
-              - új felhasználó admin siteon
-              - új item admin siteon
-              - rendelés
-              - bankkártya
+              - jelszó reset (egy része done)✅
+              - új felhasználó admin siteon✅
+              - új item admin siteon✅
+              - rendelés✅
+              - bankkártya✅
               - poszthozáadása profilról + modósítás✅
               - profil modositás✅
 
