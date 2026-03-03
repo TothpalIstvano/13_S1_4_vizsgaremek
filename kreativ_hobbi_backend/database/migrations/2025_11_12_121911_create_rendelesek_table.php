@@ -13,10 +13,18 @@ return new class extends Migration
     {
         Schema::create('rendelesek', function (Blueprint $table) {
             $table->unsignedInteger('id')->primary()->autoIncrement();
-            $table->unsignedInteger('felhasznalo_id')->nullable(false);
-            $table->enum('statusz',['függőben','szállítás alatt','teljesítve','törölve'])->default('függőben')->nullable(false);
-            $table->decimal('osszeg', 10, 2)->nullable(false);
-            $table->foreign('felhasznalo_id')->references('id')->on('felhasznalok')->nullable()->onDelete('cascade');
+            $table->unsignedInteger('felhasznalo_id')->nullable();
+            $table->enum('statusz',['függőben','szállítás alatt','teljesítve','törölve'])->default('függőben');
+            $table->enum('fizetes_statusz', ['függőben', 'fizetve', 'sikertelen'])->default('függőben');
+            $table->decimal('osszeg', 10, 2);
+            $table->string('szallitasi_nev');
+            $table->string('szallitasi_email');
+            $table->string('szallitasi_telefon');
+            $table->string('szallitasi_cim');
+            $table->string('szallitasi_varos_nev');
+            $table->unsignedInteger('szallitasi_varos_id')->nullable();
+            $table->foreign('szallitasi_varos_id')->references('id')->on('varosok')->onDelete('set null');
+            $table->foreign('felhasznalo_id')->references('id')->on('felhasznalok')->onDelete('set null');
             $table->timestamp('rendeles_datuma')->useCurrent();
             $table->timestamps();
         });

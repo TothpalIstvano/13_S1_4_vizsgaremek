@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('szinek', function (Blueprint $table) {
             $table->unsignedInteger('id')->primary()->autoIncrement();
-            $table->string('nev',50)->unique()->nullable(false);
-            $table->string('hex_kod',7)->unique()->nullable(false);
+            $table->string('nev',50)->unique();
+            $table->string('hex_kod',7)->unique();
             $table->timestamps();
         });
     }

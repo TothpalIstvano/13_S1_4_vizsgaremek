@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('felhasznalok', function (Blueprint $table) {
             $table->unsignedInteger('id')->autoIncrement();
-            $table->string('felhasz_nev', 100)->unique()->nullable(false);
-            $table->string('email', 150)->unique()->nullable(false);
-            $table->string('jelszo')->nullable(false);
+            $table->string('felhasz_nev', 100)->unique();
+            $table->string('email', 150)->unique();
+            $table->string('jelszo');
             $table->unsignedInteger('profilKep_id')->default(1);
             $table->boolean('statusz')->default(1);
             $table->timestamp('letrehozas_Datuma')->useCurrent();

@@ -275,7 +275,7 @@
   </template>
 
 
-  <script setup>
+<script setup>
   //#region imports
   import { ref, onMounted, onBeforeUnmount, watch, computed, provide, inject, onUnmounted } from 'vue'
   import axios from 'axios'
@@ -688,13 +688,16 @@ onBeforeUnmount(() => {
 /*#region ===== FILTER CHIPS ===== */
 .active-filters {
   display: flex;
-  gap: 12px; /* Increased spacing for a cleaner look */
+  gap: 8px;
   align-items: center;
   flex-wrap: wrap;
   margin-right: 0;
   justify-self: start;
-  grid-column: 1; /* Helps prevent the section from getting squashed */
+  grid-column: 1;
+  grid-row: 1;
   min-width: 0;
+  max-height: calc(2 * 32px + 12px); /* max 2 sor chip + gap */
+  overflow:hidden;
 }
 
 .filter-chip {
@@ -767,6 +770,7 @@ onBeforeUnmount(() => {
   cursor: pointer;
   transition: all 0.2s;
   font-family: inherit;
+  flex-shrink: 0;
 }
 
 #clear-filters:hover {

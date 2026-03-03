@@ -12,9 +12,9 @@ return new class extends Migration {
     {
         Schema::create('posztok', function (Blueprint $table) {
             $table->unsignedInteger('id')->primary()->autoIncrement();
-            $table->string('cim', 255)->nullable(false);
-            $table->string('kivonat', 255)->nullable(false);
-            $table->text('tartalom', )->nullable(false);
+            $table->string('cim', 255);
+            $table->string('kivonat', 255);
+            $table->text('tartalom', );
             $table->unsignedInteger('szerzo_id')->nullable();
             $table->unsignedInteger('fo_kep_id')->nullable();
             $table->timestamp('letrehozas_datuma')->useCurrent()->useCurrentOnUpdate();

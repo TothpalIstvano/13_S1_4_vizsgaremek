@@ -65,14 +65,42 @@
           <h3 class="delivery-title">Szállítási Adatok</h3>
           
           <form @submit.prevent="checkout">
-            <div class="form-group">
-              <label for="fullName">Teljes Név *</label>
-              <input 
-                id="fullName" 
-                v-model="deliveryDetails.fullName" 
-                placeholder="Pl. Nagy János"
-                required 
-              />
+            <div class="form-row">
+              <div class="form-group">
+                <label for="lastName">
+                  Vezetéknév *
+                  <span v-if="lastNameError" class="error-indicator">⚠</span>
+                  <span v-else-if="lastNameValid" class="success-indicator">✓</span>
+                </label>
+                <input
+                  id="lastName"
+                  v-model="deliveryDetails.lastName"
+                  placeholder="Pl. Nagy"
+                  required
+                  @blur="validateLastName"
+                  @keyup.enter="validateLastName"
+                  :class="{ 'input-error': lastNameError, 'input-success': lastNameValid }"
+                />
+                <span v-if="lastNameError" class="error-message">{{ lastNameError }}</span>
+              </div>
+
+              <div class="form-group">
+                <label for="firstName">
+                  Keresztnév *
+                  <span v-if="firstNameError" class="error-indicator">⚠</span>
+                  <span v-else-if="firstNameValid" class="success-indicator">✓</span>
+                </label>
+                <input
+                  id="firstName"
+                  v-model="deliveryDetails.firstName"
+                  placeholder="Pl. János"
+                  required
+                  @blur="validateFirstName"
+                  @keyup.enter="validateFirstName"
+                  :class="{ 'input-error': firstNameError, 'input-success': firstNameValid }"
+                />
+                <span v-if="firstNameError" class="error-message">{{ firstNameError }}</span>
+              </div>
             </div>
 
             <div class="form-group">
@@ -82,8 +110,12 @@
                 type="email" 
                 v-model="deliveryDetails.email" 
                 placeholder="janos@example.com"
-                required 
+                required
+                @blur="validateEmail"
+                @keyup.enter="validateEmail"
+                :class="{ 'input-error': emailError, 'input-success': emailValid }"
               />
+              <span v-if="emailError" class="error-message">{{ emailError }}</span>
             </div>
 
             <div class="form-group">
@@ -92,20 +124,15 @@
                 id="address" 
                 v-model="deliveryDetails.address" 
                 placeholder="Utca, házszám"
-                required 
+                required
+                @blur="validateAddress"
+                @keyup.enter="validateAddress"
+                :class="{ 'input-error': addressError, 'input-success': addressValid }"
               />
+              <span v-if="addressError" class="error-message">{{ addressError }}</span>
             </div>
 
             <div class="form-row">
-              <div class="form-group">
-                <label for="city">Város *</label>
-                <input 
-                  id="city" 
-                  v-model="deliveryDetails.city" 
-                  placeholder="Budapest"
-                  required 
-                />
-              </div>
               <div class="form-group">
                 <label for="zipCode">
                   Irányítószám *
@@ -125,18 +152,37 @@
                 />
                 <span v-if="zipCodeError" class="error-message">{{ zipCodeError }}</span>
               </div>
+              <div class="form-group">
+                <label for="city">Város *</label>
+                <select
+                  id="city"
+                  v-model="deliveryDetails.cityId"
+                  required
+                  :class="{ 'input-error': cityError, 'input-success': cityValid }"
+                  @change="validateCity"
+                >
+                  <option value="" disabled>Válassz várost...</option>
+                  <option v-for="city in cities" :key="city.id" :value="city.id">
+                    {{ city.varos_nev }}
+                  </option>
+                </select>
+                <span v-if="cityError" class="error-message">{{ cityError }}</span>
+              </div>
             </div>
-
             <div class="form-group">
               <label for="phone">Telefonszám *</label>
               <input 
                 id="phone" 
                 v-model="deliveryDetails.phone" 
                 placeholder="+36 30 123 4567"
-                required 
+                required
+                @blur="validatePhone"
+                @keyup.enter="validatePhone"
+                :class="{ 'input-error': phoneError, 'input-success': phoneValid }"
                 inputmode="tel"
                 aria-describedby="phoneHelp"
               />
+              <span v-if="phoneError" class="error-message">{{ phoneError }}</span>
               <small id="phoneHelp" class="help-text">Formátum: min. 9 számjegy; szóköz, + és - engedélyezett.</small>
             </div>
           </form>
@@ -167,16 +213,18 @@
 </template>
 
 <script setup>
-import { ref, computed, provide } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useCartStore } from '@/stores/cartStore'
+import axios from 'axios';
 
 const router = useRouter()
 const cartStore = useCartStore()
 const cartItems = computed(() => cartStore.cartItems)
 
 const deliveryDetails = ref({
-  fullName: '',
+  firstName: '',
+  lastName: '',
   email: '',
   address: '',
   city: '',
@@ -186,6 +234,16 @@ const deliveryDetails = ref({
 
 const zipCodeError = ref('')
 const zipCodeValid = ref(false)
+const phoneError = ref('')
+const phoneValid = ref(false)
+const emailError = ref('')
+const emailValid = ref(false)
+const addressError = ref('')
+const addressValid = ref(false)
+const lastNameError = ref('')
+const lastNameValid = ref(false)
+const firstNameError = ref('')
+const firstNameValid = ref(false)
 
 const cartTotal = computed(() => {
   return cartItems.value.reduce((s, i) => s + (Number(i.ar || i.price) * Number(i.quantity || 0)), 0)
@@ -216,6 +274,62 @@ function removeFromCart(id) {
 function emptyCart(confirmPrompt = true) {
   if (confirmPrompt && !confirm('Biztosan üríteni szeretnéd a kosarat?')) return
   cartStore.clearCart()
+}
+
+//#region Validation
+
+const cities = ref([])
+const cityError = ref('')
+const cityValid = ref(false)
+
+// városok betöltése
+onMounted(async () => {
+  const res = await axios.get('/api/varosok')
+  cities.value = res.data
+})
+
+function validateCity() {
+  if (!deliveryDetails.value.cityId) {
+    cityError.value = 'Kérlek válassz várost!'
+    cityValid.value = false
+    return
+  }
+  cityError.value = ''
+  cityValid.value = true
+}
+
+const nameRegex = /^[A-Za-záéíóöőúüűÁÉÍÓÖŐÚÜŰ\-]{2,}$/
+
+function validateLastName() {
+  const value = deliveryDetails.value.lastName.trim()
+  if (!value) {
+    lastNameError.value = ''
+    lastNameValid.value = false
+    return
+  }
+  if (!nameRegex.test(value)) {
+    lastNameError.value = 'Csak betűk engedélyezettek (min. 2 karakter)'
+    lastNameValid.value = false
+    return
+  }
+  lastNameError.value = ''
+  lastNameValid.value = true
+}
+
+function validateFirstName() {
+  const value = deliveryDetails.value.firstName.trim()
+  if (!value) {
+    firstNameError.value = ''
+    firstNameValid.value = false
+    return
+  }
+  if (!nameRegex.test(value)) {
+    firstNameError.value = 'Csak betűk engedélyezettek (min. 2 karakter)'
+    firstNameValid.value = false
+    return
+  }
+  firstNameError.value = ''
+  firstNameValid.value = true
 }
 
 function validateZipCode() {
@@ -253,6 +367,77 @@ function validateZipCode() {
   zipCodeValid.value = true
 }
 
+function validatePhone() {
+  const value = deliveryDetails.value.phone.trim()  // ← d.phone helyett
+  const phoneRegex = /^[+]?[\d\s\-()]{9,15}$/
+  
+  if (!value) {
+    phoneError.value = ''
+    phoneValid.value = false
+    return
+  }
+
+  if (!phoneRegex.test(value)) {
+    phoneError.value = 'Érvénytelen telefonszám formátum!'
+    phoneValid.value = false
+    return
+  }
+
+  const digits = value.replace(/\D/g, '')
+  if (digits.length < 9) {
+    phoneError.value = `Túl rövid (${digits.length}/9 számjegy)`
+    phoneValid.value = false
+    return
+  }
+
+  phoneError.value = ''
+  phoneValid.value = true
+}
+
+function validateEmail() {
+  const value = deliveryDetails.value.email.trim()
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  
+  if (!value) {
+    emailError.value = ''
+    emailError.value = false
+    return
+  }
+
+  if (!emailRegex.test(value)) {
+    emailError.value = 'Érvenytelen email formátum!'
+    emailValid.value = false
+    return
+  }
+
+  emailError.value = ''
+  emailValid.value = true
+}
+
+function validateAddress() {
+  const value = deliveryDetails.value.address.trim()
+  const addressRegex = /^[A-Za-zÀ-ÖØ-öø-ÿ0-9\s\.\,\-\/]+$/
+  if (!value) {
+    addressError.value = ''
+    addressValid.value = false
+    return
+  }
+  if (!addressRegex.test(value)) {
+    addressError.value = 'Érvénytelen cím formátum!'
+    addressValid.value = false
+    return
+  }
+  if (value.length < 5) {
+    addressError.value = 'Túl rövid (min 5 karakter)'
+    addressValid.value = false
+    return
+  }
+  addressError.value = ''
+  addressValid.value = true
+}
+
+//#endregion
+
 const payload = ref({})
 async function checkout() {
   const currentCart = (cartItems && cartItems.value) ? cartItems.value : (cartStore && cartStore.cartItems ? cartStore.cartItems : [])
@@ -261,26 +446,49 @@ async function checkout() {
     return
   }
   const d = deliveryDetails.value
-  if (!d.fullName || !d.email || !d.address || !d.city || !d.zipCode || !d.phone) {
+  if (!d.firstName || !d.lastName || !d.email || !d.address || !d.city || !d.zipCode || !d.phone) {
     alert('Kérlek töltsd ki az összes szállítási adatot')
     return
   }
 
+  // Vezetéknév validáció
+  validateFirstName()
+  if (!firstNameValid.value) {
+    alert('A vezetéknév nem érvényes!')
+    return
+  }
+
+  // Keresztéknév validáció
+  validateLastName()
+  if (!lastNameValid.value) {
+    alert('A keresztéknév nem érvenytes!')
+    return
+  }
+
   // Irányítószám validáció a checkout előtt
+  validateZipCode()
   if (!zipCodeValid.value) {
     alert('Az irányítószám nem érvényes!\n\nMagyar irányítószámok: 4-5 számjegy')
     return
   }
 
   // Egyszerű telefonszám ellenőrzés: legalább 9 számjegy
-  const phoneDigits = (d.phone || '').replace(/\D/g, '')
-  if (phoneDigits.length < 9) {
-    alert('A telefonszám érvénytelen (minimum 9 számjegy).')
+  validatePhone()
+  if (!phoneValid.value) {
+    alert('A telefonszám nem érvényes!')
     return
   }
 
+  // Email ellenörzés
+  validateEmail()
+  if (!emailValid.value) {
+    alert('Az email ciém nem érvenytelen!')
+    return
+  }
+
+  // Fizetés adatok
   payload.value = {
-    delivery: { name: d.fullName, address: d.address, zip: d.zipCode, email: d.email, phone: d.phone, city: d.city },
+    delivery: { firstName: d.firstName, lastName: d.lastName, address: d.address, zip: d.zipCode, email: d.email, phone: d.phone, city: d.city },
     items: currentCart.map(i => ({ id: i.id, mennyiseg: i.quantity, szin_id: i.selectedColor?.id ?? null }))
   }
 
@@ -651,7 +859,7 @@ async function checkout() {
 }
 
 .btn-primary,
-.btn-secondary {
+.btn-secondary{
   padding: 14px 24px;
   border: none;
   border-radius: 10px;

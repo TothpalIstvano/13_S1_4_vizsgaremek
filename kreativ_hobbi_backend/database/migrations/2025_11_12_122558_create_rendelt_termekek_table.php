@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::create('rendeltTermekek', function (Blueprint $table) {
             $table->unsignedInteger('id')->primary()->autoIncrement();
-            $table->unsignedInteger('rendeles_id')->nullable(false);
-            $table->unsignedInteger('termek_id')->nullable(false);
-            $table->integer('mennyiseg')->nullable(false);
-            $table->decimal('egysegar', 10, 2)->nullable(false);
+            $table->unsignedInteger('rendeles_id');
+            $table->unsignedInteger('termek_id');
+            $table->integer('mennyiseg');
+            $table->decimal('egysegar', 10, 2);
             $table->unsignedInteger('szin_id')->nullable(true);
             $table->foreign('rendeles_id')->references('id')->on('rendelesek')->onDelete('cascade');
             $table->foreign('termek_id')->references('id')->on('termekek')->onDelete('cascade');
