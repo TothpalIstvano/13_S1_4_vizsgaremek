@@ -1,3 +1,4 @@
+
 * \[x] Navbar alapok✅
 * \[x] Navbar✅
 * \[x] Regsiztráció / Belépés✅
@@ -67,37 +68,24 @@
   - poszthozáadása profilról + modósítás✅
   - profil modositás✅
   
-##
-
-$request->validate([
-    'delivery.name'    => ['required', 'string', 'regex:/^[\p{L}]+([\s\-][\p{L}]+)+$/u'],
-    'delivery.email'   => ['required', 'email:rfc,dns'],
-    'delivery.phone'   => ['required', 'regex:/^[+]?[\d\s\-()]{9,15}$/'],
-    'delivery.zip'     => ['required', 'digits_between:4,5'],
-    'delivery.city'    => ['required', 'string', 'min:2'],
-    'delivery.address' => ['required', 'string', 'min:5'],
-    'termekek'         => ['required', 'array', 'min:1'],
-    'termekek.*.termek_id' => ['required', 'integer', 'exists:termekek,id'],
-    'termekek.*.mennyiseg' => ['required', 'integer', 'min:1'],
-    'termekek.*.szin_id'   => ['nullable', 'integer', 'exists:szinek,id'],
-]);
-
-# IMPLEMENTÁLHATÓ KÓD RÉSZLETEK A JÖVÖBBEN FUNKCIÓ BŐVÍTÉS KAPCSÁN
+- \[ ] Alertek lecserélése mindenhol modellekre
+- \[ ] kosár eltárolása
+- \[ ] áruház alsó oldalak számok átírni (12, 24, 48)
+- \[ ] rendelés pending
 
 ha megakarjuk oldani azt hogy bejelentkezve maradok
 
 2. Vagy hozzáadni a táblához migráccióval:
-bashphp artisan make:migration add_remember_token_to_felhasznalok_table
-phppublic function up(): void
-{
-    Schema::table('felhasznalok', function (Blueprint $table) {
-        $table->rememberToken();
-    });
-}
-bashphp artisan migrate
+   bashphp artisan make:migration add_remember_token_to_felhasznalok_table
+   phppublic function up(): void
+   {
+   Schema::table('felhasznalok', function (Blueprint $table) {
+   $table->rememberToken();
+   });
+   }
+   bashphp artisan migrate
 
-ja és a NewPasswordController törlöd ki a // hogy müköjön->néz utána 
-
+ja és a NewPasswordController törlöd ki a // hogy müköjön->néz utána
 
 lehet old meg
 
@@ -114,33 +102,34 @@ const currentProductPage = ref(Number(route.query.page) ?? 1);
 const currentBlogPage = ref(Number(route.query.page) ?? 1);
 A currentView watch-hoz add hozzá az URL frissítést:
 jswatch(currentView, (newView) => {
-  if (oldView === 'dashboard') destroyDashboardCharts();
-  if (oldView === 'analytics') destroyAnalyticsCharts();
-  
-  // URL frissítése
-  router.replace({ query: { view: newView, page: 1 } });
-  
-  // Oldal reset nézet váltáskor
-  currentPage.value = 1;
-  currentProductPage.value = 1;
-  currentBlogPage.value = 1;
-  
-  initCharts();
+if (oldView === 'dashboard') destroyDashboardCharts();
+if (oldView === 'analytics') destroyAnalyticsCharts();
+
+// URL frissítése
+router.replace({ query: { view: newView, page: 1 } });
+
+// Oldal reset nézet váltáskor
+currentPage.value = 1;
+currentProductPage.value = 1;
+currentBlogPage.value = 1;
+
+initCharts();
 });
 Az oldalszám változásakor is frissítsd az URL-t — add hozzá mindhárom paginált nézethez:
 jswatch(currentPage, (val) => {
-  router.replace({ query: { view: currentView.value, page: val } });
+router.replace({ query: { view: currentView.value, page: val } });
 });
 
 watch(currentProductPage, (val) => {
-  router.replace({ query: { view: currentView.value, page: val } });
+router.replace({ query: { view: currentView.value, page: val } });
 });
 
 watch(currentBlogPage, (val) => {
-  router.replace({ query: { view: currentView.value, page: val } });
+router.replace({ query: { view: currentView.value, page: val } });
 });
 Az onMounted-ban olvasd vissza az URL-t:
 jsonMounted(async () => {
+
   // URL-ből visszaállítás
   if (route.query.view) currentView.value = route.query.view;
   if (route.query.page) {
