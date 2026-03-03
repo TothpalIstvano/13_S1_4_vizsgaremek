@@ -64,7 +64,7 @@ const router = createRouter({
       props: route => ({ postId: route.params.id })
     },
     {
-      path: '/kosar/fizetes',
+      path: '/kosar/fizetes/:id',
       name: 'Fizetes',
       component: Fizetes,
     },

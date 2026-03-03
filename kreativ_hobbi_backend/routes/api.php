@@ -146,81 +146,78 @@ Route::get('/termekek/{id}', function ($id) {
 
 Route::post('/rendeles', function (Request $request) {
     $validated = $request->validate([
-        'felhasznalo_id' => 'nullable|exists:felhasznalok,id',
-        'termekek' => 'required|array|min:1',
-        'termekek.*.termek_id' => 'required|integer|exists:termekek,id',
-        'termekek.*.mennyiseg' => 'required|integer|min:1',
-        'termekek.*.szin_id' => 'nullable|integer|exists:szinek,id'
+        'delivery.name' => ['required', 'string', 'regex:/^[\p{L}\-]{2,}(\s[\p{L}\-]{2,}){0,3}$/u'],
+        'delivery.email'         => ['required', 'email:rfc'],
+        'delivery.phone'         => ['required', 'regex:/^[+]?[\d\s\-()]{9,15}$/'],
+        'delivery.city_id'       => ['required', 'integer', 'min:1', 'exists:varosok,id'],
+        'delivery.address'       => ['required', 'string', 'min:5'],
+        'items'                  => ['required', 'array', 'min:1'],
+        'items.*.id'             => ['required', 'integer', 'exists:termekek,id'],
+        'items.*.mennyiseg'      => ['required', 'integer', 'min:1'],
+        'items.*.szin_id'        => ['nullable', 'integer', 'exists:szinek,id'],
     ]);
-    if ($validated == false) {
-        return response()->json(['error' => 'Validation failed'], 422);
-    } else {
-        response()->json(['message' => 'Validation passed'], 200);
-    }
-
-    // Determine user: authenticated > provided felhasznalo_id > fallback to a shared guest account
-    $userId = Auth::check() ? auth()->id() : ($validated['felhasznalo_id'] ?? null);
-    if (!$userId) {
-        \Log::info('No user supplied for rendelés, using or creating a guest user');
-        $guest = Felhasznalok::firstOrCreate(
-            ['email' => 'guest@local'],
-            ['felhasz_nev' => 'guest', 'jelszo' => \Illuminate\Support\Str::random(12)]
-        );
-        $userId = $guest->id;
-    }
 
     try {
         \DB::beginTransaction();
 
-        // Recompute total and validate stock under lock
         $total = 0;
-        foreach ($validated['termekek'] as $t) {
-            $p = Termekek::lockForUpdate()->find($t['termek_id']);
+        foreach ($validated['items'] as $item) {
+            $p = Termekek::lockForUpdate()->find($item['id']);
             if (!$p) {
                 \DB::rollBack();
-                return response()->json(['message' => "Product {$t['termek_id']} not found"], 404);
+                return response()->json(['message' => "Termék nem található: {$item['id']}"], 404);
             }
-            if ($p->darab < $t['mennyiseg']) {
+            if ($p->darab < $item['mennyiseg']) {
                 \DB::rollBack();
-                return response()->json(['message' => "Not enough stock for {$p->nev}"], 422);
+                return response()->json(['message' => "Nincs elegendő készlet: {$p->nev}"], 422);
             }
-            $total += $p->ar * $t['mennyiseg'];
+            $total += $p->ar * $item['mennyiseg'];
         }
 
-        $rendeles = new Rendelesek();
-        $rendeles->felhasznalo_id = $userId;
-        $rendeles->osszeg = $total;
-        $rendeles->statusz = 'függőben';
-        $rendeles->rendeles_datuma = now();
-        $rendeles->save();
+        // Város neve snapshot-hoz
+        $varos = Varosok::find($validated['delivery']['city_id']);
 
-        foreach ($validated['termekek'] as $termek) {
-            $p = Termekek::lockForUpdate()->find($termek['termek_id']);
+        $rendeles = Rendelesek::create([
+            'felhasznalo_id'      => auth()->user()->id ?? null,
+            'statusz'             => 'függőben',
+            'fizetes_statusz'     => 'függőben',
+            'osszeg'              => $total,
+            'szallitasi_nev'      => $validated['delivery']['name'],
+            'szallitasi_email'    => $validated['delivery']['email'],
+            'szallitasi_telefon'  => $validated['delivery']['phone'],
+            'szallitasi_cim'      => $validated['delivery']['address'],
+            'szallitasi_varos_nev'=> $varos->varos_nev,
+            'szallitasi_varos_id' => $validated['delivery']['city_id'],
+        ]);
 
-            $rt = new RendeltTermekek();
-            $rt->rendeles_id = $rendeles->id;
-            $rt->termek_id = $termek['termek_id'];
-            $rt->mennyiseg = $termek['mennyiseg'];
-            $rt->egysegar = $p->ar;
-            $rt->szin_id = $termek['szin_id'] ?? null;
-            $rt->save();
+        foreach ($validated['items'] as $item) {
+            $p = Termekek::find($item['id']);
 
-            $p->darab -= $termek['mennyiseg'];
-            $p->save();
+            RendeltTermekek::create([
+                'rendeles_id' => $rendeles->id,
+                'termek_id'   => $item['id'],
+                'mennyiseg'   => $item['mennyiseg'],
+                'egysegar'    => $p->ar,
+                'szin_id'     => $item['szin_id'] ?? null,
+            ]);
+
+            $p->decrement('darab', $item['mennyiseg']);
         }
 
         \DB::commit();
-        return response()->json(['message' => 'Rendelés sikeresen létrehozva', 'rendeles_id' => $rendeles->id], 201);
+        return response()->json([
+            'message'     => 'Rendelés sikeresen létrehozva',
+            'rendeles_id' => $rendeles->id
+        ], 201);
+
     } catch (\Exception $e) {
         \DB::rollBack();
-        \Log::error('Rendeles creation failed', [
-            'message' => $e->getMessage(),
-            'payload' => $request->all(),
-            'trace' => $e->getTraceAsString(),
-        ]);
-        return response()->json(['message' => 'Server error'], 500);
+        \Log::error('Rendeles creation failed', ['message' => $e->getMessage(), 'line' => $e->getLine()]);
+        return response()->json(['message' => $e->getMessage(), 'line' => $e->getLine()], 500);
     }
 });
+
+
 
 Route::get('/carousel/termekek', function () {
     $termekek = Termekek::select('id', 'darab', 'nev', 'ar', 'fo_kep_id', 'leiras', 'updated_at')

@@ -13,6 +13,7 @@
 * \[x] Jelszó(megtekintés)✅
 
 * \[/] Webshop
+* \[ ] Session storage helyett cookie a kosárhoz amiben az item idik vannak illetve csak az id-t és a mennyiséget tárolni
 * \[ ] cimke szűrés + ha itemen katintás akkkor hozzá adás
 * \[X] active cimkek✅
 * \[X] active termékeknél cimkek✅

@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Varosok;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Models\Felhasznalok;
 
@@ -17,11 +18,19 @@ class RendelesekFactory extends Factory
      */
     public function definition(): array
     {
+        $varos = Varosok::inRandomOrder()->first();
+
         return [
             "felhasznalo_id"=> Felhasznalok::pluck("id")->random(),
             "statusz"=>$this->faker->randomElement(["függőben","szállítás alatt","teljesítve","törölve"]),
             "osszeg"=>rand(1000, 5000),
             "rendeles_datuma"=>$this->faker->dateTime(),
+            'szallitasi_nev'=>$this->faker->name(),
+            'szallitasi_email'=>$this->faker->email(),
+            'szallitasi_telefon'=>$this->faker->phoneNumber(),
+            'szallitasi_cim'=>$this->faker->streetAddress(),
+            'szallitasi_varos_id'=>$varos->id,
+            'szallitasi_varos_nev'=>$varos->varos_nev
         ];
     }
 }

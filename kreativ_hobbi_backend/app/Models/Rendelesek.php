@@ -11,7 +11,23 @@ class Rendelesek extends Model
     use HasFactory;
     protected $table = "rendelesek";
     protected $PrimaryKey = "id";
-    protected $fillable = ['felhasznalo_id', 'statusz', 'osszeg', 'rendeles_datuma', 'nev', 'cim', 'irsz'];
+    protected $fillable = [
+        'felhasznalo_id', 
+        'statusz', 
+        'fizetes_statusz',
+        'osszeg',     
+        'szallitasi_nev',
+        'szallitasi_email',
+        'szallitasi_telefon',
+        'szallitasi_cim',
+        'szallitasi_varos_nev',
+        'szallitasi_varos_id',
+        'rendeles_datuma', 
+    ];
+
+
+    
+
 
     public function felhasznalo()
     {
