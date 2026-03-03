@@ -141,7 +141,7 @@
                 </label>
                 <input 
                   id="zipCode" 
-                  v-model="deliveryDetails.zipCode" 
+                  v-model="zipCode" 
                   type="text"
                   placeholder="1000"
                   required 
@@ -175,6 +175,9 @@
                 id="phone" 
                 v-model="deliveryDetails.phone" 
                 placeholder="+36 30 123 4567"
+                type="tel"
+                pattern="^\+\d{2}\s\d{3}\s\d{3}\s\d{4}$"
+                maxlength="15"
                 required
                 @blur="validatePhone"
                 @keyup.enter="validatePhone"
@@ -227,11 +230,11 @@ const deliveryDetails = ref({
   lastName: '',
   email: '',
   address: '',
-  city: '',
-  zipCode: '',
+  cityId: null,
   phone: ''
 })
 
+const zipCode = ref('')
 const zipCodeError = ref('')
 const zipCodeValid = ref(false)
 const phoneError = ref('')
@@ -298,7 +301,7 @@ function validateCity() {
   cityValid.value = true
 }
 
-const nameRegex = /^[A-Za-záéíóöőúüűÁÉÍÓÖŐÚÜŰ\-]{2,}$/
+const nameRegex = /^[A-Za-záéíóöőúüűÁÉÍÓÖŐÚÜŰ\-]{2,}(\s[A-Za-záéíóöőúüűÁÉÍÓÖŐÚÜŰ\-]{2,}){0,3}$/
 
 function validateLastName() {
   const value = deliveryDetails.value.lastName.trim()
@@ -308,7 +311,7 @@ function validateLastName() {
     return
   }
   if (!nameRegex.test(value)) {
-    lastNameError.value = 'Csak betűk engedélyezettek (min. 2 karakter)'
+    lastNameError.value = 'Csak betűk és max. 3 szóköz engedélyezett (min. 2 karakter)'
     lastNameValid.value = false
     return
   }
@@ -324,7 +327,7 @@ function validateFirstName() {
     return
   }
   if (!nameRegex.test(value)) {
-    firstNameError.value = 'Csak betűk engedélyezettek (min. 2 karakter)'
+    firstNameError.value = 'Csak betűk és max. 3 szóköz engedélyezett (min. 2 karakter)'
     firstNameValid.value = false
     return
   }
@@ -333,7 +336,7 @@ function validateFirstName() {
 }
 
 function validateZipCode() {
-  const value = deliveryDetails.value.zipCode.trim()
+  const value = zipCode.value.trim()
   
   // Üres érték - nincs hiba, csak nem valid
   if (!value) {
@@ -405,7 +408,7 @@ function validateEmail() {
   }
 
   if (!emailRegex.test(value)) {
-    emailError.value = 'Érvenytelen email formátum!'
+    emailError.value = 'Érvenytelen email cím!'
     emailValid.value = false
     return
   }
@@ -446,7 +449,7 @@ async function checkout() {
     return
   }
   const d = deliveryDetails.value
-  if (!d.firstName || !d.lastName || !d.email || !d.address || !d.city || !d.zipCode || !d.phone) {
+  if (!d.firstName || !d.lastName || !d.email || !d.address || !d.cityId || !d.phone) {
     alert('Kérlek töltsd ki az összes szállítási adatot')
     return
   }
@@ -488,18 +491,26 @@ async function checkout() {
 
   // Fizetés adatok
   payload.value = {
-    delivery: { firstName: d.firstName, lastName: d.lastName, address: d.address, zip: d.zipCode, email: d.email, phone: d.phone, city: d.city },
-    items: currentCart.map(i => ({ id: i.id, mennyiseg: i.quantity, szin_id: i.selectedColor?.id ?? null }))
+    delivery: {
+      name:    `${d.lastName} ${d.firstName}`,
+      address: d.address,
+      email:   d.email,
+      phone:   d.phone,
+      city_id: d.cityId,         
+    },
+    items: currentCart.map(i => ({
+      id:       i.id,
+      mennyiseg: i.quantity,
+      szin_id:  i.selectedColor?.id ?? null
+    }))
   }
-
-  // Persist payload across routes (provide/inject doesn't work across route navigation)
   try {
-    sessionStorage.setItem('orderPayload', JSON.stringify(payload.value))
+    axios.post('/api/rendeles', payload.value)
   } catch (e) {
-    console.warn('Could not persist order payload to sessionStorage', e)
+    console.warn('bug:', e)
   }
-
-  router.push({ path: '/kosar/fizetes' })
+  const res = await axios.post('/api/rendeles', payload.value)
+  router.push({ path: `/kosar/fizetes/${res.data.rendeles_id}` })
 }
 </script>
 
