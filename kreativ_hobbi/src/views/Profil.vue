@@ -400,9 +400,8 @@ function formatDate(d) { return new Date(d).toLocaleDateString(); }
                       <div>{{ slotProps.option.varos_nev }} ({{ slotProps.option.iranyitoszam }})</div>
                     </template>
                   </Dropdown>
-                  <label for="avatar">Profilkép feltöltése:</label>
-                  <input type="file" id="avatar" accept="image/*" @change="handleFileUpload">
                   <label for="profilkep">Kép kiválasztása/feltöltése</label>
+                  <input type="file" id="avatar" accept="image/*" @change="handleFileUpload">
                   <div v-if="showCamera" class="camera-preview">
                   <video ref="videoRef" autoplay playsinline></video>
                   <canvas ref="canvasRef" style="display: none;"></canvas>
@@ -468,27 +467,27 @@ function formatDate(d) { return new Date(d).toLocaleDateString(); }
 
 
           <div class="posts">
-<article v-for="p in posts" :key="p.id" class="post-card">
-  <div class="post-cover">
-    <img :src="p.fo_kep.url_Link" :alt="p.fo_kep.alt_szoveg" />
-  </div>
-  <div class="post-body">
-    <div class="post-meta">
-      <span>{{ formatDate(p.letrehozas_datuma) }}</span>
-      <span class="tags">
-        <small v-for="cimke in p.cimkek" :key="cimke.id" class="tag">#{{ cimke.nev }}</small>
-      </span>
-      <span v-if="p.statusz === 'piszkozat'" class="draft-badge">Piszkozat</span>
-    </div>
-    <h3 class="post-title">{{ p.cim }}</h3>
-    <p class="post-excerpt">{{ truncateText(p.kivonat || p.tartalom, 150) }}</p>
-    <div class="post-actions">
-      <RouterLink :to="`/blog/${p.id}`" class="read">Olvasás</RouterLink>
-      <RouterLink v-if="p.sajat" :to="`/editpost/${p.id}`" class="modify">Szerkesztés</RouterLink>
-      <RouterLink v-else :to="`/editpost/${p.id}`" class="modify">Szerkesztés</RouterLink>
-    </div>
-  </div>
-</article>
+            <article v-for="p in posts" :key="p.id" class="post-card">
+              <div class="post-cover">
+                <img :src="p.fo_kep.url_Link" :alt="p.fo_kep.alt_szoveg" />
+              </div>
+              <div class="post-body">
+                <div class="post-meta">
+                  <span>{{ formatDate(p.letrehozas_datuma) }}</span>
+                  <span class="tags">
+                    <small v-for="cimke in p.cimkek" :key="cimke.id" class="tag">#{{ cimke.nev }}</small>
+                  </span>
+                  <span v-if="p.statusz === 'piszkozat'" class="draft-badge">Piszkozat</span>
+                </div>
+                <h3 class="post-title">{{ p.cim }}</h3>
+                <p class="post-excerpt">{{ truncateText(p.kivonat || p.tartalom, 60) }}</p>
+                <div class="post-actions">
+                  <RouterLink :to="`/blog/${p.id}`" class="read">Olvasás</RouterLink>
+                  <RouterLink v-if="p.sajat" :to="`/editpost/${p.id}`" class="modify">Szerkesztés</RouterLink>
+                  <RouterLink v-else :to="`/editpost/${p.id}`" class="modify">Szerkesztés</RouterLink>
+                </div>
+              </div>
+            </article>
           </div>
         </section>
       </div>
@@ -507,8 +506,8 @@ function formatDate(d) { return new Date(d).toLocaleDateString(); }
   margin-left: 8px;
 }
 .edit {
-  background: #e5e7eb;
-  color: #111827;
+  background: #ffece3;
+  color: #380c02;
   padding: 8px 12px;
   border-radius: 10px;
   text-decoration: none;
@@ -704,10 +703,6 @@ input[type=text]:focus, input[type=tel]:focus, textarea:focus, input[type=number
   text-decoration: none;
 }
 
-.btn.edit { 
-  background: #eef2ff; 
-}
-
 .btn.logout { 
   background: #fee2e2; 
   color: #991b1b; 
@@ -820,7 +815,7 @@ color: #6b7280;
 
 .post-card {
   display: flex;
-  gap: 16px;
+  gap: 10px;
   background: #fff;
   border-radius: 12px;
   overflow: hidden;
@@ -831,12 +826,6 @@ color: #6b7280;
 .post-cover {
   width: 240px;
   min-width: 240px;
-  height: 140px;
-  /*
-  background-size: cover;
-  background-position: center;
-  flex-shrink: 0;
-  */
 }
 
 .post-cover img {
@@ -853,30 +842,29 @@ color: #6b7280;
 }
 
 .post-title {
- margin: 0 0 6px 0; 
- font-size: 1.05rem; 
- }
+  margin: 6px 0;
+  padding-top: 10px; 
+}
 
 .post-meta { 
-color: #6b7280; 
-font-size: 0.85rem; 
-display: flex; 
-gap: 10px; 
-align-items: center; 
+  color: #6b7280; 
+  font-size: 0.85rem; 
+  display: flex; 
+  gap: 10px; 
+  align-items: center; 
 }
 
 .tag { 
-margin-left: 6px; 
-background: #f1f5f9; 
-padding: 4px 8px; 
-border-radius: 999px; 
-font-size: 0.75rem; 
-color: #374151; 
+  margin-left: 6px; 
+  background: #f9f4f1; 
+  padding: 4px 8px; 
+  border-radius: 50px; 
+  font-size: 0.75rem; 
+  color: #412d25; 
 }
 
-.post-excerpt { 
-margin: 10px 0; 
-color: #374151; 
+.post-excerpt {
+  margin-top: 0px;
 }
 
 .post-actions {
@@ -899,35 +887,33 @@ color: #374151;
 }
 
 .post-actions .read {
-  background: #eef2ff;
-  color: #1e3a8a;
+  background: #ffece4;
+  color: #422207;
 }
 
 .post-actions .read:hover {
-  background: #dbeafe;
+  background: #ffddce;
   box-shadow: 0 3px 6px rgba(0,0,0,0.1);
   transform: translateY(-1px);
 }
 
 .post-actions .modify {
-  background: #f1f5f9;
-  color: #334155;
+  background: #e2c1b3;
+  color: #331903;
 }
 
 .post-actions .modify:hover {
-  background: #e2e8f0;
+  background: #cfa999;
   box-shadow: 0 3px 6px rgba(0,0,0,0.1);
   transform: translateY(-1px);
 }
 
 .post-actions .read::before {
-  content: "↗";
-  font-size: 0.95rem;
+  content: "←";
 }
 
 .post-actions .modify::before {
   content: "✎";
-  font-size: 0.95rem;
 }
 
 /* responsive */
