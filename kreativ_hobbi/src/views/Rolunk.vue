@@ -2,6 +2,7 @@
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { faFacebook, faInstagram, faTwitter, faLinkedin, faGithub, faTelegram } from '@fortawesome/free-brands-svg-icons'
 import { library } from '@fortawesome/fontawesome-svg-core'
+import { RouterLink } from 'vue-router';
 
 library.add(faFacebook, faInstagram, faTwitter, faLinkedin, faGithub, faTelegram)
 
@@ -37,40 +38,82 @@ export default {
           <p class="szoveg-stilus leiras">
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fermentum pulvinar ullamcorper suspendisse ac eget. Pellentesque tempus leo in ullamcorper quis vestibulum ligula elementum ut. Lorem ipsum dolor sit amet consectetur adipisicing elit. Optio odit inventore, obcaecati dolore atque modi doloribus, deleniti quae, quis rem totam. Magnam distinctio esse adipisci qui delectus repellendus in corporis?
           </p>
-          <a class="gomb">
+          <RouterLink to="/aruhaz" class="gomb">
             View Services
-          </a>
+          </RouterLink>
         </div>
       </div>
 
       <hr>
       <div class="gyik">
         <h1>Gyakran ismételt kérdések</h1>
-        <h3>Rendelés nélkül is lehet nálatok vásárolni?</h3>
-        <p>Igen, a üzletben rendelés nélkül is meg lehet vásárolni a készleten lévő termékeket.
-          Nyitvatartási idő:
-          Hétfő-Péntek:10.00-18.30
-          Szombat: 10.00-16.00</p>
-        <h3>Hol van a bolt?</h3>
-        <p>A boltunk a Szent Gellért térhez nagyon közel helyezkedik el, a metró megállótól minössze pár perc sétára. Az üzlethez nagyon közel van még a 7-es, 133E, és a 107-es autóbusz megállója.</p>
-        <h3>Honnan tudom, mennyi van az adott termékből az üzletben?</h3>
-        <p>A weboldalon a termékek mellett olvasható készlet információ az üzletre is vonatkozik, hiszen itt kerülnek összeállításra az olnine megrendelt csomagok is. Ha valamit elérhetőnek látsz az webshopon, azt az üzletben is meg fogod találni.</p>
-        <h3>Hogyan rendelhetek?</h3>
-        <p>Megrendelését egy egyszerű regisztrációt követően a www.fiok.net oldalon a webáruházunkon keresztül tudjuk fogadni. A későbbi rendeléseit, a bejelentkezést követően a termékek kosárba helyezésével, majd a megrendelés véglegesítésével adhatja fel.</p>
-        <h3>Mennyi idő alatt kapom meg az árut?</h3>
-        <p>Ha a termék készleten van, telefon vagy e-mail értesítés után átvehető a Fiók Shop-ban. Ha pedig a terméket szállítással ( GLS ) küldjük Önnek, akkor az a következő munkanapon a futárszolgálathoz kerül. Amennyiben a rendelt termék nincs raktáron, akkor kollégáink egyeztetnek a megrendelővel.</p>
-        <h3>Hogyan vehetem át a megrendelt és visszaigazolt árut?</h3>
-        <p>A vásárlónak lehetősége van futárszolgálattal elküldetni a rendelését, de személyesen is átveheti hétfőtől - péntekig 10:00-18:30 óra között üzletünkben. </p>
-        <h3>Meggondoltam magam, hogyan törölhetem, vagy vonhatom vissza a megrendelést?</h3>
-        <p>Az elállás joga
-        Az elállás jogát csak természetüknél fogva visszaszolgáltatható áruk esetén gyakorolhatja a Megrendelő és abban az
-        esetben, ha az árut sértetlenül juttatja vissza. A sértetlenséget nem zárja ki a felbontott külső csomagolás.
-        Kozmetikai és higiéniai termékeknél csak akkor alkalmazható az elállás, ha a csomagolás, védőfólia nem lett kibontva.</p>
-        <h3>A kézbesített csomagot sérültnek látom, mi a teendőm?</h3>
-        <p>Kérjük, még a futár jelenlétében bontsák ki a csomagot. Ha a kézbesített csomagot sérültnek vagy hiányosnak látja, a sérülést vagy hiányt a helyszínen jegyzőkönyvben rögzítsék, majd vegyék fel munkatársainkkal a kapcsolatot az alábbi telefonszámok egyikén:
-        Ennek elmaradása esetén szállítási sérülésre, vagy termék hiányra vonatkozó reklamációt nem áll módunkban elfogadni.</p>
-        <h3>Bankkártyával tudok-e fizetni az üzletükben?</h3>
-        <p>Igen, üzletünkben lehetőség van a bankkártyával történő fizetésre.</p>
+        <div class="gyik-lista">
+
+          <details class="gyik-elem">
+            <summary class="gyik-kerdes">Rendelés nélkül is lehet nálatok vásárolni?</summary>
+            <div class="gyik-valasz">
+              <p>Igen, az üzletben rendelés nélkül is meg lehet vásárolni a készleten lévő termékeket.</p>
+              <p><strong>Nyitvatartás:</strong> Hétfő–Péntek: 10:00–18:30 &nbsp;|&nbsp; Szombat: 10:00–16:00</p>
+            </div>
+          </details>
+
+          <details class="gyik-elem">
+            <summary class="gyik-kerdes">Hol van a bolt?</summary>
+            <div class="gyik-valasz">
+              <p>A boltunk a Szent Gellért térhez nagyon közel helyezkedik el, a metró megállótól mindössze pár perc sétára. Közel van még a 7-es, 133E, és a 107-es autóbusz megállója is.</p>
+            </div>
+          </details>
+
+          <details class="gyik-elem">
+            <summary class="gyik-kerdes">Honnan tudom, mennyi van az adott termékből az üzletben?</summary>
+            <div class="gyik-valasz">
+              <p>A weboldalon a termékek mellett olvasható készlet-információ az üzletre is vonatkozik, hiszen itt kerülnek összeállításra az online megrendelt csomagok is.</p>
+            </div>
+          </details>
+
+          <details class="gyik-elem">
+            <summary class="gyik-kerdes">Hogyan rendelhetek?</summary>
+            <div class="gyik-valasz">
+              <p>Megrendelését egy egyszerű regisztrációt követően a <strong>www.fiok.net</strong> oldalon, webáruházunkon keresztül tudjuk fogadni. A termékeket kosárba helyezve, majd a megrendelést véglegesítve adhatja fel.</p>
+            </div>
+          </details>
+
+          <details class="gyik-elem">
+            <summary class="gyik-kerdes">Mennyi idő alatt kapom meg az árut?</summary>
+            <div class="gyik-valasz">
+              <p>Ha a termék készleten van, telefon vagy e-mail értesítés után átvehető a Fiók Shop-ban. GLS futárszolgálattal küldve a következő munkanapon kerül kiszállításra. Raktáron nem lévő termék esetén kollégáink egyeztetnek Önnel.</p>
+            </div>
+          </details>
+
+          <details class="gyik-elem">
+            <summary class="gyik-kerdes">Hogyan vehetem át a megrendelt árut?</summary>
+            <div class="gyik-valasz">
+              <p>Futárszolgálattal elküldettheti, vagy személyesen is átveheti hétfőtől péntekig <strong>10:00–18:30</strong> között üzletünkben.</p>
+            </div>
+          </details>
+
+          <details class="gyik-elem">
+            <summary class="gyik-kerdes">Hogyan törölhetem a megrendelést?</summary>
+            <div class="gyik-valasz">
+              <p>Az elállás joga csak természetüknél fogva visszaszolgáltatható, sértetlenül visszajuttatott áruk esetén gyakorolható. Kozmetikai és higiéniai termékeknél kizárólag bontatlan csomagolás esetén alkalmazható.</p>
+            </div>
+          </details>
+
+          <details class="gyik-elem">
+            <summary class="gyik-kerdes">A kézbesített csomag sérültnek látszik — mi a teendőm?</summary>
+            <div class="gyik-valasz">
+              <p>Kérjük, még a futár jelenlétében bontsa ki a csomagot. Sérülés vagy hiány esetén azt a helyszínen jegyzőkönyvben kell rögzíteni, majd vegye fel a kapcsolatot munkatársainkkal. Ennek elmaradása esetén reklamációt nem áll módunkban elfogadni.</p>
+            </div>
+          </details>
+
+          <details class="gyik-elem">
+            <summary class="gyik-kerdes">Bankkártyával tudok fizetni az üzletükben?</summary>
+            <div class="gyik-valasz">
+              <p>Igen, üzletünkben lehetőség van bankkártyás fizetésre.</p>
+            </div>
+          </details>
+
+        </div>
       </div>
       <hr>
 
@@ -234,6 +277,7 @@ main {
 
 .gomb {
   font-size: 16px;
+  text-decoration: none;
   line-height: 28px;
   color: rgb(102, 102, 102);
   border: 2px solid rgb(102, 102, 102);
@@ -295,10 +339,122 @@ main {
   position: relative;
 }
 
+/* #region GYIK */
 .gyik {
   text-align: left;
-  max-width: 1300px;
+  max-width: 860px;
+  width: 100%;
+  margin: 40px auto;
 }
+
+.gyik h1 {
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 32px;
+  color: #222;
+}
+
+.gyik-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.gyik-elem {
+  border: 1.5px solid #eee;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+  transition: box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.gyik-elem:hover {
+  box-shadow: 0 4px 20px rgba(199, 71, 71, 0.1);
+  border-color: rgba(199, 71, 71, 0.3);
+}
+
+.gyik-elem[open] {
+  border-color: rgb(199, 71, 71);
+  box-shadow: 0 4px 20px rgba(199, 71, 71, 0.12);
+}
+
+.gyik-kerdes {
+  list-style: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #222;
+  cursor: pointer;
+  user-select: none;
+  gap: 16px;
+  transition: color 0.2s ease;
+}
+
+.gyik-kerdes::-webkit-details-marker {
+  display: none;
+}
+
+.gyik-kerdes::after {
+  content: '+';
+  font-size: 22px;
+  font-weight: 300;
+  color: rgb(199, 71, 71);
+  flex-shrink: 0;
+  transition: transform 0.3s ease;
+}
+
+.gyik-elem[open] > .gyik-kerdes::after {
+  transform: rotate(45deg);
+}
+
+.gyik-elem[open] > .gyik-kerdes {
+  color: rgb(199, 71, 71);
+}
+
+.gyik-valasz {
+  padding: 0 24px 18px 24px;
+  font-size: 15px;
+  line-height: 1.7;
+  color: #555;
+  border-top: 1px solid #f5f5f5;
+  padding-top: 14px;
+  animation: gyik-slide-in 0.25s ease;
+}
+
+.gyik-valasz p {
+  margin: 0 0 8px 0;
+}
+
+.gyik-valasz p:last-child {
+  margin-bottom: 0;
+}
+
+@keyframes gyik-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .gyik-kerdes {
+    font-size: 14px;
+    padding: 15px 18px;
+  }
+
+  .gyik-valasz {
+    padding: 12px 18px 16px;
+    font-size: 14px;
+  }
+}
+/* #endregion */
 
 @media (max-width: 1024px) {
   .kontener.felso-resz {

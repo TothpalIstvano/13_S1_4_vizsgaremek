@@ -265,8 +265,11 @@ function decreaseFromCart(id) {
   }
 }
 
-function updateQuantity(id, value) {
-  cartStore.updateQuantity(id, value)
+function updateQuantity(id, quantity) {
+  const idx = cartItems.value.findIndex(i => i.id === id)
+  if (idx === -1) return
+  const clamped = Math.max(1, Math.min(quantity, cartItems.value[idx].darab ?? Infinity))
+  cartItems.value.splice(idx, 1, { ...cartItems.value[idx], quantity: clamped })
 }
 
 function removeFromCart(id) {
