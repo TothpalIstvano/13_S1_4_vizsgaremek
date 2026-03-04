@@ -580,15 +580,15 @@ const oldalra = (lap) => {
 
 // calculate slider fill
 const rangeStyle = computed(() => {
-  const minPercent = ((tempMin.value - absMin.value) / (absMax.value - absMin.value)) * 100
-  const maxPercent = ((tempMax.value - absMin.value) / (absMax.value - absMin.value)) * 100
+  const range = absMax.value - absMin.value
+  if (range === 0) return { left: '0%', width: '0%' }
 
-  if (minPercent<0) {
-    minPercent = 0
-  }
-  if (maxPercent>100) {
-    maxPercent = 100
-  }
+  let minPercent = ((tempMin.value - absMin.value) / range) * 100
+  let maxPercent = ((tempMax.value - absMin.value) / range) * 100
+
+  minPercent = Math.max(0, Math.min(minPercent, 100))
+  maxPercent = Math.max(0, Math.min(maxPercent, 100))
+
   return {
     left: `${minPercent}%`,
     width: `${maxPercent - minPercent}%`
@@ -596,12 +596,18 @@ const rangeStyle = computed(() => {
 })
 
 // safety clamps
+const MIN_DISTANCE = 500
+
 watch(tempMin, val => {
-  if (val > tempMax.value) tempMin.value = tempMax.value
+  if (val > tempMax.value - MIN_DISTANCE) {
+    tempMin.value = tempMax.value - MIN_DISTANCE
+  }
 })
 
 watch(tempMax, val => {
-  if (val < tempMin.value) tempMax.value = tempMin.value
+  if (val < tempMin.value + MIN_DISTANCE) {
+    tempMax.value = tempMin.value + MIN_DISTANCE
+  }
 })
 
 watch([searchTerm, selectedkategoriak, appliedMin, appliedMax], () => {
@@ -717,19 +723,19 @@ onBeforeUnmount(() => {
   align-items: center;
   gap: 8px;
   padding: 6px 12px;
-  background: #e3e8ff;
-  color: #2b3ea8;
+  background: #ffebd3;
+  color: #b55b3f;
   border: 1px solid rgba(43, 62, 168, 0.1); /* Subtle border added */
   border-radius: 999px;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 500;
   transition: all 0.2s ease; /* Smooth animation for hover */
   cursor: default;
 }
 
 .filter-chip:hover {
-  background-color: #dbe0ff;
-  border-color: #2b3ea8;
+  background-color: #ffecdb;
+  border-color: #cc6c34;
   transform: translateY(-1px); /* Slight lift effect */
   box-shadow: 0 2px 5px rgba(43, 62, 168, 0.15);
 }
@@ -743,7 +749,7 @@ onBeforeUnmount(() => {
   height: 18px;
   border-radius: 50%;
   background-color: rgba(255, 255, 255, 0.6);
-  color: #2b3ea8;
+  color: #000000;
   font-size: 10px;
   cursor: pointer;
   transition: all 0.2s;
@@ -751,7 +757,7 @@ onBeforeUnmount(() => {
 }
 
 .filter-chip .remove:hover {
-  background-color: #2b3ea8; /* Fills with color on hover */
+  background-color: #b55b3f; /* Fills with color on hover */
   color: white;
 }
 
@@ -928,7 +934,7 @@ onBeforeUnmount(() => {
 }
 
 .side-bar-content .item-tag:hover {
-  background: #e3e8ff;
+  background: #ffeee3;
   color: #b55b3f;
 };
 
@@ -951,7 +957,7 @@ onBeforeUnmount(() => {
 }
 
 .category-header:hover {
-  background: #e3e8ff;
+  background: #ffeee3;
 }
 
 .category-name {
@@ -984,20 +990,20 @@ margin-left: 10px;
 
 .lapozas-sor {
   grid-column: 1 / -1;
-  display: flex;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
   padding: 8px 0 16px;
-  flex-wrap: wrap;
   gap: 12px;
 }
 
 .lapozas {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
   flex-wrap: wrap;
-  width: 100%;
+  grid-column: 2;
 }
 
 .lap-gomb {
@@ -1081,6 +1087,7 @@ margin-left: 10px;
   position: relative;
   height: 38px;
   width: 100%;
+  margin-top: 1px;
 }
 
 .slider-track {
@@ -1104,7 +1111,8 @@ margin-left: 10px;
 .thumb {
   pointer-events: none;
   position: absolute;
-  width: 100%;
+  width: calc(100% + 18px);
+  left: -9px;
   height: 36px;
   appearance: none;
   background: none;
@@ -1116,7 +1124,24 @@ margin-left: 10px;
   height: 18px;
   border-radius: 50%;
   background: #b55b3f;
-  border: none;
+  border: 2px solid #ffe4dcc4;
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+  appearance: none;
+}
+
+.thumb::-webkit-slider-thumb:hover {
+  transform: scale(1.1);
+}
+
+.thumb::-moz-range-thumb {
+  pointer-events: all;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #b55b3f;
+  border: 2px solid white;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.25);
   cursor: pointer;
 }
 

@@ -258,7 +258,7 @@ function capturePhoto() {
   }, 'image/jpeg', 0.9);
 }
 
-watch(capturedBlob, (newBlob, oldBlob) => {
+watch(capturedBlob, (newBlob) => {
   if (objectUrl.value) {
     URL.revokeObjectURL(objectUrl.value);
   }
