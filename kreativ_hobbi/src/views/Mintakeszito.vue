@@ -2,9 +2,6 @@
 import { ref, reactive, onMounted, onUnmounted, nextTick, computed, watch } from "vue"
 import axios from 'axios';
 import { useCartStore } from "@/stores/cartStore";
-import api from '@/services/api.js'
-import Stepper from "primevue/stepper";
-import StepperPanel from "primevue/stepperpanel";
 
 // #region Adat változók
 const resz = ref(1)
@@ -671,6 +668,42 @@ function hexToRgb(hex) {
     
     return `rgba(${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}, 1)`
 }
+
+function generateGridCanvas() {
+  if (!pixelSorok.value.length || !pixelSorok.value[0]?.pixels.length) return null;
+
+  const rows = pixelSorok.value.length;
+  const cols = pixelSorok.value[0].pixels.length;
+  const cellSize = parseInt(pixelMeret.value);
+  const canvas = document.createElement('canvas');
+  canvas.width = cols * cellSize;
+  canvas.height = rows * cellSize;
+  const ctx = canvas.getContext('2d');
+
+  for (let y = 0; y < rows; y++) {
+    const row = pixelSorok.value[y];
+    const opacity = row.sorLathatosag;
+    ctx.globalAlpha = opacity;
+
+    for (let x = 0; x < cols; x++) {
+      const pixel = row.pixels[x];
+      const color = pixel.color;
+
+      ctx.fillStyle = color;
+      ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
+
+      const borderColor = isDarkColor(color)
+        ? 'rgba(255,255,255,0.6)'
+        : `rgba(0,0,0,${racsLathatosag.value / 100})`;
+      ctx.strokeStyle = borderColor;
+      ctx.lineWidth = 1;
+      ctx.strokeRect(x * cellSize, y * cellSize, cellSize, cellSize);
+    }
+  }
+
+  ctx.globalAlpha = 1.0;
+  return canvas;
+}
 //#endregion
 
 //#region Optimalizálás
@@ -762,15 +795,17 @@ function adatokVissza() {
   betoltesKorabbrol()
 }
 
-function kepletoltes(canvas, filename = 'modified-image.png') {
-  if (!canvas.value) return
-  canvas.toBlob((blob) => {
+function kepletoltes(canvasArg, filename = 'elkeszitett-minta.png') {
+  const canvasToUse = canvasArg || generateGridCanvas();
+  if (!canvasToUse) return;
+
+  canvasToUse.toBlob((blob) => {
     const link = document.createElement('a');
     link.download = filename;
     link.href = URL.createObjectURL(blob);
-    
     link.click();
-  })
+    URL.revokeObjectURL(link.href);
+  });
 }
 
 function visszaallitas() {
@@ -853,10 +888,6 @@ async function fonalHozzaadasKosarhoz() {
         if (result.success) {
             kosarHozzaadva.value = true
             kosarModal.value = true
-            
-            setTimeout(() => {
-                kosarModal.value = false
-            }, 5000)
         } else {
             alert('Hiba: ' + result.message)
         }
@@ -1208,7 +1239,7 @@ onUnmounted(() => {
                     max="40" 
                     v-model.number="pixelMeret"
                     class="szam-input"
-                    @input="mintaFrussites"
+                    @input="mintaFrissites"
                   />
                 </div>
               </div>
@@ -1336,7 +1367,7 @@ onUnmounted(() => {
           <div class="gombok">
             <button @click="adatokVissza" class="gomb">↩ &nbsp Vissza a feltöltéshez</button>
             <button @click="visszaallitas" class="gomb">Eredeti állapot</button>
-            <button @click="kepletoltes(canvas)" class="gomb letolt">Letöltés</button>
+            <button @click="kepletoltes()" class="gomb letolt">Letöltés</button>
             <button @click="kepTorles" class="gomb">Új kép</button>
           </div>
           <!--#endregion-->
@@ -2311,6 +2342,12 @@ input[type="file"] {
   display: flex;
   align-items: center;
   justify-content: center;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .modal-content {
@@ -2391,7 +2428,7 @@ input[type="file"] {
   flex-direction: column;
   gap: 20px;
   padding: 10px;
-  background-color: rgb(255, 235, 235);
+  background-color: rgb(250, 237, 237);
   border-radius: 8px;
   box-shadow: 0 4px 15px var(--mk-arnyekszin);
   align-self: flex-start;
@@ -2427,167 +2464,166 @@ input[type="file"] {
 
 /*#region Színmatch */
 .color-match-loading {
-    text-align: center;
-    padding: 20px;
-    color: var(--mk-text-light);
+  text-align: center;
+  padding: 20px;
+  color: var(--mk-text-light);
 }
 
 .loading-spinner-small {
-    width: 30px;
-    height: 30px;
-    border: 3px solid rgba(255, 255, 255, 0.3);
-    border-top-color: var(--mk-text-light);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin: 10px auto;
+  width: 30px;
+  height: 30px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top-color: var(--mk-text-light);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 10px auto;
 }
 
 .color-match-success {
-    margin-bottom: 20px;
+  margin-bottom: 20px;
 }
 
 .match-title {
-    color: #4CAF50;
-    font-weight: 600;
-    margin-bottom: 15px;
-    font-size: 16px;
+  color: #4CAF50;
+  font-weight: 600;
+  margin-bottom: 15px;
+  font-size: 16px;
 }
 
 .color-match-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 8px 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .color-match-item:last-child {
-    border-bottom: none;
+  border-bottom: none;
 }
 
 .color-comparison {
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
 }
 
 .color-comparison .color-sample {
-    width: 30px;
-    height: 30px;
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    border-radius: 4px;
+  width: 30px;
+  height: 30px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
 }
 
 .color-names {
-    text-align: right;
-    flex: 1;
-    margin-left: 15px;
+  text-align: right;
+  flex: 1;
+  margin-left: 15px;
 }
 
 .color-name {
-    font-size: 14px;
-    color: var(--mk-text-light);
-    opacity: 0.9;
+  font-size: 14px;
+  color: var(--mk-text-light);
+  opacity: 0.9;
 }
 
 .color-no-match, .color-no-match-all {
-    background: rgba(255, 193, 7, 0.1);
-    border-left: 4px solid #FFC107;
-    padding: 15px;
-    border-radius: 4px;
-    margin-top: 15px;
+  border-left: 4px solid #fcd059;
+  padding: 15px;
+  border-radius: 4px;
+  margin-top: 15px;
 }
 
 .no-match-title {
-    color: #FFC107;
-    font-weight: 600;
-    margin-bottom: 8px;
-    font-size: 16px;
+  color: #fcd059;
+  font-weight: 600;
+  margin-bottom: 8px;
+  font-size: 16px;
 }
 
 .no-match-subtitle {
-    color: rgba(255, 255, 255, 0.8);
-    font-size: 14px;
-    margin-bottom: 12px;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 14px;
+  margin-bottom: 12px;
 }
 
 .unmatched-colors {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
 }
 
 .unmatched-color .color-sample {
-    width: 25px;
-    height: 25px;
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    border-radius: 4px;
+  width: 25px;
+  height: 25px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
 }
 
 .available-yarn-colors {
-    margin-top: 15px;
+  margin-top: 15px;
 }
 
 .available-title {
-    color: rgba(255, 255, 255, 0.9);
-    font-size: 14px;
-    margin-bottom: 12px;
-    font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+  margin-bottom: 12px;
+  font-weight: 500;
 }
 
 .yarn-colors-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    max-height: 200px;
-    overflow-y: auto;
-    padding: 10px;
-    background: rgba(0, 0, 0, 0.2);
-    border-radius: 4px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  max-height: 200px;
+  overflow-y: auto;
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
 }
 
 .yarn-color-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
 }
 
 .yarn-color-item .color-sample {
-    width: 30px;
-    height: 30px;
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    border-radius: 4px;
-    margin-bottom: 5px;
+  width: 30px;
+  height: 30px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+  margin-bottom: 5px;
 }
 
 .yarn-color-name {
-    font-size: 11px;
-    color: rgba(255, 255, 255, 0.8);
-    word-break: break-word;
-    line-height: 1.2;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.8);
+  word-break: break-word;
+  line-height: 1.2;
 }
 
 .no-colors-info {
-    background: rgba(255, 87, 87, 0.1);
-    border-left: 4px solid #FF5757;
-    padding: 15px;
-    border-radius: 4px;
-    margin-top: 15px;
-    text-align: center;
+  background: rgba(255, 87, 87, 0.1);
+  border-left: 4px solid #FF5757;
+  padding: 15px;
+  border-radius: 4px;
+  margin-top: 15px;
+  text-align: center;
 }
 
 .no-colors-info p {
-    color: rgba(255, 255, 255, 0.8);
-    font-size: 14px;
-    margin: 0;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 14px;
+  margin: 0;
 }
 
 .color-match-empty {
-    text-align: center;
-    padding: 20px;
-    color: rgba(255, 255, 255, 0.7);
-    font-style: italic;
+  text-align: center;
+  padding: 20px;
+  color: rgba(255, 255, 255, 0.7);
+  font-style: italic;
 }
 /*#endregion*/
 
@@ -2699,134 +2735,151 @@ input[type="file"] {
 }
 
 .kosar-modal {
-  max-width: 400px;
+  max-width: 450px;
+  border-radius: 24px;
+  overflow: hidden;
+  background: linear-gradient(145deg, #fffaf5, #fff);
+  box-shadow: 0 25px 50px -12px rgba(139, 67, 64, 0.5);
+  border: 1px solid rgba(139, 67, 64, 0.1);
 }
 
 .modal-success {
   text-align: center;
+  padding: 8px 0;
 }
 
 .success-icon {
-  width: 60px;
-  height: 60px;
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
-  background:#4CAF50;
+  background: linear-gradient(135deg, #8B4340, #C86C68);
   color: white;
-  font-size: 32px;
+  font-size: 42px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto 20px;
+  margin: 0 auto 24px;
   font-weight: bold;
+  box-shadow: 0 10px 20px -5px rgba(139, 67, 64, 0.4);
 }
 
 .modal-success h3 {
-  margin: 0 0 20px 0;
-  color: var(--mk-text-dark);
+  color: #5a3e3a;
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0 0 16px;
 }
 
 .kosar-termek-info {
   display: flex;
-  gap: 15px;
-  padding: 15px;
-  background: #f5f5f5;
-  border-radius: 8px;
-  margin-bottom: 20px;
+  gap: 20px;
+  padding: 20px;
+  background: #fef6f2;
+  border-radius: 16px;
+  margin-bottom: 24px;
+  border: 1px solid rgba(139, 67, 64, 0.1);
+  text-align: left;
 }
 
 .modal-termek-kep {
-  width: 80px;
-  height: 80px;
+  width: 90px;
+  height: 90px;
   object-fit: cover;
-  border-radius: 4px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
 }
 
 .modal-termek-details {
   flex: 1;
-  text-align: left;
 }
 
 .modal-termek-nev {
-  font-weight: 600;
-  margin: 0 0 5px 0;
-  color: #333;
+  font-weight: 700;
+  font-size: 18px;
+  color: #5a3e3a;
+  margin: 0 0 8px;
 }
 
 .modal-termek-mennyiseg,
 .modal-termek-osszeg {
-  margin: 5px 0;
-  color: #666;
-  font-size: 14px;
+  color: #7b5e58;
+  font-size: 15px;
+  margin: 6px 0;
 }
 
 .modal-termek-osszeg {
-  font-size: 16px;
-  margin-top: 8px;
-  padding-top: 8px;
-  border-top: 1px solid #ddd;
+  font-size: 17px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed rgba(139, 67, 64, 0.2);
+  color: #5a3e3a;
+  font-weight: 600;
 }
 
 .modal-gombok {
   display: flex;
-  gap: 10px;
-  margin-top: 20px;
+  gap: 12px;
+  margin-top: 24px;
 }
 
 .modal-gomb {
   flex: 1;
-  padding: 12px;
+  padding: 14px 8px;
   border: none;
-  border-radius: 6px;
+  border-radius: 40px;
   font-weight: 600;
+  font-size: 16px;
   cursor: pointer;
   text-decoration: none;
   text-align: center;
-  font-size: 14px;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 }
 
 .modal-gomb.folytatas {
-  background: #f0f0f0;
-  color: #333;
+  background: #f0eae7;
+  color: #5a3e3a;
+  border: 1px solid rgba(139, 67, 64, 0.15);
 }
 
 .modal-gomb.folytatas:hover {
-  background: #e0e0e0;
+  background: #e5dbd6;
+  transform: translateY(-2px);
 }
 
 .modal-gomb.kosar {
-  background: #7649b1;
+  background: linear-gradient(135deg, #8B4340, #C86C68);
   color: white;
+  box-shadow: 0 8px 18px -6px rgba(139, 67, 64, 0.5);
 }
 
 .modal-gomb.kosar:hover {
-  background: #9946c0;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(175, 115, 194, 0.3);
+  box-shadow: 0 12px 24px -8px rgba(139, 67, 64, 0.6);
 }
 
 .modal-close {
   position: absolute;
-  top: 15px;
-  right: 15px;
-  background: none;
+  top: 16px;
+  right: 16px;
+  background: rgba(0, 0, 0, 0.04);
   border: none;
-  font-size: 24px;
-  color: #666;
+  font-size: 28px;
+  color: #8B4340;
   cursor: pointer;
-  padding: 0;
-  width: 30px;
-  height: 30px;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  transition: all 0.3s ease;
+  transition: all 0.2s;
+  line-height: 1;
+  z-index: 10;
 }
 
 .modal-close:hover {
-  background: #f5f5f5;
-  color: #333;
+  background: rgba(139, 67, 64, 0.1);
+  transform: rotate(90deg);
 }
 
 @media (max-width: 768px) {
@@ -3015,6 +3068,27 @@ input[type="file"] {
         margin-top: 8px;
         text-align: left;
     }
+}
+
+@media (max-width: 500px) {
+  .kosar-modal {
+    margin: 20px;
+    max-width: calc(100% - 40px);
+  }
+  
+  .kosar-termek-info {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  
+  .modal-termek-details {
+    text-align: center;
+  }
+  
+  .modal-gombok {
+    flex-direction: column;
+  }
 }
 /*#endregion*/
 </style>

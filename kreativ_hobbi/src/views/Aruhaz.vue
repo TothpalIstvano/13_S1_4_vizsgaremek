@@ -250,7 +250,6 @@
             <div class="oldal-meret">
               <label for="perPage">Megjelenítés:</label>
               <select id="perPage" v-model="oldalMeret" @change="oldalra(1)">
-                <option :value="9">9</option>
                 <option :value="12">12</option>
                 <option :value="24">24</option>
                 <option :value="48">48</option>
@@ -358,7 +357,7 @@
   const open = ref(false)
   const dropdown = ref(null)
   const aktualisOldal = ref(1)
-  const oldalMeret = ref(9)
+  const oldalMeret = ref(12)
 
   function toggle() {
     open.value = !open.value
@@ -677,7 +676,7 @@ onBeforeUnmount(() => {
   box-shadow:0 4px 12px rgba(0, 0, 0, 0.151);
 }  
 
-@media screen and (max-width: 480px) {
+/*@media screen and (max-width: 480px) {
   #toolbar {
     grid-template-columns: 1fr;
     height: auto;
@@ -701,7 +700,7 @@ onBeforeUnmount(() => {
     width: 100% !important;
     margin: 0 auto !important;
   }
-}
+}*/
 /*#endregion*/
 
 /*#region ===== FILTER CHIPS ===== */
@@ -1201,11 +1200,13 @@ margin-left: 10px;
   user-select: none;
   cursor: pointer;
 }
+
 .checkbox-wrapper-46 .cbx span {
   display: inline-block;
   vertical-align: middle;
   transform: translate3d(0, 0, 0);
 }
+
 .checkbox-wrapper-46 .cbx span:first-child {
   position: relative;
   width: 18px;
@@ -1216,6 +1217,7 @@ margin-left: 10px;
   border: 1px solid #9098a9;
   transition: all 0.2s ease;
 }
+
 .checkbox-wrapper-46 .cbx span:first-child svg {
   position: absolute;
   top: 3px;
@@ -1231,6 +1233,7 @@ margin-left: 10px;
   transition-delay: 0.1s;
   transform: translate3d(0, 0, 0);
 }
+
 .checkbox-wrapper-46 .cbx span:first-child:before {
   content: "";
   width: 100%;
@@ -1241,9 +1244,11 @@ margin-left: 10px;
   opacity: 1;
   border-radius: 50%;
 }
+
 .checkbox-wrapper-46 .cbx span:last-child {
-  padding-left: 8px;
+  padding-left: 8px; /*oválissá teszi a főkategóriák kattintésos animációját*/
 }
+
 .checkbox-wrapper-46 .cbx:hover span:first-child {
   border-color: #ff5d2adb;
 }
@@ -1419,5 +1424,185 @@ margin-left: 10px;
 @keyframes pulse {
   0%, 100% { transform: scale(1); opacity: 1; }
   50% { transform: scale(0.6); opacity: 0.5; }
+}
+
+@media screen and (max-width: 1024px) {
+  .side-bar {
+    width: 220px;
+    padding: 16px;
+  }
+
+  #products {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+  }
+
+  .product-image {
+    height: 170px;
+  }
+}
+
+@media screen and (max-width: 900px) {
+  .side-bar {
+    padding: 14px;
+  }
+
+  #products {
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+  }
+
+  .product-body {
+    padding: 12px;
+    min-height: 220px;
+  }
+
+  .product-title {
+    font-size: 16px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  #tartalom {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .side-bar {
+    width: 100%;
+    padding: 16px;
+  }
+
+  .side-bar-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+  }
+
+  .category-group {
+    margin-bottom: 0;
+  }
+
+  #products {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  }
+
+  .oldal-meret {
+    position: static;
+    margin: 0 auto 12px;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .lapozas-sor {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  #toolbar {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 16px;
+    height: auto;
+  }
+
+  .active-filters {
+    justify-content: center;
+    max-height: none;
+    margin-bottom: 0;
+  }
+
+  .search-container,
+  .dropdown {
+    width: 100% !important;
+    margin: 0 auto !important;
+  }
+
+  .dropdown {
+    justify-self: stretch;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .side-bar-content {
+    grid-template-columns: 1fr;
+  }
+
+  #products {
+    grid-template-columns: 1fr;
+  }
+
+  .product-card {
+    max-width: 100%;
+  }
+
+  .filter-chip {
+    font-size: 12px;
+    padding: 4px 10px;
+  }
+
+  #clear-filters {
+    width: 100%;
+    text-align: center;
+  }
+
+  .dropdown__selected {
+    padding: 8px 12px;
+  }
+}
+
+@media screen and (max-width: 400px) {
+  #toolbar {
+    grid-template-columns: 1fr;
+    gap: 15px;
+    padding: 16px;
+  }
+
+  .active-filters,
+  .search-container,
+  .dropdown {
+    grid-column: 1;
+    width: 100% !important;
+    margin: 0 auto !important;
+  }
+
+  .active-filters {
+    justify-self: center;
+    max-height: none;
+    justify-content: center;
+  }
+
+  .search-container {
+    justify-self: center;
+  }
+
+  .dropdown {
+    justify-self: stretch;
+  }
+
+  .filter-chip {
+    font-size: 12px;
+    padding: 4px 10px;
+  }
+
+  #clear-filters {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+@media screen and (max-width: 350px) {
+  .side-bar-content {
+    grid-template-columns: 1fr;
+  }
+  #products {
+    grid-template-columns: 1fr;
+  }
+  .product-card {
+    max-width: 100%;
+  }
+  .dropdown__selected {
+    padding: 8px 12px;
+  }
 }
 </style>

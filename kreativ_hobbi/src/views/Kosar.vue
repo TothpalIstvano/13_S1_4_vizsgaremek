@@ -2,7 +2,7 @@
   <div class="cart-page">
     <!-- Header -->
     <div class="cart-header">
-      <h1>🛒 kosarad</h1>
+      <h1 class="title">Kosarad</h1>
       <p class="header-subtitle">Ellenőrizd a termékeket és fejezd be a rendelésed</p>
     </div>
 
@@ -45,7 +45,7 @@
       <div class="cart-sidebar">
         <!-- Order Summary -->
         <div class="summary-card">
-          <h2 class="summary-title">Rendelés Összegzés</h2>
+          <h2 class="summary-title">Rendelés összegzése</h2>
           
           <div class="summary-row">
             <span class="summary-label">Tételek száma:</span>
@@ -60,7 +60,7 @@
 
         <!-- Delivery Form -->
         <div class="delivery-card">
-          <h3 class="delivery-title">Szállítási Adatok</h3>
+          <h3 class="delivery-title">Szállítási adatok</h3>
           
           <form @submit.prevent="checkout">
             <div class="form-row">
@@ -195,10 +195,10 @@
         <!-- Action Buttons -->
         <div class="action-buttons">
           <button id="checkout" @click="checkout" class="btn-primary">
-            <span>✓</span> Rendelés Véglegesítése
+            <span>✓</span> Rendelés véglegesítése
           </button>
           <button id="emptyCart" @click="emptyCart(true)" class="btn-secondary">
-            <span>🗑</span> Kosár Ürítése
+            <span>🗑</span> Kosár ürítése
           </button>
         </div>
       </div>
@@ -207,7 +207,7 @@
     <!-- Empty State -->
     <div v-else class="empty-state">
       <div class="empty-icon">🛒</div>
-      <h2>A kosárod üres</h2>
+      <h2>A kosarad üres</h2>
       <p>Még nincs termék a kosárban. Nézz körül a boltban és válassz szét, amit szívesen megvennél!</p>
       <router-link to="/aruhaz" class="btn-primary">
         <span>→</span> Vissza az Áruházba
@@ -487,6 +487,18 @@ async function checkout() {
 .cart-page {
   min-height: 100vh;
   padding: 40px 24px;
+}
+
+.title {
+  display: inline-block;
+  font-weight: 700;
+  font-size: 45px;
+  color: var(--mk-text-dark);
+  background-image: linear-gradient(90deg, #f08686, #853303);
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 100% 4px;
+  padding-bottom: 6px;
 }
 
 /* Header */
@@ -848,14 +860,14 @@ async function checkout() {
 }
 
 .btn-primary {
-  background:  #0fe020;
+  background:  #2ac403;
   color: white;
-  box-shadow: 0 4px 16px rgba(63, 81, 181, 0.3);
+  box-shadow: 0 4px 16px rgba(39, 100, 23, 0.3);
 }
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(63, 81, 181, 0.4);
+  box-shadow: 0 6px 20px rgba(17, 70, 1, 0.4);
 }
 
 .btn-primary:active {
