@@ -2,7 +2,7 @@
 import { RouterLink, useRouter } from 'vue-router'
 import logo_kalapacs from '@/components/icons/logo_kalapacs.png'
 import logo_reszelo from '@/components/icons/logo_reszelo.png'
-import { ref, onMounted, onUnmounted, inject } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import axios from 'axios';
 import { useCartStore } from '@/stores/cartStore'
 

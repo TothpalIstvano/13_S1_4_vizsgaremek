@@ -52,8 +52,6 @@
             <span class="summary-value">{{ cartItems.reduce((t, i) => t + i.quantity, 0) }}</span>
           </div>
 
-          <div class="summary-divider"></div>
-
           <div class="summary-row total">
             <span class="summary-label">Végösszeg:</span>
             <span class="summary-value-total">{{ cartTotal.toLocaleString('hu-HU') }} Ft</span>
@@ -132,42 +130,45 @@
               <span v-if="addressError" class="error-message">{{ addressError }}</span>
             </div>
 
-            <div class="form-row">
-              <div class="form-group">
-                <label for="zipCode">
-                  Irányítószám *
-                  <span v-if="zipCodeError" class="error-indicator">⚠</span>
-                  <span v-else-if="zipCodeValid" class="success-indicator">✓</span>
-                </label>
-                <input 
-                  id="zipCode" 
-                  v-model="zipCode" 
-                  type="text"
-                  placeholder="1000"
-                  required 
-                  @blur="validateZipCode"
-                  @keyup.enter="validateZipCode"
-                  :class="{ 'input-error': zipCodeError, 'input-success': zipCodeValid }"
-                  maxlength="5"
-                />
-                <span v-if="zipCodeError" class="error-message">{{ zipCodeError }}</span>
-              </div>
-              <div class="form-group">
-                <label for="city">Város *</label>
-                <select
-                  id="city"
-                  v-model="deliveryDetails.cityId"
-                  required
-                  :class="{ 'input-error': cityError, 'input-success': cityValid }"
-                  @change="validateCity"
-                >
-                  <option value="" disabled>Válassz várost...</option>
-                  <option v-for="city in cities" :key="city.id" :value="city.id">
-                    {{ city.varos_nev }}
-                  </option>
-                </select>
+            <div class="form-group">
+              <label for="city">Város *
+                <span v-if="cityError" class="error-indicator">⚠</span>
+                <span v-else-if="cityValid" class="success-indicator">✓</span>
+              </label>
+              <Dropdown
+                id="city"
+                v-model="deliveryDetails.cityId"
+                :options="cities"
+                optionLabel="varos_nev"
+                optionValue="id"
+                placeholder="Válassz vagy írj be egy várost"
+                :filter="true"
+                filterBy="varos_nev,iranyitoszam"
+                :showClear="true"
+                :loading="loadingCities"
+                @change="validateCity"
+                :class="{ 'p-invalid': cityError, 'p-success': cityValid }"
+                class="w-full"
+              >
+                <template #value="slotProps">
+                  <span v-if="slotProps.value">
+                    {{ cities.find(c => c.id === slotProps.value)?.varos_nev }}
+                    <span class="irsz-badge">
+                      {{ cities.find(c => c.id === slotProps.value)?.iranyitoszam }}
+                    </span>
+                  </span>
+                  <span v-else class="p-placeholder">Válassz vagy írj be egy várost</span>
+                </template>
+
+                <!-- A lista elemeinek megjelenítése -->
+                <template #option="slotProps">
+                  <div class="city-option">
+                    <span class="city-name">{{ slotProps.option.varos_nev }}</span>
+                    <span class="irsz-badge">{{ slotProps.option.iranyitoszam }}</span>
+                  </div>
+                </template>
+              </Dropdown>
                 <span v-if="cityError" class="error-message">{{ cityError }}</span>
-              </div>
             </div>
             <div class="form-group">
               <label for="phone">Telefonszám *</label>
@@ -220,6 +221,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useCartStore } from '@/stores/cartStore'
 import axios from 'axios';
+import Dropdown from 'primevue/dropdown';
 
 const router = useRouter()
 const cartStore = useCartStore()
@@ -234,9 +236,6 @@ const deliveryDetails = ref({
   phone: ''
 })
 
-const zipCode = ref('')
-const zipCodeError = ref('')
-const zipCodeValid = ref(false)
 const phoneError = ref('')
 const phoneValid = ref(false)
 const emailError = ref('')
@@ -284,11 +283,18 @@ function emptyCart(confirmPrompt = true) {
 const cities = ref([])
 const cityError = ref('')
 const cityValid = ref(false)
+const loadingCities = ref(false)
 
 // városok betöltése
+
 onMounted(async () => {
-  const res = await axios.get('/api/varosok')
-  cities.value = res.data
+  loadingCities.value = true
+  try {
+    const res = await axios.get('/api/varosok')
+    cities.value = res.data
+  } finally {
+    loadingCities.value = false
+  }
 })
 
 function validateCity() {
@@ -333,41 +339,6 @@ function validateFirstName() {
   }
   firstNameError.value = ''
   firstNameValid.value = true
-}
-
-function validateZipCode() {
-  const value = zipCode.value.trim()
-  
-  // Üres érték - nincs hiba, csak nem valid
-  if (!value) {
-    zipCodeError.value = ''
-    zipCodeValid.value = false
-    return
-  }
-
-  // Csak számokat engedünk meg
-  if (!/^\d+$/.test(value)) {
-    zipCodeError.value = 'Csak számok engedélyezve!'
-    zipCodeValid.value = false
-    return
-  }
-
-  // Hossz ellenőrzés - magyar irányítószámok 4-5 számjegyűek
-  if (value.length < 4) {
-    zipCodeError.value = `Túl rövid (${value.length}/4-5 számjegy)`
-    zipCodeValid.value = false
-    return
-  }
-
-  if (value.length > 5) {
-    zipCodeError.value = 'Túl hosszú (max 5 számjegy)'
-    zipCodeValid.value = false
-    return
-  }
-
-  // Sikeres validáció
-  zipCodeError.value = ''
-  zipCodeValid.value = true
 }
 
 function validatePhone() {
@@ -465,13 +436,6 @@ async function checkout() {
   validateLastName()
   if (!lastNameValid.value) {
     alert('A keresztéknév nem érvenytes!')
-    return
-  }
-
-  // Irányítószám validáció a checkout előtt
-  validateZipCode()
-  if (!zipCodeValid.value) {
-    alert('Az irányítószám nem érvényes!\n\nMagyar irányítószámok: 4-5 számjegy')
     return
   }
 
@@ -750,12 +714,6 @@ async function checkout() {
   font-weight: 600;
 }
 
-.summary-divider {
-  height: 1px;
-  background: #e5e7eb;
-  margin: 16px 0;
-}
-
 .summary-row.total {
   padding: 16px 0 0 0;
   border-top: 2px solid #f0f1f3;
@@ -1030,5 +988,58 @@ async function checkout() {
   .empty-state h2 {
     font-size: 22px;
   }
+}
+:deep(.p-dropdown) {
+  width: 100%;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  background: #f9fafb;
+  transition: all 0.2s;
+}
+
+:deep(.p-dropdown:hover),
+:deep(.p-dropdown.p-focus) {
+  border-color: #3f51b5;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(63, 81, 181, 0.1);
+}
+
+:deep(.p-dropdown.p-invalid) {
+  border-color: #dc2626;
+  background: #fef2f2;
+}
+
+:deep(.p-dropdown.p-success) {
+  border-color: #059669;
+  background: #f0fdf4;
+}
+
+:deep(.p-dropdown .p-dropdown-label) {
+  font-size: 14px;
+  color: #1a2332;
+  padding: 12px 14px;
+}
+
+.city-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+}
+
+.city-name {
+  font-weight: 500;
+  color: #1a2332;
+}
+
+.irsz-badge {
+  font-size: 12px;
+  color: #6b7280;
+  background: #f3f4f6;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-weight: 600;
+  flex-shrink: 0;
 }
 </style>

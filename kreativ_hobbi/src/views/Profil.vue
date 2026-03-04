@@ -111,12 +111,11 @@ onMounted(async () => {
     user.name = userData.value.felhasz_nev;
     user.username = userData.value.felhasz_nev;
     posts.value = await fetchUserBlogPosts();
-
-    const hasProfileImage = userData.value.profilKep_id;
+    const hasProfileImage = userData.value.profil_kep.id;
     if (hasProfileImage) {
-        if (userData.value.profilKep?.url_Link) {
-            const url = userData.value.profilKep.url_Link;
-            applyAvatar(userData.value.profilKep);
+        if (userData.value.profil_kep?.url_Link) {
+            const url = userData.value.profil_kep.url_Link;
+            applyAvatar(userData.value.profil_kep);
         } else {
             user.avatar = `${baseUrl}/profilKepek/kep_${hasProfileImage}.jpg`;
         }
@@ -140,7 +139,6 @@ onMounted(async () => {
     editForm.varos = adat.varos || '';
     if (videoRef.value) {
     videoRef.value.addEventListener('loadedmetadata', () => {
-      console.log('Video metadata loaded, ready to play');
       videoRef.value.play()
         .then(() => console.log('Video playing'))
         .catch(err => console.error('Video play failed:', err));
@@ -285,7 +283,6 @@ async function uploadProfilePhoto() {
 
     userData.value = await fetchUserData();
     applyAvatar(userData.value.profilKep);
-
     stopCamera();
   } catch (error) {
     console.error('Upload failed', error);
@@ -367,7 +364,7 @@ function formatDate(d) { return new Date(d).toLocaleDateString(); }
                   <label for="keresztnev">Keresztnév</label>
                   <input type="text" id="keresztnev" v-model="editForm.keresztnev">
                   <label for="telefon">Telefonszám</label>
-                  <input input type="text" pattern="/(06|+36)\d{9}/" id="telefon" v-model="editForm.telefonszam"> <!--nem működik a regex-->
+                  <input input type="text" pattern="(06|+36)\d{9}" id="telefon" v-model="editForm.telefonszam"> <!--nem működik a regex-->
                   <!--<label for="bio">Bio</label>
                   <textarea id="bio" v-model="editForm.bio"></textarea>-->
                   <label for="utca">Utca</label>
@@ -496,7 +493,6 @@ function formatDate(d) { return new Date(d).toLocaleDateString(); }
 </template>
 
 <style scoped> 
-
 .draft-badge {
   background: #fbbf24;
   color: #000;
