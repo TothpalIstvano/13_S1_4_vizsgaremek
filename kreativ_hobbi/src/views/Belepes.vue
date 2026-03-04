@@ -240,7 +240,6 @@ const handleSignIn = async () => {
     },{
       withCredentials: true
     })
-    console.log('Login response:', response);
 
     if (response.status === 204) {
       router.push('/Profil') // Redirect to profile page on successful login
@@ -282,8 +281,6 @@ const handleSignUp = async () => {
     // API call to register
     await axios.get('/sanctum/csrf-cookie') // Get CSRF cookie if needed
 
-    console.log(signUpForm.value.password)
-
     const response = await axios.post('/register', {
       felhasz_nev: signUpForm.value.name,
       email: signUpForm.value.email,
@@ -292,8 +289,6 @@ const handleSignUp = async () => {
     }, {
       withCredentials: true
     })
-
-    console.log('Registration response:', response);
 
     // backend returns noContent() (204) after registering and logging in the user
     if (response.status === 204 || response.status === 201) {

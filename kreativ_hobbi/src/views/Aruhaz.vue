@@ -208,6 +208,16 @@
 
         <!-- PRODUCT GRID -->
         <div id="products">
+          <div v-if="loading" class="tolto-kontener">
+            <div class="tolto-content">
+              <p class="tolto-szoveg">Termékek betöltése...</p>
+              <div class="toltes">
+                <div class="pulse-dot"></div>
+                <div class="pulse-dot"></div>
+                <div class="pulse-dot"></div>
+              </div>
+            </div>
+          </div>
           <div v-for="item in lapozottTermekek" :key="item.id" class="product-card" @click="router.push(`/aruhaz/${item.id}`)" style="cursor: pointer;">
             <img :src="item.termek_fo_kep.url_Link" :alt="item.termek_fo_kep.alt_szoveg" class="product-image" />
 
@@ -233,10 +243,10 @@
               </button>
             </div>
           </div>
-          <div v-if="filteredItems.length == 0" style="grid-column: 1/-1; text-align: center; color: #555; font-size: 24px; padding: 2rem 0;">
+          <div v-if="filteredItems.length == 0 && !loading" style="grid-column: 1/-1; text-align: center; color: #555; font-size: 24px; padding: 2rem 0;">
             Nincs találat
           </div>
-          <div class="lapozas-sor" v-if="osszesenLap > 0">
+          <div class="lapozas-sor" v-if="osszesenLap > 0 && !loading">
             <div class="oldal-meret">
               <label for="perPage">Megjelenítés:</label>
               <select id="perPage" v-model="oldalMeret" @change="oldalra(1)">
@@ -308,7 +318,8 @@
     faChevronLeft,
     faChevronRight
   )
-  
+
+  const loading = ref(false)
   const router = useRouter()
   const cartStore = useCartStore()
   const cartModal = ref(null)
@@ -412,7 +423,6 @@
   const max = ref(0)
   const searchTerm = ref('')
   const activekategoriak = computed(() => kategoriak.value.filter(c => selectedkategoriak.value.includes(c.id)))
-  const foKategoriak = computed(() => kategoriak.value.filter(k => !k.fo_kategoria_id))
   const maxLathatoFilter = 8 //max látható szűrők száma a chipben
   const originalItems = ref([])
 
@@ -600,6 +610,7 @@ watch([searchTerm, selectedkategoriak, appliedMin, appliedMax], () => {
 })
 
 onMounted(async () => {
+  loading.value = true
   const data = await fetchTermek()
 
   originalItems.value = data
@@ -613,6 +624,8 @@ onMounted(async () => {
 
   appliedMin.value = absMin.value
   appliedMax.value = absMax.value
+
+  loading.value = false
 })
 
 function applyPriceFilter(){
@@ -917,7 +930,7 @@ onBeforeUnmount(() => {
 
 .side-bar-content .item-tag:hover {
   background: #e3e8ff;
-  color: #3f51b5;
+  color: #b55b3f;
 };
 
 .category-group {
@@ -1006,9 +1019,9 @@ margin-left: 10px;
 }
 
 .lap-gomb:hover:not(:disabled) {
-  background: #3f51b5;
+  background: #b55b3f;
   color: white;
-  border-color: #3f51b5;
+  border-color: #b55b3f;
   transform: translateY(-2px);
 }
 
@@ -1018,9 +1031,9 @@ margin-left: 10px;
 }
 
 .aktiv-lap {
-  background: #3f51b5 !important;
+  background: #b55b3f !important;
   color: white !important;
-  border-color: #3f51b5 !important;
+  border-color: #b55b3f !important;
   box-shadow: 0 4px 6px -1px rgba(63, 81, 181, 0.3);
 }
 
@@ -1053,7 +1066,7 @@ margin-left: 10px;
 
 .oldal-meret select:focus {
   outline: none;
-  border-color: #3f51b5;
+  border-color: #b55b3f;
 }
 /*#endregion*/
 
@@ -1103,7 +1116,7 @@ margin-left: 10px;
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: #3f51b5;
+  background: #b55b3f;
   border: none;
   cursor: pointer;
 }
@@ -1139,7 +1152,7 @@ margin-left: 10px;
   margin-top: 6px;
   padding: 8px;
   border: none;
-  background: #3f51b5;
+  background: #b55b3f;
   color: white;
   font-weight: 600;
   border-radius: 6px;
@@ -1147,7 +1160,7 @@ margin-left: 10px;
 }
 
 .apply-btn:hover {
-  background: #2f3fa3;
+  background: #81442f;
 }
 /*#endregion*/
 
@@ -1197,7 +1210,7 @@ margin-left: 10px;
   content: "";
   width: 100%;
   height: 100%;
-  background: #506eec;
+  background: #ff5d2adb;
   display: block;
   transform: scale(0);
   opacity: 1;
@@ -1207,12 +1220,12 @@ margin-left: 10px;
   padding-left: 8px;
 }
 .checkbox-wrapper-46 .cbx:hover span:first-child {
-  border-color: #506eec;
+  border-color: #ff5d2adb;
 }
 
 .checkbox-wrapper-46 .inp-cbx:checked + .cbx span:first-child {
-  background: #506eec;
-  border-color: #506eec;
+  background: #ff5d2adb;
+  border-color: #ff5d2adb;
   animation: wave-46 0.4s ease;
 }
 .checkbox-wrapper-46 .inp-cbx:checked + .cbx span:first-child svg {
@@ -1329,7 +1342,7 @@ margin-left: 10px;
   padding: 10px;
   border: none;
   border-radius: 8px;
-  background: #3f51b5;
+  background: #b55b3f;
   color: white;
   font-weight: 600;
   cursor: pointer;
@@ -1337,7 +1350,49 @@ margin-left: 10px;
 }
 
 .add-btn:hover {
-  background: #2f3fa3;
+  background: #81442f;
 }
 /*#endregion*/
+
+/* ===== BETÖLTÉS ===== */
+.tolto-kontener {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+}
+
+.tolto-content {
+  text-align: center;
+}
+
+.tolto-szoveg {
+  font-size: 18px;
+  color: #363636;
+  margin-bottom: 32px;
+  font-weight: 500;
+}
+
+.toltes {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+}
+
+.pulse-dot {
+  width: 12px;
+  height: 12px;
+  background: linear-gradient(135deg, #b55b3f 0%, #81442f 100%);
+  border-radius: 50%;
+  animation: pulse 1.4s infinite ease-in-out;
+}
+
+.pulse-dot:nth-child(2) { animation-delay: 0.2s; }
+.pulse-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(0.6); opacity: 0.5; }
+}
 </style>
