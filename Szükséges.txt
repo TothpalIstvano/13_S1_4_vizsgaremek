@@ -1,13 +1,9 @@
 - kommentek saját törléssel, ellenőrzéssel (csúnya beszéd szűrés)
 - profil szerkesztés visszaigazoló üzi kellene: adatok sikeresen mentve (vagy nem), szebbítés
-- mintakészítő kosárhoz adás szebbítés
-- mintakészítő letöltés, néhány megnevezés/szöveg átírása ÉS A CSÚSZKA ÉS A NUMBERINPUT IZÉ ÖSSZEHANGOLÁSA
 - blog posztoknál a seederbe írtaknak szép főképe legyen
 - címkék és kategóriák felvétele (ne legyen ennyi latin hablaty)
 - newpost notifications magyarul/jobban
-- profilon a posztoknál reszponzivitás
 - reakciók poszthoz - tartsa meg a színt frissítés után
 - rólunk oldal rendes szöveg
 - reszponzívitás
-- rip dino
 (ha úgy gondolná h nem működik - blog képfeltöltés esetleg: https://stackoverflow.com/questions/50730143/laravel-storage-link-wont-work-on-production)
