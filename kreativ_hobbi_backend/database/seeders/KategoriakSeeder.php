@@ -16,53 +16,60 @@ class KategoriakSeeder extends Seeder
         $this->faker = Factory::create();
     }
 
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        // Step 1: Create fixed "Fonalak" main category
-        $fonalakCategory = Kategoriak::firstOrCreate(
-            ['nev' => 'Fonalak'],
-            ['fo_kategoria_id' => null]
-        );
+        $manualCategories = [
+            'Fonalak' => [
+                'A fonal',
+                'B fonal',
+                'C fonal',
+                'D fonal',
+                'E fonal',
+            ],
 
-        // Step 2: Create fixed subcategories under "Fonalak"
-        $fonalSubcategories = [
-            'A fonal',
-            'B fonal',
-            'C fonal',
-            'D fonal',
-            'E fonal'
+            'Kötőtűk' => [
+                'Egyenes kötőtűk',
+                'Körkötőtűk',
+            ],
+
+            'Horgolótűk' => [],
+            'Hímzőcérna' => [],
+
+            'Kiegészítők' => [
+                'Mérőszalagok',
+                'Ollók',
+                'Bontó olló'
+            ],
+            'Barkácsolás' => [
+                'Kalapács',
+                'Csavarhúzó',
+                'Fűrész',
+                'Fúró'
+            ],
+            'Kertészkedés' => [
+                'Ásó',
+                'Lapát',
+                'Virágcserép',
+                'Metszőolló'
+            ]
         ];
 
-        $createdSubcategories = [];
-        foreach ($fonalSubcategories as $subcategoryName) {
-            $subcategory = Kategoriak::firstOrCreate(
-                ['nev' => $subcategoryName],
-                ['fo_kategoria_id' => $fonalakCategory->id]
+        foreach ($manualCategories as $mainCategoryName => $subCategories) {
+            $mainCategory = Kategoriak::firstOrCreate(
+                ['nev' => $mainCategoryName],
+                ['fo_kategoria_id' => null]
             );
-            $createdSubcategories[] = $subcategory;
-        }
 
-        // Step 3: Create other random parent categories (9 instead of 10 since we already have "Fonalak")
-        $parentCategories = Kategoriak::factory(10)->create(['fo_kategoria_id' => null]);
-
-        // Step 4: Create child categories for each parent (including "Fonalak")
-        $allParents = $parentCategories->push($fonalakCategory);
-
-        foreach ($allParents as $parent) {
-            // Don't create random children for "Fonalak" since we already have fixed ones
-            if ($parent->id !== $fonalakCategory->id) {
-                Kategoriak::factory(rand(1, 5))->create(['fo_kategoria_id' => $parent->id]);
+            foreach ($subCategories as $subCategoryName) {
+                Kategoriak::firstOrCreate(
+                    ['nev' => $subCategoryName],
+                    ['fo_kategoria_id' => $mainCategory->id]
+                );
             }
         }
 
-        // Step 5: Ensure at least one product is created in one of the fixed fonal categories
-        if (Termekek::whereIn('kategoria_id', array_column($createdSubcategories, 'id'))->count() === 0) {
-            // Create at least one product in "A fonal" category
-            $aFonalCategory = Kategoriak::where('nev', 'A fonal')->first();
-
+        $aFonalCategory = Kategoriak::where('nev', 'A fonal')->first();
+        if ($aFonalCategory && Termekek::where('kategoria_id', $aFonalCategory->id)->count() === 0) {
             Termekek::factory()->create([
                 'nev' => 'Prémium gyapjú fonal',
                 'leiras' => 'Kiváló minőségű prémium gyapjú fonal kézzel készítéshez.',
@@ -74,7 +81,5 @@ class KategoriakSeeder extends Seeder
         }
 
         $this->command->info('Kategóriák sikeresen seedelve!');
-        $this->command->info('Fix "Fonalak" kategória és alkategóriái létrehozva.');
-        $this->command->info('Legalább egy termék létrehozva az "A fonal" kategóriában.');
     }
 }
