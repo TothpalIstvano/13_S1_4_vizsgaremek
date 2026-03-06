@@ -128,7 +128,7 @@
               </div>
               
               <p class="leiras">
-                {{ post.kivonat || post.tartalom?.substring(0, 150) || 'Nincs leírás...' }}
+                {{ post.kivonat || 'Nincs leírás...' }}
                 <span v-if="(post.kivonat || post.tartalom)?.length > 150">...</span>
               </p>
               
@@ -244,6 +244,12 @@ const aktualisOldal = ref(1)
 const oldalMeret = ref(9)
 
 const isAuthenticated = computed(() => authStore.isAuthenticated)
+
+watch(isAuthenticated, (newVal) => {
+  if (newVal && mindenPoszt.value.length > 0) {
+    fetchReakcio();
+  }
+});
 
 const aktivCimkek = computed(() =>
   cimkeOpciok.value.filter(cimke => valasztottCimkek.value.includes(cimke.id))
@@ -422,25 +428,23 @@ const posztMegjelenitese = (postId) => {
 
 const posztokLekerese = async () => {
   try {
-    loading.value = true
-    error.value = null
-    
-    const response = await api.get('/api/blog')
+    loading.value = true;
+    error.value = null;
+    const response = await api.get('/api/blog');
     mindenPoszt.value = response.data;
     posztok.value = [...mindenPoszt.value];
-    
     rendezes();
 
+    // If already authenticated, fetch reactions immediately
     if (isAuthenticated.value) {
-      await fetchReakcio()
+      await fetchReakcio();
     }
-    
   } catch (err) {
-    error.value = 'Hiba történt a blog bejegyzések betöltése közben.'
+    error.value = 'Hiba történt a blog bejegyzések betöltése közben.';
   } finally {
-    loading.value = false
+    loading.value = false;
   }
-}
+};
 
 const fetchReakcio = async () => {
   try {
@@ -462,25 +466,25 @@ const reakcioKezeles = async (postId, reactionType) => {
   try {
     const response = await api.post(`/api/blog/${postId}/reaction`, {
       reaction: reactionType
-    })
+    });
     
-    const { likes_count, dislikes_count, user_reaction } = response.data
+    const { likes_count, dislikes_count, user_reaction } = response.data;
     
-    const postIndex = mindenPoszt.value.findIndex(post => post.id === postId)
+    const postIndex = mindenPoszt.value.findIndex(post => post.id === postId);
     if (postIndex !== -1) {
-      mindenPoszt.value[postIndex].likes_count = likes_count
-      mindenPoszt.value[postIndex].dislikes_count = dislikes_count
-      mindenPoszt.value[postIndex].reakcio = user_reaction
-      posztok.value = [...mindenPoszt.value]
+      mindenPoszt.value[postIndex].likes_count = likes_count;
+      mindenPoszt.value[postIndex].dislikes_count = dislikes_count;
+      mindenPoszt.value[postIndex].reakcio = user_reaction;
     }
-    
   } catch (err) {
     if (err.response?.status === 401) {
-      alert('Kérjük, jelentkezzen be a reakciókhoz!')
-      router.push('/Belepes')
+      alert('Kérjük, jelentkezzen be a reakciókhoz!');
+      router.push('/Belepes');
+    } else {
+      console.error('Reaction error:', err);
     }
   }
-}
+};
 
 const kepHiba = (event) => {
   event.target.src = potKep

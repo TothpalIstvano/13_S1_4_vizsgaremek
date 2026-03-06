@@ -1,7 +1,6 @@
 - kommentek saját törléssel, ellenőrzéssel (csúnya beszéd szűrés)
-- profil szerkesztés visszaigazoló üzi kellene: adatok sikeresen mentve (vagy nem), szebbítés
+- profilba meg poszt feltöltésnél a primevue dropdownt valami szebb színre zöld helyett
 - blog posztoknál a seederbe írtaknak szép főképe legyen
-- címkék és kategóriák felvétele (ne legyen ennyi latin hablaty)
 - newpost notifications magyarul/jobban
 - reakciók poszthoz - tartsa meg a színt frissítés után
 - rólunk oldal rendes szöveg

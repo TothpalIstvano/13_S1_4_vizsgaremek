@@ -165,6 +165,7 @@ async function saveProfile() {
     user.name = userData.value.felhasz_nev;
     user.username = userData.value.felhasz_nev;
     showSzerkesztes.value = false;
+    alert('Profil sikeresen frissítve!'); // ✅ Success alert
   } catch (error) {
     console.error('Error saving profile:', error);
     if (error.response && error.response.status === 422) {
@@ -355,24 +356,48 @@ function formatDate(d) { return new Date(d).toLocaleDateString(); }
         </div>
         <div v-else-if="showSzerkesztes" class="szerk-modal-backdrop" @click.self="cancelSzerkesztes">
           <div class="szerk-modal">
-            <div class="szerk-modal-actions">
-              <div class="szerkesztes">
-                <h3>Profil szerkesztése</h3>
-                <form @submit.prevent="saveProfile">
-                  <label for="vezeteknev">Vezetéknév</label>
-                  <input type="text" id="vezeteknev" v-model="editForm.vezeteknev">
-                  <label for="keresztnev">Keresztnév</label>
-                  <input type="text" id="keresztnev" v-model="editForm.keresztnev">
+            <div class="szerk-modal-header">
+              <h3>Profil szerkesztése</h3>
+              <button class="close-btn" @click="cancelSzerkesztes">✕</button>
+            </div>
+            <form @submit.prevent="saveProfile">
+              <!-- Személyes adatok -->
+              <div class="form-section">
+                <h4>Személyes adatok</h4>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="vezeteknev">Vezetéknév</label>
+                    <input type="text" id="vezeteknev" v-model="editForm.vezeteknev" placeholder="Pl. Nagy" />
+                  </div>
+                  <div class="form-group">
+                    <label for="keresztnev">Keresztnév</label>
+                    <input type="text" id="keresztnev" v-model="editForm.keresztnev" placeholder="Pl. Anna" />
+                  </div>
+                </div>
+                <div class="form-group">
                   <label for="telefon">Telefonszám</label>
-                  <input input type="text" pattern="(06|+36)\d{9}" id="telefon" v-model="editForm.telefonszam"> <!--nem működik a regex-->
-                  <!--<label for="bio">Bio</label>
-                  <textarea id="bio" v-model="editForm.bio"></textarea>-->
+                  <input type="tel" pattern="(06|+36)\d{9}" id="telefon" v-model="editForm.telefonszam" placeholder="+36 20 123 4567" />
+                </div>
+              </div>
+
+              <!-- Cím adatok -->
+              <div class="form-section">
+                <h4>Lakcím</h4>
+                <div class="form-group">
                   <label for="utca">Utca</label>
-                  <input type="text" id="utca" v-model="editForm.utca">
-                  <label for="hazszam">Házszám</label>
-                  <input type="number" id="hazszam" v-model="editForm.hazszam">
-                  <label for="emeletAjto">Emelet/Ajtó</label>
-                  <input type="text" id="emeletAjto" v-model="editForm.emeletAjto">
+                  <input type="text" id="utca" v-model="editForm.utca" placeholder="Kossuth Lajos utca" />
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="hazszam">Házszám</label>
+                    <input type="number" id="hazszam" v-model="editForm.hazszam" placeholder="12" />
+                  </div>
+                  <div class="form-group">
+                    <label for="emeletAjto">Emelet/Ajtó</label>
+                    <input type="text" id="emeletAjto" v-model="editForm.emeletAjto" placeholder="2/5" />
+                  </div>
+                </div>
+                <div class="form-group">
                   <label for="varos">Város</label>
                   <Dropdown
                     id="varos"
@@ -397,32 +422,44 @@ function formatDate(d) { return new Date(d).toLocaleDateString(); }
                       <div>{{ slotProps.option.varos_nev }} ({{ slotProps.option.iranyitoszam }})</div>
                     </template>
                   </Dropdown>
-                  <label for="profilkep">Kép kiválasztása/feltöltése</label>
-                  <input type="file" id="avatar" accept="image/*" @change="handleFileUpload">
-                  <div v-if="showCamera" class="camera-preview">
+                </div>
+              </div>
+
+              <!-- Profilkép -->
+              <div class="form-section">
+                <h4>Profilkép</h4>
+                <div class="form-group">
+                  <label for="avatar">Feltöltés számítógépről</label>
+                  <input type="file" id="avatar" accept="image/*" @change="handleFileUpload" />
+                </div>
+                <div v-if="!showCamera" class="camera-toggle">
+                  <button type="button" class="btn camera-btn" @click="startCamera">📷 Kamera használata</button>
+                </div>
+                <div v-if="showCamera" class="camera-preview">
                   <video ref="videoRef" autoplay playsinline></video>
                   <canvas ref="canvasRef" style="display: none;"></canvas>
                   <div class="camera-controls">
-                    <button type="button" @click="capturePhoto">Fotózás</button>
-                    <button type="button" @click="stopCamera">Mégse</button>
+                    <button type="button" class="btn capture" @click="capturePhoto">Fotózás</button>
+                    <button type="button" class="btn cancel" @click="stopCamera">Mégse</button>
                   </div>
-                  <div v-if="capturedBlob">
+                  <div v-if="capturedBlob" class="captured-preview">
                     <p>Előkép:</p>
-                    <img :src="objectUrl" alt="preview" style="max-width: 200px;">
-                    <button type="button" @click="uploadProfilePhoto" :disabled="uploading">
+                    <img :src="objectUrl" alt="preview" />
+                    <button type="button" class="btn upload" @click="uploadProfilePhoto" :disabled="uploading">
                       {{ uploading ? 'Feltöltés...' : 'Profilkép beállítása' }}
                     </button>
                   </div>
                 </div>
-                <button type="button" v-if="!showCamera" @click="startCamera">Kamera használata</button>
-
-                  <div class="szerk-gombok">
-                    <button type="submit" class="btn mentes" :disabled="saving">Mentés</button>
-                    <button type="button" class="btn megse" @click="cancelSzerkesztes">Mégse</button>
-                  </div>
-                </form>
               </div>
-            </div>
+
+              <!-- Mentés/Mégse gombok -->
+              <div class="form-actions">
+                <button type="button" class="btn cancel" @click="cancelSzerkesztes">Mégse</button>
+                <button type="submit" class="btn save" :disabled="saving">
+                  {{ saving ? 'Mentés...' : 'Mentés' }}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       </div>
@@ -477,7 +514,7 @@ function formatDate(d) { return new Date(d).toLocaleDateString(); }
                   <span v-if="p.statusz === 'piszkozat'" class="draft-badge">Piszkozat</span>
                 </div>
                 <h3 class="post-title">{{ p.cim }}</h3>
-                <p class="post-excerpt">{{ truncateText(p.kivonat || p.tartalom, 60) }}</p>
+                <p class="post-excerpt">{{ truncateText(p.kivonat || 'Nincs leírás...', 60) }}</p>
                 <div class="post-actions">
                   <RouterLink :to="`/blog/${p.id}`" class="read">Olvasás</RouterLink>
                   <RouterLink v-if="p.sajat" :to="`/editpost/${p.id}`" class="modify">Szerkesztés</RouterLink>
@@ -496,7 +533,7 @@ function formatDate(d) { return new Date(d).toLocaleDateString(); }
 .draft-badge {
   background: #fbbf24;
   color: #000;
-  font-size: 0.7rem;
+  font-size: 14px;
   padding: 2px 8px;
   border-radius: 999px;
   margin-left: 8px;
@@ -510,104 +547,276 @@ function formatDate(d) { return new Date(d).toLocaleDateString(); }
   font-weight: 600;
 }
 
-/*#region Szerkesztés*/
-.szerkesztes {
-  box-sizing: border-box;
-}
-
+/*#region Szerkesztés Modal */
 .szerk-modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.4);
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 10;
+  z-index: 100;
 }
 
 .szerk-modal {
   background: #fff;
-  padding: 0px 24px 24px 24px;
-  border-radius: 12px;
-  box-shadow: 0 8px 28px rgba(12,12,12,0.15);
-  max-width: 400px;
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
   width: 100%;
+  max-width: 600px;
   max-height: 90vh;
   overflow-y: auto;
+  animation: modalFadeIn 0.2s ease;
 }
 
-label {
+@keyframes modalFadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.szerk-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 25px;
+  border-bottom: 1px solid #e9ecef;
+  background: #fafbfc;
+  border-radius: 20px 20px 0 0;
+}
+
+.szerk-modal-header h3 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
+  color: #1a1e24;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #6c757d;
+  padding: 4px 8px;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.close-btn:hover {
+  background: #e9ecef;
+  color: #212529;
+}
+
+/* Form szekciók */
+.form-section {
+  padding: 10px 20px;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.form-section h4 {
+  margin: 0 0 20px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #2c3e50;
+  letter-spacing: 0.3px;
+}
+
+.form-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.form-row .form-group {
+  flex: 1 1 200px;
+}
+
+.form-group {
+  margin-bottom: 8px;
+}
+
+.form-group label {
   display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  font-size: 15px;
+  color: #4a5568;
+}
+
+.form-group input[type="text"],
+.form-group input[type="tel"],
+.form-group input[type="number"],
+.form-group input[type="file"] {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 15px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  background: #fff;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #ad6801;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Kamera rész */
+.camera-toggle {
+  margin-top: 8px;
+}
+
+.camera-btn {
+  background: #f1f5f9;
+  color: #1e293b;
+  border: 1.5px dashed #94a3b8;
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.camera-btn:hover {
+  background: #e2e8f0;
+  border-color: #64748b;
 }
 
 .camera-preview {
-  background-color: #f0f0f0;
-  padding: 10px;
-  margin: 10px 0;
+  margin-top: 16px;
+  background: #f8fafc;
+  border-radius: 16px;
+  padding: 16px;
+  border: 1.5px solid #e2e8f0;
 }
 
 .camera-preview video {
   width: 100%;
-  max-width: 400px;
-  min-height: 300px;
-  border: 2px solid blue;
+  max-width: 100%;
+  border-radius: 12px;
+  background: #0f172a;
+  min-height: 240px;
   object-fit: cover;
 }
 
-input[type=text], input[type=tel], textarea, input[type=file], input[type=number] {
+.camera-controls {
+  display: flex;
+  gap: 12px;
+  margin: 16px 0;
+  justify-content: center;
+}
+
+.camera-controls .btn {
+  flex: 1;
+  padding: 10px;
+  border-radius: 40px;
+  font-weight: 600;
+}
+
+.btn.capture {
+  background: #926129;
+  color: white;
+  border: none;
+}
+
+.btn.cancel {
+  background: #e2e8f0;
+  color: #334155;
+  border: none;
+}
+
+.captured-preview {
+  text-align: center;
+  margin-top: 16px;
+}
+
+.captured-preview p {
+  margin: 0 0 8px;
+  font-weight: 500;
+  color: #334155;
+}
+
+.captured-preview img {
+  max-width: 200px;
+  border-radius: 12px;
+  border: 3px solid white;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  margin-bottom: 16px;
+}
+
+.btn.upload {
+  background: #059669;
+  color: white;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 40px;
+  font-weight: 600;
+}
+
+.btn.upload:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Űrlap akciógombok */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+  padding: 15px 25px;
+  background: #f8fafc;
+  border-radius: 0 0 20px 20px;
+}
+
+.form-actions .btn {
+  padding: 12px 24px;
+  border-radius: 40px;
+  font-weight: 600;
+  font-size: 16px;
+  transition: all 0.2s;
+  border: none;
+  cursor: pointer;
+}
+
+.form-actions .btn.save {
+  background: #017e07;
+  color: white;
+}
+
+.form-actions .btn.save:hover:not(:disabled) {
+  background: #1e293b;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.form-actions .btn.cancel {
+  background: #e2e8f0;
+  color: #101722;
+}
+
+.form-actions .btn.cancel:hover {
+  background: #cbd5e1;
+}
+
+/* PrimeVue dropdown finomhangolás */
+:deep(.p-dropdown) {
   width: 100%;
-  padding: 5px;
-  margin: 6px 0;
-  display: inline-block;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  border-radius: 12px;
+  border: 1.5px solid #e2e8f0;
 }
 
-input[type=text]:focus, input[type=tel]:focus, textarea:focus, input[type=number]:focus {
-  background-color: #ddd;
+:deep(.p-dropdown:not(.p-disabled):hover) {
+  border-color: #ad6801;
 }
 
-.varos-adat {
-  display: inline-block;
-  margin: 0 auto;
-  width: 380px;
+:deep(.p-dropdown-panel) {
+  border-radius: 12px;
+  margin-top: 4px;
+  box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
 }
 
-.varos {
-  float: left;
-  width: auto;
-}
-.varos input[type=text] {
-  width: 100%;
-}
-
-.iranyitoszam {
-  float: right;
-}
-
-.iranyitoszam input[type=text] {
-  width: 80%;
-}
-
-.szerk-gombok {
-  width: 350px;
-  display:inline-block;
-  overflow: auto;
-  white-space: nowrap;
-  margin:0px auto;
-}
-
-.mentes {
-  float: left;
-  background-color: #317431;
-  color: #f3f3e2;
-}
-
-.megse {
-  float: right;
-  background: #e5e7eb; 
-  color: #374151; 
-}
 /*#endregion*/
 
 .profile-page {
@@ -665,13 +874,13 @@ input[type=text]:focus, input[type=tel]:focus, textarea:focus, input[type=number
 }
 .name {
   margin: 0;
-  font-size: 1.25rem;
+  font-size: 20px;
   font-weight: 700;
 }
 .username {
   margin: 4px 0;
   color: #666;
-  font-size: 0.95rem;
+  font-size: 15px;
 }
 .bio {
   margin: 8px 0;
@@ -681,7 +890,7 @@ input[type=text]:focus, input[type=tel]:focus, textarea:focus, input[type=number
   display: flex;
   gap: 12px;
   color: #71717a;
-  font-size: 0.9rem;
+  font-size: 15px;
 }
 
 /* actions */
@@ -795,7 +1004,7 @@ color: #444;
 /* main column */
 .section-header h2 { 
 margin: 0; 
-font-size: 1.25rem; 
+font-size: 20px; 
 }
 
 .section-header .sub { 
@@ -844,7 +1053,7 @@ color: #6b7280;
 
 .post-meta { 
   color: #6b7280; 
-  font-size: 0.85rem; 
+  font-size: 12px; 
   display: flex; 
   gap: 10px; 
   align-items: center; 
@@ -855,7 +1064,7 @@ color: #6b7280;
   background: #f9f4f1; 
   padding: 4px 8px; 
   border-radius: 50px; 
-  font-size: 0.75rem; 
+  font-size: 12px; 
   color: #412d25; 
 }
 
@@ -932,24 +1141,6 @@ color: #6b7280;
     flex-direction: row; 
     width: 100%; 
     justify-content: space-between; 
-  }
-}
-
-@media (max-width: 390px) {
-  .szerk-gombok {
-    width: 270px;
-  }
-}
-
-@media (max-width: 310px) {
-  .szerk-gombok {
-    width: 170px;
-  }
-}
-
-@media (max-width: 210px) {
-  .szerk-gombok {
-    width: 80px;
   }
 }
 
