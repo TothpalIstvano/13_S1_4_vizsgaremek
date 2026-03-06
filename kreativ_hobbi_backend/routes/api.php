@@ -133,7 +133,7 @@ Route::get('/termekek', function () {
 
 Route::get('/termekek/{id}', function ($id) {
     try {
-        $termek = Termekek::with('TermekKategoria', 'TermekFoKep', 'TermekSzinek', 'TermekKategoriak')->find($id);
+        $termek = Termekek::with('TermekKategoria', 'TermekFoKep', 'TermekSzinek', 'TermekKategoriak', 'TermekKepek')->find($id);
         if ($termek) {
             return response()->json($termek);
         } else {

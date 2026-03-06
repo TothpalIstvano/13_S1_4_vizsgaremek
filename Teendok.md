@@ -20,6 +20,8 @@
 * \[ ] active cimkek megtartása sessionstorage
 * \[X] active cimkek stilus✅
 * \[ ] termek cimkek termékeken katinthatók legyenek
+* \[X] termekképek több galeria✅
+* \[ ] kosár jel hozzáadása a kis méretű módhoz vhogy ez alatt azt étve hogy mikor nem fullos a navbar
 * \[X] cimke kategoriára való csere✅
 * \[X] szöveg röviditése ha overflow van és ... hozááadása
 * \[X] cimkeék az itemen való mennyiség kiírás + + jel oda írása + enyitható legyen✅

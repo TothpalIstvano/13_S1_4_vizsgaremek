@@ -140,7 +140,7 @@
         </div>
         <div>
         </div>
-        <button @click="submit" class="card-form__button" type="submit">Submit</button>
+        <button @click="submit" class="card-form__button" type="button">Submit</button>
       </div>
     </div>
 
@@ -166,6 +166,7 @@ const cardCvv = ref('');
 const isCardFlipped = ref(false);
 const showOverlay = ref(false);
 const overlayMessage = ref('');
+const isSubmitting = ref(false);
 
 const minYear = new Date().getFullYear();
 const minMonth = new Date().getMonth() + 1;
@@ -241,82 +242,45 @@ const formatCardNumber = async (event: Event) => {
 };
 
 const submit = async () => {
-  if (
-    cardNumber.value &&
-    cardName.value.length >= 8 &&
-    cardMonth.value &&
-    cardYear.value &&
-    cardCvv.value
-  ) {
-    overlayMessage.value = 'Card accepted!';
-    showOverlay.value = true;
-    console.log('submitting order', orderPayload.value);
-    await submitOrder(orderPayload.value);
+  if (isSubmitting.value) return; 
+  isSubmitting.value = true;
+  try {
+    if (
+      cardNumber.value &&
+      cardName.value.length >= 8 &&
+      cardMonth.value &&
+      cardYear.value &&
+      cardCvv.value
+    ){
+      overlayMessage.value = 'Card accepted!';
+      showOverlay.value = true;
+      console.log('submitting order', orderPayload.value);
+    
 
-    // Reset form fields
-    cardNumber.value = '';
-    cardName.value = '';
-    cardMonth.value = '';
-    cardYear.value = '';
-    cardCvv.value = '';
-    isCardFlipped.value = false;
-  } else {
-    overlayMessage.value = 'Please fill all fields correctly.';
+      // Reset form fields
+      cardNumber.value = '';
+      cardName.value = '';
+      cardMonth.value = '';
+      cardYear.value = '';
+      cardCvv.value = '';
+      isCardFlipped.value = false;
+    } else {
+      overlayMessage.value = 'Please fill all fields correctly.';
+      showOverlay.value = true;
+    }
+  } catch (e) {
+    console.error(e);
+    overlayMessage.value = 'An error occurred. Please try again.';
     showOverlay.value = true;
+  }
+  finally {
+    isSubmitting.value = false;
   }
 };
 
 const closeOverlay = () => {
   showOverlay.value = false;
 };
-
-async function submitOrder(orderData) {
-    if (!orderData) {
-      overlayMessage.value = 'Nincs rendelési adat. Kérlek térj vissza a kosárhoz.';
-      showOverlay.value = true;
-      return;
-    }
-
-    // Transform to API format: { termekek: [{termek_id, mennyiseg, szin_id}], felhasznalo_id }
-    const apiPayload = {
-      felhasznalo_id: null,
-      termekek: (orderData.items || orderData.termekek || []).map(i => ({
-        termek_id: i.termek_id ?? i.id,
-        mennyiseg: i.mennyiseg ?? i.quantity ?? i.mennyiseg ?? 1,
-        szin_id: i.szin_id ?? null
-      }))
-    }
-
-    try {
-      const res = await axios.post('/api/rendeles', apiPayload)
-      console.log('Order submitted:', res.data);
-      // clear persisted payload on success
-      try { sessionStorage.removeItem('orderPayload') } catch(e){}
-      overlayMessage.value = 'Rendelés sikeresen elküldve!';
-      showOverlay.value = true;
-      router.push('/');
-      return res;
-    } catch (error) {
-      console.error('Error submitting order:', error)
-      // Handle validation errors (422)
-      if (error.response && error.response.status === 422) {
-        const data = error.response.data;
-        let msg = data.message || 'Érvénytelen adatok';
-        if (data.errors) {
-          const errs = Object.values(data.errors).flat().join('\n');
-          msg = errs || msg;
-        }
-        overlayMessage.value = msg;
-        showOverlay.value = true;
-        return;
-      }
-
-      overlayMessage.value = 'Hiba a rendelés elküldése közben.';
-      showOverlay.value = true;
-      return;
-    }
-}
-
 </script>
 
 <style scoped lang="scss">
