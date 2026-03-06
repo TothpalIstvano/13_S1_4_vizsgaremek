@@ -23,7 +23,7 @@ class Termekek extends Model
     }
     public function TermekKepek()
     {
-        return $this->belongsToMany(Kepek::class, 'termekKepek', 'termek_id', 'id');
+        return $this->belongsToMany(Kepek::class, 'termekKepek', 'termek_id', 'kep_id');
     }
 
     public function TermekSzinek()
