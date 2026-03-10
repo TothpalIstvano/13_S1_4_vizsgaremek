@@ -219,6 +219,12 @@
             </div>
           </div>
           <div v-for="item in lapozottTermekek" :key="item.id" class="product-card" @click="router.push(`/aruhaz/${item.id}`)" style="cursor: pointer;">
+            <div class="heart-wrapper">
+              <button class="heart-btn" @click="toggleLike(item, $event)"
+                      :class="{ liked: likedIds.has(item.id) }">
+                <FontAwesomeIcon :icon="likedIds.has(item.id) ? ['fas', 'heart'] : ['far', 'heart']" />
+              </button>
+            </div>
             <img :src="item.termek_fo_kep.url_Link" :alt="item.termek_fo_kep.alt_szoveg" class="product-image" />
 
             <div class="product-body">
@@ -305,7 +311,6 @@
     faChevronRight
   } from '@fortawesome/free-solid-svg-icons'
 
-
   library.add(
     faArrowUp,
     faArrowDown,
@@ -317,6 +322,11 @@
     faChevronLeft,
     faChevronRight
   )
+
+  import { faHeart as fasHeart } from '@fortawesome/free-solid-svg-icons'
+  import { faHeart as farHeart } from '@fortawesome/free-regular-svg-icons'
+
+  library.add(fasHeart, farHeart)
 
   const loading = ref(false)
   const router = useRouter()
@@ -424,6 +434,7 @@
   const activekategoriak = computed(() => kategoriak.value.filter(c => selectedkategoriak.value.includes(c.id)))
   const maxLathatoFilter = 8 //max látható szűrők száma a chipben
   const originalItems = ref([])
+  const likedIds = ref(new Set())
 
   // absolute bounds (from backend)
   const absMin = ref(0)
@@ -631,7 +642,19 @@ onMounted(async () => {
   appliedMax.value = absMax.value
 
   loading.value = false
+
+    try {
+    const res = await axios.get('/api/user/kedvencek')
+    likedIds.value = new Set(res.data)
+  } catch {} // not logged in = no likes shown
 })
+
+async function toggleLike(item, event) {
+  event.stopPropagation()
+  const res = await axios.post(`/api/termekek/${item.id}/kedvenc`)
+  if (res.data.liked) likedIds.value.add(item.id)
+  else likedIds.value.delete(item.id)
+}
 
 function applyPriceFilter(){
   appliedMin.value = tempMin.value
@@ -657,6 +680,19 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
+.heart-wrapper { position: relative; }
+.heart-btn {
+  position: absolute; top: 8px; right: 8px;
+  background: rgba(255,255,255,0.85);
+  border: none; border-radius: 50%;
+  width: 34px; height: 34px;
+  font-size: 18px; cursor: pointer;
+  color: #ccc; transition: color 0.2s, transform 0.15s;
+  z-index: 1;
+}
+.heart-btn.liked { color: #e03e3e; }
+.heart-btn:hover { transform: scale(1.15); }
+
 #shop {
   min-height: 90vh;
   padding: 15px;

@@ -18,6 +18,7 @@ use App\Models\Felhasznalok;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Kategoriak;
 use App\Models\Varosok;
+use App\Models\Kedvencek;
 
 //User related API routes:
 
@@ -86,6 +87,46 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/user/reactions', [BlogController::class, 'userReactions']);
     Route::post('/blog/{id}/reaction', [BlogController::class, 'reaction']);
+
+    // Fetch the logged-in user's liked product IDs
+    Route::get('/user/kedvencek', function (Request $request) {
+        return $request->user()
+            ->kedvencek()           // see model note below
+            ->pluck('termek_id');
+    });
+
+    // Toggle like on a product
+    Route::post('/termekek/{id}/kedvenc', function (Request $request, $id) {
+        $user = $request->user();
+        $exists = \DB::table('kedvencek')
+            ->where('felhasznalo_id', $user->id)
+            ->where('termek_id', $id)
+            ->exists();
+
+        if ($exists) {
+            \DB::table('kedvencek')
+                ->where('felhasznalo_id', $user->id)
+                ->where('termek_id', $id)
+                ->delete();
+            return response()->json(['liked' => false]);
+        }
+
+        \DB::table('kedvencek')->insert([
+            'felhasznalo_id' => $user->id,
+            'termek_id' => $id,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        return response()->json(['liked' => true]);
+    });
+});
+
+Route::get('/user/kedvencek/termekek', function (Request $request) {
+    return $request->user()
+        ->kedvencek()
+        ->with('termek.TermekFoKep')
+        ->get()
+        ->pluck('termek');
 });
 
 Route::get('/varosok', function () {
@@ -147,14 +188,14 @@ Route::get('/termekek/{id}', function ($id) {
 Route::post('/rendeles', function (Request $request) {
     $validated = $request->validate([
         'delivery.name' => ['required', 'string', 'regex:/^[\p{L}\-]{2,}(\s[\p{L}\-]{2,}){0,3}$/u'],
-        'delivery.email'         => ['required', 'email:rfc'],
-        'delivery.phone'         => ['required', 'regex:/^[+]?[\d\s\-()]{9,15}$/'],
-        'delivery.city_id'       => ['required', 'integer', 'min:1', 'exists:varosok,id'],
-        'delivery.address'       => ['required', 'string', 'min:5'],
-        'items'                  => ['required', 'array', 'min:1'],
-        'items.*.id'             => ['required', 'integer', 'exists:termekek,id'],
-        'items.*.mennyiseg'      => ['required', 'integer', 'min:1'],
-        'items.*.szin_id'        => ['nullable', 'integer', 'exists:szinek,id'],
+        'delivery.email' => ['required', 'email:rfc'],
+        'delivery.phone' => ['required', 'regex:/^[+]?[\d\s\-()]{9,15}$/'],
+        'delivery.city_id' => ['required', 'integer', 'min:1', 'exists:varosok,id'],
+        'delivery.address' => ['required', 'string', 'min:5'],
+        'items' => ['required', 'array', 'min:1'],
+        'items.*.id' => ['required', 'integer', 'exists:termekek,id'],
+        'items.*.mennyiseg' => ['required', 'integer', 'min:1'],
+        'items.*.szin_id' => ['nullable', 'integer', 'exists:szinek,id'],
     ]);
 
     try {
@@ -178,15 +219,15 @@ Route::post('/rendeles', function (Request $request) {
         $varos = Varosok::find($validated['delivery']['city_id']);
 
         $rendeles = Rendelesek::create([
-            'felhasznalo_id'      => auth()->user()->id ?? null,
-            'statusz'             => 'függőben',
-            'fizetes_statusz'     => 'függőben',
-            'osszeg'              => $total,
-            'szallitasi_nev'      => $validated['delivery']['name'],
-            'szallitasi_email'    => $validated['delivery']['email'],
-            'szallitasi_telefon'  => $validated['delivery']['phone'],
-            'szallitasi_cim'      => $validated['delivery']['address'],
-            'szallitasi_varos_nev'=> $varos->varos_nev,
+            'felhasznalo_id' => auth()->user()->id ?? null,
+            'statusz' => 'függőben',
+            'fizetes_statusz' => 'függőben',
+            'osszeg' => $total,
+            'szallitasi_nev' => $validated['delivery']['name'],
+            'szallitasi_email' => $validated['delivery']['email'],
+            'szallitasi_telefon' => $validated['delivery']['phone'],
+            'szallitasi_cim' => $validated['delivery']['address'],
+            'szallitasi_varos_nev' => $varos->varos_nev,
             'szallitasi_varos_id' => $validated['delivery']['city_id'],
         ]);
 
@@ -195,10 +236,10 @@ Route::post('/rendeles', function (Request $request) {
 
             RendeltTermekek::create([
                 'rendeles_id' => $rendeles->id,
-                'termek_id'   => $item['id'],
-                'mennyiseg'   => $item['mennyiseg'],
-                'egysegar'    => $p->ar,
-                'szin_id'     => $item['szin_id'] ?? null,
+                'termek_id' => $item['id'],
+                'mennyiseg' => $item['mennyiseg'],
+                'egysegar' => $p->ar,
+                'szin_id' => $item['szin_id'] ?? null,
             ]);
 
             $p->decrement('darab', $item['mennyiseg']);
@@ -206,7 +247,7 @@ Route::post('/rendeles', function (Request $request) {
 
         \DB::commit();
         return response()->json([
-            'message'     => 'Rendelés sikeresen létrehozva',
+            'message' => 'Rendelés sikeresen létrehozva',
             'rendeles_id' => $rendeles->id
         ], 201);
 
