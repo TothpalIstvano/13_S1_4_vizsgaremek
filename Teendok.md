@@ -13,7 +13,6 @@
 * \[x] Jelszó(megtekintés)✅
 
 * \[/] Webshop
-* \[ ] Session storage helyett cookie a kosárhoz amiben az item idik vannak illetve csak az id-t és a mennyiséget tárolni
 * \[ ] cimke szűrés + ha itemen katintás akkkor hozzá adás
 * \[X] active cimkek✅
 * \[X] active termékeknél cimkek✅
@@ -23,14 +22,14 @@
 * \[X] termekképek több galeria✅
 * \[ ] kosár jel hozzáadása a kis méretű módhoz vhogy ez alatt azt étve hogy mikor nem fullos a navbar
 * \[X] cimke kategoriára való csere✅
-* \[X] szöveg röviditése ha overflow van és ... hozááadása
+* \[X] szöveg röviditése ha overflow van és ... hozááadása✅
 * \[X] cimkeék az itemen való mennyiség kiírás + + jel oda írása + enyitható legyen✅
 * \[X] kosár mennyiség írása✅
 * \[ ] Carouselbe itemek berakása kedvenc alapján ->IMPLEMENTÁCIÓRA VÁRÓ NEM LEHETSÉGES FEATURE✅
 * \[X] email verifikáció✅
 * \[ ] vásárol email
-* \[ ] jelszó reset✅
-* \[ ] kosár eltárolása✅
+* \[X] jelszó reset✅
+* \[X] kosár eltárolása✅
 * \[ ] rendelés pending
 * \[X] Dashboard betöltése + valós input"" from database✅
 * \[ ] áruház loading
@@ -42,7 +41,7 @@
 * \[ ] Admin oldal kategoria megoszlás csere to fokategoriak és az alá tartozok szám
 
 * \[ ] Dashboard szerző + modosítás javítás +/- jobb stilus
-* \[ ] kicsit akad az animáció a belépés oldalon a váltásnál 
+* \[X] kicsit akad az animáció a belépés oldalon a váltásnál✅
 * \[X] resend ki cserélésre gmailre✅
 * \[X] verifikáld az emailed felszólitás✅
 
@@ -72,9 +71,9 @@
   - profil modositás✅
   
 - \[ ] Alertek lecserélése mindenhol modellekre
-- \[ ] kosár eltárolása
-- \[ ] áruház alsó oldalak számok átírni (12, 24, 48)
-- \[ ] rendelés pending
+- \[X] kosár eltárolása✅
+- \[X] áruház alsó oldalak számok átírni (12, 24, 48)✅
+- \[X] rendelés pending✅
 
 ha megakarjuk oldani azt hogy bejelentkezve maradok
 

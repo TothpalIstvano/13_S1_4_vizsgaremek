@@ -1,9 +1,8 @@
 <template>
   <div class="cart-page">
     <!-- Header -->
-    <div class="cart-header">
+    <div class="cart-header" style="padding-bottom: 35px;">
       <h1 class="title">Kosarad</h1>
-      <p class="header-subtitle">Ellenőrizd a termékeket és fejezd be a rendelésed</p>
     </div>
 
     <div v-if="cartItems.length > 0" class="cart-container">
@@ -472,12 +471,11 @@ async function checkout() {
     }))
   }
   try {
-    axios.post('/api/rendeles', payload.value)
+    const res = await axios.post('/api/rendeles', payload.value);
+    router.push({ path: `/kosar/fizetes/${res.data.rendeles_id}`});
   } catch (e) {
     console.warn('bug:', e)
   }
-  const res = await axios.post('/api/rendeles', payload.value)
-  router.push({ path: `/kosar/fizetes/${res.data.rendeles_id}` })
 }
 </script>
 

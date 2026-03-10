@@ -197,10 +197,10 @@ Route::post('/rendeles', function (Request $request) {
         'items.*.mennyiseg' => ['required', 'integer', 'min:1'],
         'items.*.szin_id' => ['nullable', 'integer', 'exists:szinek,id'],
     ]);
-
+    
     try {
         \DB::beginTransaction();
-
+        
         $total = 0;
         foreach ($validated['items'] as $item) {
             $p = Termekek::lockForUpdate()->find($item['id']);
@@ -214,10 +214,10 @@ Route::post('/rendeles', function (Request $request) {
             }
             $total += $p->ar * $item['mennyiseg'];
         }
-
+        
         // Város neve snapshot-hoz
         $varos = Varosok::find($validated['delivery']['city_id']);
-
+        
         $rendeles = Rendelesek::create([
             'felhasznalo_id' => auth()->user()->id ?? null,
             'statusz' => 'függőben',
@@ -230,10 +230,10 @@ Route::post('/rendeles', function (Request $request) {
             'szallitasi_varos_nev' => $varos->varos_nev,
             'szallitasi_varos_id' => $validated['delivery']['city_id'],
         ]);
-
+        
         foreach ($validated['items'] as $item) {
             $p = Termekek::find($item['id']);
-
+            
             RendeltTermekek::create([
                 'rendeles_id' => $rendeles->id,
                 'termek_id' => $item['id'],
@@ -241,7 +241,7 @@ Route::post('/rendeles', function (Request $request) {
                 'egysegar' => $p->ar,
                 'szin_id' => $item['szin_id'] ?? null,
             ]);
-
+            
             $p->decrement('darab', $item['mennyiseg']);
         }
 
@@ -250,7 +250,7 @@ Route::post('/rendeles', function (Request $request) {
             'message' => 'Rendelés sikeresen létrehozva',
             'rendeles_id' => $rendeles->id
         ], 201);
-
+        
     } catch (\Exception $e) {
         \DB::rollBack();
         \Log::error('Rendeles creation failed', ['message' => $e->getMessage(), 'line' => $e->getLine()]);
@@ -258,6 +258,15 @@ Route::post('/rendeles', function (Request $request) {
     }
 });
 
+Route::patch('/rendelesek/{id}/fizetes_statusz', function (Request $request, $id) {
+    $request->validate(['fizetes_statusz' => 'required|string|in:függőben,fizetve,sikertelen']);
+
+    $rendeles = Rendelesek::findOrFail($id);
+    $rendeles->fizetes_statusz = $request->fizetes_statusz;
+    $rendeles->save();
+
+    return response()->json(['message' => 'fizetes_statusz frissítve', 'fizetes_statusz' => $rendeles->statusz]);
+});
 
 
 Route::get('/carousel/termekek', function () {
@@ -367,6 +376,7 @@ Route::post('/kosar/hozzaad', function (Request $request) {
         return response()->json(['error' => $e->getMessage()], 500);
     }
 });
+
 
 // Admin routes
 Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
