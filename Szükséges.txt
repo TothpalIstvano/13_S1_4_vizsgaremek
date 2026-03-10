@@ -2,6 +2,7 @@
 - profilba meg poszt feltöltésnél a primevue dropdownt valami szebb színre zöld helyett
 - blog posztoknál a seederbe írtaknak szép főképe legyen
 - newpost notifications magyarul/jobban
+- áruház kedvenc popup nem bejelentkezve
 - reakciók poszthoz - tartsa meg a színt frissítés után
 - rólunk oldal rendes szöveg
 - reszponzívitás

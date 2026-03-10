@@ -52,7 +52,7 @@ async function fonalTermekBetoltese() {
     if (!masodikLepes.value || !masodikLepes.value.fonalTipus) return
     
     kosarBetoltes.value = true
-    colorMatchLoading.value = true
+    szinMatchBetoltes.value = true
     
     try {
         const fonalTipusEncoded = encodeURIComponent(masodikLepes.value.fonalTipus)
@@ -72,14 +72,14 @@ async function fonalTermekBetoltese() {
             fonalTermek.value = data[0]
             
             if (fonalTermek.value.TermekSzinek && fonalTermek.value.TermekSzinek.length > 0) {
-                yarnColors.value = fonalTermek.value.TermekSzinek.map(szin => ({
+                fonalSzinek.value = fonalTermek.value.TermekSzinek.map(szin => ({
                     hex: szin.hex_kod,
                     name: szin.szin_nev || szin.nev || 'Névtelen'
                 }))
             } else if (fonalTermek.value.available_colors) {
-                yarnColors.value = fonalTermek.value.available_colors
+                fonalSzinek.value = fonalTermek.value.available_colors
             } else {
-                yarnColors.value = []
+                fonalSzinek.value = []
             }
             
             if (fonalTermek.value && fonalTermek.value.meter && fonalHossz.value > 0) {
@@ -88,23 +88,23 @@ async function fonalTermekBetoltese() {
             }
             
             if (szinPaletta.value && szinPaletta.value.length > 0) {
-                checkColorMatching()
+                szinMatchEllenorzes()
             }
         } else {
             fonalTermek.value = null
             szuksegesGombolyagok.value = 0
-            yarnColors.value = []
-            colorMatchResult.value = null
+            fonalSzinek.value = []
+            szinMatchEredmeny.value = null
         }
     } catch (error) {
         console.error('Fonal termék betöltése sikertelen:', error)
         fonalTermek.value = null
         szuksegesGombolyagok.value = 0
-        yarnColors.value = []
-        colorMatchResult.value = null
+        fonalSzinek.value = []
+        szinMatchEredmeny.value = null
     } finally {
         kosarBetoltes.value = false
-        colorMatchLoading.value = false
+        szinMatchBetoltes.value = false
     }
 }
 
@@ -222,10 +222,10 @@ function canvasFeldolgozas(img) {
     return
   }
 
-  processImageWithColors(img)
+  szinekFeldolgozasa(img)
 }
 
-function processImageWithColors(img) {
+function szinekFeldolgozasa(img) {
   const pxMeret = parseInt(pixelMeret.value)
   
   const szelesseg = img.width
@@ -261,7 +261,7 @@ function processImageWithColors(img) {
       const color = `rgba(${avg.r}, ${avg.g}, ${avg.b}, ${avg.a})`
       szinGyakorisag[color] = (szinGyakorisag[color] || 0) + 1
       pixels.push({
-        originalColor: color,
+        eredetiszin: color,
         color: color
       })
     }
@@ -283,9 +283,9 @@ function processImageWithColors(img) {
   for (let y = 0; y < rows; y++) {
     const pixels = []
     for (let x = 0; x < cols; x++) {
-      const originalColor = atmenetiPixelAdatok[y].pixels[x].originalColor
+      const eredetiszin = atmenetiPixelAdatok[y].pixels[x].eredetiszin
       
-      const legkozelebbiSzin = legkozelebbiSzinKereses(originalColor, szinPaletta.value)
+      const legkozelebbiSzin = legkozelebbiSzinKereses(eredetiszin, szinPaletta.value)
       
       pixels.push({
         color: legkozelebbiSzin
@@ -489,9 +489,9 @@ function getDominantColor(pixels) {
 //#endregion
 
 //#region Színmatch
-const colorMatchResult = ref(null)
-const colorMatchLoading = ref(false)
-const yarnColors = ref([])
+const szinMatchEredmeny = ref(null)
+const szinMatchBetoltes = ref(false)
+const fonalSzinek = ref([])
 
 function hexToRgbObject(hex) {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
@@ -513,67 +513,62 @@ function rgbaToRgbObject(rgba) {
     }
 }
 
-function calculateColorDistance(rgb1, rgb2) {
-    // Calculate Euclidean distance between colors
+function szintavolsagSzamitas(rgb1, rgb2) {
     const dr = rgb1.r - rgb2.r
     const dg = rgb1.g - rgb2.g
     const db = rgb1.b - rgb2.b
     return Math.sqrt(dr * dr + dg * dg + db * db)
 }
 
-function findNearestYarnColor(imageColor) {
-    if (!yarnColors.value || yarnColors.value.length === 0) return null
+function legkozelebbiFonalszin(imageColor) {
+    if (!fonalSzinek.value || fonalSzinek.value.length === 0) return null
     
     const imageRgb = rgbaToRgbObject(imageColor)
-    let nearestColor = null
-    let minDistance = Infinity
+    let közeliszin = null
+    let mintavolsag = Infinity
     
-    yarnColors.value.forEach(yarnColor => {
-        const yarnRgb = hexToRgbObject(yarnColor.hex)
-        const distance = calculateColorDistance(imageRgb, yarnRgb)
+    fonalSzinek.value.forEach(fonalSzin => {
+        const yarnRgb = hexToRgbObject(fonalSzin.hex)
+        const tavolsag = szintavolsagSzamitas(imageRgb, yarnRgb)
         
-        if (distance < minDistance) {
-            minDistance = distance
-            nearestColor = yarnColor
+        if (tavolsag < mintavolsag) {
+            mintavolsag = tavolsag
+            közeliszin = fonalSzin
         }
     })
     
-    // Check if the distance is within an acceptable threshold (you can adjust this)
-    return minDistance <= 100 ? nearestColor : null // Threshold of 100
+    // Check if the distance is within an acceptable threshold
+    return mintavolsag <= 100 ? közeliszin : null // Threshold of 100
 }
 
-async function checkColorMatching() {
+async function szinMatchEllenorzes() {
     if (!fonalTermek.value || !szinPaletta.value || szinPaletta.value.length === 0) return
     
-    colorMatchLoading.value = true
+    szinMatchBetoltes.value = true
     
     try {
-        // Get yarn colors from the product
         if (fonalTermek.value.TermekSzinek && fonalTermek.value.TermekSzinek.length > 0) {
-            yarnColors.value = fonalTermek.value.TermekSzinek.map(szin => ({
+            fonalSzinek.value = fonalTermek.value.TermekSzinek.map(szin => ({
                 hex: szin.hex_kod,
                 name: szin.szin_nev || szin.nev || 'Névtelen'
             }))
         } else if (fonalTermek.value.available_colors) {
-            yarnColors.value = fonalTermek.value.available_colors
+            fonalSzinek.value = fonalTermek.value.available_colors
         } else {
-            // If no colors available, set empty array
-            yarnColors.value = []
+            fonalSzinek.value = []
         }
         
-        // Extract unique colors from the image
-        const imageColors = [...new Set(szinPaletta.value.map(szin => szin.jelenlegi))]
+        const kepSzinek = [...new Set(szinPaletta.value.map(szin => szin.jelenlegi))]
         
-        // Check for matches
         const matches = []
         const noMatches = []
         
-        imageColors.forEach(imageColor => {
-            const yarnColor = findNearestYarnColor(imageColor)
-            if (yarnColor) {
+        kepSzinek.forEach(imageColor => {
+            const fonalSzin = legkozelebbiFonalszin(imageColor)
+            if (fonalSzin) {
                 matches.push({
                     imageColor: imageColor,
-                    yarnColor: yarnColor,
+                    fonalSzin: fonalSzin,
                     hexColor: rgbToHex(imageColor)
                 })
             } else {
@@ -584,32 +579,30 @@ async function checkColorMatching() {
             }
         })
         
-        colorMatchResult.value = {
+        szinMatchEredmeny.value = {
             matches: matches,
             noMatches: noMatches,
-            hasYarnColors: yarnColors.value.length > 0,
-            allYarnColors: yarnColors.value
+            vanfonalszin: fonalSzinek.value.length > 0,
+            mindenfonalszin: fonalSzinek.value
         }
         
     } catch (error) {
         console.error('Szín egyeztetés sikertelen:', error)
-        colorMatchResult.value = null
+        szinMatchEredmeny.value = null
     } finally {
-        colorMatchLoading.value = false
+        szinMatchBetoltes.value = false
     }
 }
 
-// Watch for changes in the fonalTermek and trigger color matching
 watch(fonalTermek, (newVal) => {
     if (newVal && szinPaletta.value && szinPaletta.value.length > 0) {
-        checkColorMatching()
+        szinMatchEllenorzes()
     }
 })
 
-// Also trigger when palette changes
 watch(szinPaletta, () => {
     if (fonalTermek.value && szinPaletta.value && szinPaletta.value.length > 0) {
-        checkColorMatching()
+        szinMatchEllenorzes()
     }
 }, { deep: true })
 //#endregion
@@ -669,7 +662,7 @@ function hexToRgb(hex) {
     return `rgba(${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}, 1)`
 }
 
-function generateGridCanvas() {
+function canvasLetrehozas() {
   if (!pixelSorok.value.length || !pixelSorok.value[0]?.pixels.length) return null;
 
   const rows = pixelSorok.value.length;
@@ -692,7 +685,7 @@ function generateGridCanvas() {
       ctx.fillStyle = color;
       ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
 
-      const borderColor = isDarkColor(color)
+      const borderColor = sotetSzin(color)
         ? 'rgba(255,255,255,0.6)'
         : `rgba(0,0,0,${racsLathatosag.value / 100})`;
       ctx.strokeStyle = borderColor;
@@ -707,7 +700,7 @@ function generateGridCanvas() {
 //#endregion
 
 //#region Optimalizálás
-function isDarkColor(rgba) {
+function sotetSzin(rgba) {
   const m = rgba.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/i)
   if (!m) return false
   const r = Number(m[1]), g = Number(m[2]), b = Number(m[3])
@@ -786,7 +779,7 @@ function kepTorles() {
   localStorage.removeItem('pixelesValtoztatasok')
   localStorage.removeItem('mintakeszitoForm')
   
-  const fileInput = document.getElementById('file-upload')
+  const fileInput = document.getElementById('file-feltoltes')
   if (fileInput) fileInput.value = ''
 }
 
@@ -796,7 +789,7 @@ function adatokVissza() {
 }
 
 function kepletoltes(canvasArg, filename = 'elkeszitett-minta.png') {
-  const canvasToUse = canvasArg || generateGridCanvas();
+  const canvasToUse = canvasArg || canvasLetrehozas();
   if (!canvasToUse) return;
 
   canvasToUse.toBlob((blob) => {
@@ -868,7 +861,6 @@ async function fonalHozzaadasKosarhoz() {
     
     kosarBetoltes.value = true
     try {
-        // First validate with API
         const response = await axios.post('/api/kosar/hozzaad', {
             termek_id: fonalTermek.value.id,
             mennyiseg: szuksegesGombolyagok.value
@@ -881,9 +873,8 @@ async function fonalHozzaadasKosarhoz() {
             withCredentials: true
         })
         
-        // If API validation passes, add to client-side cart store
-        const cartStore = useCartStore()
-        const result = cartStore.addToCart(fonalTermek.value, szuksegesGombolyagok.value)
+        const kosar = useCartStore()
+        const result = kosar.addToCart(fonalTermek.value, szuksegesGombolyagok.value)
         
         if (result.success) {
             kosarHozzaadva.value = true
@@ -932,27 +923,27 @@ function formBetoltes() {
   }
 }
 
-const showAlert = ref(false);
-const isMobile = ref(false);
+const ertesites = ref(false);
+const kiskepernyo = ref(false);
 
-function checkScreenWidth() {
-  isMobile.value = window.innerWidth < 440;
-  if (isMobile.value) {
-    showSuccessAlert();
+function kepMeretezes() {
+  kiskepernyo.value = window.innerWidth < 440;
+  if (kiskepernyo.value) {
+    felugroErtesites();
   }
 }
 
-function showSuccessAlert() {
-  showAlert.value = true;
+function felugroErtesites() {
+  ertesites.value = true;
 }
 
 onMounted(() => {
-  checkScreenWidth();
-  window.addEventListener('resize', checkScreenWidth);
+  kepMeretezes();
+  window.addEventListener('resize', kepMeretezes);
 });
 
 onUnmounted(() => {
-  window.removeEventListener('resize', checkScreenWidth);
+  window.removeEventListener('resize', kepMeretezes);
 });
 //#endregion
 
@@ -1004,97 +995,7 @@ onUnmounted(() => {
 
 
     <!--#region Adatok bekérése -->
-     <!-- ide ilyet: https://v3.primevue.org/stepper/-->
     <div v-if="!pixelesKep">
-
-      <!--
-      <Stepper>
-        <StepperPanel header="Típus">
-                  <div v-show="resz === 1" id="elsoResz" class="radioStilus">
-              <p class="cimek">Válassz típust a projektedhez:</p>
-              <div class="radioBelso">
-                <div v-for="option in tipusok" :key="option" class="radio-container">
-                  <input
-                    type="radio"
-                    :id="option"
-                    name="elsoLepes"
-                    :value="option"
-                    v-model="elsoLepes"
-                  />
-                  <label :for="option">{{ option }}</label>
-                </div>
-              </div>
-              
-              <button
-                :disabled="!elsoLepes"
-                @click="kovetkezoResz"
-                class="tovabbGomb"
-              >
-                Következő ⇒
-              </button>
-            </div>
-        </StepperPanel>
-        <StepperPanel header="Fonal">
-          <div v-show="resz === 2" id="masodikResz" class="radioStilus">
-              <p class="vissza">
-                A projekted: <strong>{{ elsoLepes }}</strong> 
-                <button @click="modositas(1)" class="visszaGomb">Vissza</button>
-              </p>
-
-              <p class="cimek">Válassz fonaltípust:</p>
-              <div class="radioBelso">
-                <div v-for="(option, index) in fonalak" :key="index" class="radio-container">
-                  <input
-                    type="radio"
-                    :id="option.fonalTipus"
-                    name="masodikLepes"
-                    :value="option"
-                    v-model="masodikLepes"
-                  />
-                  <label :for="option.fonalTipus">{{ option.fonalTipus }}</label>
-                </div>
-              </div>
-              
-              <button
-                :disabled="!masodikLepes"
-                @click="kovetkezoResz"
-                class="tovabbGomb"
-              >
-                Következő ⇒
-              </button>
-            </div>
-        </StepperPanel>
-        <StepperPanel header="Fájl">
-          <div v-show="resz === 3" id="harmadikResz">
-              <p class="vissza">
-                A projekted: <strong>{{ elsoLepes }}</strong> 
-                <button @click="modositas(1)" class="visszaGomb">Vissza</button>
-              </p>
-              <p class="vissza">
-                A fonaltípusod: <strong>{{masodikLepes?.fonalTipus || masodikLepes}}</strong> 
-                <button @click="modositas(2)" class="visszaGomb">Vissza</button>
-              </p>
-
-              <p class="cimek">Fájl feltöltése:</p>
-              <label for="file-upload" class="file-upload-label">
-                Kép kiválasztása
-              </label>
-              <input id="file-upload" type="file" @change="kepfeltoltes" accept="image/*" />
-              
-              <div v-if="file" class="file-preview-container">
-                <img :src="kepUrl" alt="Preview" class="file-preview" />
-                <p>{{ file.name }}</p>
-              </div>
-
-              <button
-                :disabled="!file"
-                @click="toMintavaltoztato" 
-                class="tovabbGomb">
-                Minta készítése ⇒
-              </button>
-            </div>
-        </StepperPanel>
-    </Stepper>-->
 
       <div id="adatok">
         <div class="progress-container">
@@ -1185,10 +1086,10 @@ onUnmounted(() => {
           </p>
 
           <p class="cimek">Fájl feltöltése:</p>
-          <label for="file-upload" class="file-upload-label">
+          <label for="file-feltoltes" class="file-feltoltes-label">
             Kép kiválasztása
           </label>
-          <input id="file-upload" type="file" @change="kepfeltoltes" accept="image/*" />
+          <input id="file-feltoltes" type="file" @change="kepfeltoltes" accept="image/*" />
           
           <div v-if="file" class="file-preview-container">
             <img :src="kepUrl" alt="Preview" class="file-preview" />
@@ -1207,7 +1108,7 @@ onUnmounted(() => {
     <!--#endregion-->
 
     <!--#region Elkészült minta -->
-    <div v-else class="pixelation-main-container">
+    <div v-else class="pixeles-main-container">
       <div class="pixelesContainer">
         <h1>Minta változtató</h1>
         
@@ -1220,7 +1121,7 @@ onUnmounted(() => {
           <div class="modositas">
               <div class="valtoztatok">
                 <p>Minta részletessége (pixel mérete): {{ pixelMeret }}px</p>
-                <div class="valtoztatok-input custom-slider-wrapper">
+                <div class="valtoztatok-input slider-wrapper">
                   <label class="custom-slider">
                     <input 
                       type="range" 
@@ -1246,7 +1147,7 @@ onUnmounted(() => {
 
               <div class="valtoztatok">
                 <p>Rács vastagsága: {{ racsLathatosag }}%</p>
-                <div class="valtoztatok-input custom-slider-wrapper">
+                <div class="valtoztatok-input slider-wrapper">
                   <label class="custom-slider">
                     <input 
                       type="range" 
@@ -1272,7 +1173,7 @@ onUnmounted(() => {
 
               <div class="valtoztatok">
                 <p>Színek száma: {{ szinSzam }}</p>
-                <div class="valtoztatok-input custom-slider-wrapper">
+                <div class="valtoztatok-input slider-wrapper">
                   <label class="custom-slider">
                     <input 
                       type="range" 
@@ -1337,10 +1238,10 @@ onUnmounted(() => {
                       width: pixelMeret + 'px',
                       height: pixelMeret + 'px',
                       backgroundColor: pixel.color,
-                      borderColor: isDarkColor(pixel.color)
+                      borderColor: sotetSzin(pixel.color)
                       ? 'rgba(255,255,255,0.6)'
                       : `rgba(0,0,0, ${racsLathatosag / 100})`,
-                      color: isDarkColor(pixel.color) ? '#fff' : '#000'
+                      color: sotetSzin(pixel.color) ? '#fff' : '#000'
                       }"
                   ></div>
                 </div>
@@ -1390,34 +1291,34 @@ onUnmounted(() => {
         <div class="oldal-kartya" v-if="fonalTermek && szinPaletta && szinPaletta.length > 0">
           <h3>Szín egyeztetés</h3>
           
-          <div v-if="colorMatchLoading" class="color-match-loading">
+          <div v-if="szinMatchBetoltes" class="color-match-loading">
               <p>Színek egyeztetése...</p>
               <div class="loading-spinner-small"></div>
           </div>
           
-          <div v-else-if="colorMatchResult">
-              <div v-if="colorMatchResult.matches.length > 0">
+          <div v-else-if="szinMatchEredmeny">
+              <div v-if="szinMatchEredmeny.matches.length > 0">
                   <div class="color-match-success">
                       <p class="match-title">✓ Egyező színek találhatók</p>
-                      <div v-for="(match, index) in colorMatchResult.matches" :key="index" class="color-match-item">
+                      <div v-for="(match, index) in szinMatchEredmeny.matches" :key="index" class="color-match-item">
                           <div class="color-comparison">
                               <span class="color-sample" :style="{ backgroundColor: match.imageColor }" 
                                     :title="'Kép színe: ' + match.hexColor"></span>
                               <span style="margin: 0 8px; color: var(--mk-text-light);">→</span>
-                              <span class="color-sample" :style="{ backgroundColor: match.yarnColor.hex }" 
-                                    :title="'Fonal színe: ' + match.yarnColor.name"></span>
+                              <span class="color-sample" :style="{ backgroundColor: match.fonalSzin.hex }" 
+                                    :title="'Fonal színe: ' + match.fonalSzin.name"></span>
                           </div>
                           <div class="color-names">
-                              <span class="color-name">{{ match.yarnColor.name }}</span>
+                              <span class="color-name">{{ match.fonalSzin.name }}</span>
                           </div>
                       </div>
                   </div>
                   
-                  <div v-if="colorMatchResult.noMatches.length > 0" class="color-no-match">
+                  <div v-if="szinMatchEredmeny.noMatches.length > 0" class="color-no-match">
                       <p class="no-match-title">⚠ Nem található pontosan egyező szín</p>
                       <p class="no-match-subtitle">Az alábbi kép színekhöz nincs pontosan megegyező fonal szín:</p>
                       <div class="unmatched-colors">
-                          <div v-for="(noMatch, index) in colorMatchResult.noMatches" :key="index" class="unmatched-color">
+                          <div v-for="(noMatch, index) in szinMatchEredmeny.noMatches" :key="index" class="unmatched-color">
                               <span class="color-sample" :style="{ backgroundColor: noMatch.imageColor }"
                                     :title="'Kép színe: ' + noMatch.hexColor"></span>
                           </div>
@@ -1429,14 +1330,14 @@ onUnmounted(() => {
                   <p class="no-match-title">⚠ Nincs egyező szín</p>
                   <p class="no-match-subtitle">A képen használt színekhez nem található egyező fonal szín.</p>
                   
-                  <div v-if="colorMatchResult.hasYarnColors" class="available-yarn-colors">
+                  <div v-if="szinMatchEredmeny.vanfonalszin" class="available-yarn-colors">
                       <p class="available-title">Elérhető színek ehhez a fonaltípushoz:</p>
                       <div class="yarn-colors-grid">
-                          <div v-for="(yarnColor, index) in colorMatchResult.allYarnColors" 
+                          <div v-for="(fonalSzin, index) in szinMatchEredmeny.mindenfonalszin" 
                               :key="index" class="yarn-color-item">
-                              <span class="color-sample" :style="{ backgroundColor: yarnColor.hex }"
-                                    :title="yarnColor.name"></span>
-                              <span class="yarn-color-name">{{ yarnColor.name }}</span>
+                              <span class="color-sample" :style="{ backgroundColor: fonalSzin.hex }"
+                                    :title="fonalSzin.name"></span>
+                              <span class="yarn-color-name">{{ fonalSzin.name }}</span>
                           </div>
                       </div>
                   </div>
@@ -1557,9 +1458,9 @@ onUnmounted(() => {
 
     </div>
     <!--#region Alert -->
-    <div class="alert-overlay" :class="{ active: showAlert }">
+    <div class="alert-overlay" :class="{ active: ertesites }">
       <div class="alert success">
-        <span class="closebtn" @click="showAlert = false">&times;</span>  
+        <span class="closebtn" @click="ertesites = false">&times;</span>  
         <strong>A jobb láthatóság érdekében fordítsa el az eszközét.</strong> 
       </div>
     </div>
@@ -1957,7 +1858,7 @@ input[type="file"] {
   display: none;
 }
 
-.file-upload-label {
+.file-feltoltes-label {
   display: inline-block;
   padding: 16px 32px;
   background-color: var(--mk-gomb-masodszin);
@@ -1969,7 +1870,7 @@ input[type="file"] {
   margin-bottom: 16px;
 }
 
-.file-upload-label:hover {
+.file-feltoltes-label:hover {
   background-color: var(--mk-gomb-foszin);
   transform: translateY(-3px);
   color: var(--mk-text-light);
@@ -2054,7 +1955,7 @@ input[type="file"] {
 /*#endregion*/
 
 /*#region mintaváltozásos box*/
-.pixelation-main-container {
+.pixeles-main-container {
   display: flex;
   gap: 20px;
   margin: 0 auto;
@@ -2229,7 +2130,7 @@ input[type="file"] {
 /*#endregion*/
 
 /*#region Rangerek*/
-.custom-slider-wrapper {
+.slider-wrapper {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -2975,7 +2876,7 @@ input[type="file"] {
 }
 
 @media (max-width: 1100px) {
-  .pixelation-main-container {
+  .pixeles-main-container {
     flex-direction: column;
   }
   
