@@ -421,6 +421,28 @@ async function checkout() {
     alert('A kosarad üres')
     return
   }
+
+  // Készlet ellenőrzés az API-n keresztül
+  try {
+    for (const item of currentCart) {
+      const res = await axios.get(`/api/termekek/${item.id}`)
+      const freshItem = res.data
+      if (freshItem.darab < item.quantity) {
+        alert(`"${item.nev}" termékből csak ${freshItem.darab} db érhető el, de ${item.quantity} db van a kosárban!`)
+        // Frissítsd a kosarat a valós készlettel
+        if (freshItem.darab === 0) {
+          cartStore.removeFromCart(item.id)
+        } else {
+          cartStore.updateStock(item.id, freshItem.darab)
+        }
+        return
+      }
+    }
+  } catch (e) {
+    alert('Hiba történt a készlet ellenőrzése közben!')
+    return
+  }
+
   const d = deliveryDetails.value
   if (!d.firstName || !d.lastName || !d.email || !d.address || !d.cityId || !d.phone) {
     alert('Kérlek töltsd ki az összes szállítási adatot')
