@@ -76,6 +76,17 @@ export const useCartStore = defineStore('cart', () => {
     if (item) item.quantity = Math.max(1, quantity)
   }
 
+  function updateStock(id, newDarab) {
+    const item = cartItems.value.find(i => i.id === id)
+    if (item) {
+      item.darab = newDarab
+      // Ha a jelenlegi mennyiség több mint az új készlet, csökkentsd
+      if (item.quantity > newDarab) {
+        item.quantity = newDarab
+      }
+    }
+  }
+
   function clearCart() {
     cartItems.value.splice(0)
     sessionStorage.removeItem('cartItems')
@@ -87,6 +98,7 @@ export const useCartStore = defineStore('cart', () => {
     addToCart,
     removeFromCart,
     updateQuantity,
+    updateStock,
     clearCart
   }
 })
