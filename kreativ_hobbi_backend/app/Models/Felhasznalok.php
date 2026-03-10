@@ -63,4 +63,9 @@ class Felhasznalok extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasOne(FelhasznaloAdatok::class, 'felhasznalo_id', 'id');
     }
+
+    public function kedvencek()
+    {
+        return $this->hasMany(Kedvencek::class, 'felhasznalo_id');
+    }
 }

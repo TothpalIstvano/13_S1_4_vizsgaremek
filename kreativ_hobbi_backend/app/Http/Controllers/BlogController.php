@@ -167,24 +167,39 @@ class BlogController extends Controller
         $userId = auth()->id();
         $post = Posztok::findOrFail($id);
 
-        $reaction = PosztReakciok::updateOrCreate(
-            [
+        $existing = \DB::table('posztreakciok') // use your actual table name
+            ->where('poszt_id', $post->id)
+            ->where('felhasznalo_id', $userId)
+            ->first();
+
+        if ($existing) {
+            if ($existing->reakcio === $request->reaction) {
+                // Same button clicked again → toggle off
+                \DB::table('posztreakciok')
+                    ->where('poszt_id', $post->id)
+                    ->where('felhasznalo_id', $userId)
+                    ->delete();
+            } else {
+                // Switching like ↔ dislike
+                \DB::table('posztreakciok')
+                    ->where('poszt_id', $post->id)
+                    ->where('felhasznalo_id', $userId)
+                    ->update(['reakcio' => $request->reaction, 'updated_at' => now()]);
+            }
+        } else {
+            \DB::table('posztreakciok')->insert([
                 'poszt_id' => $post->id,
                 'felhasznalo_id' => $userId,
-            ],
-            [
-                'reakcio' => $request->reaction
-            ]
-        );
+                'reakcio' => $request->reaction,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
 
-        $likesCount = PosztReakciok::where('poszt_id', $post->id)
-            ->where('reakcio', 'like')
-            ->count();
-        $dislikesCount = PosztReakciok::where('poszt_id', $post->id)
-            ->where('reakcio', 'dislike')
-            ->count();
-
-        $userReaction = PosztReakciok::where('poszt_id', $post->id)
+        $likesCount = PosztReakciok::where('poszt_id', $post->id)->where('reakcio', 'like')->count();
+        $dislikesCount = PosztReakciok::where('poszt_id', $post->id)->where('reakcio', 'dislike')->count();
+        $userReaction = \DB::table('posztreakciok')
+            ->where('poszt_id', $post->id)
             ->where('felhasznalo_id', $userId)
             ->value('reakcio');
 

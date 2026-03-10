@@ -303,6 +303,17 @@ const handleFileUpload = async (event) => {
   event.target.value = ''; 
 };
 
+const showKedvencek = ref(false)
+const kedvencTermekek = ref([])
+
+async function loadKedvencek() {
+  showKedvencek.value = !showKedvencek.value
+  if (showKedvencek.value && kedvencTermekek.value.length === 0) {
+    const res = await axios.get('/api/user/kedvencek/termekek') // see below
+    kedvencTermekek.value = res.data
+  }
+}
+
 function kijelentkezes() { showLogout.value = true; }
 function szerkesztes() { showSzerkesztes.value = true; }
 function cancelSzerkesztes() { showSzerkesztes.value = false; }
@@ -317,6 +328,7 @@ async function confirmLogout() {
     setTimeout(() => window.location.href = '/belepes', 10); // or router.push('/belepes')
   }
 }
+
 function cancelLogout() { showLogout.value = false; }
 function formatDate(d) { return new Date(d).toLocaleDateString(); }
 </script>
@@ -476,6 +488,35 @@ function formatDate(d) { return new Date(d).toLocaleDateString(); }
               <li><strong>{{ user.stats.posts }}</strong> bejegyzés</li>
             </ul>
           </div>
+          <button class="btn edit" style="margin-top:12px; width:100%" @click="loadKedvencek">
+            ♥ Kedvenc termékek
+          </button>
+          <div v-if="showKedvencek" class="kedvenc-lista">
+            <div v-if="kedvencTermekek.length === 0" class="kedvenc-ures">
+              Még nincs kedvenc termék.
+            </div>
+            <div
+              v-for="t in kedvencTermekek"
+              :key="t.id"
+              class="kedvenc-card"
+              @click="$router.push(`/aruhaz/${t.id}`)"
+            >
+              <img :src="t.termek_fo_kep.url_Link" :alt="t.termek_fo_kep.alt_szoveg" class="kedvenc-img" />
+              <div class="kedvenc-body">
+                <h3 class="kedvenc-title">{{ t.nev }}</h3>
+                <p class="kedvenc-price">{{ t.ar }} Ft</p>
+                <p class="kedvenc-desc">{{ t.leiras }}</p>
+                <div class="kedvenc-tags">
+                  <span
+                    v-for="kat in t.termek_kategoriak"
+                    :key="kat.id"
+                    class="kedvenc-tag"
+                    :class="{ 'main-category': kat.fo_kategoria_id === null }"
+                  >{{ kat.nev }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </aside>
 
         <section class="main-col">
@@ -529,7 +570,91 @@ function formatDate(d) { return new Date(d).toLocaleDateString(); }
   </main>
 </template>
 
-<style scoped> 
+<style scoped>
+.kedvenc-lista {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.kedvenc-ures {
+  color: #888;
+  font-size: 14px;
+  text-align: center;
+  padding: 16px 0;
+}
+
+.kedvenc-card {
+  background: white;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  border: 1px solid rgba(0,0,0,0.04);
+}
+
+.kedvenc-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 26px rgba(0,0,0,0.12);
+}
+
+.kedvenc-img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+}
+
+.kedvenc-body {
+  padding: 12px 14px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.kedvenc-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.kedvenc-price {
+  font-weight: 700;
+  color: #2e7d32;
+  margin: 0;
+}
+
+.kedvenc-desc {
+  font-size: 13px;
+  color: #555;
+  line-height: 1.3;
+  max-height: 2.6em;
+  overflow: hidden;
+  margin: 0;
+}
+
+.kedvenc-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 2px;
+}
+
+.kedvenc-tag {
+  background: #ffebd3;
+  color: #a8532b;
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 999px;
+}
+
+.kedvenc-tag.main-category {
+  background: #ff753657;
+}
+
 .draft-badge {
   background: #fbbf24;
   color: #000;
