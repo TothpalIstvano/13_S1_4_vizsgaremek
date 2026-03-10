@@ -106,8 +106,8 @@
             <div class="card-form__group">
               <select v-model="cardMonth" class="card-input__input">
                 <option value="" disabled>Month</option>
-                <option v-for="n in 12" :key="n" :value="minMonth + n - 1">
-                  {{ minMonth + n - 1 }}
+                <option v-for="month in availableMonths" :key="month" :value="month">
+                  {{ month }}
                 </option>
               </select>
               <select v-model="cardYear" class="card-input__input">
@@ -154,10 +154,12 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { ref, computed, nextTick, inject } from 'vue';
+import { ref, computed, nextTick, watch } from 'vue';
 import axios from 'axios';
 import router from '@/router/router';
+import { useCartStore } from '@/stores/cartStore';
 
+const cartStore = useCartStore();
 const cardNumber = ref('');
 const cardName = ref('');
 const cardMonth = ref('');
@@ -167,15 +169,20 @@ const isCardFlipped = ref(false);
 const showOverlay = ref(false);
 const overlayMessage = ref('');
 const isSubmitting = ref(false);
+const rendelesId = router.currentRoute.value.params.id;
 
 const minYear = new Date().getFullYear();
 const minMonth = new Date().getMonth() + 1;
 
-// Read order payload persisted by Kosar (sessionStorage)
-const stored = typeof window !== 'undefined' ? sessionStorage.getItem('orderPayload') : null;
-const orderPayload = ref(stored ? JSON.parse(stored) : null);
+const availableMonths = computed(() => {
+  if (Number(cardYear.value) === minYear) {
+    // Ha az aktuális év, csak az aktuális hónaptól
+    return Array.from({ length: 12 - minMonth + 1 }, (_, i) => minMonth + i)
+  }
+  // Jövőbeli év esetén 1-12
+  return Array.from({ length: 12 }, (_, i) => i + 1)
+})
 
-console.log('orderPayload loaded', orderPayload);
 // Single cardType computed property
 const cardType = computed(() => {
   const num = cardNumber.value.replace(/\D/g, ''); // Clean number for detection
@@ -252,10 +259,14 @@ const submit = async () => {
       cardYear.value &&
       cardCvv.value
     ){
-      overlayMessage.value = 'Card accepted!';
+
+      if (rendelesId) {
+        await axios.patch(`/api/rendelesek/${rendelesId}/fizetes_statusz`, {
+          fizetes_statusz: 'fizetve'
+        });
+      }
+      overlayMessage.value = 'Sikeres fizetés! Köszönjük a vásárlást!';
       showOverlay.value = true;
-      console.log('submitting order', orderPayload.value);
-    
 
       // Reset form fields
       cardNumber.value = '';
@@ -264,12 +275,25 @@ const submit = async () => {
       cardYear.value = '';
       cardCvv.value = '';
       isCardFlipped.value = false;
+
+      // Kosár törlés
+      cartStore.clearCart();
+
+      // Redirect to home page
+      setTimeout(() => {
+        router.push('/');
+      }, 3000);
     } else {
       overlayMessage.value = 'Please fill all fields correctly.';
       showOverlay.value = true;
     }
   } catch (e) {
     console.error(e);
+    if (rendelesId || e) {
+      await axios.patch(`/api/rendelesek/${rendelesId}/fizetes_statusz`, {
+        fizetes_statusz: 'sikertelen'
+      });
+    }
     overlayMessage.value = 'An error occurred. Please try again.';
     showOverlay.value = true;
   }
@@ -281,6 +305,12 @@ const submit = async () => {
 const closeOverlay = () => {
   showOverlay.value = false;
 };
+
+watch(cardYear, (newYear) => {
+  if (Number(newYear) === minYear && Number(cardMonth.value) < minMonth) {
+    cardMonth.value = ''
+  }
+})
 </script>
 
 <style scoped lang="scss">
