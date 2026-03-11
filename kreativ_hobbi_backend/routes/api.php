@@ -197,10 +197,10 @@ Route::post('/rendeles', function (Request $request) {
         'items.*.mennyiseg' => ['required', 'integer', 'min:1'],
         'items.*.szin_id' => ['nullable', 'integer', 'exists:szinek,id'],
     ]);
-    
+
     try {
         \DB::beginTransaction();
-        
+
         $total = 0;
         foreach ($validated['items'] as $item) {
             $p = Termekek::lockForUpdate()->find($item['id']);
@@ -214,10 +214,10 @@ Route::post('/rendeles', function (Request $request) {
             }
             $total += $p->ar * $item['mennyiseg'];
         }
-        
+
         // Város neve snapshot-hoz
         $varos = Varosok::find($validated['delivery']['city_id']);
-        
+
         $rendeles = Rendelesek::create([
             'felhasznalo_id' => auth()->user()->id ?? null,
             'statusz' => 'függőben',
@@ -230,10 +230,10 @@ Route::post('/rendeles', function (Request $request) {
             'szallitasi_varos_nev' => $varos->varos_nev,
             'szallitasi_varos_id' => $validated['delivery']['city_id'],
         ]);
-        
+
         foreach ($validated['items'] as $item) {
             $p = Termekek::find($item['id']);
-            
+
             RendeltTermekek::create([
                 'rendeles_id' => $rendeles->id,
                 'termek_id' => $item['id'],
@@ -241,7 +241,7 @@ Route::post('/rendeles', function (Request $request) {
                 'egysegar' => $p->ar,
                 'szin_id' => $item['szin_id'] ?? null,
             ]);
-            
+
             $p->decrement('darab', $item['mennyiseg']);
         }
 
@@ -252,9 +252,9 @@ Route::post('/rendeles', function (Request $request) {
             $tetelek = collect($validated['items'])->map(function ($item) {
                 $p = Termekek::find($item['id']);
                 return [
-                    'nev'       => $p->nev,
+                    'nev' => $p->nev,
                     'mennyiseg' => $item['mennyiseg'],
-                    'egysegar'  => $p->ar,
+                    'egysegar' => $p->ar,
                 ];
             })->toArray();
 
@@ -266,8 +266,8 @@ Route::post('/rendeles', function (Request $request) {
         } catch (\Exception $mailEx) {
             \Log::warning('Visszaigazoló email küldése sikertelen', [
                 'rendeles_id' => $rendeles->id,
-                'email'       => $validated['delivery']['email'],
-                'error'       => $mailEx->getMessage(),
+                'email' => $validated['delivery']['email'],
+                'error' => $mailEx->getMessage(),
             ]);
         }
 
@@ -275,7 +275,7 @@ Route::post('/rendeles', function (Request $request) {
             'message' => 'Rendelés sikeresen létrehozva',
             'rendeles_id' => $rendeles->id
         ], 201);
-        
+
     } catch (\Exception $e) {
         \DB::rollBack();
         \Log::error('Rendeles creation failed', ['message' => $e->getMessage(), 'line' => $e->getLine()]);
@@ -285,20 +285,20 @@ Route::post('/rendeles', function (Request $request) {
 
 Route::middleware('auth:sanctum')->post('/user/szallitasi-adatok-mentese', function (Request $request) {
     $validated = $request->validate([
-        'vezeteknev'  => ['required', 'string', 'max:100'],
-        'keresztnev'  => ['required', 'string', 'max:100'],
-        'varos_id'    => ['required', 'integer', 'exists:varosok,id'],
-        'utca'        => ['required', 'string', 'max:255'],
+        'vezeteknev' => ['required', 'string', 'max:100'],
+        'keresztnev' => ['required', 'string', 'max:100'],
+        'varos_id' => ['required', 'integer', 'exists:varosok,id'],
+        'utca' => ['required', 'string', 'max:255'],
         'telefonszam' => ['required', 'string', 'max:20'],
     ]);
 
     $adatok = FelhasznaloAdatok::firstOrNew(['felhasznalo_id' => auth()->id()]);
     $adatok->felhasznalo_id = auth()->id();
-    $adatok->vezeteknev     = $validated['vezeteknev'];
-    $adatok->keresztnev     = $validated['keresztnev'];
-    $adatok->varos          = $validated['varos_id'];
-    $adatok->utca           = $validated['utca'];
-    $adatok->telefonszam    = $validated['telefonszam'];
+    $adatok->vezeteknev = $validated['vezeteknev'];
+    $adatok->keresztnev = $validated['keresztnev'];
+    $adatok->varos = $validated['varos_id'];
+    $adatok->utca = $validated['utca'];
+    $adatok->telefonszam = $validated['telefonszam'];
     $adatok->save();
 
     return response()->json(['message' => 'Szállítási adatok mentve']);
@@ -317,7 +317,12 @@ Route::patch('/rendelesek/{id}/fizetes_statusz', function (Request $request, $id
 
 Route::get('/carousel/termekek', function () {
     $termekek = Termekek::select('id', 'darab', 'nev', 'ar', 'fo_kep_id', 'leiras', 'updated_at')
-        ->with('TermekFoKep')
+        ->with([
+            'TermekFoKep',
+            'TermekSzinek' => function ($query) {
+                $query->select('szinek.id', 'szinek.hex_kod', 'szinek.nev');
+            }
+        ])
         ->where('darab', '>', 0)
         ->orderBy('updated_at', 'desc')
         ->orderBy('darab', 'desc')

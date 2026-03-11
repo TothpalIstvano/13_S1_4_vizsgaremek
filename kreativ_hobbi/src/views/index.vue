@@ -64,7 +64,7 @@ function formatDate(dateString) {
 
 <template>
   <main>
-    <carousel></carousel>
+    
     <div id="mottoContainer">
       <div class="mottoInner">
         <h1>Webáruházunk vmije</h1>
@@ -74,6 +74,8 @@ function formatDate(dateString) {
         </p>
       </div>
     </div>
+
+    <carousel></carousel>
 
     <!-- add ref, tabindex so it can receive keyboard focus, and class binding -->
     <h1

@@ -3,38 +3,48 @@
         <div id="carouselContainer" :style="{ backgroundColor: bgColors[currentIndex % bgColors.length] }">
             <!--img id="carouselBackground" :src="kepek[currentIndex].src" :alt="kepek[currentIndex].alt" /-->
 
-            <div class="webshop-item" :key="currentIndex">
-                <h2 
-                id="carouselTitle" 
-                :key="currentIndex" 
-                :class="currentIndex % 2 === 0 ? 'leftText' : 'rightText'">{{ kepek[currentIndex].nev || 'Termék neve' }}</h2>
-                <p 
-                id="carouselDescription" 
-                :key="currentIndex" 
-                :class="currentIndex % 2 === 0 ? 'leftText' : 'rightText'">
-                    {{ kepek[currentIndex].leiras || 'Ez egy fantasztikus termék, amelyet érdemes megtekinteni!' }}
-                </p>
-                <p id="carouselPrice" :key="currentIndex" :class="currentIndex % 2 === 0 ? 'leftText' : 'rightText'">
-                    Ár: {{ kepek[currentIndex].ar ? kepek[currentIndex].ar + ' Ft' : 'Ár nincs megadva' }}
-                </p>
-                <button 
-                @click="router.push(`/aruhaz/${kepek[currentIndex].id}`)"
-                :key="currentIndex" 
-                id="termekMegtekinteseGomb" 
-                    :class="currentIndex % 2 === 0 ? 'leftText' : 'rightText'">Termék megtekintése</button>
-                <div id="carouselItemImageContainer"
-                    :style="{ left: currentIndex % 2 === 0 ? '56.6%' : '10%' }"
-                    >
-                    <img 
-                    :src="kepek[currentIndex].termek_fo_kep ? kepek[currentIndex].termek_fo_kep.url_Link : 'http://localhost:8000/storage/termekkepek/default.jpg'"
-                    :key="currentIndex + '-title'"
-                    id="carouselItemImage" 
-                    width="200" 
-                    height="200"
-                    alt="A beautiful webshop item" 
-                    />
+            <div class="webshop-item" :class="currentIndex % 2 === 0 ? 'layout-even' : 'layout-odd'" :key="currentIndex">
+
+                <div class="col-image">
+                    <div id="carouselItemImageContainer">
+                        <img 
+                        :src="kepek[currentIndex].termek_fo_kep ? kepek[currentIndex].termek_fo_kep.url_Link : 'http://localhost:8000/storage/termekkepek/default.jpg'"
+                        :key="currentIndex + '-img'"
+                        id="carouselItemImage" 
+                        alt="A beautiful webshop item" 
+                        />
+                    </div>
                 </div>
+
+                <div class="col-center">
+                    <p id="carouselPrice" :key="currentIndex">
+                        Ár: {{ kepek[currentIndex].ar ? kepek[currentIndex].ar + ' Ft' : 'Ár nincs megadva' }}
+                    </p>
+                    <p>Elérhető színek:</p>
+                    <div class="color-swatches">
+                        <span
+                            v-for="(color, i) in bgColors"
+                            :key="i"
+                            class="swatch"
+                            :style="{ backgroundColor: color }"
+                        ></span>
+                    </div>
+                    <button 
+                        @click="router.push(`/aruhaz/${kepek[currentIndex].id}`)"
+                        :key="currentIndex" 
+                        id="termekMegtekinteseGomb">Termék megtekintése
+                    </button>
+                </div>
+
+                <div class="col-info">
+                    <h2 id="carouselTitle" :key="currentIndex">{{ kepek[currentIndex].nev || 'Termék neve' }}</h2>
+                    <p id="carouselDescription" :key="currentIndex">
+                        {{ kepek[currentIndex].leiras || 'Ez egy fantasztikus termék, amelyet érdemes megtekinteni!' }}
+                    </p>
+                </div>
+
                 
+
             </div>
             <button @click="prevImage" type="button" id="balGomb"> 	&#129104;</button>
             <button @click="nextImage" type="button" id="jobbGomb">&#129106;</button>
@@ -113,45 +123,16 @@ onMounted(() => {
 /*#region Carousel elemei */
 #carouselContainer {
     position: relative;
-    height: 500px;
+    height: clamp(300px, 40vw, 500px);
     border-radius: 25px;
     background-color: var(--carousel-bg);
     transition: background-color 0.6s ease-in-out;
     box-shadow: var(--carousel-shadow);
     width: 97%;
-    margin: 0 auto ;
+    margin: 0 auto;
     margin-top: 5px;
-}
-#carouselTitle, #carouselDescription {
-    position: absolute;
-    color: rgb(255, 255, 255);
-    width: 25%; 
-    overflow: hidden;
-}
-#carouselTitle {
-    animation: titlePopUp 1.5s ease-in-out;
-    margin-top: 60px;
-    width: 550px;
-    opacity: 1;
-}
-#carouselDescription {
-    top: 100px;
-    animation: fade-in 1.5s ease-in-out;
-    opacity: 1;
-    overflow: hidden;          
-    text-overflow: ellipsis;
-    display: -webkit-box;
-    line-clamp: 6; /* number of lines to show */
-    -webkit-line-clamp: 6; /* number of lines to show */
-    -webkit-box-orient: vertical;
-}
-#carouselPrice{
-    position: absolute;
-    top: 270px;
-    width: 25%; 
-    overflow: hidden;
-    animation: fade-in 1.5s ease-in-out;
-    opacity: 1;
+    display: flex;
+    align-items: center;
 }
 /*#region Carousel háttér */
 #carouselBackground {
@@ -217,62 +198,107 @@ onMounted(() => {
 }
 /*#endregion */
 
-/*#region Webhop elemek */
+/*#region Webshop elemek */
+
+/* 3-column grid inside the carousel */
 .webshop-item {
-    position: absolute;
-    color: rgb(255, 255, 255);
-    top: 50px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    align-items: center;
+    height: 100%;
     width: 100%;
+    padding: 0 70px; /* leave room for nav buttons */
+    box-sizing: border-box;
+    color: white;
     animation: fade-in 0.8s ease-in-out;
-    opacity: 1;
+    gap: 16px;
 }
+
+/* Even slides: image | center | info */
+.layout-even {
+    grid-template-areas: "image center info";
+}
+/* Odd slides: info | center | image  */
+.layout-odd {
+    grid-template-areas: "info center image";
+}
+
+.col-image  { grid-area: image;  display: flex; align-items: center; justify-content: center; }
+.col-center { grid-area: center; display: flex; flex-direction: column; justify-content: center; gap: 10px; text-align: center; }
+.col-info   { grid-area: info;   display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 16px; text-align: center; }
+
+/* Title & Description */
+#carouselTitle {
+    margin: 0;
+    animation: titlePopUp 1.5s ease-in-out;
+    font-size: clamp(1rem, 2vw, 1.6rem);
+}
+#carouselDescription {
+    margin: 0;
+    animation: fade-in 1.5s ease-in-out;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 6;
+    -webkit-box-orient: vertical;
+    font-size: clamp(0.8rem, 1.2vw, 1rem);
+    opacity: 0.9;
+}
+
+/* Price */
+#carouselPrice {
+    margin: 0;
+    font-size: clamp(1rem, 1.5vw, 1.3rem);
+    font-weight: bold;
+    animation: fade-in 1.5s ease-in-out;
+}
+
+/* Color swatches */
+.color-swatches {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+.swatch {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.6);
+    display: inline-block;
+}
+
+/* Button */
 #termekMegtekinteseGomb {
     background-color: #4CAF50;
     border: none;
     color: white;
     padding: 10px 20px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
     font-size: 16px;
-    margin: 4px 2px;
     cursor: pointer;
     border-radius: 5px;
-    position: absolute;
-    color: rgb(255, 255, 255);
-    top: 320px;
-    animation: buttonPopUp 0.75s ease-in-out;
-    opacity: 1;
+    animation: fade-in 0.75s ease-in-out;
+    white-space: nowrap;
 }
-.leftText {
-    justify-content: left;
-    float: left;
-    left: 12%;
+#termekMegtekinteseGomb:hover {
+    background-color: #45a049;
 }
-.rightText {
-    justify-content: right;
-    float: right;
-    left: 60%;
-}
+
+/* Image */
 #carouselItemImageContainer {
-    width: 600px;
-    height: 350px;
-    display: block;
-    border-radius: 15px;
-    box-shadow: var(--carousel-shadow);
-    margin-bottom: 20px;
-    position: absolute;
-    top: 20px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
 }
 #carouselItemImage {
-    width: 600px;
-    height: 350px;
+    width: 100%;
+    max-width: 380px;
+    height: auto;
+    max-height: 300px;
+    object-fit: contain;
     border-radius: 15px;
     box-shadow: var(--carousel-shadow);
-    display: block;
-    margin: 0 auto;
     opacity: 1;
-    transition: fade-in-image  ease-in-out 25s;
 }
 /*#endregion */
 
@@ -312,15 +338,42 @@ onMounted(() => {
     } 
 }
 @keyframes buttonPopUp {
-    0% {
-        top: 420px;
-        opacity: 0;
-    }
-    100% {
-        top: 320px;
-        opacity: 1;
-        
-    }
+    0% { opacity: 0; transform: translateY(20px); }
+    100% { opacity: 1; transform: translateY(0); }
 }
 /*#endregion */
+
+@media (max-width: 768px) {
+  #carouselContainer {
+    height: auto;
+    min-height: 400px;
+    padding: 20px 0 60px;
+  }
+
+  .webshop-item {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "image"
+      "center"
+      "info" !important;
+    padding: 0 50px;
+    gap: 12px;
+  }
+
+  .layout-even, .layout-odd {
+    grid-template-areas:
+      "image"
+      "center"
+      "info";
+  }
+
+  #carouselItemImage {
+    max-height: 160px;
+  }
+
+  #balGomb { left: 8px; }
+  #jobbGomb { right: 8px; }
+
+  .helyzetJelzo { width: 60px; }
+}
 </style>
