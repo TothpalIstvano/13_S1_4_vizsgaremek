@@ -214,7 +214,7 @@
           </div>
           <div v-for="item in lapozottTermekek" :key="item.id" class="product-card" @click="router.push(`/aruhaz/${item.id}`)" style="cursor: pointer;">
             <div class="heart-wrapper">
-              <button class="heart-btn" @click="toggleLike(item, $event)"
+              <button v-if="isLoggedIn" class="heart-btn" @click="toggleLike(item, $event)"
                       :class="{ liked: likedIds.has(item.id) }">
                 <FontAwesomeIcon :icon="likedIds.has(item.id) ? ['fas', 'heart'] : ['far', 'heart']" />
               </button>
@@ -326,6 +326,7 @@
   const router = useRouter()
   const cartStore = useCartStore()
   const cartModal = ref(null)
+  const isLoggedIn = ref(false)
   //#endregion
 
   //#region eszköztár
@@ -637,7 +638,12 @@ onMounted(async () => {
 
   loading.value = false
 
-    try {
+  try {
+    const res = await axios.get('/api/user/check')
+    isLoggedIn.value = res.data.loggedIn
+  } catch {}
+
+  try {
     const res = await axios.get('/api/user/kedvencek')
     likedIds.value = new Set(res.data)
   } catch {} // not logged in = no likes shown
@@ -645,6 +651,8 @@ onMounted(async () => {
 
 async function toggleLike(item, event) {
   event.stopPropagation()
+  if (!isLoggedIn.value) return
+
   const res = await axios.post(`/api/termekek/${item.id}/kedvenc`)
   if (res.data.liked) likedIds.value.add(item.id)
   else likedIds.value.delete(item.id)
