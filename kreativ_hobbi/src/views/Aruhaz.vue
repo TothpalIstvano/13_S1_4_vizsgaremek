@@ -4,24 +4,18 @@
 
       <!-- TOP FILTER BAR -->
       <div id="toolbar">
-        <div class="active-filters" v-if="activekategoriak.length">
-          <span class="filter-label">Aktiv kategóriák:</span>
-          <div
-            class="filter-chip"
-            v-for="tag in lathatoFilter"
-            :key="tag.id"
-          >
-            {{ tag.nev }}
-            <span class="remove" @click="togglekategoria(tag.id)">✕</span>
+        <div class="filter-group">
+          <span class="filter-label">Aktív kategóriák:</span>
+          <div class="active-filters" v-if="activekategoriak.length">
+            <div class="filter-chip" v-for="tag in lathatoFilter" :key="tag.id">
+              {{ tag.nev }}
+              <span class="remove" @click="togglekategoria(tag.id)">✕</span>
+            </div>
+            <div v-if="rejtettFilter > 0" class="filter-chip more-chip">
+              +{{ rejtettFilter }}
+            </div>
+            <button type="button" id="clear-filters" @click="clearFilters">Összes törlése</button>
           </div>
-
-          <div
-            v-if="rejtettFilter > 0"
-            class="filter-chip more-chip"
-          >
-            +{{ rejtettFilter }} 
-          </div>
-          <button type="button" id="clear-filters" @click="clearFilters">Összes törlése</button>
         </div>
 
         <div class="search-container">
@@ -432,7 +426,7 @@
   const max = ref(0)
   const searchTerm = ref('')
   const activekategoriak = computed(() => kategoriak.value.filter(c => selectedkategoriak.value.includes(c.id)))
-  const maxLathatoFilter = 8 //max látható szűrők száma a chipben
+  const maxLathatoFilter = 4 //max látható szűrők száma a chipben
   const originalItems = ref([])
   const likedIds = ref(new Set())
 
@@ -707,36 +701,12 @@ onBeforeUnmount(() => {
   background-color: white;
   border-radius: 14px;
   width: 100%;
-  min-height: 80px;
+  min-height: 100px;
   padding: 0 24px;
   box-shadow:0 4px 12px rgba(0, 0, 0, 0.151);
 }  
 
-/*@media screen and (max-width: 480px) {
-  #toolbar {
-    grid-template-columns: 1fr;
-    height: auto;
-    gap: 15px;
-  }
 
-  .active-filters {
-    justify-self: start;
-    width: 100%;
-    margin-bottom: 0;
-  }
-
-  .search-container{
-    justify-self: center;
-    width: 100% !important;
-    margin: 0 auto 15px auto !important;
-  }
-
-  .dropdown {
-    justify-self: center;
-    width: 100% !important;
-    margin: 0 auto !important;
-  }
-}*/
 /*#endregion*/
 
 /*#region ===== FILTER CHIPS ===== */
@@ -745,13 +715,21 @@ onBeforeUnmount(() => {
   gap: 8px;
   align-items: center;
   flex-wrap: wrap;
-  margin-right: 0;
-  justify-self: start;
+}
+
+.filter-label {
+  font-size: 16px;
+  font-weight: 900;
+  color: #333;
+  white-space: nowrap;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
   grid-column: 1;
-  grid-row: 1;
-  min-width: 0;
-  max-height: calc(2 * 32px + 12px); /* max 2 sor chip + gap */
-  overflow:hidden;
+  justify-self: start;
 }
 
 .filter-chip {
@@ -790,6 +768,7 @@ onBeforeUnmount(() => {
   cursor: pointer;
   transition: all 0.2s;
   line-height: 1;
+  animation: fade-out 0.5s ease-in-out;
 }
 
 .filter-chip .remove:hover {
@@ -831,6 +810,11 @@ onBeforeUnmount(() => {
   border-color: #dc3545;
   color: #dc3545;
   background-color: #fff5f5;
+}
+
+@keyframes fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
 }
 /*#endregion*/
 
