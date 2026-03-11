@@ -332,6 +332,8 @@ Route::middleware('auth:sanctum')->post('/user/szallitasi-adatok-mentese', funct
     return response()->json(['message' => 'Szállítási adatok mentve']);
 });
 
+
+
 Route::patch('/rendelesek/{id}/fizetes_statusz', function (Request $request, $id) {
     $request->validate(['fizetes_statusz' => 'required|string|in:függőben,fizetve,sikertelen']);
 

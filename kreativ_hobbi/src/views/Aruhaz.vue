@@ -422,7 +422,9 @@
 
   const items = ref([])
   const kategoriak = ref([]) // Holds the list of tags for the sidebar
-  const selectedkategoriak = ref([])
+  const selectedkategoriak = ref(
+    JSON.parse(sessionStorage.getItem('shop_selected_kategoriak') || '[]')
+  )
   const min = ref(0)
   const max = ref(0)
   const searchTerm = ref('')
@@ -509,6 +511,10 @@ onMounted(() => {
 onUnmounted(() => {
   document.removeEventListener('click', handleClickOutside)
 })
+
+watch(selectedkategoriak, (val) => {
+  sessionStorage.setItem('shop_selected_kategoriak', JSON.stringify(val))
+}, { deep: true })
 
 watch(selected, () => {
   setTimeout(() => {
