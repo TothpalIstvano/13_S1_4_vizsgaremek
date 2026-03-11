@@ -76,6 +76,7 @@
                   required
                   @blur="validateLastName"
                   @keyup.enter="validateLastName"
+                  autocomplete="family-name"
                   :class="{ 'input-error': lastNameError, 'input-success': lastNameValid }"
                 />
                 <span v-if="lastNameError" class="error-message">{{ lastNameError }}</span>
@@ -90,6 +91,7 @@
                 <input
                   id="firstName"
                   v-model="deliveryDetails.firstName"
+                  autocomplete="given-name"
                   placeholder="Pl. János"
                   required
                   @blur="validateFirstName"
@@ -108,6 +110,7 @@
                 v-model="deliveryDetails.email" 
                 placeholder="janos@example.com"
                 required
+                autocomplete="email"
                 @blur="validateEmail"
                 @keyup.enter="validateEmail"
                 :class="{ 'input-error': emailError, 'input-success': emailValid }"
@@ -122,6 +125,7 @@
                 v-model="deliveryDetails.address" 
                 placeholder="Utca, házszám"
                 required
+                autocomplete="address"
                 @blur="validateAddress"
                 @keyup.enter="validateAddress"
                 :class="{ 'input-error': addressError, 'input-success': addressValid }"
@@ -178,6 +182,7 @@
                 type="tel"
                 pattern="^\+\d{2}\s\d{3}\s\d{3}\s\d{4}$"
                 maxlength="15"
+                autocomplete="tel"
                 required
                 @blur="validatePhone"
                 @keyup.enter="validatePhone"
@@ -187,6 +192,10 @@
               />
               <span v-if="phoneError" class="error-message">{{ phoneError }}</span>
               <small id="phoneHelp" class="help-text">Formátum: min. 9 számjegy; szóköz, + és - engedélyezett.</small>
+            </div>
+            <div class="form-group">
+              <label for="mentes">Szálliítás és fizetés adatok mentése</label>
+              <input type="checkbox" name="mentes" id="mentes" v-model="deliveryDetails.mentes">
             </div>
           </form>
         </div>
@@ -232,7 +241,8 @@ const deliveryDetails = ref({
   email: '',
   address: '',
   cityId: null,
-  phone: ''
+  phone: '',
+  mentes: false
 })
 
 const phoneError = ref('')
@@ -296,6 +306,24 @@ onMounted(async () => {
     cities.value = res.data
   } finally {
     loadingCities.value = false
+  }
+
+  // user adatok betöltése
+  const check = await axios.get('/api/user/check', { withCredentials: true })
+  if(check.data.loggedIn){
+    try {
+      const user = await axios.get('/api/user')
+      const a = user.data.adatok
+      if (a) {
+        deliveryDetails.value.lastName  = a.vezeteknev  ?? ''
+        deliveryDetails.value.firstName = a.keresztnev  ?? ''
+        deliveryDetails.value.cityId    = a.varos        ?? null
+        deliveryDetails.value.address   = a.utca         ?? ''
+        deliveryDetails.value.phone     = a.telefonszam  ?? ''
+      }
+    } catch {
+      // ignore
+    }
   }
 })
 
@@ -494,6 +522,19 @@ async function checkout() {
   }
   try {
     const res = await axios.post('/api/rendeles', payload.value);
+    if (deliveryDetails.value.mentes) {
+      try {
+        await axios.post('/api/user/szallitasi-adatok-mentese', {
+          vezeteknev:  d.lastName,
+          keresztnev:  d.firstName,
+          varos_id:    d.cityId,
+          utca:        d.address,
+          telefonszam: d.phone,
+        })
+      } catch (mentesHiba) {
+        console.warn('Adatok mentése sikertelen:', mentesHiba)
+      }
+    }
     router.push({ path: `/kosar/fizetes/${res.data.rendeles_id}`});
   } catch (e) {
     console.warn('bug:', e)
