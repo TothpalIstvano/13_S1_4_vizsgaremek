@@ -50,8 +50,20 @@ Route::middleware('auth:sanctum')->post('/logout', function (Request $request) {
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', function (Request $request) {
-        return $request->user()->load('profilKep:id,url_Link,alt_szoveg', 'adatok:vezeteknev,keresztnev,varos,utca,hazszam,emeletAjto,kartyaszam,telefonszam')->only(['id', 'email', 'profilKep', 'adatok']);
+        return $request->user()
+            ->load(
+                'profilKep:id,url_Link,alt_szoveg',
+                'adatok:felhasznalo_id,vezeteknev,keresztnev,szerepkor,varos,utca,hazszam,emeletAjto,telefonszam'
+            )
+            ->only(['id', 'felhasz_nev', 'email', 'profilKep', 'adatok', 'letrehozas_Datuma']);
     });
+
+    Route::get('/user/navbar', function (Request $request) {
+        return $request->user()
+            ->load('profilKep:id,url_Link')
+            ->only(['profilKep']);
+    });
+
     // Get posts of authenticated user
     Route::get('/user/posts', function () {
         if (Auth::check()) {
@@ -283,6 +295,22 @@ Route::post('/rendeles', function (Request $request) {
     }
 });
 
+Route::get('/user/szallitasi-adatok', function (Request $request) {
+    $adatok = $request->user()->adatok;
+    if (!$adatok) return response()->json(null);
+    
+    return response()->json([
+        'vezeteknev'  => $adatok->vezeteknev,
+        'keresztnev'  => $adatok->keresztnev,
+        'varos'       => $adatok->varos,
+        'utca'        => $adatok->utca,
+        'hazszam'     => $adatok->hazszam,    
+        'emeletAjto'  => $adatok->emeletAjto,
+        'telefonszam' => $adatok->telefonszam,
+        'email'       => $request->user()->email
+    ]);
+});
+
 Route::middleware('auth:sanctum')->post('/user/szallitasi-adatok-mentese', function (Request $request) {
     $validated = $request->validate([
         'vezeteknev' => ['required', 'string', 'max:100'],
@@ -431,6 +459,10 @@ Route::post('/kosar/hozzaad', function (Request $request) {
 
 // Admin routes
 Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
+
+    Route::get('/user/id', function (Request $request) {
+        return response()->json(['id' => $request->user()->id]);
+    });
 
     // Stats
     Route::get('/stats', function () {

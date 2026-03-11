@@ -111,11 +111,11 @@ onMounted(async () => {
     user.name = userData.value.felhasz_nev;
     user.username = userData.value.felhasz_nev;
     posts.value = await fetchUserBlogPosts();
-    const hasProfileImage = userData.value.profil_kep.id;
+    const hasProfileImage = userData.value.profilKep.id;
     if (hasProfileImage) {
-        if (userData.value.profil_kep?.url_Link) {
-            const url = userData.value.profil_kep.url_Link;
-            applyAvatar(userData.value.profil_kep);
+        if (userData.value.profilKep?.url_Link) {
+            const url = userData.value.profilKep.url_Link;
+            applyAvatar(userData.value.profilKep);
         } else {
             user.avatar = `${baseUrl}/profilKepek/kep_${hasProfileImage}.jpg`;
         }

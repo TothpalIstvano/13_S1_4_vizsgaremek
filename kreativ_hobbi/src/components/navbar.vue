@@ -60,14 +60,14 @@ async function checkUser() {
   }
   else {
     try {
-      const response = await axios.get('/api/user', { withCredentials: true });
+      const response = await axios.get('/api/user/navbar', { withCredentials: true });
       if (response.data) {
         const user = response.data;
         const baseUrl = import.meta.env.VITE_API_URL;
-        const hasProfileImage =  user.profil_kep;
+        const hasProfileImage =  user.profilKep;
         userPath.value = '/Profil';
         if (hasProfileImage) {
-          isLoggedIn.value = user.profil_kep.url_Link;
+          isLoggedIn.value = user.profilKep.url_Link;
           altSzoveg = 'Profilkép';
         } else {
           isLoggedIn.value = `${baseUrl}/storage/profilKepek/default.jpg`;
