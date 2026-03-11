@@ -27,7 +27,10 @@
 * \[X] kosár mennyiség írása✅
 * \[ ] Carouselbe itemek berakása kedvenc alapján ->IMPLEMENTÁCIÓRA VÁRÓ NEM LEHETSÉGES FEATURE✅
 * \[X] email verifikáció✅
-* \[ ] vásárol email
+* \[X] vásárol email✅
+* \[ ] vissza api/user végpont által vissza adott adatok limitálása a csak kellökre és több helyen is van használva
+* \[ ] rendelés adatoki szét szedése és a rendelés táblába vagy szédeni külön ugyan úgy vagy összefüzni
+* \[ ] vásárlási mezők verfikációjának javítása
 * \[X] jelszó reset✅
 * \[X] kosár eltárolása✅
 * \[ ] rendelés pending

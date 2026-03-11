@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\TermekKategoriak;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BlogController;
@@ -18,8 +17,9 @@ use App\Models\Felhasznalok;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Kategoriak;
 use App\Models\Varosok;
+use App\Mail\RendelesVisszaigazolas;
+use Illuminate\Support\Facades\Mail;
 use App\Models\Kedvencek;
-
 //User related API routes:
 
 // Check if user is logged in and return szerepkor
@@ -50,7 +50,7 @@ Route::middleware('auth:sanctum')->post('/logout', function (Request $request) {
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', function (Request $request) {
-        return $request->user()->load('profilKep:id,url_Link,alt_szoveg', 'adatok')->toArray();
+        return $request->user()->load('profilKep:id,url_Link,alt_szoveg', 'adatok:vezeteknev,keresztnev,varos,utca,hazszam,emeletAjto,kartyaszam,telefonszam')->only(['id', 'email', 'profilKep', 'adatok']);
     });
     // Get posts of authenticated user
     Route::get('/user/posts', function () {
@@ -246,6 +246,31 @@ Route::post('/rendeles', function (Request $request) {
         }
 
         \DB::commit();
+
+        // Email visszaigazolás küldése
+        try {
+            $tetelek = collect($validated['items'])->map(function ($item) {
+                $p = Termekek::find($item['id']);
+                return [
+                    'nev'       => $p->nev,
+                    'mennyiseg' => $item['mennyiseg'],
+                    'egysegar'  => $p->ar,
+                ];
+            })->toArray();
+
+            Mail::to($validated['delivery']['email'])
+                ->send(new RendelesVisszaigazolas(
+                    $rendeles->fresh()->toArray(),
+                    $tetelek
+                ));
+        } catch (\Exception $mailEx) {
+            \Log::warning('Visszaigazoló email küldése sikertelen', [
+                'rendeles_id' => $rendeles->id,
+                'email'       => $validated['delivery']['email'],
+                'error'       => $mailEx->getMessage(),
+            ]);
+        }
+
         return response()->json([
             'message' => 'Rendelés sikeresen létrehozva',
             'rendeles_id' => $rendeles->id
@@ -256,6 +281,27 @@ Route::post('/rendeles', function (Request $request) {
         \Log::error('Rendeles creation failed', ['message' => $e->getMessage(), 'line' => $e->getLine()]);
         return response()->json(['message' => $e->getMessage(), 'line' => $e->getLine()], 500);
     }
+});
+
+Route::middleware('auth:sanctum')->post('/user/szallitasi-adatok-mentese', function (Request $request) {
+    $validated = $request->validate([
+        'vezeteknev'  => ['required', 'string', 'max:100'],
+        'keresztnev'  => ['required', 'string', 'max:100'],
+        'varos_id'    => ['required', 'integer', 'exists:varosok,id'],
+        'utca'        => ['required', 'string', 'max:255'],
+        'telefonszam' => ['required', 'string', 'max:20'],
+    ]);
+
+    $adatok = FelhasznaloAdatok::firstOrNew(['felhasznalo_id' => auth()->id()]);
+    $adatok->felhasznalo_id = auth()->id();
+    $adatok->vezeteknev     = $validated['vezeteknev'];
+    $adatok->keresztnev     = $validated['keresztnev'];
+    $adatok->varos          = $validated['varos_id'];
+    $adatok->utca           = $validated['utca'];
+    $adatok->telefonszam    = $validated['telefonszam'];
+    $adatok->save();
+
+    return response()->json(['message' => 'Szállítási adatok mentve']);
 });
 
 Route::patch('/rendelesek/{id}/fizetes_statusz', function (Request $request, $id) {
