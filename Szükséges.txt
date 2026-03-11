@@ -4,6 +4,7 @@
 - newpost notifications magyarul/jobban
 - áruház kedvenc popup nem bejelentkezve
 - reakciók poszthoz - tartsa meg a színt frissítés után
+- carousel legiten és reszponzívan
 - rólunk oldal rendes szöveg
 - reszponzívitás
 (ha úgy gondolná h nem működik - blog képfeltöltés esetleg: https://stackoverflow.com/questions/50730143/laravel-storage-link-wont-work-on-production)
