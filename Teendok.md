@@ -1,4 +1,44 @@
 
+
+* \[/] Webshop
+* \[ ] kosár jel hozzáadása a kis méretű módhoz vhogy ez alatt azt étve hogy mikor nem fullos a navbar
+* \[ ] rendelés adatoki szét szedése és a rendelés táblába vagy szédeni külön ugyan úgy vagy összefüzni
+* \[ ] vásárlási mezők verfikációjának javítása
+* \[ ] kártya adatok mentése
+* \[ ] kártya adatverifikáció
+* \[ ] telefon szám jobbá tétele
+* \[ ] szét szedni a szálitási címet kisebb részekre
+* \[ ] Analitika fixelés
+* \[ ] Admin oldal kategoria megoszlás csere to fokategoriak és az alá tartozok szám
+- \[ ] Alertek lecserélése mindenhol modellekre
+* \[ ] Táblák egységesítése ez alat azt értve hogy a táblákban lévő adatok megegyezenek 
+* \[ ] Posztok és további backend helyekből kivenni a letrehozas_datuma nevű felesleges taget, mivel a created_at egyszerűbb és alap 
+* \[ ] Térkép javítása
+* \[ ] Az oldal kódjának tisztázás
+* \[ ] Az oldal tesztelése
+* \[ ] Az oldal dokumenálása
+* \[ ] Optimalizálás
+
+* \[X] Dashboard szerző + modosítás javítás +/- jobb stilus✅
+* \[X] rendelés pending✅
+* \[X] active cimkek✅
+* \[X] active termékeknél cimkek✅
+* \[X] active cimkek megtartása sessionstorage✅
+* \[X] active cimkek stilus✅
+* \[X] termekképek több galeria✅
+* \[X] cimke kategoriára való csere✅
+* \[X] szöveg röviditése ha overflow van és ... hozááadása✅
+* \[X] cimkeék az itemen való mennyiség kiírás + + jel oda írása + enyitható legyen✅
+* \[X] kosár mennyiség írása✅
+* \[X] Carouselbe itemek berakása kedvenc alapján ->IMPLEMENTÁCIÓRA VÁRÓ NEM LEHETSÉGES FEATURE✅
+* \[X] email verifikáció✅
+* \[X] vásárol email✅
+* \[X] vissza api/user végpont által vissza adott adatok limitálása a csak kellökre és több helyen is van használva✅
+* \[X] jelszó reset✅
+* \[X] kosár eltárolása✅
+* \[X] Dashboard betöltése + valós input"" from database✅
+* \[X] áruház loading✅
+* \[X] Rendelések javtása✅
 * \[x] Navbar alapok✅
 * \[x] Navbar✅
 * \[x] Regsiztráció / Belépés✅
@@ -11,55 +51,16 @@
 * \[x] Footer✅
 * \[x] Jelszó(regisztráció)✅
 * \[x] Jelszó(megtekintés)✅
-
-* \[/] Webshop
-* \[ ] cimke szűrés + ha itemen katintás akkkor hozzá adás
-* \[X] active cimkek✅
-* \[X] active termékeknél cimkek✅
-* \[ ] active cimkek megtartása sessionstorage
-* \[X] active cimkek stilus✅
-* \[ ] termek cimkek termékeken katinthatók legyenek
-* \[X] termekképek több galeria✅
-* \[ ] kosár jel hozzáadása a kis méretű módhoz vhogy ez alatt azt étve hogy mikor nem fullos a navbar
-* \[X] cimke kategoriára való csere✅
-* \[X] szöveg röviditése ha overflow van és ... hozááadása✅
-* \[X] cimkeék az itemen való mennyiség kiírás + + jel oda írása + enyitható legyen✅
-* \[X] kosár mennyiség írása✅
-* \[ ] Carouselbe itemek berakása kedvenc alapján ->IMPLEMENTÁCIÓRA VÁRÓ NEM LEHETSÉGES FEATURE✅
-* \[X] email verifikáció✅
-* \[X] vásárol email✅
-* \[ ] vissza api/user végpont által vissza adott adatok limitálása a csak kellökre és több helyen is van használva
-* \[ ] rendelés adatoki szét szedése és a rendelés táblába vagy szédeni külön ugyan úgy vagy összefüzni
-* \[ ] vásárlási mezők verfikációjának javítása
-* \[X] jelszó reset✅
-* \[X] kosár eltárolása✅
-* \[ ] rendelés pending
-* \[X] Dashboard betöltése + valós input"" from database✅
-* \[ ] áruház loading
-* \[ ] Rendelések javtása
-* \[ ] Analitika fixelés
 * \[X] Sorba rendezés admin felületen✅
 * \[X] Admin oldalak alsó oldalakra bontása a számos cucc✅
-* \[ ] Admin oldal blogok javítása
-* \[ ] Admin oldal kategoria megoszlás csere to fokategoriak és az alá tartozok szám
-
-* \[ ] Dashboard szerző + modosítás javítás +/- jobb stilus
+* \[X] Admin oldal blogok javítása✅
 * \[X] kicsit akad az animáció a belépés oldalon a váltásnál✅
 * \[X] resend ki cserélésre gmailre✅
 * \[X] verifikáld az emailed felszólitás✅
-
-* \[ ] Táblák egységesítése ez alat azt értve hogy a táblákban lévő adatok megegyezenek 
-* \[ ] különböző roleok hozzá adása
-* \[ ] Admin site
-* \[ ] Posztok és további backend helyekből kivenni a letrehozas_datuma nevű felesleges taget, mivel a created_at egyszerűbb és alap 
+* \[X] különböző roleok hozzá adása✅
+* \[X] Admin site✅
 * \[X] Elfeljtette a jelszót + email✅
-* \[ ] Térkép javítása
-
-* \[ ] Az oldal kódjának tisztázás
-* \[ ] Az oldal tesztelése
-* \[ ] Az oldal dokumenálása
-* \[ ] Optimalizálás
-* \[ ] Tesztek:
+* \[X] Tesztek:
   - Mintakészitő✅
   - regisztráció✅
   - regisztráció rossz adattal✅
@@ -72,11 +73,11 @@
   - bankkártya✅
   - poszthozáadása profilról + modósítás✅
   - profil modositás✅
-  
-- \[ ] Alertek lecserélése mindenhol modellekre
 - \[X] kosár eltárolása✅
 - \[X] áruház alsó oldalak számok átírni (12, 24, 48)✅
 - \[X] rendelés pending✅
+
+
 
 ha megakarjuk oldani azt hogy bejelentkezve maradok
 
@@ -96,65 +97,3 @@ lehet old meg
 
 router.js-ben az admin route-hoz nem kell változtatni, de a Dashboard komponensben:
 jsimport { useRouter, useRoute } from 'vue-router';
-
-const router = useRouter();
-const route = useRoute();
-
-// currentView inicializálása URL-ből
-const currentView = ref(route.query.view ?? 'dashboard');
-const currentPage = ref(Number(route.query.page) ?? 1);
-const currentProductPage = ref(Number(route.query.page) ?? 1);
-const currentBlogPage = ref(Number(route.query.page) ?? 1);
-A currentView watch-hoz add hozzá az URL frissítést:
-jswatch(currentView, (newView) => {
-if (oldView === 'dashboard') destroyDashboardCharts();
-if (oldView === 'analytics') destroyAnalyticsCharts();
-
-// URL frissítése
-router.replace({ query: { view: newView, page: 1 } });
-
-// Oldal reset nézet váltáskor
-currentPage.value = 1;
-currentProductPage.value = 1;
-currentBlogPage.value = 1;
-
-initCharts();
-});
-Az oldalszám változásakor is frissítsd az URL-t — add hozzá mindhárom paginált nézethez:
-jswatch(currentPage, (val) => {
-router.replace({ query: { view: currentView.value, page: val } });
-});
-
-watch(currentProductPage, (val) => {
-router.replace({ query: { view: currentView.value, page: val } });
-});
-
-watch(currentBlogPage, (val) => {
-router.replace({ query: { view: currentView.value, page: val } });
-});
-Az onMounted-ban olvasd vissza az URL-t:
-jsonMounted(async () => {
-
-  // URL-ből visszaállítás
-  if (route.query.view) currentView.value = route.query.view;
-  if (route.query.page) {
-    const page = Number(route.query.page);
-    currentPage.value = page;
-    currentProductPage.value = page;
-    currentBlogPage.value = page;
-  }
-
-  const { data } = await axios.get('/api/user');
-  currentUserId.value = data.id;
-
-  await Promise.all([
-    fetchStats(), 
-    fetchOrders(), 
-    fetchAnalytics(), 
-    fetchProducts(),
-    fetchUsers(),
-    fetchBlogPosts(),
-    fetchTagsFromDatabase()
-  ]);
-  initCharts();
-});

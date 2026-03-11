@@ -1327,7 +1327,7 @@ const initCharts = () => {
 // --- Lifecycle ---
 
 onMounted(async () => {
-  const { data } = await axios.get('/api/user/id');
+  const { data } = await axios.get('/api/admin/user/id');
   currentUserId.value = data.id;
 
   await Promise.all([

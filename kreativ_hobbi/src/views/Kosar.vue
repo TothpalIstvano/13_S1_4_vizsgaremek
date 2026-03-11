@@ -193,9 +193,12 @@
               <span v-if="phoneError" class="error-message">{{ phoneError }}</span>
               <small id="phoneHelp" class="help-text">Formátum: min. 9 számjegy; szóköz, + és - engedélyezett.</small>
             </div>
-            <div class="form-group">
-              <label for="mentes">Szálliítás és fizetés adatok mentése</label>
-              <input type="checkbox" name="mentes" id="mentes" v-model="deliveryDetails.mentes">
+            <div class="form-group toggle-group" v-if="userLogged">
+              <label class="toggle-label" for="mentes">Szállítási adatok mentése</label>
+              <label class="toggle-switch">
+                <input type="checkbox" name="mentes" id="mentes" v-model="deliveryDetails.mentes" />
+                <span class="toggle-slider"></span>
+              </label>
             </div>
           </form>
         </div>
@@ -255,6 +258,7 @@ const lastNameError = ref('')
 const lastNameValid = ref(false)
 const firstNameError = ref('')
 const firstNameValid = ref(false)
+const userLogged = ref(false)
 
 const cartTotal = computed(() => {
   return cartItems.value.reduce((s, i) => s + (Number(i.ar || i.price) * Number(i.quantity || 0)), 0)
@@ -310,16 +314,20 @@ onMounted(async () => {
 
   // user adatok betöltése
   const check = await axios.get('/api/user/check', { withCredentials: true })
-  if(check.data.loggedIn){
+  userLogged.value = check.data.loggedIn
+  if(userLogged.value) {
     try {
       const user = await axios.get('/api/user/szallitasi-adatok', { withCredentials: true })
-      const a = user.data.adatok
+      const a = user.data
+      console.log(a)
       if (a) {
         deliveryDetails.value.lastName  = a.vezeteknev  ?? ''
         deliveryDetails.value.firstName = a.keresztnev  ?? ''
         deliveryDetails.value.cityId    = a.varos        ?? null
+        deliveryDetails.value.email     = a.email        ?? ''
         deliveryDetails.value.address   = a.utca         ?? ''
         deliveryDetails.value.phone     = a.telefonszam  ?? ''
+        deliveryDetails.value.mentes    = true
       }
     } catch {
       // ignore
@@ -522,7 +530,7 @@ async function checkout() {
   }
   try {
     const res = await axios.post('/api/rendeles', payload.value);
-    if (deliveryDetails.value.mentes) {
+    if (deliveryDetails.value.mentes || userLogged.value) {
       try {
         await axios.post('/api/user/szallitasi-adatok-mentese', {
           vezeteknev:  d.lastName,
@@ -861,6 +869,74 @@ async function checkout() {
 
 .form-group input.input-success:focus {
   box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1) !important;
+}
+
+.toggle-group {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  background: #f9fafb;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 12px 14px;
+}
+
+.toggle-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #4b5563;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0;
+}
+
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+
+.toggle-slider {
+  position: absolute;
+  inset: 0;
+  background: #d1d5db;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.25s ease;
+}
+
+.toggle-slider::before {
+  content: '';
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  left: 3px;
+  top: 3px;
+  background: white;
+  border-radius: 50%;
+  transition: transform 0.25s ease;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+}
+
+.toggle-switch input:checked + .toggle-slider {
+  background: #059669;
+}
+
+.toggle-switch input:checked + .toggle-slider::before {
+  transform: translateX(20px);
+}
+
+.toggle-switch input:focus-visible + .toggle-slider {
+  box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.2);
 }
 
 .error-message {
