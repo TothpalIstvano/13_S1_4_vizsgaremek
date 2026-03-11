@@ -312,7 +312,7 @@ onMounted(async () => {
   const check = await axios.get('/api/user/check', { withCredentials: true })
   if(check.data.loggedIn){
     try {
-      const user = await axios.get('/api/user')
+      const user = await axios.get('/api/user/szallitasi-adatok', { withCredentials: true })
       const a = user.data.adatok
       if (a) {
         deliveryDetails.value.lastName  = a.vezeteknev  ?? ''
