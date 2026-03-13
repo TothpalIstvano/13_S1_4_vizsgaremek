@@ -203,7 +203,9 @@ Route::post('/rendeles', function (Request $request) {
         'delivery.email' => ['required', 'email:rfc'],
         'delivery.phone' => ['required', 'regex:/^[+]?[\d\s\-()]{9,15}$/'],
         'delivery.city_id' => ['required', 'integer', 'min:1', 'exists:varosok,id'],
-        'delivery.address' => ['required', 'string', 'min:5'],
+        'delivery.utca'      => ['required', 'string', 'min:3', 'max:255'],
+        'delivery.hazszam'   => ['required', 'integer', 'min:1'],
+        'delivery.emeletAjto'=> ['nullable', 'string', 'max:10'],
         'items' => ['required', 'array', 'min:1'],
         'items.*.id' => ['required', 'integer', 'exists:termekek,id'],
         'items.*.mennyiseg' => ['required', 'integer', 'min:1'],
@@ -238,7 +240,9 @@ Route::post('/rendeles', function (Request $request) {
             'szallitasi_nev' => $validated['delivery']['name'],
             'szallitasi_email' => $validated['delivery']['email'],
             'szallitasi_telefon' => $validated['delivery']['phone'],
-            'szallitasi_cim' => $validated['delivery']['address'],
+            'szallitasi_utca' => $validated['delivery']['utca'],
+            'szallitasi_hazszam' => $validated['delivery']['hazszam'],
+            'szallitasi_emeletAjto' => $validated['delivery']['emeletAjto'],
             'szallitasi_varos_nev' => $varos->varos_nev,
             'szallitasi_varos_id' => $validated['delivery']['city_id'],
         ]);
@@ -317,6 +321,8 @@ Route::middleware('auth:sanctum')->post('/user/szallitasi-adatok-mentese', funct
         'keresztnev' => ['required', 'string', 'max:100'],
         'varos_id' => ['required', 'integer', 'exists:varosok,id'],
         'utca' => ['required', 'string', 'max:255'],
+        'hazszam'    => ['required', 'integer', 'min:1'],
+        'emeletAjto' => ['nullable', 'string', 'max:10'],
         'telefonszam' => ['required', 'string', 'max:20'],
     ]);
 
@@ -326,13 +332,46 @@ Route::middleware('auth:sanctum')->post('/user/szallitasi-adatok-mentese', funct
     $adatok->keresztnev = $validated['keresztnev'];
     $adatok->varos = $validated['varos_id'];
     $adatok->utca = $validated['utca'];
+    $adatok->hazszam    = $validated['hazszam'];
+    $adatok->emeletAjto = $validated['emeletAjto'] ?? null;
     $adatok->telefonszam = $validated['telefonszam'];
     $adatok->save();
 
     return response()->json(['message' => 'Szállítási adatok mentve']);
 });
 
+// Kártyaadatok lekérése
+Route::middleware('auth:sanctum')->get('/user/kartya-adatok', function (Request $request) {
+    $adatok = $request->user()->adatok;
+    if (!$adatok || !$adatok->kartyaszam) return response()->json(null);
 
+    return response()->json([
+        'kartyaszam'   => decrypt($adatok->kartyaszam),
+        'kartya_nev'   => $adatok->kartya_nev,
+        'kartya_honap' => $adatok->kartya_honap,
+        'kartya_ev'    => $adatok->kartya_ev,
+    ]);
+});
+
+// Kártyaadatok mentése
+Route::middleware('auth:sanctum')->post('/user/kartya-mentese', function (Request $request) {
+    $validated = $request->validate([
+        'kartyaszam'   => ['required', 'string', 'min:13', 'max:19'],
+        'kartya_nev'   => ['required', 'string', 'max:100'],
+        'kartya_honap' => ['required', 'integer', 'min:1', 'max:12'],
+        'kartya_ev'    => ['required', 'integer', 'min:' . date('Y')],
+    ]);
+
+    $adatok = FelhasznaloAdatok::firstOrNew(['felhasznalo_id' => auth()->id()]);
+    $adatok->felhasznalo_id = auth()->id();
+    $adatok->kartyaszam     = encrypt($validated['kartyaszam']);
+    $adatok->kartya_nev     = $validated['kartya_nev'];
+    $adatok->kartya_honap   = $validated['kartya_honap'];
+    $adatok->kartya_ev      = $validated['kartya_ev'];
+    $adatok->save();
+
+    return response()->json(['message' => 'Kártyaadatok mentve']);
+});
 
 Route::patch('/rendelesek/{id}/fizetes_statusz', function (Request $request, $id) {
     $request->validate(['fizetes_statusz' => 'required|string|in:függőben,fizetve,sikertelen']);

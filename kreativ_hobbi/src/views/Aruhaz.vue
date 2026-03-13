@@ -16,6 +16,9 @@
             </div>
             <button type="button" id="clear-filters" @click="clearFilters">Összes törlése</button>
           </div>
+          <div class="active-filters" v-else>
+            <div class="filter-chip-empty">Nincs aktiv kategória</div>
+          </div>
         </div>
 
         <div class="search-container">
@@ -715,7 +718,7 @@ onBeforeUnmount(() => {
   background-color: white;
   border-radius: 14px;
   width: 100%;
-  min-height: 100px;
+  height: 100px; /*Ez miatt van fentebb az Aktív kategóriák és innen kikerült a min-heights*/
   padding: 0 24px;
   box-shadow:0 4px 12px rgba(0, 0, 0, 0.151);
 }  
@@ -744,6 +747,7 @@ onBeforeUnmount(() => {
   gap: 6px;
   grid-column: 1;
   justify-self: start;
+  height: 52px; /*Ez miatt van fentebb az Aktív kategóriák*/
 }
 
 .filter-chip {
@@ -753,12 +757,24 @@ onBeforeUnmount(() => {
   padding: 6px 12px;
   background: #ffebd3;
   color: #b55b3f;
-  border: 1px solid rgba(43, 62, 168, 0.1); /* Subtle border added */
+  border: 1px solid rgba(43, 62, 168, 0.1);
   border-radius: 999px;
   font-size: 14px;
   font-weight: 500;
-  transition: all 0.2s ease; /* Smooth animation for hover */
+  transition: all 0.2s ease; 
   cursor: default;
+}
+
+.filter-chip-empty {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  background: #f8f9fa;
+  color: #aaa;
+  border: 1px dashed #d0d0d0;
+  border-radius: 999px;
+  font-size: 14px;
+  font-style: italic;
 }
 
 .filter-chip:hover {
@@ -782,7 +798,6 @@ onBeforeUnmount(() => {
   cursor: pointer;
   transition: all 0.2s;
   line-height: 1;
-  animation: fade-out 0.5s ease-in-out;
 }
 
 .filter-chip .remove:hover {
@@ -826,10 +841,6 @@ onBeforeUnmount(() => {
   background-color: #fff5f5;
 }
 
-@keyframes fade-out {
-  from { opacity: 1; }
-  to { opacity: 0; }
-}
 /*#endregion*/
 
 
