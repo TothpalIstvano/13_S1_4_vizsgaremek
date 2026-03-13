@@ -22,6 +22,9 @@ return new class extends Migration {
             $table->string('emeletAjto', 10)->nullable();
             $table->string('telefonszam', 20)->nullable();
             $table->string('kartyaszam')->nullable();
+            $table->string('kartya_nev', 100)->nullable()->after('kartyaszam');
+            $table->unsignedTinyInteger('kartya_honap')->nullable()->after('kartya_nev');
+            $table->unsignedSmallInteger('kartya_ev')->nullable()->after('kartya_honap');
             $table->foreign('felhasznalo_id')->references('id')->on('felhasznalok')->onDelete('cascade');
             $table->foreign('varos')->references('id')->on('varosok')->onDelete('set null');
         });

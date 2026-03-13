@@ -160,14 +160,22 @@
               </div>
 
               <div class="form-group">
-                <label for="emeletAjto">Emelet / Ajtó</label>
+                <label for="emeletAjto">
+                  Emelet / Ajtó
+                  <span v-if="emeletAjtoError" class="error-indicator">⚠</span>
+                  <span v-else-if="emeletAjtoValid" class="success-indicator">✓</span>
+                </label>
                 <input
                   id="emeletAjto"
                   v-model="deliveryDetails.emeletAjto"
                   placeholder="Pl. 2/B"
                   maxlength="10"
                   autocomplete="address-line3"
+                  @blur="validateEmeletAjto"
+                  @input="validateEmeletAjto"
+                  :class="{ 'input-error': emeletAjtoError, 'input-success': emeletAjtoValid }"
                 />
+                <span v-if="emeletAjtoError" class="error-message">{{ emeletAjtoError }}</span>
               </div>
             </div>
 
@@ -280,7 +288,6 @@ const deliveryDetails = ref({
   firstName: '',
   lastName: '',
   email: '',
-  address: '',
   cityId: null,
   utca: '',
   hazszam: null,
@@ -293,8 +300,6 @@ const phoneError = ref('')
 const phoneValid = ref(false)
 const emailError = ref('')
 const emailValid = ref(false)
-const addressError = ref('')
-const addressValid = ref(false)
 const lastNameError = ref('')
 const lastNameValid = ref(false)
 const firstNameError = ref('')
@@ -304,6 +309,8 @@ const utcaError = ref('')
 const utcaValid = ref(false)
 const hazszamError = ref('')
 const hazszamValid = ref(false)
+const emeletAjtoError = ref('')
+const emeletAjtoValid = ref(false)
 
 const cartTotal = computed(() => {
   return cartItems.value.reduce((s, i) => s + (Number(i.ar || i.price) * Number(i.quantity || 0)), 0)
@@ -369,8 +376,10 @@ onMounted(async () => {
         deliveryDetails.value.lastName  = a.vezeteknev  ?? ''
         deliveryDetails.value.firstName = a.keresztnev  ?? ''
         deliveryDetails.value.cityId    = a.varos        ?? null
+        deliveryDetails.value.utca       = a.utca        ?? ''
+        deliveryDetails.value.hazszam    = a.hazszam     ?? null
+        deliveryDetails.value.emeletAjto = a.emeletAjto  ?? ''
         deliveryDetails.value.email     = a.email        ?? ''
-        deliveryDetails.value.address   = a.utca         ?? ''
         deliveryDetails.value.phone     = a.telefonszam  ?? ''
         deliveryDetails.value.mentes    = true
       }
@@ -405,6 +414,19 @@ function validateHazszam() {
     hazszamValid.value = false; return
   }
   hazszamError.value = ''; hazszamValid.value = true
+}
+
+function validateEmeletAjto() {
+  const value = deliveryDetails.value.emeletAjto.trim()
+  if (!value) { emeletAjtoError.value = ''; emeletAjtoValid.value = false; return } // opcionális, üres = ok
+  const regex = /^[A-Za-z0-9\/\.\-]{1,10}$/
+  if (!regex.test(value)) {
+    emeletAjtoError.value = 'Csak betű, szám, /, . és - engedélyezett'
+    emeletAjtoValid.value = false
+    return
+  }
+  emeletAjtoError.value = ''
+  emeletAjtoValid.value = true
 }
 
 const nameRegex = /^[A-Za-záéíóöőúüűÁÉÍÓÖŐÚÜŰ\-]{2,}(\s[A-Za-záéíóöőúüűÁÉÍÓÖŐÚÜŰ\-]{2,}){0,3}$/
@@ -474,7 +496,7 @@ function validateEmail() {
   
   if (!value) {
     emailError.value = ''
-    emailError.value = false
+    emailValid.value = false
     return
   }
 
@@ -487,29 +509,6 @@ function validateEmail() {
   emailError.value = ''
   emailValid.value = true
 }
-
-function validateAddress() {
-  const value = deliveryDetails.value.address.trim()
-  const addressRegex = /^[A-Za-zÀ-ÖØ-öø-ÿ0-9\s\.\,\-\/]+$/
-  if (!value) {
-    addressError.value = ''
-    addressValid.value = false
-    return
-  }
-  if (!addressRegex.test(value)) {
-    addressError.value = 'Érvénytelen cím formátum!'
-    addressValid.value = false
-    return
-  }
-  if (value.length < 5) {
-    addressError.value = 'Túl rövid (min 5 karakter)'
-    addressValid.value = false
-    return
-  }
-  addressError.value = ''
-  addressValid.value = true
-}
-
 //#endregion
 
 const payload = ref({})
@@ -542,7 +541,7 @@ async function checkout() {
   }
 
   const d = deliveryDetails.value
-  if (!d.firstName || !d.lastName || !d.email || !d.address || !d.cityId || !d.phone) {
+  if (!d.firstName || !d.lastName || !d.email || !d.utca || !d.hazszam || !d.cityId || !d.phone) {
     alert('Kérlek töltsd ki az összes szállítási adatot')
     return
   }
@@ -561,25 +560,24 @@ async function checkout() {
     return
   }
 
-  // Címsor validáció
-  validateAddress()
-  if (!addressValid.value) {
-    alert('A címsor nem érvényes!')
-    return
-  }
-
   // Utca validáció
   validateUtca()
   if (!utcaValid.value) {
-    alert('Az utca nem érvenytes!')
+    alert('A megadott utca nem érvényes!')
     return
   }
 
   // Házsorzás validáció
   validateHazszam()
   if (!hazszamValid.value) {
-    alert('A házsorzás nem érvényes!')
+    alert('A házszám nem érvényes!')
     return
+  }
+
+  // Emelet/ajtó validáció
+  if (deliveryDetails.value.emeletAjto) {
+    validateEmeletAjto()
+    if (!emeletAjtoValid.value) { alert('Az emelet/ajtó formátuma nem érvényes!'); return }
   }
 
   // Egyszerű telefonszám ellenőrzés: legalább 9 számjegy
@@ -600,10 +598,12 @@ async function checkout() {
   payload.value = {
     delivery: {
       name:    `${d.lastName} ${d.firstName}`,
-      address: d.address,
       email:   d.email,
       phone:   d.phone,
-      city_id: d.cityId,         
+      city_id: d.cityId,
+      utca:       d.utca,
+      hazszam:    d.hazszam,
+      emeletAjto: d.emeletAjto || null,         
     },
     items: currentCart.map(i => ({
       id:       i.id,
@@ -619,7 +619,9 @@ async function checkout() {
           vezeteknev:  d.lastName,
           keresztnev:  d.firstName,
           varos_id:    d.cityId,
-          utca:        d.address,
+          utca:       d.utca,
+          hazszam:    d.hazszam,
+          emeletAjto: d.emeletAjto || null,
           telefonszam: d.phone,
         })
       } catch (mentesHiba) {

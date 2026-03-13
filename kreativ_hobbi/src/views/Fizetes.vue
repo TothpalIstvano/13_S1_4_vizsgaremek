@@ -138,23 +138,30 @@
             </div>
           </div>
         </div>
-        <div>
+        <div v-if="userLogged" class="card-form__toggle">
+          <span class="card-form__toggle-label">Kártyaadatok mentése</span>
+          <label class="toggle-switch">
+            <input type="checkbox" v-model="kartyaMentes" />
+            <span class="toggle-slider"></span>
+          </label>
         </div>
-        <button @click="submit" class="card-form__button" type="button">Submit</button>
+        <div>
+          <button @click="submit" class="card-form__button" type="button">Submit</button>
+        </div>
       </div>
     </div>
 
     <!-- Overlay -->
     <div v-if="showOverlay" class="overlay">
       <div class="overlay-content">
-        <p>{{ overlayMessage }}</p>
+        <p style="white-space: pre-line">{{ overlayMessage }}</p>
         <button @click="closeOverlay" class="overlay-button">Close</button>
       </div>
     </div>
   </div>
 </template>
 <script lang="ts" setup>
-import { ref, computed, nextTick, watch } from 'vue';
+import { ref, computed, nextTick, watch, onMounted } from 'vue';
 import axios from 'axios';
 import router from '@/router/router';
 import { useCartStore } from '@/stores/cartStore';
@@ -169,6 +176,8 @@ const isCardFlipped = ref(false);
 const showOverlay = ref(false);
 const overlayMessage = ref('');
 const isSubmitting = ref(false);
+const kartyaMentes = ref(false)
+const userLogged = ref(false)
 const rendelesId = router.currentRoute.value.params.id;
 
 const minYear = new Date().getFullYear();
@@ -265,7 +274,24 @@ const submit = async () => {
           fizetes_statusz: 'fizetve'
         });
       }
+
       overlayMessage.value = 'Sikeres fizetés! Köszönjük a vásárlást!';
+      
+
+      if (kartyaMentes.value && userLogged.value) {
+        try {
+          await axios.post('/api/user/kartya-mentese', {
+            kartyaszam:   cardNumber.value.replace(/\s/g, ''),
+            kartya_nev:   cardName.value,
+            kartya_honap: Number(cardMonth.value),
+            kartya_ev:    Number(cardYear.value),
+          })
+        } catch (e) {
+          overlayMessage.value = 'Sikeres fizetés! Köszönjük a vásárlást!\n\nMegjegyzés: Kártyaadataidat sajnos nem sikerült elmenteni.'
+          console.warn('Kártyaadatok mentése sikertelen:', e)
+        }
+      }
+
       showOverlay.value = true;
 
       // Reset form fields
@@ -310,6 +336,24 @@ watch(cardYear, (newYear) => {
   if (Number(newYear) === minYear && Number(cardMonth.value) < minMonth) {
     cardMonth.value = ''
   }
+})
+
+onMounted(async () => {
+  try {
+    const check = await axios.get('/api/user/check', { withCredentials: true })
+    userLogged.value = check.data.loggedIn
+    if (userLogged.value) {
+      const res = await axios.get('/api/user/kartya-adatok', { withCredentials: true })
+      const a = res.data
+      if (a) {
+        cardNumber.value = a.kartyaszam
+        cardName.value   = a.kartya_nev   ?? ''
+        cardMonth.value  = a.kartya_honap ?? ''
+        cardYear.value   = a.kartya_ev    ?? ''
+        kartyaMentes.value = true
+      }
+    }
+  } catch { /* ignore */ }
 })
 </script>
 
@@ -978,4 +1022,46 @@ watch(cardYear, (newYear) => {
   font-weight: bold;
   color: #1a3b5d;
 }
+
+.card-form__toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 16px;
+  padding: 12px 0;
+  border-top: 1px solid #ced6e0;
+}
+.card-form__toggle-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #1a3b5d;
+}
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+  flex-shrink: 0;
+}
+.toggle-switch input { opacity: 0; width: 0; height: 0; position: absolute; }
+.toggle-slider {
+  position: absolute;
+  inset: 0;
+  background: #d1d5db;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.25s ease;
+}
+.toggle-slider::before {
+  content: '';
+  position: absolute;
+  width: 18px; height: 18px;
+  left: 3px; top: 3px;
+  background: white;
+  border-radius: 50%;
+  transition: transform 0.25s ease;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+}
+.toggle-switch input:checked + .toggle-slider { background: #2364d2; }
+.toggle-switch input:checked + .toggle-slider::before { transform: translateX(20px); }
 </style>

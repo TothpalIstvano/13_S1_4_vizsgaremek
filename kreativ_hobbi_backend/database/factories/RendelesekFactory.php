@@ -28,7 +28,9 @@ class RendelesekFactory extends Factory
             'szallitasi_nev'=>$this->faker->name(),
             'szallitasi_email'=>$this->faker->email(),
             'szallitasi_telefon'=>$this->faker->phoneNumber(),
-            'szallitasi_cim'=>$this->faker->streetAddress(),
+            'szallitasi_utca'=>$this->faker->streetName(),
+            'szallitasi_hazszam'=>$this->faker->buildingNumber(),
+            'szallitasi_emeletAjto'=>$this->faker->bothify('##??'),
             'szallitasi_varos_id'=>$varos->id,
             'szallitasi_varos_nev'=>$varos->varos_nev
         ];

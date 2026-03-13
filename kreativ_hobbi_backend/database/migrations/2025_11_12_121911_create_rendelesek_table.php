@@ -20,7 +20,9 @@ return new class extends Migration
             $table->string('szallitasi_nev');
             $table->string('szallitasi_email');
             $table->string('szallitasi_telefon');
-            $table->string('szallitasi_cim');
+            $table->string('szallitasi_utca');
+            $table->string('szallitasi_hazszam');
+            $table->string('szallitasi_emeletAjto')->nullable();
             $table->string('szallitasi_varos_nev');
             $table->unsignedInteger('szallitasi_varos_id')->nullable();
             $table->foreign('szallitasi_varos_id')->references('id')->on('varosok')->onDelete('set null');
