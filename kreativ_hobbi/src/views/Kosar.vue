@@ -119,18 +119,56 @@
             </div>
 
             <div class="form-group">
-              <label for="address">Szállítási Cím *</label>
-              <input 
-                id="address" 
-                v-model="deliveryDetails.address" 
-                placeholder="Utca, házszám"
+              <label for="utca">
+                Utca *
+                <span v-if="utcaError" class="error-indicator">⚠</span>
+                <span v-else-if="utcaValid" class="success-indicator">✓</span>
+              </label>
+              <input
+                id="utca"
+                v-model="deliveryDetails.utca"
+                placeholder="Pl. Kossuth Lajos utca"
+                autocomplete="address-line1"
                 required
-                autocomplete="address"
-                @blur="validateAddress"
-                @keyup.enter="validateAddress"
-                :class="{ 'input-error': addressError, 'input-success': addressValid }"
+                @blur="validateUtca"
+                @keyup.enter="validateUtca"
+                :class="{ 'input-error': utcaError, 'input-success': utcaValid }"
               />
-              <span v-if="addressError" class="error-message">{{ addressError }}</span>
+              <span v-if="utcaError" class="error-message">{{ utcaError }}</span>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="hazszam">
+                  Házszám *
+                  <span v-if="hazszamError" class="error-indicator">⚠</span>
+                  <span v-else-if="hazszamValid" class="success-indicator">✓</span>
+                </label>
+                <input
+                  id="hazszam"
+                  v-model.number="deliveryDetails.hazszam"
+                  type="number"
+                  min="1"
+                  placeholder="Pl. 12"
+                  autocomplete="address-line2"
+                  required
+                  @blur="validateHazszam"
+                  @keyup.enter="validateHazszam"
+                  :class="{ 'input-error': hazszamError, 'input-success': hazszamValid }"
+                />
+                <span v-if="hazszamError" class="error-message">{{ hazszamError }}</span>
+              </div>
+
+              <div class="form-group">
+                <label for="emeletAjto">Emelet / Ajtó</label>
+                <input
+                  id="emeletAjto"
+                  v-model="deliveryDetails.emeletAjto"
+                  placeholder="Pl. 2/B"
+                  maxlength="10"
+                  autocomplete="address-line3"
+                />
+              </div>
             </div>
 
             <div class="form-group">
@@ -244,6 +282,9 @@ const deliveryDetails = ref({
   email: '',
   address: '',
   cityId: null,
+  utca: '',
+  hazszam: null,
+  emeletAjto: '',
   phone: '',
   mentes: false
 })
@@ -259,6 +300,10 @@ const lastNameValid = ref(false)
 const firstNameError = ref('')
 const firstNameValid = ref(false)
 const userLogged = ref(false)
+const utcaError = ref('')
+const utcaValid = ref(false)
+const hazszamError = ref('')
+const hazszamValid = ref(false)
 
 const cartTotal = computed(() => {
   return cartItems.value.reduce((s, i) => s + (Number(i.ar || i.price) * Number(i.quantity || 0)), 0)
@@ -343,6 +388,23 @@ function validateCity() {
   }
   cityError.value = ''
   cityValid.value = true
+}
+
+function validateUtca() {
+  const value = deliveryDetails.value.utca.trim()
+  if (!value) { utcaError.value = ''; utcaValid.value = false; return }
+  if (value.length < 3) { utcaError.value = 'Túl rövid (min. 3 karakter)'; utcaValid.value = false; return }
+  utcaError.value = ''; utcaValid.value = true
+}
+
+function validateHazszam() {
+  const value = deliveryDetails.value.hazszam
+  if (!value) { hazszamError.value = ''; hazszamValid.value = false; return }
+  if (!Number.isInteger(Number(value)) || Number(value) < 1) {
+    hazszamError.value = 'Érvénytelen házszám'
+    hazszamValid.value = false; return
+  }
+  hazszamError.value = ''; hazszamValid.value = true
 }
 
 const nameRegex = /^[A-Za-záéíóöőúüűÁÉÍÓÖŐÚÜŰ\-]{2,}(\s[A-Za-záéíóöőúüűÁÉÍÓÖŐÚÜŰ\-]{2,}){0,3}$/
@@ -496,6 +558,27 @@ async function checkout() {
   validateLastName()
   if (!lastNameValid.value) {
     alert('A keresztéknév nem érvenytes!')
+    return
+  }
+
+  // Címsor validáció
+  validateAddress()
+  if (!addressValid.value) {
+    alert('A címsor nem érvényes!')
+    return
+  }
+
+  // Utca validáció
+  validateUtca()
+  if (!utcaValid.value) {
+    alert('Az utca nem érvenytes!')
+    return
+  }
+
+  // Házsorzás validáció
+  validateHazszam()
+  if (!hazszamValid.value) {
+    alert('A házsorzás nem érvényes!')
     return
   }
 
