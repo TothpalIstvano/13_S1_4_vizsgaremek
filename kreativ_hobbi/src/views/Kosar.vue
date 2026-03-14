@@ -371,7 +371,6 @@ onMounted(async () => {
     try {
       const user = await axios.get('/api/user/szallitasi-adatok', { withCredentials: true })
       const a = user.data
-      console.log(a)
       if (a) {
         deliveryDetails.value.lastName  = a.vezeteknev  ?? ''
         deliveryDetails.value.firstName = a.keresztnev  ?? ''
@@ -1013,7 +1012,7 @@ async function checkout() {
 }
 
 .toggle-switch input:checked + .toggle-slider {
-  background: #059669;
+  background: #119605;
 }
 
 .toggle-switch input:checked + .toggle-slider::before {

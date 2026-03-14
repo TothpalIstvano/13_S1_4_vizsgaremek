@@ -75,12 +75,16 @@
 
       <div class="card-form__inner">
         <div class="card-input">
-          <label class="card-input__label">Card Number</label>
+          <label class="card-input__label">Card Number
+            <span v-if="kartyaLejart && !kartyaszamModositva" class="expired-badge">⚠ Lejárt kártya</span>
+          </label>
             <input
             v-model="cardNumber"
             @input="formatCardNumber"
+            @click="clearIfSaved"
             @focus="flipCard(false)"
             class="card-input__input"
+            :class="{ 'input-expired': kartyaLejart && !kartyaszamModositva }"
             placeholder="0000 0000 0000 0000"
             :maxlength="cardType === 'amex' ? 17 : 19"
             />
@@ -93,6 +97,7 @@
             @focus="flipCard(false)"
             class="card-input__input"
             placeholder="FULL NAME"
+            :class="{ 'input-expired': kartyaLejart && !kartyaszamModositva }"
             @input="cardName = ($event.target as HTMLInputElement).value
                 .replace(/((?:[^-]*?-){2}[^-]*?)-/g, '$1')
                 .toUpperCase()" 
@@ -104,13 +109,13 @@
           <div class="card-form__col">
             <label class="card-input__label">Expiration Date</label>
             <div class="card-form__group">
-              <select v-model="cardMonth" class="card-input__input">
+              <select v-model="cardMonth" class="card-input__input" :class="{ 'input-expired': kartyaLejart && !kartyaszamModositva }">
                 <option value="" disabled>Month</option>
                 <option v-for="month in availableMonths" :key="month" :value="month">
                   {{ month }}
                 </option>
               </select>
-              <select v-model="cardYear" class="card-input__input">
+              <select v-model="cardYear" class="card-input__input" :class="{ 'input-expired': kartyaLejart && !kartyaszamModositva }">
                 <option value="" disabled>Year</option>
                 <option
                   v-for="n in 7"
@@ -132,21 +137,26 @@
                 @focus="flipCard(true)"
                 @blur="flipCard(false)"
                 class="card-input__input"
+                :class="{ 'input-expired': kartyaLejart && !kartyaszamModositva }"
                 :maxlength="cardType === 'amex' ? 4 : 3"
                 :placeholder="cardType === 'amex' ? '1234' : '123'"
               />
             </div>
           </div>
         </div>
-        <div v-if="userLogged" class="card-form__toggle">
-          <span class="card-form__toggle-label">Kártyaadatok mentése</span>
+        <div class="form-group toggle-group" v-if="userLogged">
+          <label class="toggle-label" for="kartyaMentesToggle">Kártyaadatok mentése</label>
           <label class="toggle-switch">
-            <input type="checkbox" v-model="kartyaMentes" />
+            <input type="checkbox" id="kartyaMentesToggle" v-model="kartyaMentes" />
             <span class="toggle-slider"></span>
           </label>
         </div>
         <div>
-          <button @click="submit" class="card-form__button" type="button">Submit</button>
+          <button @click="submit" class="card-form__button" type="button" 
+            :disabled="(kartyaLejart && !kartyaszamModositva) || !kartyaValid"
+            :class="{ 'button-disabled': (kartyaLejart && !kartyaszamModositva) || !kartyaValid}">
+            Submit
+          </button>
         </div>
       </div>
     </div>
@@ -179,9 +189,34 @@ const isSubmitting = ref(false);
 const kartyaMentes = ref(false)
 const userLogged = ref(false)
 const rendelesId = router.currentRoute.value.params.id;
-
+const kartyaszamModositva = ref(false)
+const savedLastFour = ref('')
+const savedCardTipus = ref('')
 const minYear = new Date().getFullYear();
 const minMonth = new Date().getMonth() + 1;
+const kartyaLejart = ref(false)
+
+const kartyaValid = computed(() => {
+  const numLen = cardNumber.value.replace(/\s/g, '').length
+  const cvvLen = cardCvv.value.length
+
+  return !!(
+    // Kártyaszám: Amex=15, többi=16 számjegy
+    (cardType.value === 'amex' ? numLen === 15 : numLen === 16) &&
+
+    // Kártyabirtokos: min 4, max 25, csak betű és szóköz/kötőjel
+    cardName.value.length >= 4 &&
+    cardName.value.length <= 25 &&
+    /^[A-Za-z\s\-]+$/.test(cardName.value) &&
+
+    // Lejárat hónap és év ki van választva
+    cardMonth.value &&
+    cardYear.value &&
+
+    // CVV: Amex=4, többi=3
+    (cardType.value === 'amex' ? cvvLen === 4 : cvvLen === 3)
+  )
+})
 
 const availableMonths = computed(() => {
   if (Number(cardYear.value) === minYear) {
@@ -195,6 +230,9 @@ const availableMonths = computed(() => {
 // Single cardType computed property
 const cardType = computed(() => {
   const num = cardNumber.value.replace(/\D/g, ''); // Clean number for detection
+  if (!kartyaszamModositva.value && savedCardTipus.value) {
+    return savedCardTipus.value
+  }
   if (/^4/.test(num)) return 'visa';
   if (/^3[47]/.test(num)) return 'amex';
   if (/^5[1-5]/.test(num)) return 'mastercard';
@@ -218,11 +256,18 @@ const cardMask = computed(() =>
 );
 
 const maskedCardNumber = computed(() => {
-  const cleaned = cardNumber.value.replace(/\D/g, '');
-  const mask = cardMask.value;
-  let i = 0;
-  return mask.split('').map(c => c === '#' ? cleaned[i++] || '#' : c);
-});
+  const raw = cardNumber.value
+  if (!kartyaszamModositva.value && savedLastFour.value) {
+    const mask = cardMask.value  // "#### #### #### ####"
+    const display = '*'.repeat(12) + savedLastFour.value
+    let i = 0
+    return mask.split('').map(c => c === '#' ? display[i++] || '*' : c)
+  }
+  const cleaned = raw.replace(/\D/g, '')
+  const mask = cardMask.value
+  let i = 0
+  return mask.split('').map(c => c === '#' ? cleaned[i++] || '#' : c)
+})
 
 const formattedCardName = computed(() => cardName.value || 'FULL NAME');
 
@@ -230,7 +275,17 @@ function flipCard(status: boolean) {
   isCardFlipped.value = status;
 }
 
+function clearIfSaved() {
+  if (!kartyaszamModositva.value && savedLastFour.value) {
+    cardNumber.value = ''
+    savedLastFour.value = ''
+    savedCardTipus.value = ''
+    kartyaszamModositva.value = true
+  }
+}
+
 const formatCardNumber = async (event: Event) => {
+  kartyaszamModositva.value = true
   const input = event.target as HTMLInputElement;
   let value = input.value.replace(/\D/g, '');
   let formatted = '';
@@ -260,59 +315,61 @@ const formatCardNumber = async (event: Event) => {
 const submit = async () => {
   if (isSubmitting.value) return; 
   isSubmitting.value = true;
+
+  if (!kartyaszamModositva.value && kartyaLejart.value) {
+    overlayMessage.value = 'A mentett kártyád lejárt!\nKérlek adj meg egy új kártyaszámot.'
+    showOverlay.value = true
+    isSubmitting.value = false
+    return
+  }
+
+  if (!kartyaValid.value) {
+  overlayMessage.value = 'Kérlek töltsd ki az összes mezőt helyesen!'
+  showOverlay.value = true
+  isSubmitting.value = false
+  return
+  }
   try {
-    if (
-      cardNumber.value &&
-      cardName.value.length >= 8 &&
-      cardMonth.value &&
-      cardYear.value &&
-      cardCvv.value
-    ){
-
-      if (rendelesId) {
-        await axios.patch(`/api/rendelesek/${rendelesId}/fizetes_statusz`, {
-          fizetes_statusz: 'fizetve'
-        });
-      }
-
-      overlayMessage.value = 'Sikeres fizetés! Köszönjük a vásárlást!';
-      
-
-      if (kartyaMentes.value && userLogged.value) {
-        try {
-          await axios.post('/api/user/kartya-mentese', {
-            kartyaszam:   cardNumber.value.replace(/\s/g, ''),
-            kartya_nev:   cardName.value,
-            kartya_honap: Number(cardMonth.value),
-            kartya_ev:    Number(cardYear.value),
-          })
-        } catch (e) {
-          overlayMessage.value = 'Sikeres fizetés! Köszönjük a vásárlást!\n\nMegjegyzés: Kártyaadataidat sajnos nem sikerült elmenteni.'
-          console.warn('Kártyaadatok mentése sikertelen:', e)
-        }
-      }
-
-      showOverlay.value = true;
-
-      // Reset form fields
-      cardNumber.value = '';
-      cardName.value = '';
-      cardMonth.value = '';
-      cardYear.value = '';
-      cardCvv.value = '';
-      isCardFlipped.value = false;
-
-      // Kosár törlés
-      cartStore.clearCart();
-
-      // Redirect to home page
-      setTimeout(() => {
-        router.push('/');
-      }, 3000);
-    } else {
-      overlayMessage.value = 'Please fill all fields correctly.';
-      showOverlay.value = true;
+    if (rendelesId) {
+      await axios.patch(`/api/rendelesek/${rendelesId}/fizetes_statusz`, {
+        fizetes_statusz: 'fizetve'
+      });
     }
+
+    overlayMessage.value = 'Sikeres fizetés! Köszönjük a vásárlást!';
+    
+
+    if (kartyaMentes.value && userLogged.value) {
+      try {
+        await axios.post('/api/user/kartya-mentese', {
+          kartyaszam:   kartyaszamModositva.value ? cardNumber.value.replace(/\s/g, '') : null,
+          kartya_nev:   cardName.value,
+          kartya_honap: Number(cardMonth.value),
+          kartya_ev:    Number(cardYear.value),
+        })
+      } catch (e) {
+        overlayMessage.value = 'Sikeres fizetés! Köszönjük a vásárlást!\n\nMegjegyzés: Kártyaadataidat sajnos nem sikerült elmenteni.'
+        console.warn('Kártyaadatok mentése sikertelen:', e)
+      }
+    }
+
+    showOverlay.value = true;
+
+    // Reset form fields
+    cardNumber.value = '';
+    cardName.value = '';
+    cardMonth.value = '';
+    cardYear.value = '';
+    cardCvv.value = '';
+    isCardFlipped.value = false;
+
+    // Kosár törlés
+    cartStore.clearCart();
+
+    // Redirect to home page
+    setTimeout(() => {
+      router.push('/');
+    }, 3000);
   } catch (e) {
     console.error(e);
     if (rendelesId || e) {
@@ -346,7 +403,15 @@ onMounted(async () => {
       const res = await axios.get('/api/user/kartya-adatok', { withCredentials: true })
       const a = res.data
       if (a) {
-        cardNumber.value = a.kartyaszam
+        kartyaLejart.value = a.lejart ?? false
+        savedLastFour.value = a.kartyaszam?.slice(-4) ?? ''
+        savedCardTipus.value = a.kartya_tipus ?? 'visa'
+        const raw = (a.kartyaszam ?? '').replace(/\s/g, '')
+        if (raw.length === 15) {
+          cardNumber.value = raw.slice(0,4) + ' ' + raw.slice(4,10) + ' ' + raw.slice(10)
+        } else {
+          cardNumber.value = raw.replace(/(.{4})/g, '$1 ').trim()
+        }
         cardName.value   = a.kartya_nev   ?? ''
         cardMonth.value  = a.kartya_honap ?? ''
         cardYear.value   = a.kartya_ev    ?? ''
@@ -450,13 +515,13 @@ onMounted(async () => {
   &__button {
     width: 100%;
     height: 55px;
-    background: #2364d2;
+    background: #2ac403;
     border: none;
     border-radius: 5px;
     font-size: 22px;
     font-weight: 500;
     font-family: "Source Sans Pro", sans-serif;
-    box-shadow: 3px 10px 20px 0px rgba(35, 100, 210, 0.3);
+    box-shadow: 3px 10px 20px 0px rgba(79, 210, 35, 0.3);
     color: #fff;
     margin-top: 20px;
     cursor: pointer;
@@ -940,44 +1005,6 @@ onMounted(async () => {
   pointer-events: none;
 }
 
-
-
-.github-btn {
-  position: absolute;
-  right: 40px;
-  bottom: 50px;
-  text-decoration: none;
-  padding: 15px 25px;
-  border-radius: 4px;
-  box-shadow: 0px 4px 30px -6px rgba(36, 52, 70, 0.65);
-  background: #24292e;
-  color: #fff;
-  font-weight: bold;
-  letter-spacing: 1px;
-  font-size: 16px;
-  text-align: center;
-  transition: all .3s ease-in-out;
-
-  @media screen and (min-width: 500px) {
-    &:hover {
-      transform: scale(1.1);
-      box-shadow: 0px 17px 20px -6px rgba(36, 52, 70, 0.36);
-    }
-  }
-
-  @media screen and (max-width: 700px) {
-    position: relative;
-    bottom: auto;
-    right: auto;
-    margin-top: 20px;
-
-    &:active {
-      transform: scale(1.1);
-      box-shadow: 0px 17px 20px -6px rgba(36, 52, 70, 0.36);
-    }
-  }
-}
-
 .overlay {
   position: fixed;
   top: 0;
@@ -1005,7 +1032,7 @@ onMounted(async () => {
 }
 
 .overlay-button {
-  background: #2364d2;
+  background: #d27b23;
   color: white;
   border: none;
   padding: 10px 20px;
@@ -1015,7 +1042,7 @@ onMounted(async () => {
 }
 
 .overlay-button:hover {
-  background: #1a4bb8;
+  background: #b8691a;
 }
 #total {
   font-size: 20px;
@@ -1023,19 +1050,6 @@ onMounted(async () => {
   color: #1a3b5d;
 }
 
-.card-form__toggle {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 16px;
-  padding: 12px 0;
-  border-top: 1px solid #ced6e0;
-}
-.card-form__toggle-label {
-  font-size: 14px;
-  font-weight: 500;
-  color: #1a3b5d;
-}
 .toggle-switch {
   position: relative;
   display: inline-block;
@@ -1062,6 +1076,57 @@ onMounted(async () => {
   transition: transform 0.25s ease;
   box-shadow: 0 1px 4px rgba(0,0,0,0.2);
 }
-.toggle-switch input:checked + .toggle-slider { background: #2364d2; }
+.toggle-switch input:checked + .toggle-slider { background: #119605; }
 .toggle-switch input:checked + .toggle-slider::before { transform: translateX(20px); }
+
+.form-group.toggle-group {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  background: #f9fafb;
+  border: 1px solid #ced6e0;
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-top: 16px;
+}
+
+.toggle-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #1a3b5d;
+  margin: 0;
+}
+
+.expired-badge {
+  color: #dc2626;
+  font-size: 12px;
+  font-weight: 700;
+  margin-left: 8px;
+  animation: pulse 1.5s infinite;
+}
+
+.input-expired {
+  border-color: #dc2626 !important;
+  background: #fef2f2 !important;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.card-form__button:disabled,
+.card-form__button.button-disabled {
+  background: #9ca3af;
+  box-shadow: none;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.card-form__button:disabled:hover,
+.card-form__button.button-disabled:hover {
+  transform: none;
+  box-shadow: none;
+}
 </style>

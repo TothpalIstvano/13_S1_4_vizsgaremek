@@ -67,8 +67,15 @@
 
         <p class="price">{{ Number(product.ar).toLocaleString('hu-HU') }} Ft</p>
 
-        <div class="tags" v-if="product.termek_cimkek?.length">
-          <span v-for="tag in product.termek_cimkek" :key="tag.id" class="tag">{{ tag.nev }}</span>
+        <div class="tag-container">
+          <span
+            v-for="kategoria in product.termek_kategoriak"
+            :key="kategoria.id"
+            class="item-tag-sm"
+            :class="{ 'main-category': kategoria.fo_kategoria_id === null }"
+          >
+            {{ kategoria.nev }}
+          </span>
         </div>
 
         <p class="description">{{ product.leiras }}</p>
@@ -268,7 +275,7 @@ onMounted(() => {
 .spinner {
   width: 36px; height: 36px;
   border: 3px solid #e5e5e5;
-  border-top-color: #2c3e50;
+  border-top-color: #50432c;
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
 }
@@ -370,7 +377,7 @@ onMounted(() => {
   background: #f4f4f0;
 }
 .thumb-wrap:hover { border-color: #aaa; }
-.thumb-wrap.active { border-color: #2c3e50; }
+.thumb-wrap.active { border-color: #50452c; }
 .thumb { width: 100%; height: 100%; object-fit: cover; display: block; }
 
 /* ── PRODUCT INFO ── */
@@ -408,20 +415,38 @@ onMounted(() => {
 }
 
 /* Tags */
-.tags {
+.tag-container {
   display: flex;
   flex-wrap: wrap;
-  gap: 7px;
-  margin-bottom: 20px;
+  gap: 6px;
+  flex-grow: 0;
 }
-.tag {
-  background: #eff1fb;
-  color: #3a4fc4;
-  padding: 4px 13px;
-  border-radius: 20px;
+
+.item-tag-sm {
+  background: #ffebd3;
+  color: #a8532b;
   font-size: 12px;
-  font-weight: 500;
+  padding: 4px 8px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s;
 }
+
+.item-tag-sm.main-category {
+  background: #ff753657;
+  color: #a8532b;
+}
+
+.item-tag-sm:hover {
+  background: #ffc583fd;
+  color: #553000;
+}
+
+.item-tag-sm:hover.main-category {
+  background: #ffa074d2;
+  color: #553000;
+}
+
 
 /* Description */
 .description {
@@ -536,7 +561,7 @@ onMounted(() => {
 /* Add to cart */
 .add-to-cart-btn {
   padding: 15px 32px;
-  background: #1a1a2e;
+  background: #b55b3f;
   color: white;
   border: none;
   border-radius: 12px;
@@ -548,7 +573,7 @@ onMounted(() => {
   letter-spacing: 0.02em;
 }
 .add-to-cart-btn:hover:not(:disabled) {
-  background: #2d2d52;
+  background: #81442f;
   transform: translateY(-2px);
   box-shadow: 0 8px 24px rgba(26, 26, 46, 0.28);
 }

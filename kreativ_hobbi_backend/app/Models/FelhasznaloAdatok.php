@@ -17,15 +17,20 @@ class FelhasznaloAdatok extends Model
     protected $fillable = [
         'felhasznalo_id',
         'szerepkor',
+        'vezeteknev',
+        'keresztnev',
+        'varos',
+        'utca',
+        'hazszam',
+        'emeletAjto',
+        'telefonszam',
+        'kartyaszam',
+        'kartya_nev',
+        'kartya_honap',
+        'kartya_ev',
     ];
 
     public $timestamps = false;    
-
-    public function setKartyaszamAttribute($value)
-    {
-        $this->attributes['kartyaszam'] = bcrypt($value);
-    }
-
     public function felhasznalo()
     {
         return $this->belongsTo(Felhasznalok::class, 'felhasznalo_id', 'id');

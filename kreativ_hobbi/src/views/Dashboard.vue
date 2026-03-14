@@ -1280,14 +1280,107 @@ const initCharts = () => {
     }
 
     if (categoryChart.value && !categoryChartInstance) {
-      categoryChartInstance = new Chart(categoryChart.value, {
-        type: 'doughnut',
-        data: {
-          labels: analyticsData.value.categories.map(c => c.nev),
-          datasets: [{ data: analyticsData.value.categories.map(c => c.db), backgroundColor: ['#6366f1','#8b5cf6','#ec4899','#f59e0b','#10b981'] }]
-        },
-        options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+    const foKats = analyticsData.value.categories;
+    const FO_HUES = foKats.map((_, i) => 
+      Math.round((i / foKats.length) * 360)
+    );
+
+
+    // Főkategória színek: telített, közepes világosság
+    const foBg = foKats.map((_, i) => {
+      const hue = FO_HUES[i % FO_HUES.length];
+      return `hsl(${hue}, 62%, 52%)`;
+    });
+
+    // Alkategória színek: ugyanaz a hue, halvány + kissé eltolva
+    const alBg = foKats.flatMap((k, i) => {
+      const hue = FO_HUES[i % FO_HUES.length];
+      return (k.alkategoriak ?? []).map((_, j) => {
+        const lightness = 72 + (j * 4);
+        return `hsl(${hue}, 48%, ${Math.min(lightness, 87)}%)`;
       });
+    });
+
+    const foLabels = foKats.map(k => k.nev);
+    const foData   = foKats.map(k => k.db);
+
+    const alLabels = foKats.flatMap(k =>
+      (k.alkategoriak ?? []).map(a => a.nev)
+    );
+    const alData = foKats.flatMap(k =>
+      (k.alkategoriak ?? []).map(a => a.db)
+    );
+
+    // Szülő neve minden alkategóriához → tooltip-hez
+    const alParent = foKats.flatMap(k =>
+      (k.alkategoriak ?? []).map(() => k.nev)
+    );
+
+    const grandTotal = [...foData, ...alData].reduce((s, v) => s + v, 0);
+
+    categoryChartInstance = new Chart(categoryChart.value, {
+      type: 'doughnut',
+      data: {
+        labels: [...foLabels, ...alLabels],
+        datasets: [
+          {
+            label: 'Főkategóriák',
+            data: foData,
+            backgroundColor: foBg,
+            borderWidth: 3,
+            borderColor: '#ffffff',
+            hoverOffset: 8,
+          },
+          {
+            label: 'Alkategóriák',
+            data: alData,
+            backgroundColor: alBg,
+            borderWidth: 2,
+            borderColor: '#ffffff',
+            hoverOffset: 5,
+          },
+        ]
+      },
+      options: {
+        responsive: true,
+        cutout: '40%',   // kétszintes gyűrű jól látható marad
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              boxWidth: 12,
+              boxHeight: 12,
+              borderRadius: 3,
+              useBorderRadius: true,
+              padding: 12,
+              font: { size: 12 },
+              // Csak a 6 főkategória jelenik meg a legendában
+              filter: (item) => item.datasetIndex === 0,
+            }
+          },
+          tooltip: {
+            callbacks: {
+              title: (items) => {
+                const item = items[0];
+                if (item.datasetIndex === 1) {
+                  // "Kiegészítők › Ollók"
+                  return `${alParent[item.dataIndex]} › ${item.label}`;
+                }
+                return item.label;
+              },
+              label: (ctx) => {
+                const db  = ctx.parsed;
+                const pct = grandTotal > 0
+                  ? ((db / grandTotal) * 100).toFixed(1)
+                  : '0.0';
+                const type = ctx.datasetIndex === 0 ? 'Főkategória' : 'Alkategória';
+                return ` ${type}: ${db} db  (${pct}%)`;
+              }
+            }
+          }
+        }
+      }
+    });
     }
 
     if (productSalesChart.value && !productSalesChartInstance) {
