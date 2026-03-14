@@ -11,9 +11,9 @@
             
             <div class="cart-preview">
               <img v-if="item?.termek_fo_kep?.url_Link || item?.image" 
-                   :src="item?.termek_fo_kep?.url_Link || item?.image" 
-                   :alt="item?.nev || item?.name"
-                   class="preview-image" />
+                  :src="item?.termek_fo_kep?.url_Link || item?.image" 
+                  :alt="item?.nev || item?.name"
+                  class="preview-image" />
               
               <div class="item-details">
                 <p class="item-name">{{ item?.nev || item?.name }}</p>
@@ -126,7 +126,7 @@ defineExpose({
 }
 
 .close-btn:hover {
-  background: #e5e7eb;
+  background: #ebe8e5;
   color: #333;
 }
 
@@ -159,7 +159,7 @@ defineExpose({
   display: flex;
   gap: 16px;
   padding: 20px;
-  background: #f9fafb;
+  background: #fbfaf9;
   border-radius: 12px;
   margin-bottom: 32px;
   align-items: center;
@@ -212,7 +212,7 @@ defineExpose({
   font-size: 16px;
   font-weight: 700;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.3s ease;  
   text-decoration: none;
   display: flex;
   align-items: center;
@@ -221,23 +221,23 @@ defineExpose({
 
 .btn-continue {
   background: white;
-  color: #3f51b5;
-  border: 2px solid #3f51b5;
+  color: #b5593f;
+  border: 2px solid #b5593f;
 }
 
 .btn-continue:hover {
-  background: #f0f4ff;
+  background: #fff8f0;
 }
 
 .btn-checkout {
-  background: linear-gradient(135deg, #3f51b5 0%, #2f3fa3 100%);
+  background: linear-gradient(135deg, #b5593f 0%, #a3632f 100%);
   color: white;
   box-shadow: 0 4px 16px rgba(63, 81, 181, 0.3);
 }
 
 .btn-checkout:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(63, 81, 181, 0.4);
+  box-shadow: 0 6px 20px rgba(181, 124, 63, 0.4);
 }
 
 /* Transitions */

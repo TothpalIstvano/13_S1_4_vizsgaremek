@@ -2,14 +2,10 @@
 
 * \[/] Webshop
 * \[ ] kosár jel hozzáadása a kis méretű módhoz vhogy ez alatt azt étve hogy mikor nem fullos a navbar
-* \[ ] rendelés adatoki szét szedése és a rendelés táblába vagy szédeni külön ugyan úgy vagy összefüzni
 * \[ ] vásárlási mezők verfikációjának javítása
-* \[ ] kártya adatok mentése
 * \[ ] kártya adatverifikáció
 * \[ ] telefon szám jobbá tétele
-* \[ ] szét szedni a szálitási címet kisebb részekre
 * \[ ] Analitika fixelés
-* \[ ] Admin oldal kategoria megoszlás csere to fokategoriak és az alá tartozok szám
 - \[ ] Alertek lecserélése mindenhol modellekre
 * \[ ] Táblák egységesítése ez alat azt értve hogy a táblákban lévő adatok megegyezenek 
 * \[ ] Posztok és további backend helyekből kivenni a letrehozas_datuma nevű felesleges taget, mivel a created_at egyszerűbb és alap 
@@ -19,6 +15,10 @@
 * \[ ] Az oldal dokumenálása
 * \[ ] Optimalizálás
 
+* \[X] Admin oldal kategoria megoszlás csere to fokategoriak és az alá tartozok szám✅
+* \[X] szét szedni a szálitási címet kisebb részekre✅
+* \[X] kártya adatok mentése✅
+* \[X] rendelés adatoki szét szedése és a rendelés táblába vagy szédeni külön ugyan úgy vagy összefüzni✅
 * \[X] Dashboard szerző + modosítás javítás +/- jobb stilus✅
 * \[X] rendelés pending✅
 * \[X] active cimkek✅

@@ -38,7 +38,7 @@ class FelhasznaloAdatokFactory extends Factory
             'hazszam' => $this->faker->buildingNumber(),
             'emeletAjto' => $this->faker->bothify('##??'),
             'telefonszam' => str_replace([' ', '-', '(', ')', '+', '.', '', ','], '', $this->faker->phoneNumber()),
-            'kartyaszam' => str_replace([' ', '-'], '', $this->faker->creditCardNumber()),
+            'kartyaszam' => encrypt(str_replace([' ', '-'], '', $this->faker->creditCardNumber())),
             'kartya_nev' => $this->faker->name(),
             'kartya_honap' => $this->faker->numberBetween(1, 12),
             'kartya_ev' => $this->faker->numberBetween(2023, 2030),

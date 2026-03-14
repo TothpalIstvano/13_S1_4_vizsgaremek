@@ -19,6 +19,7 @@ use App\Models\Kategoriak;
 use App\Models\Varosok;
 use App\Mail\RendelesVisszaigazolas;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Crypt;
 use App\Models\Kedvencek;
 //User related API routes:
 
@@ -342,21 +343,58 @@ Route::middleware('auth:sanctum')->post('/user/szallitasi-adatok-mentese', funct
 
 // Kártyaadatok lekérése
 Route::middleware('auth:sanctum')->get('/user/kartya-adatok', function (Request $request) {
-    $adatok = $request->user()->adatok;
-    if (!$adatok || !$adatok->kartyaszam) return response()->json(null);
 
+    $adatok = $request->user()->adatok;
+
+    if (!$adatok || !$adatok->kartyaszam) {
+        return response()->json(null);
+    }
+
+    try {
+        $kartyaszam = decrypt($adatok->kartyaszam);
+        $masked = str_repeat('*', strlen($kartyaszam) - 4) . substr($kartyaszam, -4);
+        $prefix = substr($kartyaszam, 0, 4);
+        $prefix2 = substr($kartyaszam, 0, 2);
+        $prefix1 = substr($kartyaszam, 0, 1);
+
+        if (str_starts_with($kartyaszam, '34') || str_starts_with($kartyaszam, '37')) {
+            $tipus = 'amex';
+        } elseif ($prefix1 === '4') {
+            $tipus = 'visa';
+        } elseif (in_array($prefix2, ['51','52','53','54','55'])) {
+            $tipus = 'mastercard';
+        } elseif ($prefix === '6011') {
+            $tipus = 'discover';
+        } elseif (str_starts_with($kartyaszam, '9792')) {
+            $tipus = 'troy';
+        } else {
+            $tipus = 'visa';
+        }
+
+    } catch (\Exception $e) {
+        $kartyaszam = null;
+    }
+
+    $lejart = false;
+    if ($adatok->kartya_ev && $adatok->kartya_honap) {
+        $now = now();
+        $lejart = $adatok->kartya_ev < $now->year || 
+                ($adatok->kartya_ev == $now->year && $adatok->kartya_honap < $now->month);
+    }
     return response()->json([
-        'kartyaszam'   => decrypt($adatok->kartyaszam),
+        'kartyaszam'   => $masked,
+        'kartya_tipus'  => $tipus,
         'kartya_nev'   => $adatok->kartya_nev,
         'kartya_honap' => $adatok->kartya_honap,
         'kartya_ev'    => $adatok->kartya_ev,
+        'lejart'       => $lejart
     ]);
 });
 
 // Kártyaadatok mentése
 Route::middleware('auth:sanctum')->post('/user/kartya-mentese', function (Request $request) {
     $validated = $request->validate([
-        'kartyaszam'   => ['required', 'string', 'min:13', 'max:19'],
+        'kartyaszam'   => ['nullable', 'string', 'min:13', 'max:19'],
         'kartya_nev'   => ['required', 'string', 'max:100'],
         'kartya_honap' => ['required', 'integer', 'min:1', 'max:12'],
         'kartya_ev'    => ['required', 'integer', 'min:' . date('Y')],
@@ -364,7 +402,9 @@ Route::middleware('auth:sanctum')->post('/user/kartya-mentese', function (Reques
 
     $adatok = FelhasznaloAdatok::firstOrNew(['felhasznalo_id' => auth()->id()]);
     $adatok->felhasznalo_id = auth()->id();
-    $adatok->kartyaszam     = encrypt($validated['kartyaszam']);
+    if ($validated['kartyaszam']) {
+        $adatok->kartyaszam = encrypt($validated['kartyaszam']);
+    }
     $adatok->kartya_nev     = $validated['kartya_nev'];
     $adatok->kartya_honap   = $validated['kartya_honap'];
     $adatok->kartya_ev      = $validated['kartya_ev'];
@@ -530,8 +570,23 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
                 ->orderBy('honap')
                 ->pluck('db');
 
-            $categories = Kategoriak::withCount('termekek')->get()
-                ->map(fn($k) => ['nev' => $k->nev, 'db' => $k->termekek_count]);
+            $foKategoriak = Kategoriak::whereNull('fo_kategoria_id')
+                ->with(['alkategoriak' => function ($q) {
+                    $q->withCount('termekek');
+                }])
+                ->withCount('termekek')
+                ->get()
+                ->map(fn($fo) => [
+                    'nev' => $fo->nev,
+                    // saját termékek + összes alkategória termékei együtt
+                    'db'  => $fo->termekek_count + $fo->alkategoriak->sum('termekek_count'),
+                    'alkategoriak' => $fo->alkategoriak->map(fn($al) => [
+                        'nev' => $al->nev,
+                        'db'  => $al->termekek_count,
+                    ]),
+                ]);
+
+            $categories = $foKategoriak;
 
             return response()->json([
                 'monthlySales' => $monthlySales,

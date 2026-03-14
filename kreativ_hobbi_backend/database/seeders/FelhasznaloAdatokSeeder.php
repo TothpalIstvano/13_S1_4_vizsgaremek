@@ -23,7 +23,10 @@ class FelhasznaloAdatokSeeder extends Seeder
                 'hazszam' => 1,
                 'emeletAjto' => '1/A',
                 'telefonszam' => '1234567890',
-                'kartyaszam' => '1111222233334444',
+                'kartyaszam' => encrypt('1111222233334444'),
+                'kartya_nev' => 'Test Felhasznalo',
+                'kartya_honap' => 1,
+                'kartya_ev' => 2024,
             ]
         );
         FelhasznaloAdatok::factory()->create(
@@ -37,7 +40,7 @@ class FelhasznaloAdatokSeeder extends Seeder
                 'hazszam' => 5,
                 'emeletAjto' => '1/A',
                 'telefonszam' => '9876543210',
-                'kartyaszam' => '1111222253334444',
+                'kartyaszam' => encrypt('1111222253334444'),
             ]
         );
 
