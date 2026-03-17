@@ -60,7 +60,7 @@
               <div>
                 <div class="stat-title">Összes értékesítés</div>
               </div>
-              <div class="stat-icon" style="background: #dbeafe; color: #1e40af;">
+              <div class="stat-icon" style="background: #fff7ed; color: #c2410c;">
                 💰
               </div>
             </div>
@@ -234,7 +234,7 @@
               <button 
                 class="btn btn-sm"
                 @click="currentProductPage = page"
-                :style="currentProductPage === page ? 'background:#6366f1; color:white;' : 'background:#f1f5f9;'"
+                :style="currentProductPage === page ? 'background:#f97316; color:white;' : 'background:#f1f5f9;'"
               >{{ page }}</button>
             </template>
             
@@ -364,7 +364,7 @@
               <button 
                 class="btn btn-sm"
                 @click="currentPage = page"
-                :style="currentPage === page ? 'background:#6366f1; color:white;' : 'background:#f1f5f9;'"
+                :style="currentPage === page ? 'background:#f97316; color:white;' : 'background:#f1f5f9;'"
               >{{ page }}</button>
             </template>
             
@@ -473,7 +473,7 @@
               <button 
                 class="btn btn-sm"
                 @click="currentBlogPage = page"
-                :style="currentBlogPage === page ? 'background:#6366f1; color:white;' : 'background:#f1f5f9;'"
+                :style="currentBlogPage === page ? 'background:#f97316; color:white;' : 'background:#f1f5f9;'"
               >{{ page }}</button>
             </template>
             
@@ -805,6 +805,12 @@ let revenueChartInstance = null;
 
 // Data
 const stats = ref({ totalSales: 0, totalOrders: 0, totalProducts: 0, totalCustomers: 0 });
+const changes = ref({
+  sales: null,
+  orders: null,
+  products: null,
+  customers: null,
+});
 const products = ref([]);
 const users = ref([]);
 const blogPosts = ref([]);
@@ -832,7 +838,11 @@ const fetchOrders = async () => {
 
 const fetchAnalytics = async () => {
   const { data } = await axios.get(`${API}/analytics`);
-  analyticsData.value = data;
+  analyticsData.value = {
+    ...data,
+    monthlySales:  Array.isArray(data.monthlySales)  ? data.monthlySales  : Object.values(data.monthlySales  ?? {}),
+    monthlyOrders: Array.isArray(data.monthlyOrders) ? data.monthlyOrders : Object.values(data.monthlyOrders ?? {}),
+  };
 };
 
 const fetchProducts = async () => {
@@ -1255,6 +1265,7 @@ const destroyAnalyticsCharts = () => {
 };
 
 const MONTHS = ['Jan', 'Feb', 'Már', 'Ápr', 'Máj', 'Jún', 'Júl', 'Aug', 'Sze', 'Okt', 'Nov', 'Dec'];
+const currentMonth = new Date().getMonth() + 1;
 
 const initCharts = () => {
   nextTick(() => {
@@ -1262,11 +1273,11 @@ const initCharts = () => {
       salesChartInstance = new Chart(salesChart.value, {
         type: 'line',
         data: {
-          labels: MONTHS.slice(0, analyticsData.value.monthlySales.length),
+          labels: MONTHS.slice(0, currentMonth),
           datasets: [{
             label: 'Értékesítés (Ft)',
-            data: analyticsData.value.monthlySales,
-            borderColor: '#6366f1',
+            data: analyticsData.value.monthlySales.slice(0, currentMonth),
+            borderColor: '#f97316',
             backgroundColor: 'rgba(99, 102, 241, 0.1)',
             tension: 0.4, fill: true
           }]
@@ -1446,14 +1457,14 @@ watch(currentView, (newView, oldView) => {
 .dashboard-wrapper {
   display: flex;
   min-height: calc(100vh - 160px);
-  background: #f8fafc;
+  background: #fcfaf8;
   margin-top: 10px;
 }
 
 /* Sidebar */
 .sidebar {
   width: 260px;
-  background: #1e293b;
+  background: #7a402d;
   color: white;
   padding: 0;
   overflow-y: auto;
@@ -1462,7 +1473,7 @@ watch(currentView, (newView, oldView) => {
 
 .sidebar-header {
   padding: 24px 20px;
-  border-bottom: 1px solid #334155;
+  border-bottom: 1px solid #a73f17;
 }
 
 .sidebar-header h1 {
@@ -1474,7 +1485,7 @@ watch(currentView, (newView, oldView) => {
 
 .sidebar-header p {
   font-size: 13px;
-  color: #94a3b8;
+  color: #b8a394;
 }
 
 .nav-menu {
@@ -1490,7 +1501,7 @@ watch(currentView, (newView, oldView) => {
   display: flex;
   align-items: center;
   padding: 12px 16px;
-  color: #cbd5e1;
+  color: #e1d7cb;
   text-decoration: none;
   border-radius: 8px;
   transition: all 0.2s;
@@ -1500,12 +1511,12 @@ watch(currentView, (newView, oldView) => {
 }
 
 .nav-link:hover {
-  background: #334155;
+  background: #a63e1e;
   color: white;
 }
 
 .nav-link.active {
-  background: #6366f1;
+  background: #ff8a65;
   color: white;
 }
 
@@ -1530,7 +1541,7 @@ watch(currentView, (newView, oldView) => {
 .header h2 {
   font-size: 28px;
   font-weight: 700;
-  color: #1e293b;
+  color: #3b281e;
 }
 
 .header-actions {
@@ -1551,7 +1562,7 @@ watch(currentView, (newView, oldView) => {
   padding: 24px;
   border-radius: 12px;
   box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-  border: 1px solid #e2e8f0;
+  border: 1px solid #f0e9e2;
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
@@ -1666,7 +1677,7 @@ watch(currentView, (newView, oldView) => {
 
 .search-input:focus {
   outline: none;
-  border-color: #6366f1;
+  border-color: #f97316;
 }
 
 table {
@@ -1719,12 +1730,12 @@ tbody tr:hover {
 }
 
 .btn-primary {
-  background: #6366f1;
+  background: #f97316;
   color: white;
 }
 
 .btn-primary:hover {
-  background: #4f46e5;
+  background: #ea6c0a;
 }
 
 .btn-secondary {
@@ -1895,7 +1906,7 @@ tbody tr:hover {
 .form-select:focus,
 .form-textarea:focus {
   outline: none;
-  border-color: #6366f1;
+  border-color: #f97316;
 }
 
 .form-textarea {
@@ -1928,8 +1939,8 @@ tbody tr:hover {
 }
 
 .badge-blue {
-  background: #1d4fd84d;
-  color: #0c004e;
+  background: #fff7ed;
+  color: #9a3412;
 }
 
 /* Product Image */

@@ -558,17 +558,21 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
     // Analytics
     Route::get('/analytics', function () {
         try {
-            $monthlySales = Rendelesek::selectRaw('MONTH(rendeles_datuma) as honap, SUM(osszeg) as osszeg')
-                ->whereYear('rendeles_datuma', now()->year)
-                ->groupBy('honap')
-                ->orderBy('honap')
-                ->pluck('osszeg');
+            $rawSales = Rendelesek::selectRaw('MONTH(rendeles_datuma) as honap, SUM(osszeg) as osszeg')
+            ->whereYear('rendeles_datuma', now()->year)
+            ->groupBy('honap')
+            ->orderBy('honap')
+            ->pluck('osszeg', 'honap');
 
-            $monthlyOrders = Rendelesek::selectRaw('MONTH(rendeles_datuma) as honap, COUNT(*) as db')
+            $rawOrders = Rendelesek::selectRaw('MONTH(rendeles_datuma) as honap, COUNT(*) as db')
                 ->whereYear('rendeles_datuma', now()->year)
                 ->groupBy('honap')
                 ->orderBy('honap')
-                ->pluck('db');
+                ->pluck('db', 'honap');
+
+            // 12 elemű, 0-indexelt tömbök — hiányzó hónapok = 0
+            $monthlySales  = collect(range(1, 12))->map(fn($m) => (int)($rawSales[$m]  ?? 0))->values();
+            $monthlyOrders = collect(range(1, 12))->map(fn($m) => (int)($rawOrders[$m] ?? 0))->values();
 
             $foKategoriak = Kategoriak::whereNull('fo_kategoria_id')
                 ->with(['alkategoriak' => function ($q) {
