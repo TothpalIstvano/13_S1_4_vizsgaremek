@@ -1,9 +1,7 @@
 - kommentek saját törléssel, ellenőrzéssel (csúnya beszéd szűrés)
 - profilba meg poszt feltöltésnél a primevue dropdownt valami szebb színre zöld helyett
-- blog posztoknál a seederbe írtaknak szép főképe legyen
 - newpost notifications magyarul/jobban
-- kedvencek lenyíló dolga modalba
 - reakciók poszthoz - tartsa meg a színt frissítés után
 - rólunk oldal rendes szöveg
-- reszponzívitás
+- dashboard reszponzívitás - és emojik másra cserélése + térkép
 (ha úgy gondolná h nem működik - blog képfeltöltés esetleg: https://stackoverflow.com/questions/50730143/laravel-storage-link-wont-work-on-production)
