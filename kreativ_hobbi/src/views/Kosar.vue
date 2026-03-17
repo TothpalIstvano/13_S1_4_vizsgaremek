@@ -192,7 +192,10 @@
                 optionValue="id"
                 placeholder="Válassz vagy írj be egy várost"
                 :filter="true"
+                :virtualScrollerOptions="{ itemSize: 38 }"
+                :filterDelay="300"
                 filterBy="varos_nev,iranyitoszam"
+                :filterFields="['varos_nev', 'iranyitoszam']"
                 :showClear="true"
                 :loading="loadingCities"
                 @change="validateCity"
@@ -220,7 +223,10 @@
                 <span v-if="cityError" class="error-message">{{ cityError }}</span>
             </div>
             <div class="form-group">
-              <label for="phone">Telefonszám *</label>
+              <label for="phone">Telefonszám *
+                <span v-if="phoneError" class="error-indicator">⚠</span>
+                <span v-else-if="phoneValid" class="success-indicator">✓</span>
+              </label>
               <input 
                 id="phone" 
                 v-model="deliveryDetails.phone" 
@@ -359,7 +365,10 @@ onMounted(async () => {
   loadingCities.value = true
   try {
     const res = await axios.get('/api/varosok')
-    cities.value = res.data
+    cities.value = res.data.map(c => ({
+      ...c,
+      iranyitoszam: String(c.iranyitoszam)
+    }))
   } finally {
     loadingCities.value = false
   }
@@ -556,6 +565,13 @@ async function checkout() {
   validateLastName()
   if (!lastNameValid.value) {
     alert('A keresztéknév nem érvenytes!')
+    return
+  }
+
+  // Város validáció
+  validateCity()
+  if (!cityValid.value) {
+    alert('A város nem érvényes!')
     return
   }
 

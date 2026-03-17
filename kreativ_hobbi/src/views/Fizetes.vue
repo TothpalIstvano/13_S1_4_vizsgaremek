@@ -76,6 +76,8 @@
       <div class="card-form__inner">
         <div class="card-input">
           <label class="card-input__label">Card Number
+            <span v-if="cardNumberError" class="error-indicator">⚠</span>
+            <span v-else-if="cardNumberValid" class="success-indicator">✓</span>
             <span v-if="kartyaLejart && !kartyaszamModositva" class="expired-badge">⚠ Lejárt kártya</span>
           </label>
             <input
@@ -83,39 +85,65 @@
             @input="formatCardNumber"
             @click="clearIfSaved"
             @focus="flipCard(false)"
+            @blur="validateCardNumber"
             class="card-input__input"
-            :class="{ 'input-expired': kartyaLejart && !kartyaszamModositva }"
+            :class="{ 
+                'input-expired': kartyaLejart && !kartyaszamModositva,
+                'input-error': cardNumberError,
+                'input-success': cardNumberValid && !kartyaLejart
+              }"
             placeholder="0000 0000 0000 0000"
             :maxlength="cardType === 'amex' ? 17 : 19"
             />
+          <span v-if="cardNumberError" class="error-message">{{ cardNumberError }}</span> 
         </div>
 
         <div class="card-input">
-          <label class="card-input__label">Card Holder</label>
+          <label class="card-input__label">Card Holder
+            <span v-if="cardNameError" class="error-indicator">⚠</span>
+            <span v-else-if="cardNameValid" class="success-indicator">✓</span>
+          </label>
             <input
             v-model="cardName"
             @focus="flipCard(false)"
+            @blur="validateCardName"
             class="card-input__input"
             placeholder="FULL NAME"
-            :class="{ 'input-expired': kartyaLejart && !kartyaszamModositva }"
+            :class="{ 
+                'input-expired': kartyaLejart && !kartyaszamModositva,
+                'input-error': cardNameError,
+                'input-success': cardNameValid 
+              }"
             @input="cardName = ($event.target as HTMLInputElement).value
                 .replace(/((?:[^-]*?-){2}[^-]*?)-/g, '$1')
                 .toUpperCase()" 
             maxlength="25"
             />
+          <span v-if="cardNameError" class="error-message">{{ cardNameError }}</span>
         </div>
 
         <div class="card-form__row">
           <div class="card-form__col">
-            <label class="card-input__label">Expiration Date</label>
+            <label class="card-input__label">Expiration Date
+                <span v-if="expiryError" class="error-indicator">⚠</span>
+                <span v-else-if="expiryValid" class="success-indicator">✓</span>
+            </label>
             <div class="card-form__group">
-              <select v-model="cardMonth" class="card-input__input" :class="{ 'input-expired': kartyaLejart && !kartyaszamModositva }">
+              <select v-model="cardMonth" class="card-input__input" :class="{ 
+                  'input-expired': kartyaLejart && !kartyaszamModositva,
+                  'input-error': expiryError,
+                  'input-success': expiryValid
+                }">
                 <option value="" disabled>Month</option>
                 <option v-for="month in availableMonths" :key="month" :value="month">
                   {{ month }}
                 </option>
               </select>
-              <select v-model="cardYear" class="card-input__input" :class="{ 'input-expired': kartyaLejart && !kartyaszamModositva }">
+              <select v-model="cardYear" class="card-input__input" :class="{ 
+                  'input-expired': kartyaLejart && !kartyaszamModositva,
+                  'input-error': expiryError,
+                  'input-success': expiryValid
+                }">
                 <option value="" disabled>Year</option>
                 <option
                   v-for="n in 7"
@@ -126,21 +154,30 @@
                 </option>
               </select>
             </div>
+            <span v-if="expiryError" class="error-message">{{ expiryError }}</span>
           </div>
 
           <div class="card-form__col -cvv">
             <div class="card-input">
-              <label class="card-input__label">CVV</label>
+              <label class="card-input__label">CVV
+                  <span v-if="cvvError" class="error-indicator">⚠</span>
+                  <span v-else-if="cvvValid" class="success-indicator">✓</span>
+              </label>
               <input
                 v-model="cardCvv"
                 @input="cardCvv = cardCvv.replace(/\D/g, '').slice(0, cardType === 'amex' ? 4 : 3)"
                 @focus="flipCard(true)"
-                @blur="flipCard(false)"
+                @blur="() => { flipCard(false); validateCvv() }"
                 class="card-input__input"
-                :class="{ 'input-expired': kartyaLejart && !kartyaszamModositva }"
+                :class="{ 
+                    'input-expired': kartyaLejart && !kartyaszamModositva,
+                    'input-error': cvvError,
+                    'input-success': cvvValid
+                  }"
                 :maxlength="cardType === 'amex' ? 4 : 3"
                 :placeholder="cardType === 'amex' ? '1234' : '123'"
               />
+              <span v-if="cvvError" class="error-message">{{ cvvError }}</span>
             </div>
           </div>
         </div>
@@ -153,8 +190,8 @@
         </div>
         <div>
           <button @click="submit" class="card-form__button" type="button" 
-            :disabled="(kartyaLejart && !kartyaszamModositva) || !kartyaValid"
-            :class="{ 'button-disabled': (kartyaLejart && !kartyaszamModositva) || !kartyaValid}">
+            :disabled="(kartyaLejart && !kartyaszamModositva) || !kartyaCheck"
+            :class="{ 'button-disabled': (kartyaLejart && !kartyaszamModositva) || !kartyaCheck}">
             Submit
           </button>
         </div>
@@ -196,7 +233,60 @@ const minYear = new Date().getFullYear();
 const minMonth = new Date().getMonth() + 1;
 const kartyaLejart = ref(false)
 
-const kartyaValid = computed(() => {
+const cardNumberError = ref('')
+const cardNumberValid = ref(false)
+const cardNameError = ref('')
+const cardNameValid = ref(false)
+const expiryError = ref('')
+const expiryValid = ref(false)
+const cvvError = ref('')
+const cvvValid = ref(false)
+
+function validateCardNumber() {
+  const num = cardNumber.value.replace(/\s/g, '')
+  if (!num) { cardNumberError.value = ''; cardNumberValid.value = false; return }
+  const expectedLen = cardType.value === 'amex' ? 15 : 16
+  if (num.length < expectedLen) {
+    cardNumberError.value = `Túl rövid (${num.length}/${expectedLen} számjegy)`
+    cardNumberValid.value = false; return
+  }
+  cardNumberError.value = ''; cardNumberValid.value = true
+}
+
+function validateCardName() {
+  const val = cardName.value.trim()
+  if (!val) { cardNameError.value = ''; cardNameValid.value = false; return }
+  if (val.length < 4) {
+    cardNameError.value = 'Túl rövid (min. 4 karakter)'
+    cardNameValid.value = false; return
+  }
+  if (!/^[A-Za-z\s\-]+$/.test(val)) {
+    cardNameError.value = 'Csak betűk, szóköz és kötőjel engedélyezett'
+    cardNameValid.value = false; return
+  }
+  cardNameError.value = ''; cardNameValid.value = true
+}
+
+function validateExpiry() {
+  if (!cardMonth.value || !cardYear.value) {
+    expiryError.value = 'Kérlek válassz hónapot és évet'
+    expiryValid.value = false; return
+  }
+  expiryError.value = ''; expiryValid.value = true
+}
+
+function validateCvv() {
+  const len = cardCvv.value.length
+  const required = cardType.value === 'amex' ? 4 : 3
+  if (!len) { cvvError.value = ''; cvvValid.value = false; return }
+  if (len < required) {
+    cvvError.value = `Túl rövid (${len}/${required} számjegy)`
+    cvvValid.value = false; return
+  }
+  cvvError.value = ''; cvvValid.value = true
+}
+
+const kartyaCheck = computed(() => {
   const numLen = cardNumber.value.replace(/\s/g, '').length
   const cvvLen = cardCvv.value.length
 
@@ -323,12 +413,20 @@ const submit = async () => {
     return
   }
 
-  if (!kartyaValid.value) {
+  if (!kartyaCheck.value) {
   overlayMessage.value = 'Kérlek töltsd ki az összes mezőt helyesen!'
   showOverlay.value = true
   isSubmitting.value = false
   return
   }
+
+  validateCardNumber(); validateCardName(); validateExpiry(); validateCvv()
+    if (cardNumberError.value || cardNameError.value || expiryError.value || cvvError.value) {
+      overlayMessage.value = 'Kérlek javítsd a hibás mezőket!'
+      showOverlay.value = true
+      isSubmitting.value = false
+      return
+    }
   try {
     if (rendelesId) {
       await axios.patch(`/api/rendelesek/${rendelesId}/fizetes_statusz`, {
@@ -1128,5 +1226,33 @@ onMounted(async () => {
 .card-form__button.button-disabled:hover {
   transform: none;
   box-shadow: none;
+}
+
+.input-error {
+  border-color: #dc2626 !important;
+  background: #fef2f2 !important;
+}
+
+.input-success {
+  border-color: #059669 !important;
+  background: #f0fdf4 !important;
+}
+
+.error-message {
+  font-size: 12px;
+  color: #dc2626;
+  font-weight: 600;
+  margin-top: 4px;
+  display: block;
+  animation: shake 0.3s ease-in-out;
+}
+
+.error-indicator { color: #dc2626; margin-left: 6px; font-weight: bold; }
+.success-indicator { color: #059669; margin-left: 6px; font-weight: bold; }
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
 }
 </style>

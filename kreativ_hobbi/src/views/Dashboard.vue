@@ -805,6 +805,12 @@ let revenueChartInstance = null;
 
 // Data
 const stats = ref({ totalSales: 0, totalOrders: 0, totalProducts: 0, totalCustomers: 0 });
+const changes = ref({
+  sales: null,
+  orders: null,
+  products: null,
+  customers: null,
+});
 const products = ref([]);
 const users = ref([]);
 const blogPosts = ref([]);
@@ -832,7 +838,11 @@ const fetchOrders = async () => {
 
 const fetchAnalytics = async () => {
   const { data } = await axios.get(`${API}/analytics`);
-  analyticsData.value = data;
+  analyticsData.value = {
+    ...data,
+    monthlySales:  Array.isArray(data.monthlySales)  ? data.monthlySales  : Object.values(data.monthlySales  ?? {}),
+    monthlyOrders: Array.isArray(data.monthlyOrders) ? data.monthlyOrders : Object.values(data.monthlyOrders ?? {}),
+  };
 };
 
 const fetchProducts = async () => {
@@ -1255,6 +1265,7 @@ const destroyAnalyticsCharts = () => {
 };
 
 const MONTHS = ['Jan', 'Feb', 'Már', 'Ápr', 'Máj', 'Jún', 'Júl', 'Aug', 'Sze', 'Okt', 'Nov', 'Dec'];
+const currentMonth = new Date().getMonth() + 1;
 
 const initCharts = () => {
   nextTick(() => {
@@ -1262,10 +1273,10 @@ const initCharts = () => {
       salesChartInstance = new Chart(salesChart.value, {
         type: 'line',
         data: {
-          labels: MONTHS.slice(0, analyticsData.value.monthlySales.length),
+          labels: MONTHS.slice(0, currentMonth),
           datasets: [{
             label: 'Értékesítés (Ft)',
-            data: analyticsData.value.monthlySales,
+            data: analyticsData.value.monthlySales.slice(0, currentMonth),
             borderColor: '#f97316',
             backgroundColor: 'rgba(99, 102, 241, 0.1)',
             tension: 0.4, fill: true
