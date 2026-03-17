@@ -3,6 +3,12 @@ import axios from 'axios';
 import { ref, reactive, onMounted, watch, onUnmounted, nextTick } from 'vue';
 import { RouterLink } from 'vue-router';
 import Dropdown from 'primevue/dropdown';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { faHeart as fasHeart } from '@fortawesome/free-solid-svg-icons'
+import { faHeart as farHeart } from '@fortawesome/free-regular-svg-icons'
+
+library.add(fasHeart, farHeart)
 
 const userData = ref(null);
 const baseUrl = `${import.meta.env.VITE_API_URL}/storage`;
@@ -29,6 +35,7 @@ const capturedBlob = ref(null);
 const objectUrl = ref(null);
 const cameraStream = ref(null);
 const uploading = ref(false);
+const likedIds = ref(new Set())
 
 const user = reactive({
   name: '',
@@ -42,6 +49,7 @@ const user = reactive({
 const posts = ref([]);
 const showLogout = ref(false);
 const showSzerkesztes = ref(false);
+const showKedvencekModal = ref(false);
 
 // Fetch user data
 async function fetchUserData() {
@@ -165,7 +173,7 @@ async function saveProfile() {
     user.name = userData.value.felhasz_nev;
     user.username = userData.value.felhasz_nev;
     showSzerkesztes.value = false;
-    alert('Profil sikeresen frissítve!'); // ✅ Success alert
+    alert('Profil sikeresen frissítve!');
   } catch (error) {
     console.error('Error saving profile:', error);
     if (error.response && error.response.status === 422) {
@@ -307,11 +315,36 @@ const showKedvencek = ref(false)
 const kedvencTermekek = ref([])
 
 async function loadKedvencek() {
-  showKedvencek.value = !showKedvencek.value
-  if (showKedvencek.value && kedvencTermekek.value.length === 0) {
-    const res = await axios.get('/api/user/kedvencek/termekek') // see below
-    kedvencTermekek.value = res.data
+  showKedvencekModal.value = true;
+  showKedvencek.value = true;
+
+  try {
+    const res = await axios.get('/api/user/kedvencek/termekek');
+    kedvencTermekek.value = res.data;
+    likedIds.value = new Set(kedvencTermekek.value.map(p => p.id));
+  } catch (error) {
+    console.error('Hiba a kedvencek betöltésekor:', error);
   }
+}
+
+async function toggleLike(item, event) {
+  event.stopPropagation();
+  try {
+    const res = await axios.post(`/api/termekek/${item.id}/kedvenc`);
+    if (res.data.liked) {
+      likedIds.value.add(item.id);
+    } else {
+      likedIds.value.delete(item.id);
+      kedvencTermekek.value = kedvencTermekek.value.filter(p => p.id !== item.id);
+    }
+  } catch (error) {
+    console.error('Toggle like failed', error);
+  }
+}
+
+function cancelKedvencek() {
+  showKedvencekModal.value = false;
+  showKedvencek.value = false;
 }
 
 function kijelentkezes() { showLogout.value = true; }
@@ -356,141 +389,130 @@ function formatDate(d) { return new Date(d).toLocaleDateString(); }
       </div>
     </section>
     <div class="profile-actions">
-        <div v-if="showLogout" class="modal-backdrop" @click.self="cancelLogout">
-          <div class="modal">
-            <h3>Kijelentkezés</h3>
-            <p>Biztos ki szeretnél jelentkezni?</p>
-            <div class="modal-actions">
-              <button class="btn confirm" @click="confirmLogout">Igen, kijelentkezés</button>
-              <button class="btn cancel" @click="cancelLogout">Mégse</button>
-            </div>
-          </div>
-        </div>
-        <div v-else-if="showSzerkesztes" class="szerk-modal-backdrop" @click.self="cancelSzerkesztes">
-          <div class="szerk-modal">
-            <div class="szerk-modal-header">
-              <h3>Profil szerkesztése</h3>
-              <button class="close-btn" @click="cancelSzerkesztes">✕</button>
-            </div>
-            <form @submit.prevent="saveProfile">
-              <!-- Személyes adatok -->
-              <div class="form-section">
-                <h4>Személyes adatok</h4>
-                <div class="form-row">
-                  <div class="form-group">
-                    <label for="vezeteknev">Vezetéknév</label>
-                    <input type="text" id="vezeteknev" v-model="editForm.vezeteknev" placeholder="Pl. Nagy" />
-                  </div>
-                  <div class="form-group">
-                    <label for="keresztnev">Keresztnév</label>
-                    <input type="text" id="keresztnev" v-model="editForm.keresztnev" placeholder="Pl. Anna" />
-                  </div>
-                </div>
-                <div class="form-group">
-                  <label for="telefon">Telefonszám</label>
-                  <input type="tel" pattern="(06|+36)\d{9}" id="telefon" v-model="editForm.telefonszam" placeholder="+36 20 123 4567" />
-                </div>
-              </div>
-
-              <!-- Cím adatok -->
-              <div class="form-section">
-                <h4>Lakcím</h4>
-                <div class="form-group">
-                  <label for="utca">Utca</label>
-                  <input type="text" id="utca" v-model="editForm.utca" placeholder="Kossuth Lajos utca" />
-                </div>
-                <div class="form-row">
-                  <div class="form-group">
-                    <label for="hazszam">Házszám</label>
-                    <input type="number" id="hazszam" v-model="editForm.hazszam" placeholder="12" />
-                  </div>
-                  <div class="form-group">
-                    <label for="emeletAjto">Emelet/Ajtó</label>
-                    <input type="text" id="emeletAjto" v-model="editForm.emeletAjto" placeholder="2/5" />
-                  </div>
-                </div>
-                <div class="form-group">
-                  <label for="varos">Város</label>
-                  <Dropdown
-                    id="varos"
-                    v-model="editForm.varos"
-                    :options="cities"
-                    optionLabel="varos_nev"
-                    optionValue="id"
-                    placeholder="Válassz vagy írj be egy várost"
-                    :filter="true"
-                    filterBy="varos_nev,iranyitoszam"
-                    :showClear="true"
-                    :loading="loadingCities"
-                    class="w-full"
-                  >
-                    <template #value="slotProps">
-                      <div v-if="slotProps.value">
-                        {{ getCityName(slotProps.value) }} ({{ getCityPostal(slotProps.value) }})
-                      </div>
-                      <span v-else>{{ slotProps.placeholder }}</span>
-                    </template>
-                    <template #option="slotProps">
-                      <div>{{ slotProps.option.varos_nev }} ({{ slotProps.option.iranyitoszam }})</div>
-                    </template>
-                  </Dropdown>
-                </div>
-              </div>
-
-              <!-- Profilkép -->
-              <div class="form-section">
-                <h4>Profilkép</h4>
-                <div class="form-group">
-                  <label for="avatar">Feltöltés számítógépről</label>
-                  <input type="file" id="avatar" accept="image/*" @change="handleFileUpload" />
-                </div>
-                <div v-if="!showCamera" class="camera-toggle">
-                  <button type="button" class="btn camera-btn" @click="startCamera">📷 Kamera használata</button>
-                </div>
-                <div v-if="showCamera" class="camera-preview">
-                  <video ref="videoRef" autoplay playsinline></video>
-                  <canvas ref="canvasRef" style="display: none;"></canvas>
-                  <div class="camera-controls">
-                    <button type="button" class="btn capture" @click="capturePhoto">Fotózás</button>
-                    <button type="button" class="btn cancel" @click="stopCamera">Mégse</button>
-                  </div>
-                  <div v-if="capturedBlob" class="captured-preview">
-                    <p>Előkép:</p>
-                    <img :src="objectUrl" alt="preview" />
-                    <button type="button" class="btn upload" @click="uploadProfilePhoto" :disabled="uploading">
-                      {{ uploading ? 'Feltöltés...' : 'Profilkép beállítása' }}
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Mentés/Mégse gombok -->
-              <div class="form-actions">
-                <button type="button" class="btn cancel" @click="cancelSzerkesztes">Mégse</button>
-                <button type="submit" class="btn save" :disabled="saving">
-                  {{ saving ? 'Mentés...' : 'Mentés' }}
-                </button>
-              </div>
-            </form>
+      <div v-if="showLogout" class="modal-backdrop" @click.self="cancelLogout">
+        <div class="modal">
+          <h3>Kijelentkezés</h3>
+          <p>Biztos ki szeretnél jelentkezni?</p>
+          <div class="modal-actions">
+            <button class="btn confirm" @click="confirmLogout">Igen, kijelentkezés</button>
+            <button class="btn cancel" @click="cancelLogout">Mégse</button>
           </div>
         </div>
       </div>
-    <section class="content">
-      <div class="content-grid">
-        <aside class="left-col">
-          <div class="about-card">
-            <h3>Rólam</h3>
-            <p><strong>Csatlakozott:</strong> {{ formatDate(user.joined) }}</p>
-            <p><strong>Hobbi:</strong> Kötés, horgolás, hímzés, mintatervezés</p>
-            <hr />
-            <h4>Információk</h4>
-            <ul>
-              <li><strong>{{ user.stats.posts }}</strong> bejegyzés</li>
-            </ul>
+      <div v-else-if="showSzerkesztes" class="szerk-modal-backdrop" @click.self="cancelSzerkesztes">
+        <div class="szerk-modal">
+          <div class="szerk-modal-header">
+            <h3>Profil szerkesztése</h3>
+            <button class="close-btn" @click="cancelSzerkesztes">✕</button>
           </div>
-          <button class="btn edit" style="margin-top:12px; width:100%" @click="loadKedvencek">
-            ♥ Kedvenc termékek
-          </button>
+          <form @submit.prevent="saveProfile">
+            <!-- Személyes adatok -->
+            <div class="form-section">
+              <h4>Személyes adatok</h4>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="vezeteknev">Vezetéknév</label>
+                  <input type="text" id="vezeteknev" v-model="editForm.vezeteknev" placeholder="Pl. Nagy" />
+                </div>
+                <div class="form-group">
+                  <label for="keresztnev">Keresztnév</label>
+                  <input type="text" id="keresztnev" v-model="editForm.keresztnev" placeholder="Pl. Anna" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="telefon">Telefonszám</label>
+                <input type="tel" pattern="(06|+36)\d{9}" id="telefon" v-model="editForm.telefonszam" placeholder="+36 20 123 4567" />
+              </div>
+            </div>
+
+            <!-- Cím adatok -->
+            <div class="form-section">
+              <h4>Lakcím</h4>
+              <div class="form-group">
+                <label for="utca">Utca</label>
+                <input type="text" id="utca" v-model="editForm.utca" placeholder="Kossuth Lajos utca" />
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="hazszam">Házszám</label>
+                  <input type="number" id="hazszam" v-model="editForm.hazszam" placeholder="12" />
+                </div>
+                <div class="form-group">
+                  <label for="emeletAjto">Emelet/Ajtó</label>
+                  <input type="text" id="emeletAjto" v-model="editForm.emeletAjto" placeholder="2/5" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="varos">Város</label>
+                <Dropdown
+                  id="varos"
+                  v-model="editForm.varos"
+                  :options="cities"
+                  optionLabel="varos_nev"
+                  optionValue="id"
+                  placeholder="Válassz vagy írj be egy várost"
+                  :filter="true"
+                  filterBy="varos_nev,iranyitoszam"
+                  :showClear="true"
+                  :loading="loadingCities"
+                  class="w-full"
+                >
+                  <template #value="slotProps">
+                    <div v-if="slotProps.value">
+                      {{ getCityName(slotProps.value) }} ({{ getCityPostal(slotProps.value) }})
+                    </div>
+                    <span v-else>{{ slotProps.placeholder }}</span>
+                  </template>
+                  <template #option="slotProps">
+                    <div>{{ slotProps.option.varos_nev }} ({{ slotProps.option.iranyitoszam }})</div>
+                  </template>
+                </Dropdown>
+              </div>
+            </div>
+
+            <!-- Profilkép -->
+            <div class="form-section">
+              <h4>Profilkép</h4>
+              <div class="form-group">
+                <label for="avatar">Feltöltés számítógépről</label>
+                <input type="file" id="avatar" accept="image/*" @change="handleFileUpload" />
+              </div>
+              <div v-if="!showCamera" class="camera-toggle">
+                <button type="button" class="btn camera-btn" @click="startCamera">📷 Kamera használata</button>
+              </div>
+              <div v-if="showCamera" class="camera-preview">
+                <video ref="videoRef" autoplay playsinline></video>
+                <canvas ref="canvasRef" style="display: none;"></canvas>
+                <div class="camera-controls">
+                  <button type="button" class="btn capture" @click="capturePhoto">Fotózás</button>
+                  <button type="button" class="btn cancel" @click="stopCamera">Mégse</button>
+                </div>
+                <div v-if="capturedBlob" class="captured-preview">
+                  <p>Előkép:</p>
+                  <img :src="objectUrl" alt="preview" />
+                  <button type="button" class="btn upload" @click="uploadProfilePhoto" :disabled="uploading">
+                    {{ uploading ? 'Feltöltés...' : 'Profilkép beállítása' }}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Mentés/Mégse gombok -->
+            <div class="form-actions">
+              <button type="button" class="btn cancel" @click="cancelSzerkesztes">Mégse</button>
+              <button type="submit" class="btn save" :disabled="saving">
+                {{ saving ? 'Mentés...' : 'Mentés' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div v-else-if="showKedvencekModal" class="kedvencek-modal-backdrop" @click.self="cancelKedvencek">
+        <div class="kedvencek-modal">
+          <div class="kedvencek-modal-header">
+            <h3>Kedvenc termékek</h3>
+            <button class="close-btn" @click="cancelKedvencek">✕</button>
+          </div>
           <div v-if="showKedvencek" class="kedvenc-lista">
             <div v-if="kedvencTermekek.length === 0" class="kedvenc-ures">
               Még nincs kedvenc termék.
@@ -501,6 +523,11 @@ function formatDate(d) { return new Date(d).toLocaleDateString(); }
               class="kedvenc-card"
               @click="$router.push(`/aruhaz/${t.id}`)"
             >
+              <div class="heart-wrapper">
+                <button class="heart-btn" @click="toggleLike(t, $event)" :class="{ liked: likedIds.has(t.id) }">
+                  <FontAwesomeIcon :icon="likedIds.has(t.id) ? ['fas', 'heart'] : ['far', 'heart']" />
+                </button>
+              </div>
               <img :src="t.termek_fo_kep.url_Link" :alt="t.termek_fo_kep.alt_szoveg" class="kedvenc-img" />
               <div class="kedvenc-body">
                 <h3 class="kedvenc-title">{{ t.nev }}</h3>
@@ -517,6 +544,25 @@ function formatDate(d) { return new Date(d).toLocaleDateString(); }
               </div>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+    <section class="content">
+      <div class="content-grid">
+        <aside class="left-col">
+          <div class="about-card">
+            <h3>Rólam</h3>
+            <p><strong>Csatlakozott:</strong> {{ formatDate(user.joined) }}</p>
+            <p><strong>Hobbi:</strong> Kötés, horgolás, hímzés, mintatervezés</p>
+            <hr />
+            <h4>Információk</h4>
+            <ul>
+              <li><strong>{{ user.stats.posts }}</strong> bejegyzés</li>
+            </ul>
+          </div>
+          <button class="btn kedvencek" style="margin-top:12px; width:100%" @click="loadKedvencek">
+            <font-awesome-icon icon="fa-solid fa-heart" style="color: red;"/> Kedvenc termékek
+          </button>
         </aside>
 
         <section class="main-col">
@@ -571,90 +617,6 @@ function formatDate(d) { return new Date(d).toLocaleDateString(); }
 </template>
 
 <style scoped>
-.kedvenc-lista {
-  margin-top: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.kedvenc-ures {
-  color: #888;
-  font-size: 14px;
-  text-align: center;
-  padding: 16px 0;
-}
-
-.kedvenc-card {
-  background: white;
-  border-radius: 14px;
-  overflow: hidden;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
-  display: flex;
-  flex-direction: column;
-  cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-  border: 1px solid rgba(0,0,0,0.04);
-}
-
-.kedvenc-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 26px rgba(0,0,0,0.12);
-}
-
-.kedvenc-img {
-  width: 100%;
-  height: 160px;
-  object-fit: cover;
-}
-
-.kedvenc-body {
-  padding: 12px 14px 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.kedvenc-title {
-  font-size: 16px;
-  font-weight: 600;
-  margin: 0;
-}
-
-.kedvenc-price {
-  font-weight: 700;
-  color: #2e7d32;
-  margin: 0;
-}
-
-.kedvenc-desc {
-  font-size: 13px;
-  color: #555;
-  line-height: 1.3;
-  max-height: 2.6em;
-  overflow: hidden;
-  margin: 0;
-}
-
-.kedvenc-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-  margin-top: 2px;
-}
-
-.kedvenc-tag {
-  background: #ffebd3;
-  color: #a8532b;
-  font-size: 11px;
-  padding: 3px 8px;
-  border-radius: 999px;
-}
-
-.kedvenc-tag.main-category {
-  background: #ff753657;
-}
-
 .draft-badge {
   background: #fbbf24;
   color: #000;
@@ -884,8 +846,9 @@ function formatDate(d) { return new Date(d).toLocaleDateString(); }
   opacity: 0.6;
   cursor: not-allowed;
 }
+/*#endregion */
 
-/* Űrlap akciógombok */
+/*#region Űrlap akciógombok */
 .form-actions {
   display: flex;
   justify-content: flex-end;
@@ -1088,6 +1051,196 @@ function formatDate(d) { return new Date(d).toLocaleDateString(); }
   color: #374151; 
 }
 
+/*#region Kedvencek modal*/
+.kedvencek {
+  padding: 18px 25px;
+  background-color: #ffffff;
+  border: 2px dashed rgb(110, 58, 13);
+  box-shadow: 0 0 0 4px #dbdbdb26, 2px 2px 4px 2px rgba(167, 157, 157, 0.5);
+  transition: .1s ease-in-out, .4s color;
+}
+
+.kedvencek:hover {
+  background-color: #f9f9f9;
+  transform: scale(1.05);
+}
+
+.kedvencek-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.kedvencek-modal {
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: modalFadeIn 0.2s ease;
+}
+
+@keyframes modalFadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.kedvencek-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 25px;
+  border-bottom: 1px solid #e9ecef;
+  background: #fafbfc;
+  border-radius: 20px 20px 0 0;
+}
+
+.kedvencek-modal-header h3 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
+  color: #1a1e24;
+}
+
+.kedvencek-modal {
+  max-width: 650px;
+}
+
+.kedvencek-modal {
+  max-width: 800px;
+}
+
+.kedvenc-lista {
+  padding: 1.5rem;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+}
+
+.kedvenc-ures {
+  grid-column: 1 / -1;
+  color: #94a3b8;
+  font-size: 1rem;
+  text-align: center;
+  padding: 2rem 0;
+}
+
+.kedvenc-card {
+  background: white;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: 1px solid rgba(0,0,0,0.04);
+  height: 100%;
+}
+
+.kedvenc-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.12);
+}
+
+.kedvenc-img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+}
+
+.kedvenc-body {
+  padding: 1rem 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.kedvenc-title {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0;
+  color: #1e293b;
+  line-height: 1.4;
+}
+
+.kedvenc-price {
+  font-weight: 700;
+  color: #2e7d32;
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.kedvenc-desc {
+  font-size: 0.8rem;
+  color: #475569;
+  line-height: 1.4;
+  max-height: 2.8em;
+  overflow: hidden;
+  margin: 0.25rem 0 0;
+}
+
+.kedvenc-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.25rem;
+}
+
+.kedvenc-tag {
+  background: #ffedd5;
+  color: #9a3412;
+  font-size: 0.7rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+  font-weight: 500;
+}
+
+.kedvenc-tag.main-category {
+  background: #f97316;
+  color: white;
+}
+
+.heart-wrapper {
+  position: relative;
+}
+
+.heart-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(255, 255, 255, 0.85);
+  border: none;
+  border-radius: 50%;
+  width: 34px;
+  height: 34px;
+  font-size: 18px;
+  cursor: pointer;
+  color: #ccc;
+  transition: color 0.2s, transform 0.15s;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.heart-btn.liked {
+  color: #e03e3e;
+}
+
+.heart-btn:hover {
+  transform: scale(1.15);
+}
+
+/*#endregion*/
+
 /* content layout */
 .content {
   max-width: 1100px;
@@ -1162,6 +1315,7 @@ color: #6b7280;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  /*max-height: 160px;*/
 }
 
 .post-body {
@@ -1266,6 +1420,12 @@ color: #6b7280;
     flex-direction: row; 
     width: 100%; 
     justify-content: space-between; 
+  }
+}
+
+@media (max-width: 640px) {
+  .kedvenc-lista {
+    grid-template-columns: 1fr;
   }
 }
 
