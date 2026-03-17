@@ -62,13 +62,13 @@
       <div class="switch__circle" :style="{ transform: isSignInMode ? 'translateX(0%)' : 'translateX(60%)' }"></div>
       <div class="switch__circle switch__circle--t" :style="{ transform: isSignInMode ? 'translateX(0%)' : 'translateX(-60%)' }"></div>
       <div class="switch__container" :class="{ 'is-hidden': isSignInMode }">
-        <h2 class="title">Üdvözöljük vissza!</h2>
-        <p class=" description">A kapcsolat fenntartásához kérjük, jelentkezzen be személyes adataival</p>
+        <h2 class="title">Üdvözlünk vissza!</h2>
+        <p class=" description">Van már fiókod? Jelentkezz be, hogy hozzáférj az eddig megszokott funkcióidhoz!</p>
         <button class="switch__button button" @click="toggleForm">Bejelentkezés</button>
       </div>
       <div class="switch__container" :class="{ 'is-hidden': !isSignInMode }">
-        <h2 class="title">Helló Barátom!</h2>
-        <p class=" description">Add meg személyes adataidat, és kezdd el az utazást velünk</p>
+        <h2 class="title">Nincs még fiókod?</h2>
+        <p class=" description">Adj meg pár adatot és regisztrálj az oldalunkra, hogy még több szuper funkcióhoz férj hozzá!</p>
         <button class="switch__button button" @click="toggleForm" >Regisztráció</button>
       </div>
     </div>
