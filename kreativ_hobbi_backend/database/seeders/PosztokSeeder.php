@@ -25,7 +25,7 @@ class PosztokSeeder extends Seeder
                 <div><p><strong>☑️ Gyakorló projekt:</strong> Horgolj egy 20x20 cm-es négyzetet! Használd ezt később alátétként, vagy varrj össze több ilyen négyzetet egy színes takaróvá. A négyzetek remek módjai az új öltések kipróbálásának.</p></div>
                 <p>A horgolás szépsége, hogy bárhol, bármikor előveheted – egy buszúton, tévézés közben vagy egy csésze tea mellett is. Adj időt magadnak, és ne aggódj, ha az első sorok nem tökéletesek. A gyakorlás hamar meghozza a rutint!</p>',
                 'szerzo_id' => 1,
-                'fo_kep_id' => 2,
+                'fo_kep_id' => 5,
                 'letrehozas_datuma' => now(),
                 'statusz' => 'közzétett'
             ],
@@ -40,7 +40,7 @@ class PosztokSeeder extends Seeder
                 <p>Két alapvető szemléletmód létezik: a sima és a fordított. A sima szem a kötés "jobb oldala", a fordított pedig a bal. Ha minden sort simán kötsz, akkor lustakötést kapsz, ami egy rugalmas, hullámos felület. Ha váltogatod a sima és fordított sorokat, akkor harisnyakötés jön létre – az egyik oldal sima, a másik bordázott. Ha egy soron belül váltogatod a két szemet (pl. 2 sima, 2 fordított), akkor patentmintát kapsz, ami a pulóverek alján és a sálak szélén is remekül mutat.</p>
                 <p>Kezdésnek tanuld meg a szemek felszedését – ez az egyik legnehezebb lépés, de rengeteg videó segít az interneten. Ne csüggedj, ha elsőre nem sikerül, próbáld újra!</p><div"><p><strong>☑️ Javaslat:</strong> Az első komolyabb projekted lehet egy egyszerű sál lustakötéssel. Válassz egy szép színű, vastag fonalat, és köss addig, amíg el nem éred a kívánt hosszt. A végén eldolgozod a szálakat, és már viselheted is a saját készítésű sáladat!</p></div>',
                 'szerzo_id' => 1,
-                'fo_kep_id' => 5,
+                'fo_kep_id' => 6,
                 'letrehozas_datuma' => now()->subDays(3),
                 'statusz' => 'közzétett'
             ],
@@ -62,7 +62,7 @@ class PosztokSeeder extends Seeder
                 <div><p><strong>☑️ Ötlet:</strong> Készíts egy mini fűszernövénykertet egy hosszúkás balkonládába! Tedd ki a konyhaablakba, és szükség szerint csipkedd le a friss zöldeket a főzéshez. A bazsalikom, menta és rozmaring együtt is elfér, és csodás illatot árasztanak.</p></div>
                 <p>Ne feledd: a kertészkedés türelemjáték. A növények nem nőnek egyik napról a másikra, de a gondoskodás meghozza gyümölcsét – szó szerint is, ha mondjuk epret vagy koktélparadicsomot ültetsz.</p>',
                 'szerzo_id' => 1,
-                'fo_kep_id' => 8,
+                'fo_kep_id' => 7,
                 'letrehozas_datuma' => now()->subDays(5),
                 'statusz' => 'közzétett'
             ],
@@ -86,7 +86,7 @@ class PosztokSeeder extends Seeder
                 <p>Most jön a legizgalmasabb rész: a falra szerelés. Tartsd a polcot a falhoz a kívánt magasságban, és vízszintezővel ellenőrizd. Jelöld meg ceruzával a furatok helyét a falon a konzolok lyukain keresztül. Fúrd ki a lyukakat a falba (ehhez használj fúrót, ami a fal anyagához illik – téglafalhoz ütvefúró, gipszkartonhoz sima fúró). Helyezd be a tipliket, majd csavard fel a konzolokat a falra. Végül helyezd rá a polcot a konzolokra, és ha szükséges, rögzítsd felülről is egy-egy apró csavarral.</p>
                 <div><p><strong>☑️ Tipp:</strong> Mielőtt a falba fúrsz, ellenőrizd, hogy nem vezet-e a falban elektromos kábel vagy vízcső (használj kábelkeresőt)! Kezdésnek válassz egy kevésbé látványos helyet, például a kamrában vagy a műhelyben, hogy magabiztosan gyakorolj.</p></div>',
                 'szerzo_id' => 1,
-                'fo_kep_id' => 6,
+                'fo_kep_id' => 8,
                 'letrehozas_datuma' => now(),
                 'statusz' => 'közzétett'
             ],
@@ -108,7 +108,7 @@ class PosztokSeeder extends Seeder
                 <p>A hímzésben nincsenek szigorú szabályok – nyugodtan kombináld az öltéseket, és alkoss szabadon. A legszebb darabok gyakran a "hibákból" születnek.</p>
                 <div><p><strong>☑️ Első projekt:</strong> Vegyél egy egyszerű, egyszínű párnahuzatot, és hímezz rá egy nagy kezdőbetűt vagy egy apró virágot. Ez egy személyre szabott ajándék is lehet, és egy este alatt elkészül.</p></div>',
                 'szerzo_id' => 1,
-                'fo_kep_id' => 7,
+                'fo_kep_id' => 9,
                 'letrehozas_datuma' => now(),
                 'statusz' => 'közzétett'
             ],
@@ -131,7 +131,7 @@ class PosztokSeeder extends Seeder
                 <div><p><strong>☑️ Egyszerű projekt:</strong> Készíts egy rugalmas karkötőt! Válassz ki 5-6 féle színes gyöngyöt, fűzd fel tetszőleges sorrendben egy rugalmas damilra, majd kösd össze a végeket. Pár perc alatt elkészül, és remek kiegészítője lehet a mindennapi viseletednek.</p></div>
                 <p>A gyöngyfűzés nemcsak szórakoztató, de fejleszti a finommotorikát és a kreativitást is. Ráadásul egyedi ékszereket készíthetsz, amelyeket senki más nem fog viselni. Próbáld ki, és hamar rákapsz az ízére!</p>',
                 'szerzo_id' => 1,
-                'fo_kep_id' => 9,
+                'fo_kep_id' => 10,
                 'letrehozas_datuma' => now(),
                 'statusz' => 'közzétett'
             ],
@@ -156,7 +156,7 @@ class PosztokSeeder extends Seeder
                 <div><p><strong>☑️ Őszi projekt:</strong> Ültess el egy cserépbe többféle tavaszi hagymát rétegesen (lasagne-módszer)! Vegyél egy nagyobb cserepet, alulra tedd a legnagyobb hagymákat (pl. tulipán), majd egy vékony földréteg után közepeseket (nárcisz), legfelülre pedig aprókat (krókusz vagy sáfrány). Így tavasszal hosszabb ideig virágzó kompozíciót kapsz egyetlen cserépben.</p></div>
                 <p>Az ősz a nyugalom és a készülődés időszaka. Végezd el ezeket a feladatokat most, hogy kerted tavasszal megköszönje. És közben élvezd a színes leveleket, a friss levegőt és a természet csodás átváltozását!</p>',
                 'szerzo_id' => 1,
-                'fo_kep_id' => 10,
+                'fo_kep_id' => 11,
                 'letrehozas_datuma' => now(),
                 'statusz' => 'közzétett'
             ]

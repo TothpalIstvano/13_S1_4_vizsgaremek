@@ -7,6 +7,7 @@ use App\Models\Kepek;
 
 use Illuminate\Database\Seeder;
 use Psy\Readline\Hoa\Console;
+use Illuminate\Support\Facades\Storage;
 
 class KepekSeeder extends Seeder
 {
@@ -15,34 +16,22 @@ class KepekSeeder extends Seeder
      */
     public function run(): void
     {
+        $baseUrl = 'http://127.0.0.1:8000/storage/';
+        $mappak = ['profilKepek', 'blog', 'termekKepek'];
 
-        $mappak = ['profilKepek','blog','termekKepek']; //kepek mappa nevei
-        $elnevezesek = ['kep','post','item']; //kepek mappa elnevezései
-        $maphosszok = [3,10,17]; //kepek mappa hosszai az adatbazisban induláskor
-        $baseUrl = 'http://127.0.0.1:8000/storage/'; // Laravel storage URL
+        foreach ($mappak as $mappa) {
+            $fajlok = Storage::disk('public')->files($mappa);
 
-        for ($index = 0; $index < count($mappak); $index++) {
-            for ($i = 1; $i <= $maphosszok[$index]; $i++) {
-                if ($i == 1) {
-                    $image = [
-                        'url_Link' => $baseUrl . $mappak[$index] . '/' . 'default' . '.jpg',
-                        'alt_Szoveg' => 'Image ' . $i . ' in ' . $mappak[$index],
-                        'leiras' => 'Description of image ' . $i . ' in ' . $mappak[$index]
-                    ];
-                }
-                else{
-                    $image = [
-                        'url_Link' => $baseUrl . $mappak[$index] . '/' . $elnevezesek[$index].'_'. $i . '.jpg',
-                        'alt_Szoveg' => 'Image ' . $i . ' in ' . $mappak[$index],
-                        'leiras' => 'Description of image ' . $i . ' in ' . $mappak[$index]
-                    ];
-                    
-                }
-                Kepek::create($image);
+            foreach ($fajlok as $fajl) {
+                Kepek::create([
+                    'url_Link' => $baseUrl . $fajl,
+                    'alt_Szoveg' => basename($fajl) . ' in ' . $mappa,
+                    'leiras' => 'Description of ' . basename($fajl) . ' in ' . $mappa,
+                ]);
             }
         }
-        Kepek::factory(100)->create();
 
-        $this->command->info('Kep table seeded with 20 images!');
+        Kepek::factory(100)->create();
+        $this->command->info('Kepek tábla sikeresen feltöltve!');
     }
 }
