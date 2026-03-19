@@ -13,7 +13,11 @@ const props = defineProps({
   isReply: {
     type: Boolean,
     default: false
-  }
+  },
+    currentUserId: {
+    type: Number,
+    default: null
+  },
 })
 
 const emit = defineEmits(['reply', 'delete'])
@@ -54,7 +58,8 @@ const formatDate = (dateString) => {
         </div>
       </div>
       
-      <button 
+      <button
+        v-if="currentUserId && comment.felhasznalo?.id === currentUserId"
         @click="$emit('delete', comment.id)" 
         class="delete-btn"
         title="Törlés"
@@ -81,11 +86,12 @@ const formatDate = (dateString) => {
     </div>
     
     <div v-if="comment.gyermekKommentek && comment.gyermekKommentek.length > 0" class="replies">
-      <CommentItem 
+      <Komment 
         v-for="reply in comment.gyermekKommentek" 
         :key="reply.id" 
         :comment="reply"
         :isReply="true"
+        :currentUserId="currentUserId"
         @reply="$emit('reply', $event)"
         @delete="$emit('delete', $event)"
       />

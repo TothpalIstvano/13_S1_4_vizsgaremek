@@ -80,7 +80,7 @@ const adatfelhasznalasFile = async () => {
   justify-content: space-around;
   gap: 2rem;
   max-width: 80%;
-  height: 150px;
+  height: auto;
   margin: 0 auto;
 }
 
@@ -121,12 +121,17 @@ const adatfelhasznalasFile = async () => {
   gap: 1rem; /* Adjust this value for bigger/smaller gaps */
   text-decoration: underline;
 }
+
 @media (max-width: 700px) {
+  .footer-content {
+    flex-direction: column;
+    max-width: 95%;
+    gap: 1.5rem;
+  }
+
   .footer-section {
     min-width: unset;
     width: 100%;
-    text-align: center;
-    flex: 100%;
   }
 }
 </style>
