@@ -147,7 +147,7 @@ export default {
                           <FontAwesomeIcon :icon="['fab', 'github']" class="icons"/>
                       </a>
                   </div>
-                  <button class="button">Contact Me</button>
+                  <button class="button">Lépj kapcsolatba</button>
               </div>
           </div>
         </div>
@@ -181,7 +181,7 @@ export default {
                           <FontAwesomeIcon :icon="['fab', 'github']" class="ikonok"/>
                       </a>
                   </div>
-                  <button class="button">Contact Me</button>
+                  <button class="button">Lépj kapcsolatba</button>
               </div>
           </div>
         </div>

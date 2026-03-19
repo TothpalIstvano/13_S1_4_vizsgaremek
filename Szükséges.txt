@@ -1,4 +1,3 @@
-- kommentek saját törléssel, ellenőrzéssel (csúnya beszéd szűrés)
 - profilba meg poszt feltöltésnél a primevue dropdownt valami szebb színre zöld helyett
 - newpost notifications magyarul/jobban
 - reakciók poszthoz - tartsa meg a színt frissítés után

@@ -178,10 +178,11 @@
             </div>
             
             <div v-else class="comments-container">
-              <CommentItem 
+              <Komment 
                 v-for="comment in comments" 
                 :key="comment.id" 
                 :comment="comment"
+                :currentUserId="currentUser?.id"
                 @reply="handleReply"
                 @delete="handleDelete"
                 class="comment-item-animate"
@@ -204,7 +205,7 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 import { faCalendar, faUser, faPaperPlane, faClock, faReply, faUserCircle, faArrowCircleUp } from '@fortawesome/free-solid-svg-icons'
 import api from '@/services/api.js'
 import axios from 'axios'
-import CommentItem from '@/components/CommentItem.vue'
+import Komment from '@/components/Komment.vue'
 import fallbackImage from '@/assets/Public/b-pl1.jpg'
 import Image from 'primevue/image';
 

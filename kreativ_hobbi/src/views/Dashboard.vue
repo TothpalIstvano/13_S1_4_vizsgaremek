@@ -1,7 +1,7 @@
 <template>
   <div class="dashboard-wrapper">
     <!-- Sidebar -->
-    <div class="sidebar">
+    <div class="sidebar" :class="{ 'sidebar-open': sidebarOpen }">
       <div class="sidebar-header">
         <h1>🎨 Kreatív Hobbi</h1>
         <p>Adminisztrációs felület</p>
@@ -42,6 +42,9 @@
 
     <!-- Main Content -->
     <main class="main-content">
+      <button class="sidebar-toggle" @click="sidebarOpen = !sidebarOpen">
+        {{ sidebarOpen ? '✕' : '☰' }}
+      </button>
       <!-- Dashboard View -->
       <div v-if="currentView === 'dashboard'">
         <div class="header">
@@ -754,6 +757,11 @@
         </div>
       </div>
     </div>
+    <div 
+    v-if="sidebarOpen" 
+    class="sidebar-overlay" 
+    @click="sidebarOpen = false"
+  ></div>
   </div>
 </template>
 
@@ -784,6 +792,7 @@ const editingBlogPost = ref({});
 const editorKey = ref(0);
 const editorRef = ref(null);
 const loading = ref(false);
+const sidebarOpen = ref(false)
 
 // Complex Form State (from new-post.vue)
 const selectedTags = ref([]); 
@@ -2092,5 +2101,112 @@ tbody tr:hover {
         border-radius: 0 0 10px 10px;
         min-height: 250px;
     }
+}
+
+@media (max-width: 1024px) {
+  .charts-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .search-input {
+    width: 180px;
+  }
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    z-index: 200;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    width: 260px;
+  }
+
+  .sidebar.sidebar-open {
+    transform: translateX(0);
+  }
+
+  .sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 199;
+  }
+
+  .sidebar-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: #7a402d;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 20px;
+    cursor: pointer;
+    margin-bottom: 20px;
+  }
+
+  .main-content {
+    padding: 16px;
+    width: 100%;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .table-container {
+    overflow-x: auto;
+  }
+
+  .table-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .search-input {
+    width: 100%;
+  }
+
+  .search-box {
+    width: 100%;
+  }
+
+  td, th {
+    padding: 10px 12px;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .stat-value {
+    font-size: 24px;
+  }
+}
+
+@media (min-width: 769px) {
+  .sidebar-toggle {
+    display: none;
+  }
+
+  .sidebar-overlay {
+    display: none;
+  }
 }
 </style>
