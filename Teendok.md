@@ -5,7 +5,10 @@
 * \[ ] vásárlási mezők verfikációjának javítása
 * \[ ] kártya adatverifikáció
 * \[ ] telefon szám jobbá tétele
-* \[ ] Analitika fixelés
+* \[ ] Analitika fixelés és kisebbre vétele
+* \[ ] Rendelések tagolása
+* \[ ] Hero banner
+* \[ ] verifikációs emailra való várás
 - \[ ] Alertek lecserélése mindenhol modellekre
 * \[ ] Táblák egységesítése ez alat azt értve hogy a táblákban lévő adatok megegyezenek 
 * \[ ] Posztok és további backend helyekből kivenni a letrehozas_datuma nevű felesleges taget, mivel a created_at egyszerűbb és alap 
@@ -14,6 +17,7 @@
 * \[ ] Az oldal tesztelése
 * \[ ] Az oldal dokumenálása
 * \[ ] Optimalizálás
+
 
 * \[X] Admin oldal kategoria megoszlás csere to fokategoriak és az alá tartozok szám✅
 * \[X] szét szedni a szálitási címet kisebb részekre✅

@@ -130,6 +130,20 @@ onUnmounted(() => {
               @click=open();
             />       
           </div>
+            <RouterLink to="/kosar" id="mobilKosar">
+              <div class="cart-icon-wrapper">
+                <img
+                  alt="Kosár"
+                  class="kosarLogo"
+                  src="@/components/icons/Cart.png"
+                  width="50"
+                  height="50"
+                />
+                <span v-if="cartStore.cartItems.reduce((t, i) => t + i.quantity, 0) > 0" class="cart-badge">
+                  {{ cartStore.cartItems.reduce((t, i) => t + i.quantity, 0) }}
+                </span>
+              </div>
+            </RouterLink>
             <RouterLink to="/" id="nev">
               <h1>Hobbitár</h1>
             </RouterLink>
@@ -268,6 +282,10 @@ onUnmounted(() => {
   border-bottom:2px solid var(--router-link-color);
 }
 
+#mobilKosar {
+  display: none;
+}
+
 #balraTolas{
   margin-left: auto;
 }
@@ -370,6 +388,7 @@ onUnmounted(() => {
     padding: 10px 0;
     height: auto;
   }
+
   #logoDiv {
     margin-left: 20px;
     margin-bottom: 10px;
@@ -399,14 +418,18 @@ onUnmounted(() => {
     padding: 0 20px; /* Add some padding on sides */
     position: relative;
   }
+  #mobilKosar {
+    margin-left: 10px;
+    margin-right: 20px;
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+  }
+
   #nev {
-    margin-right: 52px;
-    width: auto;
-    text-align: center;
-    margin-bottom: 0;
-    float: none;    
+    margin: 0;
+    float: none;
     position: static;
-    left: auto;
   }
   .menu_link.hamburgerElem, .vonal {
     float: none !important;
