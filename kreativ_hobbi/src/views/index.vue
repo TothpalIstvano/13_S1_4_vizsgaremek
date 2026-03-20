@@ -184,7 +184,7 @@ function formatDate(dateString) {
               </div>
 
               <p class="description">
-                {{ n.kivonat || n.tartalom?.substring(0, 150) || 'Nincs leírás...' }}
+                {{ n.kivonat || 'Nincs leírás' }}
                 <span v-if="(n.kivonat || n.tartalom)?.length > 150">...</span>
               </p>
                   
@@ -195,31 +195,6 @@ function formatDate(dateString) {
               </div>
                   
               <div class="card-footer">
-              <!--
-                <div class="reaction-container">
-                  <button 
-                    class="reaction-btn thumbs-up-btn" 
-                    :class="{ 'active': post.userReaction === 'like' }"
-                    @click="handleReaction(post.id, 'like')"
-                  >
-                    <div class="thumb-icon">
-                      <font-awesome-icon icon="fa-solid fa-thumbs-up"/> 
-                    </div>
-                    <span class="reaction-count">{{ post.likes_count || 0 }}</span>
-                  </button>
-                  
-                  <button 
-                    class="reaction-btn thumbs-down-btn" 
-                    :class="{ 'active': post.userReaction === 'dislike' }"
-                    @click="handleReaction(post.id, 'dislike')"
-                  >
-                    <div class="thumb-icon">
-                      <font-awesome-icon icon="fa-solid fa-thumbs-down"/> 
-                    </div>
-                    <span class="reaction-count">{{ post.dislikes_count || 0 }}</span>
-                  </button>
-                </div>-->
-                    
                 <button class="view-btn" @click="navigateToBlog(n.id)">
                   <span>Megtekintés</span>
                   <div class="arrow-icon">
