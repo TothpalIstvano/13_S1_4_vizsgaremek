@@ -8,6 +8,7 @@
 * \[ ] Analitika fixelés és kisebbre vétele
 * \[ ] Rendelések tagolása
 * \[ ] Hero banner
+* \[ ] Hybrid verifikáció
 * \[ ] verifikációs emailra való várás
 - \[ ] Alertek lecserélése mindenhol modellekre
 * \[ ] Táblák egységesítése ez alat azt értve hogy a táblákban lévő adatok megegyezenek 
