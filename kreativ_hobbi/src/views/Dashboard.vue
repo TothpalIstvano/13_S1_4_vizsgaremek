@@ -131,21 +131,73 @@
         <!-- Recent Orders -->
         <div class="table-container">
           <div class="table-header">
-            <h3 class="table-title">Legújabb rendelések</h3>
+            <h3 class="table-title">Rendelések</h3>
+            <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+              <div class="search-box">
+                <input 
+                  type="text" 
+                  class="search-input" 
+                  placeholder="Keresés (név vagy ID alapján)..."
+                  v-model="orderSearch"
+                >
+              </div>
+              <select 
+                v-model="orderStatusFilter" 
+                style="padding:8px 12px; font-size:14px; border:1px solid #e2e8f0; border-radius:8px; height:38px; min-width:160px; background:white; cursor:pointer;"
+              >
+                <option value="">Összes státusz</option>
+                <option value="teljesítve">✅ Teljesítve</option>
+                <option value="függőben">⏳ Függőben</option>
+                <option value="szállítás alatt">🚚 Szállítás alatt</option>
+                <option value="törölve">🚫 Törölve</option>
+              </select>
+            </div>
           </div>
           <table>
             <thead>
               <tr>
-                <th>Rendelés ID</th>
-                <th>Vásárló</th>
-                <th>Termékek</th>
-                <th>Összeg</th>
-                <th>Státusz</th>
-                <th>Dátum</th>
+                <th @click="toggleOrderSort('id')" style="cursor:pointer; user-select:none; white-space:nowrap;">
+                  Rendelés ID
+                  <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
+                    <span :style="orderSortKey === 'id' && orderSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
+                    <span :style="orderSortKey === 'id' && orderSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
+                  </span>
+                </th>
+                <th @click="toggleOrderSort('customer')" style="cursor:pointer; user-select:none; white-space:nowrap;">
+                  Vásárló
+                  <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
+                    <span :style="orderSortKey === 'customer' && orderSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
+                    <span :style="orderSortKey === 'customer' && orderSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
+                  </span>
+                </th>
+                <th @click="toggleOrderSort('items')" style="cursor:pointer; user-select:none; white-space:nowrap;">
+                  Termékek
+                  <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
+                    <span :style="orderSortKey === 'items' && orderSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
+                    <span :style="orderSortKey === 'items' && orderSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
+                  </span>
+                </th>
+                <th @click="toggleOrderSort('total')" style="cursor:pointer; user-select:none; white-space:nowrap;">
+                  Összeg
+                  <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
+                    <span :style="orderSortKey === 'total' && orderSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
+                    <span :style="orderSortKey === 'total' && orderSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
+                  </span>
+                </th>
+                <th style="cursor:pointer; user-select:none; white-space:nowrap;">
+                  Státusz
+                </th>
+                <th @click="toggleOrderSort('date')" style="cursor:pointer; user-select:none; white-space:nowrap;">
+                  Dátum
+                  <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
+                    <span :style="orderSortKey === 'date' && orderSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
+                    <span :style="orderSortKey === 'date' && orderSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
+                  </span>
+                </th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="order in recentOrders" :key="order.id">
+              <tr v-for="order in paginatedOrders" :key="order.id">
                 <td><strong>#{{ order.id }}</strong></td>
                 <td>{{ order.customer }}</td>
                 <td>{{ order.items }}</td>
@@ -159,6 +211,39 @@
               </tr>
             </tbody>
           </table>
+          <!-- Üres állapot -->
+          <div v-if="filteredOrders.length === 0" style="text-align:center; padding:40px; color:#94a3b8;">
+            Nincs találat a megadott feltételekre.
+          </div>
+
+          <!-- Rendelések pagináció -->
+          <div v-if="totalOrderPages > 1" style="display:flex; justify-content:center; align-items:center; gap:8px; padding:16px; border-top:1px solid #e2e8f0;">
+            <button 
+              class="btn btn-sm" 
+              @click="currentOrderPage--" 
+              :disabled="currentOrderPage === 1"
+              style="background:#f1f5f9;"
+            >← Előző</button>
+            
+            <template v-for="page in totalOrderPages" :key="page">
+              <button 
+                class="btn btn-sm"
+                @click="currentOrderPage = page"
+                :style="currentOrderPage === page ? 'background:#f97316; color:white;' : 'background:#f1f5f9;'"
+              >{{ page }}</button>
+            </template>
+            
+            <button 
+              class="btn btn-sm" 
+              @click="currentOrderPage++" 
+              :disabled="currentOrderPage === totalOrderPages"
+              style="background:#f1f5f9;"
+            >Következő →</button>
+            
+            <span style="color:#64748b; font-size:13px; margin-left:8px;">
+              {{ filteredOrders.length }} rendelés / {{ currentOrderPage }}.oldal
+            </span>
+          </div>
         </div>
       </div>
 
@@ -176,23 +261,57 @@
         <div class="table-container">
           <div class="table-header">
             <h3 class="table-title">Összes termék</h3>
-            <div class="search-box">
-              <input 
-                type="text" 
-                class="search-input" 
-                placeholder="Keresés termékek között..."
-                v-model="productSearch"
-              >
+            <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+              <input type="text" class="search-input" placeholder="Keresés termékek között..." v-model="productSearch">
+              <select v-model="productCategoryFilter" style="padding:8px 12px; font-size:14px; border:1px solid #e2e8f0; border-radius:8px; height:38px; background:white; cursor:pointer;">
+                <option value="">Összes kategória</option>
+                <option>Fonalak</option>
+                <option>Kötőtűk</option>
+                <option>Horgolótűk</option>
+                <option>Hímzőfonalak</option>
+                <option>Kellékek</option>
+                <option>Minták</option>
+              </select>
+              <select v-model="productStockFilter" style="padding:8px 12px; font-size:14px; border:1px solid #e2e8f0; border-radius:8px; height:38px; background:white; cursor:pointer;">
+                <option value="">Összes készlet</option>
+                <option value="raktaron">✅ Raktáron</option>
+                <option value="keves">⚠️ Kevés</option>
+                <option value="nincs">🚫 Nincs készleten</option>
+              </select>
             </div>
           </div>
           <table>
             <thead>
               <tr>
                 <th>Kép</th>
-                <th>Név</th>
-                <th>Kategória</th>
-                <th>Ár</th>
-                <th>Készlet</th>
+                <th @click="toggleProductSort('name')" style="cursor:pointer; user-select:none; white-space:nowrap;">
+                  Név
+                  <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
+                    <span :style="productSortKey === 'name' && productSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
+                    <span :style="productSortKey === 'name' && productSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
+                  </span>
+                </th>
+                <th @click="toggleProductSort('category')" style="cursor:pointer; user-select:none; white-space:nowrap;">
+                  Kategória
+                  <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
+                    <span :style="productSortKey === 'category' && productSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
+                    <span :style="productSortKey === 'category' && productSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
+                  </span>
+                </th>
+                <th @click="toggleProductSort('price')" style="cursor:pointer; user-select:none; white-space:nowrap;">
+                  Ár
+                  <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
+                    <span :style="productSortKey === 'price' && productSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
+                    <span :style="productSortKey === 'price' && productSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
+                  </span>
+                </th>
+                <th @click="toggleProductSort('stock')" style="cursor:pointer; user-select:none; white-space:nowrap;">
+                  Készlet
+                  <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
+                    <span :style="productSortKey === 'stock' && productSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
+                    <span :style="productSortKey === 'stock' && productSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
+                  </span>
+                </th>
                 <th>Státusz</th>
                 <th>Műveletek</th>
               </tr>
@@ -269,26 +388,63 @@
         <div class="table-container">
           <div class="table-header">
             <h3 class="table-title">Összes felhasználó</h3>
-            <div class="search-box">
-              <input 
-                type="text" 
-                class="search-input" 
-                placeholder="Keresés felhasználók között..."
-                v-model="userSearch"
-              >
+            <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+              <input type="text" class="search-input" placeholder="Keresés felhasználók között..." v-model="userSearch">
+              <select v-model="userRoleFilter" style="padding:8px 12px; font-size:14px; border:1px solid #e2e8f0; border-radius:8px; height:38px; background:white; cursor:pointer;">
+                <option value="">Összes szerepkör</option>
+                <option value="admin">Admin</option>
+                <option value="moderator">Moderátor</option>
+                <option value="sima">Felhasználó</option>
+                <option value="felfuggesztett">Felfüggesztett</option>
+              </select>
+              <select v-model="userActiveFilter" style="padding:8px 12px; font-size:14px; border:1px solid #e2e8f0; border-radius:8px; height:38px; background:white; cursor:pointer;">
+                <option value="">Összes státusz</option>
+                <option value="true">✅ Aktív</option>
+                <option value="false">🚫 Inaktív</option>
+              </select>
+              <select v-model="userOrderFilter" style="padding:8px 12px; font-size:14px; border:1px solid #e2e8f0; border-radius:8px; height:38px; background:white; cursor:pointer;">
+                <option value="">Összes rendelés</option>
+                <option value="van">📦 Van rendelése</option>
+                <option value="aktiv">⚠️ Aktív rendelése van</option>
+                <option value="nincs">— Nincs rendelése</option>
+              </select>
             </div>
           </div>
           <table>
             <thead>
               <tr>
                 <th>Profilkép</th>
-                <th>Név</th>
+                <th @click="toggleUserSort('name')" style="cursor:pointer; user-select:none; white-space:nowrap;">
+                  Név
+                  <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
+                    <span :style="userSortKey === 'name' && userSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
+                    <span :style="userSortKey === 'name' && userSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
+                  </span>
+                </th>
                 <th>Szerepkör</th>
-                <th>Email</th>
+                <th @click="toggleUserSort('email')" style="cursor:pointer; user-select:none; white-space:nowrap;">
+                  Email
+                  <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
+                    <span :style="userSortKey === 'email' && userSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
+                    <span :style="userSortKey === 'email' && userSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
+                  </span>
+                </th>
                 <th>Aktív</th>
                 <th>Rendelések</th>
-                <th>Regisztráció ideje</th>
-                <th>Utolsó bejelentkezés</th>
+                <th @click="toggleUserSort('registrationDate')" style="cursor:pointer; user-select:none; white-space:nowrap;">
+                  Regisztráció ideje
+                  <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
+                    <span :style="userSortKey === 'registrationDate' && userSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
+                    <span :style="userSortKey === 'registrationDate' && userSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
+                  </span>
+                </th>
+                <th @click="toggleUserSort('utolso_Belepes')" style="cursor:pointer; user-select:none; white-space:nowrap;">
+                  Utolsó bejelentkezés
+                  <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
+                    <span :style="userSortKey === 'utolso_Belepes' && userSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
+                    <span :style="userSortKey === 'utolso_Belepes' && userSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
+                  </span>
+                </th>
                 <th>Műveletek</th>
               </tr>
             </thead>
@@ -399,26 +555,62 @@
         <div class="table-container">
           <div class="table-header">
             <h3 class="table-title">Összes bejegyzés</h3>
-            <div class="search-box">
+            <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
               <input 
                 type="text" 
                 class="search-input" 
-                placeholder="Keresés bejegyzések között..."
+                placeholder="Keresés bejegyzések között..." 
                 v-model="blogSearch"
               >
+              <MultiSelect
+                v-model="blogTagFilter"
+                :options="tagOptions"
+                optionLabel="name"
+                placeholder="Szűrés címke alapján"
+                display="chip"
+                filter
+                :maxSelectedLabels="2"
+                style="min-width:200px; max-width:200px; font-size:13px;"
+              />
+              <select 
+                v-model="blogPublishedFilter" 
+                style="padding:8px 10px; font-size:13px; border:1px solid #e2e8f0; border-radius:8px; height:38px; background:white; cursor:pointer;"
+              >
+                <option value="">Összes státusz</option>
+                <option value="true">✅ Publikálva</option>
+                <option value="false">🗑️ Törölt</option>
+              </select>
             </div>
           </div>
           <table>
             <thead>
               <tr>
-                <th>Cím</th>
-                <th>Szerző</th>
+                <th @click="toggleBlogSort('title')" style="cursor:pointer; user-select:none; white-space:nowrap;">
+                  Cím
+                  <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
+                    <span :style="blogSortKey === 'title' && blogSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
+                    <span :style="blogSortKey === 'title' && blogSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
+                  </span>
+                </th>
+                <th @click="toggleBlogSort('author')" style="cursor:pointer; user-select:none; white-space:nowrap;">
+                  Szerző
+                  <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
+                    <span :style="blogSortKey === 'author' && blogSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
+                    <span :style="blogSortKey === 'author' && blogSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
+                  </span>
+                </th>
                 <th>Címkék</th>
-                <th>Dátum</th>
+                <th @click="toggleBlogSort('date')" style="cursor:pointer; user-select:none; white-space:nowrap;">
+                  Dátum
+                  <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
+                    <span :style="blogSortKey === 'date' && blogSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
+                    <span :style="blogSortKey === 'date' && blogSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
+                  </span>
+                </th>
                 <th>Státusz</th>
                 <th>Műveletek</th>
               </tr>
-            </thead>
+          </thead>
             <tbody>
               <tr v-for="post in paginatedBlogPosts" :key="post.id">
                 <td><strong>{{ post.title }}</strong></td>
@@ -1186,6 +1378,205 @@ const currentPage = ref(1);
 const currentProductPage = ref(1);
 const currentBlogPage = ref(1);
 const totalPages = computed(() => Math.ceil(filteredUsers.value.length / ITEMS_PER_PAGE));
+const currentOrderPage = ref(1);
+const orderSearch = ref('');
+const orderStatusFilter = ref('');
+const blogTagFilter = ref([]);
+const orderSortKey = ref('');
+const orderSortDir = ref('asc');
+
+const toggleOrderSort = (key) => {
+  if (orderSortKey.value === key) {
+    orderSortDir.value = orderSortDir.value === 'asc' ? 'desc' : 'asc';
+  } else {
+    orderSortKey.value = key;
+    orderSortDir.value = 'asc';
+  }
+  currentOrderPage.value = 1;
+};
+
+const filteredOrders = computed(() => {
+  let result = recentOrders.value.filter(order => {
+    const s = orderSearch.value.toLowerCase();
+    const matchesSearch = !s || 
+      order.customer.toLowerCase().includes(s) ||
+      String(order.id).includes(s);
+    const matchesStatus = !orderStatusFilter.value || order.status === orderStatusFilter.value;
+    return matchesSearch && matchesStatus;
+  });
+
+  if (orderSortKey.value) {
+    result = [...result].sort((a, b) => {
+      let aVal = a[orderSortKey.value];
+      let bVal = b[orderSortKey.value];
+
+      // Dátum összehasonlítás
+      if (orderSortKey.value === 'date') {
+        aVal = new Date(aVal);
+        bVal = new Date(bVal);
+      }
+      // Szám összehasonlítás (id, total, items)
+      else if (['id', 'total', 'items'].includes(orderSortKey.value)) {
+        aVal = parseInt(String(aVal).replace(/[^0-9]/g, ''), 10);
+        bVal = parseInt(String(bVal).replace(/[^0-9]/g, ''), 10);
+      }
+      // String összehasonlítás
+      else {
+        aVal = String(aVal).toLowerCase();
+        bVal = String(bVal).toLowerCase();
+      }
+
+      if (aVal < bVal) return orderSortDir.value === 'asc' ? -1 : 1;
+      if (aVal > bVal) return orderSortDir.value === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }
+
+  return result;
+});
+
+// --- Termék rendezés + szűrés ---
+const productSortKey = ref('');
+const productSortDir = ref('asc');
+const productCategoryFilter = ref('');
+const productStockFilter = ref('');
+
+const toggleProductSort = (key) => {
+  if (productSortKey.value === key) {
+    productSortDir.value = productSortDir.value === 'asc' ? 'desc' : 'asc';
+  } else {
+    productSortKey.value = key;
+    productSortDir.value = 'asc';
+  }
+  currentProductPage.value = 1;
+};
+
+const filteredProducts = computed(() => {
+  let result = products.value.filter(p => {
+    const s = productSearch.value.toLowerCase();
+    const matchesSearch = !s || p.name.toLowerCase().includes(s) || p.category.toLowerCase().includes(s);
+    const matchesCategory = !productCategoryFilter.value || p.category === productCategoryFilter.value;
+    const matchesStock = !productStockFilter.value ||
+      (productStockFilter.value === 'raktaron' && p.stock > 10) ||
+      (productStockFilter.value === 'keves' && p.stock > 0 && p.stock <= 10) ||
+      (productStockFilter.value === 'nincs' && p.stock === 0);
+    return matchesSearch && matchesCategory && matchesStock;
+  });
+
+  if (productSortKey.value) {
+    result = [...result].sort((a, b) => {
+      let aVal = a[productSortKey.value];
+      let bVal = b[productSortKey.value];
+      if (['price', 'stock'].includes(productSortKey.value)) {
+        aVal = Number(aVal); bVal = Number(bVal);
+      } else {
+        aVal = String(aVal).toLowerCase(); bVal = String(bVal).toLowerCase();
+      }
+      if (aVal < bVal) return productSortDir.value === 'asc' ? -1 : 1;
+      if (aVal > bVal) return productSortDir.value === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }
+  return result;
+});
+
+// --- Felhasználó rendezés + szűrés ---
+const userSortKey = ref('');
+const userSortDir = ref('asc');
+const userRoleFilter = ref('');
+const userActiveFilter = ref('');
+const userOrderFilter = ref('');
+
+const toggleUserSort = (key) => {
+  if (userSortKey.value === key) {
+    userSortDir.value = userSortDir.value === 'asc' ? 'desc' : 'asc';
+  } else {
+    userSortKey.value = key;
+    userSortDir.value = 'asc';
+  }
+  currentPage.value = 1;
+};
+
+const filteredUsers = computed(() => {
+  let result = users.value.filter(u => {
+    const s = userSearch.value.toLowerCase();
+    const matchesSearch = !s || u.name.toLowerCase().includes(s) || u.email.toLowerCase().includes(s) || u.role.toLowerCase().includes(s);
+    const matchesRole = !userRoleFilter.value || u.role === userRoleFilter.value;
+    const matchesActive = userActiveFilter.value === '' || u.active === (userActiveFilter.value === 'true');
+    const matchesOrder = !userOrderFilter.value ||
+      (userOrderFilter.value === 'van' && u.orderStats?.total > 0) ||
+      (userOrderFilter.value === 'aktiv' && u.orderStats?.active > 0) ||
+      (userOrderFilter.value === 'nincs' && !u.orderStats?.total);
+    return matchesSearch && matchesRole && matchesActive && matchesOrder;
+  });
+
+  if (userSortKey.value) {
+    result = [...result].sort((a, b) => {
+      let aVal = a[userSortKey.value];
+      let bVal = b[userSortKey.value];
+      if (['registrationDate', 'utolso_Belepes'].includes(userSortKey.value)) {
+        aVal = new Date(aVal || 0); bVal = new Date(bVal || 0);
+      } else {
+        aVal = String(aVal ?? '').toLowerCase(); bVal = String(bVal ?? '').toLowerCase();
+      }
+      if (aVal < bVal) return userSortDir.value === 'asc' ? -1 : 1;
+      if (aVal > bVal) return userSortDir.value === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }
+  return result;
+});
+
+// --- Blog rendezés + szűrés ---
+const blogSortKey = ref('');
+const blogSortDir = ref('asc');
+const blogPublishedFilter = ref('');
+
+const toggleBlogSort = (key) => {
+  if (blogSortKey.value === key) {
+    blogSortDir.value = blogSortDir.value === 'asc' ? 'desc' : 'asc';
+  } else {
+    blogSortKey.value = key;
+    blogSortDir.value = 'asc';
+  }
+  currentBlogPage.value = 1;
+};
+
+const filteredBlogPosts = computed(() => {
+  let result = blogPosts.value.filter(p => {
+    const s = blogSearch.value.toLowerCase();
+    const matchesSearch = !s || p.title.toLowerCase().includes(s) || p.author.toLowerCase().includes(s);
+    const matchesPublished = blogPublishedFilter.value === '' || p.published === (blogPublishedFilter.value === 'true');
+    const matchesTag = blogTagFilter.value.length === 0 || 
+      blogTagFilter.value.every(selectedTag => 
+        p.tags.some(t => t.id === selectedTag.id)
+      );
+    return matchesSearch && matchesPublished && matchesTag;
+  });
+
+  if (blogSortKey.value) {
+    result = [...result].sort((a, b) => {
+      let aVal = a[blogSortKey.value];
+      let bVal = b[blogSortKey.value];
+      if (blogSortKey.value === 'date') {
+        aVal = new Date(aVal || 0); bVal = new Date(bVal || 0);
+      } else {
+        aVal = String(aVal ?? '').toLowerCase(); bVal = String(bVal ?? '').toLowerCase();
+      }
+      if (aVal < bVal) return blogSortDir.value === 'asc' ? -1 : 1;
+      if (aVal > bVal) return blogSortDir.value === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }
+  return result;
+});
+
+const totalOrderPages = computed(() => Math.ceil(filteredOrders.value.length / ITEMS_PER_PAGE));
+
+const paginatedOrders = computed(() => {
+  const start = (currentOrderPage.value - 1) * ITEMS_PER_PAGE;
+  return filteredOrders.value.slice(start, start + ITEMS_PER_PAGE);
+});
 
 const paginatedUsers = computed(() => {
   const start = (currentPage.value - 1) * ITEMS_PER_PAGE;
@@ -1207,35 +1598,18 @@ const paginatedBlogPosts = computed(() => {
 const totalBlogPages = computed(() => Math.ceil(filteredBlogPosts.value.length / ITEMS_PER_PAGE));
 
 // --- Watchers ---
+watch(orderSearch, () => { currentOrderPage.value = 1; });
+watch(orderStatusFilter, () => { currentOrderPage.value = 1; });
 watch(userSearch, () => { currentPage.value = 1; });
 watch(productSearch, () => { currentProductPage.value = 1; });
 watch(blogSearch, () => { currentBlogPage.value = 1; });
-// --- Computed ---
-
-const filteredProducts = computed(() => {
-  if (!productSearch.value) return products.value;
-  const s = productSearch.value.toLowerCase();
-  return products.value.filter(p =>
-    p.name.toLowerCase().includes(s) || p.category.toLowerCase().includes(s)
-  );
-});
-
-const filteredBlogPosts = computed(() => {
-  if (!blogSearch.value) return blogPosts.value;
-  const s = blogSearch.value.toLowerCase();
-  return blogPosts.value.filter(p =>
-    p.title.toLowerCase().includes(s) || p.author.toLowerCase().includes(s)
-  );
-});
-
-const filteredUsers = computed(() => {
-  if (!userSearch.value) return users.value;
-  const s = userSearch.value.toLowerCase();
-  return users.value.filter(p =>
-    p.name.toLowerCase().includes(s) || p.email.toLowerCase().includes(s) || p.role.toLowerCase().includes(s)
-  );
-});
-
+watch(productCategoryFilter, () => { currentProductPage.value = 1; });
+watch(productStockFilter, () => { currentProductPage.value = 1; });
+watch(userRoleFilter, () => { currentPage.value = 1; });
+watch(userActiveFilter, () => { currentPage.value = 1; });
+watch(userOrderFilter, () => { currentPage.value = 1; });
+watch(blogPublishedFilter, () => { currentBlogPage.value = 1; });
+watch(blogTagFilter, () => { currentBlogPage.value = 1; });
 // --- Helpers ---
 
 const formatDate = (dateString) => {
@@ -1455,7 +1829,10 @@ onMounted(async () => {
   initCharts();
 });
 
-watch(currentView, (newView, oldView) => {
+watch(currentView, async (newView, oldView) => {
+  if (newView === 'blog' && tagOptions.value.length === 0) {
+    await fetchTagsFromDatabase();
+  }
   if (oldView === 'dashboard') destroyDashboardCharts();
   if (oldView === 'analytics') destroyAnalyticsCharts();
   initCharts();
@@ -1680,7 +2057,7 @@ watch(currentView, (newView, oldView) => {
   border: 1px solid #e2e8f0;
   border-radius: 8px;
   font-size: 14px;
-  width: 250px;
+  width: 220px;
   transition: border-color 0.2s;
 }
 
