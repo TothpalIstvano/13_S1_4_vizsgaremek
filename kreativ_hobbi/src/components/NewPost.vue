@@ -500,7 +500,7 @@ const resetForm = () => {
     }
     
     .p-inputtext:focus {
-        border-color: #4d8af0;
+        border-color: #ad6801;
         box-shadow: 0 0 0 3px rgba(77, 138, 240, 0.1);
         outline: none;
     }
@@ -521,22 +521,23 @@ const resetForm = () => {
     }
     
     .p-multiselect:not(.p-disabled).p-focus {
-        border-color: #4d8af0;
-        box-shadow: 0 0 0 3px rgba(77, 138, 240, 0.1);
+        border-color: #ad6801;
+    }
+
+    .p-multiselect:focus-within {
+        border-color: #ad6801;
     }
     
     .p-multiselect-panel {
         border-radius: 10px;
         border: 1px solid #e2e8f0;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
     }
     
     .p-multiselect-chip .p-chip {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: #ad6801;
         color: white;
         border-radius: 20px;
         padding: 6px 12px;
-        font-weight: 500;
     }
     
     .p-button {
@@ -792,7 +793,7 @@ const resetForm = () => {
 }
 
 .form-label-icon {
-    color: #4d8af0;
+    color: #f04dda;
     font-size: 20px;
 }
 

@@ -888,23 +888,109 @@ function formatDate(d) { return new Date(d).toLocaleDateString(); }
   background: #cbd5e1;
 }
 
-/* PrimeVue dropdown finomhangolás */
+/* PrimeVue dropdown */
 :deep(.p-dropdown) {
   width: 100%;
   border-radius: 12px;
-  border: 1.5px solid #e2e8f0;
+  border: 1.5px solid #d4d1ce;
 }
 
 :deep(.p-dropdown:not(.p-disabled):hover) {
   border-color: #ad6801;
 }
 
-:deep(.p-dropdown-panel) {
-  border-radius: 12px;
-  margin-top: 4px;
-  box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+:deep(.p-dropdown:focus-within) {
+  border-color: #ad6801;
+  box-shadow: 0 0 0 2px rgba(173, 104, 1, 0.2);
+  outline: none;
 }
 
+:deep(.p-dropdown-panel) {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+:deep(.p-dropdown-item) {
+  padding: 0.5rem 1rem;
+  color: #1e293b;
+}
+
+:deep(.p-dropdown-item:hover) {
+  background: #fef3e8;
+  color: #ad6801;
+}
+
+:deep(.p-dropdown-item.p-highlight) {
+  background: #ffece3;
+  color: #ad6801;
+  font-weight: 500;
+}
+
+:deep(.p-dropdown-trigger) {
+  color: #ad6801;
+}
+
+:deep(.p-dropdown-open .p-dropdown-trigger) {
+  color: #ad6801;
+}
+
+:deep(.p-dropdown-item.p-highlight) {
+  background: #ffece3;
+  color: #ad6801;
+}
+
+:deep(.p-dropdown-item:focus) {
+  background: #fff2e8;
+  box-shadow: none;
+}
+
+:deep(.p-dropdown-item.p-focus) {
+  background: #fff2e8;
+  outline: none;
+  box-shadow: none;
+}
+
+:deep(.p-dropdown-label) {
+  color: #1e293b;
+  background: transparent;
+}
+
+:deep(.p-dropdown-label.p-focus) {
+  border-color: #ad6801;
+}
+
+:deep(.p-dropdown-item .pi-check) {
+  color: #ad6801;
+}
+:deep(.p-dropdown-item .p-icon path) {
+  fill: #ad6801;
+}
+
+:deep(.p-dropdown-item.p-focus) {
+  background: #fff2e8;
+  outline: none;
+  box-shadow: none;
+}
+
+:deep(.p-dropdown-item.p-highlight.p-focus) {
+  background: #ffece3;
+  color: #ad6801;
+}
+
+:deep(.p-dropdown-item:active) {
+  background: #fef3e8;
+}
+
+:deep(.p-dropdown-label) {
+  background: transparent;
+}
+
+:deep(.p-dropdown:focus-within) {
+  border-color: #ad6801;
+  box-shadow: 0 0 0 2px rgba(173, 104, 1, 0.2);
+  outline: none;
+}
 /*#endregion*/
 
 .profile-page {
