@@ -484,7 +484,7 @@ const reakcioKezeles = async (postId, reactionType) => {
       console.error('Reaction error:', err);
     }
   }
-};
+}
 
 const kepHiba = (event) => {
   event.target.src = potKep
