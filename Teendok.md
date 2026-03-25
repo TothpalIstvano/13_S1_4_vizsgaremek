@@ -9,6 +9,8 @@
 * \[ ] Rendelések tagolása
 * \[ ] Hero banner
 * \[ ] Hybrid verifikáció
+* \[ ] Mintakészítő salmon szín konstans ott létének javítása
+* \[ ] Termékek modosításánál a modaba kép feltöltés és cimkék választásának javítása
 * \[ ] verifikációs emailra való várás
 - \[ ] Alertek lecserélése mindenhol modellekre
 * \[ ] Táblák egységesítése ez alat azt értve hogy a táblákban lévő adatok megegyezenek 
