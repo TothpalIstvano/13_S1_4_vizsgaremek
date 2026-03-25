@@ -398,15 +398,33 @@ const handleReply = (commentId) => {
 
 const removeComment = (commentId) => {
   const removeFromArray = (commentList) => {
-    return commentList.filter(comment => {
-      if (comment.id === commentId) return false
-      if (comment.gyermekKommentek && comment.gyermekKommentek.length > 0) {
+    const result = []
+
+    for (const comment of commentList) {
+      if (comment.id === commentId) {
+        // Don't keep the deleted comment, but promote its children
+        if (comment.gyermekKommentek?.length > 0) {
+          const promoted = comment.gyermekKommentek.map(child => ({
+            ...child,
+            elozetes_komment_id: null,
+            gyermekKommentek: child.gyermekKommentek || []
+          }))
+          result.push(...promoted)
+        }
+        // Skip the deleted comment itself
+        continue
+      }
+
+      if (comment.gyermekKommentek?.length > 0) {
         comment.gyermekKommentek = removeFromArray(comment.gyermekKommentek)
       }
-      return true
-    })
+
+      result.push(comment)
+    }
+
+    return result
   }
-  
+
   comments.value = removeFromArray(comments.value)
 }
 

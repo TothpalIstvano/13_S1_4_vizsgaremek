@@ -490,11 +490,6 @@ function formatDate(dateString) {
   margin-bottom: 4px;
 }
 
-.card-content p {
-  font-size: 0.9rem;
-  color: #666;
-}
-
 .scroll-indicator {
   position: absolute;
   bottom: 30px;
@@ -1015,7 +1010,7 @@ function formatDate(dateString) {
 
 .description {
   padding: 16px 0;
-  font-size: 16px;
+  font-size: 14px;
   margin: 0;
   line-height: 1.6;
   min-height: 80px;

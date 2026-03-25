@@ -38,10 +38,14 @@ class KommentController extends Controller
                     'letrehozas_datuma' => $comment->letrehozas_datuma,
                     'poszt_id' => $comment->poszt_id,
                     'elozetes_komment_id' => $comment->elozetes_komment_id,
-                    'felhasznalo' => [
+                    'felhasznalo' => $user ? [
                         'id' => $user->id,
                         'felhasz_nev' => $user->felhasz_nev,
                         'profil_kep_url' => $user->profilKep?->url_Link,
+                    ] : [
+                        'id' => null,
+                        'felhasz_nev' => 'Törölt felhasználó',
+                        'profil_kep_url' => null,
                     ],
                     'gyermekKommentek' => $comment->gyermekKommentek->map($transform)->values()->toArray(),
                 ];
@@ -115,7 +119,8 @@ class KommentController extends Controller
                 return response()->json(['error' => 'You can only delete your own comments'], 403);
             }
 
-            $comment->delete();
+            $comment->delete(); // children's elozetes_komment_id becomes null automatically
+
             return response()->json(['message' => 'Comment deleted!']);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);

@@ -9,8 +9,7 @@
       <ul class="nav-menu">
         <li class="nav-item">
           <a class="nav-link" :class="{active: currentView === 'dashboard'}" @click="currentView = 'dashboard'">
-            <span class="nav-icon">📊</span>
-            Dashboard
+            <span class="nav-icon">📊</span>Dashboard
           </a>
         </li>
         <li class="nav-item">
@@ -39,6 +38,7 @@
         </li>
       </ul>
     </div>
+    <div v-if="sidebarOpen" class="sidebar-overlay" @click="sidebarOpen = false"></div>
 
     <!-- Main Content -->
     <main class="main-content">
@@ -132,7 +132,7 @@
         <div class="table-container">
           <div class="table-header">
             <h3 class="table-title">Rendelések</h3>
-            <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+            <div class="filters-row">
               <div class="search-box">
                 <input 
                   type="text" 
@@ -261,7 +261,7 @@
         <div class="table-container">
           <div class="table-header">
             <h3 class="table-title">Összes termék</h3>
-            <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+            <div class="filters-row">
               <input type="text" class="search-input" placeholder="Keresés termékek között..." v-model="productSearch">
               <select v-model="productCategoryFilter" style="padding:8px 12px; font-size:14px; border:1px solid #e2e8f0; border-radius:8px; height:38px; background:white; cursor:pointer;">
                 <option value="">Összes kategória</option>
@@ -388,7 +388,7 @@
         <div class="table-container">
           <div class="table-header">
             <h3 class="table-title">Összes felhasználó</h3>
-            <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+            <div class="filters-row">
               <input type="text" class="search-input" placeholder="Keresés felhasználók között..." v-model="userSearch">
               <select v-model="userRoleFilter" style="padding:8px 12px; font-size:14px; border:1px solid #e2e8f0; border-radius:8px; height:38px; background:white; cursor:pointer;">
                 <option value="">Összes szerepkör</option>
@@ -555,7 +555,7 @@
         <div class="table-container">
           <div class="table-header">
             <h3 class="table-title">Összes bejegyzés</h3>
-            <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+            <div class="filters-row">
               <input 
                 type="text" 
                 class="search-input" 
@@ -1737,6 +1737,8 @@ const initCharts = () => {
       },
       options: {
         responsive: true,
+          maintainAspectRatio: true,
+          aspectRatio: 1.8, 
         cutout: '40%',   // kétszintes gyűrű jól látható marad
         plugins: {
           legend: {
@@ -2001,7 +2003,7 @@ watch(currentView, async (newView, oldView) => {
 /* Charts */
 .charts-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 20px;
   margin-bottom: 32px;
 }
@@ -2012,6 +2014,8 @@ watch(currentView, async (newView, oldView) => {
   border-radius: 12px;
   box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
   border: 1px solid #e2e8f0;
+  overflow: hidden;
+  min-width: 0;
 }
 
 .chart-header {
@@ -2030,7 +2034,7 @@ watch(currentView, async (newView, oldView) => {
   border-radius: 12px;
   box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
   border: 1px solid #e2e8f0;
-  overflow: hidden;
+  overflow: auto;
 }
 
 .table-header {
@@ -2480,45 +2484,53 @@ tbody tr:hover {
     }
 }
 
-@media (max-width: 1024px) {
-  .charts-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .search-input {
-    width: 180px;
-  }
+/* ── Filters row ── */
+.filters-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
 }
 
-@media (max-width: 768px) {
+/* ── Pagination ── */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  padding: 16px;
+  border-top: 1px solid #e2e8f0;
+  flex-wrap: wrap;
+}
+
+.pagination-info {
+  color: #64748b;
+  font-size: 13px;
+  margin-left: 8px;
+}
+
+@media (max-width: 1024px) {
   .sidebar {
     position: fixed;
-    top: 0;
-    left: 0;
+    top: 0; left: 0;
     height: 100vh;
     z-index: 200;
     transform: translateX(-100%);
     transition: transform 0.3s ease;
     width: 260px;
   }
-
-  .sidebar.sidebar-open {
-    transform: translateX(0);
-  }
-
+  .sidebar.sidebar-open { transform: translateX(0); }
   .sidebar-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.4);
+    background: rgba(0,0,0,0.4);
     z-index: 199;
   }
-
   .sidebar-toggle {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
+    width: 40px; height: 40px;
     background: #7a402d;
     color: white;
     border: none;
@@ -2527,6 +2539,7 @@ tbody tr:hover {
     cursor: pointer;
     margin-bottom: 20px;
   }
+  .main-content { padding: 16px; width: 100%; }
 
   .main-content {
     padding: 16px;
@@ -2565,9 +2578,93 @@ tbody tr:hover {
     align-items: flex-start;
     gap: 12px;
   }
+
+  /* Filters */
+  .filters-row {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filters-row select,
+  .filters-row input {
+    width: 100% !important;
+    min-width: unset !important;
+    max-width: unset !important;
+    box-sizing: border-box;
+  }
+
+  /* Modals — full screen on mobile */
+  .modal-overlay {
+    padding: 0;
+    align-items: flex-end;
+  }
+
+  .modal,
+  .blog-modal-large {
+    max-width: 100%;
+    width: 100%;
+    max-height: 95vh;
+    border-radius: 16px 16px 0 0;
+  }
+
+  /* Tables */
+  td {
+    font-size: 13px;
+    padding: 12px 10px;
+  }
+
+  th {
+    font-size: 11px;
+    padding: 8px 10px;
+  }
+
+  /* Pagination — hide page number buttons, show only prev/next */
+  .pagination .page-btn {
+    display: none;
+  }
+
+  .pagination-info {
+    margin-left: 0;
+    width: 100%;
+    text-align: center;
+  }
+
+  /* Action buttons in table rows */
+  .action-buttons {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .chart-card canvas {
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: 260px !important;
+  }
 }
 
+/* ── Mobile (max 480px) ── */
 @media (max-width: 480px) {
+  /* Main padding */
+  .main-content {
+    padding: 12px;
+  }
+
+  /* Header */
+  .header h2 {
+    font-size: 22px;
+  }
+
+  .header-actions .btn {
+    font-size: 13px;
+    padding: 8px 14px;
+  }
+
+  /* Stat cards */
+  .stat-card {
+    padding: 16px;
+  }
+
   .stats-grid {
     grid-template-columns: 1fr;
   }
@@ -2575,15 +2672,71 @@ tbody tr:hover {
   .stat-value {
     font-size: 24px;
   }
-}
 
-@media (min-width: 769px) {
-  .sidebar-toggle {
-    display: none;
+  .stat-value {
+    font-size: 22px;
   }
 
-  .sidebar-overlay {
-    display: none;
+  .stat-change {
+    font-size: 11px;
+  }
+
+  /* Chart cards */
+  .chart-card {
+    padding: 16px;
+  }
+
+  .chart-title {
+    font-size: 15px;
+  }
+
+  /* Table header */
+  .table-header {
+    padding: 14px 16px;
+  }
+
+  .table-title {
+    font-size: 15px;
+  }
+
+  /* Modal */
+  .modal-header,
+  .modal-footer {
+    padding: 16px;
+  }
+
+  .modal-body,
+  .modal-body-scrollable {
+    padding: 16px;
+  }
+
+  .modal-title {
+    font-size: 16px;
+  }
+
+  .chart-card {
+    padding: 12px;
+  }
+
+  .chart-card canvas {
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: 200px !important;
+  }
+}
+
+@media (min-width: 1025px) {
+  .sidebar-toggle { display: none; }
+  .sidebar-overlay { display: none; }
+}
+
+@media (max-width: 1024px) {
+  .charts-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .search-input {
+    width: 180px;
   }
 }
 </style>

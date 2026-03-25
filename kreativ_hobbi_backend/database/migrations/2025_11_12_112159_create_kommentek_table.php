@@ -14,12 +14,12 @@ return new class extends Migration {
             $table->unsignedInteger('id')->primary()->autoIncrement();
             $table->text('komment');
             $table->unsignedInteger('poszt_id');
-            $table->unsignedInteger('kommentelo');
+            $table->unsignedInteger('kommentelo')->nullable();
             $table->unsignedInteger('elozetes_komment_id')->nullable();
             $table->timestamp('letrehozas_datuma')->useCurrent();
             $table->foreign('poszt_id')->references('id')->on('posztok')->onDelete('cascade');
-            $table->foreign('kommentelo')->references('id')->on('felhasznalok')->onDelete('cascade');
-            $table->foreign('elozetes_komment_id')->references('id')->on('kommentek')->onDelete('cascade');
+            $table->foreign('kommentelo')->references('id')->on('felhasznalok')->onDelete('set null');
+            $table->foreign('elozetes_komment_id')->references('id')->on('kommentek')->onDelete('set null');
             $table->timestamps();
         });
     }
