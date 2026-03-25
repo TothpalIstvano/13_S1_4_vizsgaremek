@@ -1,5 +1,5 @@
 <script setup>
-import { RouterLink, useRouter } from 'vue-router'
+import { RouterLink, useRouter, useRoute} from 'vue-router'
 import logo_kalapacs from '@/components/icons/logo_kalapacs.png'
 import logo_reszelo from '@/components/icons/logo_reszelo.png'
 import { ref, onMounted, onUnmounted } from 'vue';
@@ -8,6 +8,7 @@ import { useCartStore } from '@/stores/cartStore'
 
 const cartStore = useCartStore()
 const router = useRouter();
+const route = useRoute();
 const latszik = ref(false);
 const logoKalapacs = logo_kalapacs
 const logoReszelo = logo_reszelo
@@ -100,7 +101,7 @@ onUnmounted(() => {
 
 <template>
   <div>
-    <div id="felsoGap"></div>
+    <div id="felsoGap" v-if="route.path !== '/'"></div>
     <header>
       <nav class="navbar" ref="navbarRef">
         <div id="nevDiv">
@@ -271,6 +272,7 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   background-color: var(--navbar-bg);
+  transition: background-color 0.4s ease;
   position: fixed;
   top: 0;
   left: 0;
@@ -280,6 +282,10 @@ onUnmounted(() => {
   z-index: 10;
   box-shadow: var(--shadow);
   border-bottom:2px solid var(--router-link-color);
+}
+
+.navbar.hero-mode {
+  background-color: #370f0269;
 }
 
 #mobilKosar {
