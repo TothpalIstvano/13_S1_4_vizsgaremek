@@ -1186,12 +1186,75 @@ async function checkout() {
     font-size: 2rem;
   }
 
-  .cart-item {
-    flex-wrap: wrap;
-  }
-
   .form-row {
     grid-template-columns: 1fr;
+  }
+}
+
+/* Cart item switches to a 2-column grid card at mid-size */
+@media (max-width: 700px) {
+  .cart-item {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto;
+    grid-template-areas:
+      "image  details"
+      "image  controls"
+      "total  total";
+    gap: 8px 16px;
+    padding: 16px;
+    align-items: start;
+    position: relative;
+  }
+
+  .item-image-wrapper {
+    grid-area: image;
+  }
+
+  .cart-item-image {
+    width: 90px;
+    height: 90px;
+  }
+
+  .cart-item-details {
+    grid-area: details;
+    padding-right: 36px; /* space for remove button */
+    align-self: end;
+  }
+
+  .item-name {
+    font-size: 15px;
+    margin-bottom: 4px;
+  }
+
+  .item-price {
+    font-size: 14px;
+  }
+
+  .cart-item-controls {
+    grid-area: controls;
+    align-self: start;
+  }
+
+  .cart-item-total {
+    grid-area: total;
+    text-align: right;
+    min-width: unset;
+    border-top: 1px solid #f0f1f3;
+    padding-top: 8px;
+  }
+
+  .total-text {
+    font-size: 16px;
+  }
+
+  .remove-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 30px;
+    height: 30px;
+    font-size: 16px;
   }
 }
 
@@ -1202,20 +1265,6 @@ async function checkout() {
 
   .cart-header h1 {
     font-size: 1.5rem;
-  }
-
-  .cart-item {
-    padding: 16px;
-    gap: 12px;
-  }
-
-  .cart-item-image {
-    width: 100px;
-    height: 100px;
-  }
-
-  .item-name {
-    font-size: 16px;
   }
 
   .summary-card,

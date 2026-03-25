@@ -607,7 +607,7 @@ function formatDate(dateString) {
 
 @media (max-width: 640px) {
   .hero-banner {
-    min-height: 90vh;
+    min-height: 100vh;
   }
   
   .hero-content {

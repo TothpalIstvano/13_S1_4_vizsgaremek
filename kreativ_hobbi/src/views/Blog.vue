@@ -1367,10 +1367,6 @@ main {
 }
 
 @media (max-width: 768px) {
-  .title {
-    font-size: 36px;
-  }
-  
   .container {
     padding: 0 20px;
   }
@@ -1387,10 +1383,6 @@ main {
 }
 
 @media (max-width: 480px) {
-  .title {
-    font-size: 28px;
-  }
-  
   .container {
     padding: 0 16px;
   }
