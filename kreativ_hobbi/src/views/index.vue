@@ -91,7 +91,7 @@ function formatDate(dateString) {
       <div class="hero-content">
         <div class="hero-text">
           <h1 class="hero-title">
-            <span class="hero-title-line">Kézműves</span>
+            <span class="hero-title-line">Kreatív</span>
             <span class="hero-title-line highlight">Alkotás</span>
             <span class="hero-title-line">Minden nap</span>
           </h1>
@@ -167,77 +167,155 @@ function formatDate(dateString) {
     <carousel></carousel>
 
     <!-- add ref, tabindex so it can receive keyboard focus, and class binding -->
-    <h1
-      id="featureTitle"
-      ref="featureTitleRef"
-      tabindex="0"
-      :class="{ 'in-view': isInView }"
-    >
-      Miért válassz minket?
-    </h1>
+    <section class="features-wrapper">
+      <div class="features-header">
+        <p class="features-subtitle">Előnyeink</p>
+        <h1
+          id="featureTitle"
+          ref="featureTitleRef"
+          tabindex="0"
+          :class="{ 'in-view': isInView }"
+        >
+          Miért válassz <span>minket?</span>
+        </h1>
+        <div class="features-divider">
+          <div class="divider-line"></div>
+          <div class="divider-dot"></div>
+          <div class="divider-line"></div>
+        </div>
+      </div>
 
-    <section class="feature-section">
-      <div class="feature-grid">
-        <router-link class="feature-link" to="/mintakeszito"  :class="{ 'in-view': isInView }">
-          <article class="feature-card">
-            <div class="feature-icon" aria-hidden="true">🎨</div>
-            <h3 class="feature-title">Mintakészítő</h3>
-            <p class="feature-desc">
-              Készíts személyre szabott mintákat saját képeid alapján. Kötés, horgolás és hímzés egy helyen.
-            </p>
-          </article>
-        </router-link>
+      <section class="feature-section">
+        <div class="feature-grid">
 
-        <router-link class="feature-link" to="/aruhaz"  :class="{ 'in-view': isInView }">      
-          <article class="feature-card">
-            <div class="feature-icon" aria-hidden="true">📦</div>
-            <h3 class="feature-title">Minőségi termékek</h3>
-            <p class="feature-desc">
-              Prémium alapanyagok és eszközök a legszebb alkotásokhoz. Raktárról, gyors szállítással.
-            </p>
-          </article>
-        </router-link>
-
-        <router-link class="feature-link" to="/blog"  :class="{ 'in-view': isInView }">
-          <article class="feature-card">
-            <div class="feature-icon" aria-hidden="true">📚</div>
-            <h3 class="feature-title">Blog és közösség</h3>
-            <p class="feature-desc">
-              Oszd meg tapasztalataidat, tanulj másoktól és inspirálódj a közösségünk által.
-            </p>
-          </article>
-        </router-link>
-
-        <router-link class="feature-link" to="/rolunk"  :class="{ 'in-view': isInView }">
-          <article class="feature-card">
-            <div class="feature-icon" aria-hidden="true">👥</div>
-            <h3 class="feature-title">Szakértő segítség</h3>
-            <p class="feature-desc">
-              Tapasztalt kézművesek állnak rendelkezésedre, hogy segítsenek a projektjeidben.
-            </p>
-          </article>
-        </router-link>
-
-        <router-link class="feature-link" to="/"  :class="{ 'in-view': isInView }">
-          <article class="feature-card">
-            <div class="feature-icon" aria-hidden="true">⭐</div>
-            <h3 class="feature-title">Elégedettség garancia</h3>
-            <p class="feature-desc">
-              Ha nem vagy elégedett a termékkel, 30 napon belül visszaküldheted.
-            </p>
-          </article>
-        </router-link>
-
-        <router-link class="feature-link" to="/" :class="{ 'in-view': isInView }">
+          <router-link
+            class="feature-link"
+            to="/mintakeszito"
+            :class="{ 'in-view': isInView }"
+            style="--delay: 0.1s"
+          >
             <article class="feature-card">
-              <div class="feature-icon" aria-hidden="true">🚚</div>
+              <span class="feature-number">01</span>
+              <div class="feature-icon-wrapper">
+                <div class="feature-icon-bg"></div>
+                <div class="feature-icon" aria-hidden="true">🎨</div>
+              </div>
+              <h3 class="feature-title">Mintakészítő</h3>
+              <p class="feature-desc">
+                Készíts személyre szabott mintákat saját képeid alapján.
+                Kötés, horgolás és hímzés egy helyen.
+              </p>
+              <div class="feature-arrow">→</div>
+            </article>
+          </router-link>
+
+          <router-link
+            class="feature-link"
+            to="/aruhaz"
+            :class="{ 'in-view': isInView }"
+            style="--delay: 0.2s"
+          >
+            <article class="feature-card">
+              <span class="feature-number">02</span>
+              <div class="feature-icon-wrapper">
+                <div class="feature-icon-bg"></div>
+                <div class="feature-icon" aria-hidden="true">📦</div>
+              </div>
+              <h3 class="feature-title">Minőségi termékek</h3>
+              <p class="feature-desc">
+                Prémium alapanyagok és eszközök a legszebb alkotásokhoz.
+                Raktárról, gyors szállítással.
+              </p>
+              <div class="feature-arrow">→</div>
+            </article>
+          </router-link>
+
+          <router-link
+            class="feature-link"
+            to="/blog"
+            :class="{ 'in-view': isInView }"
+            style="--delay: 0.3s"
+          >
+            <article class="feature-card">
+              <span class="feature-number">03</span>
+              <div class="feature-icon-wrapper">
+                <div class="feature-icon-bg"></div>
+                <div class="feature-icon" aria-hidden="true">📚</div>
+              </div>
+              <h3 class="feature-title">Blog és közösség</h3>
+              <p class="feature-desc">
+                Oszd meg tapasztalataidat, tanulj másoktól és inspirálódj
+                a közösségünk által.
+              </p>
+              <div class="feature-arrow">→</div>
+            </article>
+          </router-link>
+
+          <router-link
+            class="feature-link"
+            to="/rolunk"
+            :class="{ 'in-view': isInView }"
+            style="--delay: 0.4s"
+          >
+            <article class="feature-card">
+              <span class="feature-number">04</span>
+              <div class="feature-icon-wrapper">
+                <div class="feature-icon-bg"></div>
+                <div class="feature-icon" aria-hidden="true">👥</div>
+              </div>
+              <h3 class="feature-title">Szakértő segítség</h3>
+              <p class="feature-desc">
+                Tapasztalt kézművesek állnak rendelkezésedre, hogy
+                segítsenek a projektjeidben.
+              </p>
+              <div class="feature-arrow">→</div>
+            </article>
+          </router-link>
+
+          <router-link
+            class="feature-link"
+            to="/"
+            :class="{ 'in-view': isInView }"
+            style="--delay: 0.5s"
+          >
+            <article class="feature-card">
+              <span class="feature-number">05</span>
+              <div class="feature-icon-wrapper">
+                <div class="feature-icon-bg"></div>
+                <div class="feature-icon" aria-hidden="true">⭐</div>
+              </div>
+              <h3 class="feature-title">Elégedettség garancia</h3>
+              <p class="feature-desc">
+                Ha nem vagy elégedett a termékkel, 30 napon belül
+                visszaküldheted.
+              </p>
+              <div class="feature-arrow">→</div>
+            </article>
+          </router-link>
+
+          <router-link
+            class="feature-link"
+            to="/"
+            :class="{ 'in-view': isInView }"
+            style="--delay: 0.6s"
+          >
+            <article class="feature-card">
+              <span class="feature-number">06</span>
+              <div class="feature-icon-wrapper">
+                <div class="feature-icon-bg"></div>
+                <div class="feature-icon" aria-hidden="true">🚚</div>
+              </div>
               <h3 class="feature-title">Gyors szállítás</h3>
               <p class="feature-desc">
-                Rendeléseket 2–3 munkanapon belül házhoz szállítjuk országszerte.
+                Rendeléseket 2–3 munkanapon belül házhoz szállítjuk
+                országszerte.
               </p>
+              <div class="feature-arrow">→</div>
             </article>
-        </router-link>
-      </div>
+          </router-link>
+
+        </div>
+      </section>
     </section>
 
     
@@ -744,139 +822,267 @@ function formatDate(dateString) {
 /*#endregion*/
 
 /*#region Feature Container*/
-#featureTitle {
-  max-width: 650px;
-  width: 100%;
-  text-align: center;
-  font-size: 2.5rem;
-  justify-self: center;
-  margin: 10rem 1rem 1.5rem 1rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  padding: 0.6rem 1rem;
-  color: transparent; /* keep this if animation sets color */
-  border-bottom: 5px solid var(--navbar-bg);
-  /* no animation here */
+.features-wrapper {
+  position: relative;
+  padding: 100px 0 80px;
+  overflow: hidden;
 }
 
-/* trigger animation only when in-view OR when focused via keyboard */
+.features-wrapper::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* ── Header ── */
+.features-header {
+  text-align: center;
+  margin-bottom: 72px;
+  position: relative;
+  z-index: 2;
+  padding: 0 24px;
+}
+
+.features-subtitle {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--accent, #667eea);
+  margin-bottom: 14px;
+  opacity: 0;
+  animation: fadeInUp 0.8s ease 0.1s forwards;
+}
+
+/* ── Cím: Vue animációs rendszer + első doc tipográfia ── */
+#featureTitle {
+  font-size: clamp(2.2rem, 5vw, 3.6rem);
+  font-weight: 800;
+  margin: 0;
+  line-height: 1.1;
+  color: transparent;          /* animáció állítja be */
+  letter-spacing: -0.02em;
+  border-bottom: none;         /* az első doc nem használ border-bottom-ot */
+  opacity: 0;
+  animation: none;             /* .in-view váltja ki */
+}
+
+#featureTitle span {
+  background: linear-gradient(90deg,#914f04 0%,  #ff6800 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
 #featureTitle.in-view,
 #featureTitle:focus-visible {
-  animation: feature-title-appear 1s ease both;
+  animation: feature-title-appear 0.9s ease both;
 }
 
-/*#region existing keyframes */
 @keyframes feature-title-appear {
-  0% {
-    color: transparent;
-    transform: translateY(20px);
-    opacity: 0;
-  }
-  100% {
-    color: black;
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-/*#endregion*/
-
-.feature-section{
-  background: var(--bg);
-  padding: 32px 64px;
+  0%   { color: transparent; opacity: 0; transform: translateY(24px); }
+  100% { color: #2d3748;     opacity: 1; transform: translateY(0);    }
 }
 
-.feature-grid{
-  max-width: 1400px;
+/* ── Elválasztó ── */
+.features-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 28px;
+  opacity: 0;
+  animation: fadeInUp 0.8s ease 0.4s forwards;
+}
+
+.divider-line {
+  width: 600px;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #cbd5e0, transparent);
+}
+
+.divider-dot {
+  width: 8px;
+  height: 8px;
+  background: #ad6801;
+  border-radius: 50%;
+  margin: 0 16px;
+  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15);
+}
+
+/* ── Section & Grid ── */
+.feature-section {
+  position: relative;
+  z-index: 2;
+  padding: 0 24px;
+}
+
+.feature-grid {
+  max-width: 1200px;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 32px 70px;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 28px;
 }
 
-@media (max-width: 800px){
-  .feature-grid{ grid-template-columns: 1fr; }
-  #featureTitle {
-  font-size: clamp(1.6rem, 5.5vw, 2.2rem);
-  margin: 4rem 1rem 1rem;
-  padding: 0.4rem 0.6rem;
-  }
-}
-
-.feature-link{
+/* ── Link wrapper animáció (Vue-s odd/even + első doc delay) ── */
+.feature-link {
   text-decoration: none;
-}
-@keyframes feature-card-appear-left {
-  0% {
-    color: transparent;
-    transform: translatex(-125px);
-    opacity: 0;
-  }
-  100% {
-    color: black;
-    transform: translateX(0);
-    opacity: 1;
-  }
+  display: block;
+  opacity: 0;
+  transform: translateY(30px);
 }
 
-@keyframes feature-card-appear-right {
-  0% {
-    color: transparent;
-    transform: translatex(125px);
-    opacity: 0;
-  }
-  100% {
-    color: black;
-    transform: translateX(0);
-    opacity: 1;
-  }
+.feature-link.in-view {
+  animation: fadeInUp 0.75s ease forwards;
+  animation-delay: var(--delay, 0.1s);
 }
 
-.feature-card{
-  background: var(--card);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  min-height: 150px;
-  padding: 60px ;
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+/* ── Kártya ── */
+.feature-card {
+  position: relative;
+  background: white;
+  border-radius: 24px;
+  padding: 40px 32px 32px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.07);
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+              box-shadow 0.4s ease;
+  overflow: hidden;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
   text-align: center;
-  transition: transform .15s ease, box-shadow .15s ease;
-}
-.feature-link:nth-child(odd).in-view{
-  animation: feature-card-appear-left 1s ease both;
-}
-.feature-link:nth-child(even).in-view{
-  animation: feature-card-appear-right 1s ease both;
 }
 
-.feature-card:hover{
-  transform: translateY(-2px);
-  box-shadow: 0 12px 28px rgba(17, 24, 39, 0.08);
+/* Felső gradient csík (első doc) */
+.feature-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(135deg, #ff6a00, #680000);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s ease;
 }
 
-.feature-icon{
-  width: 56px;
-  height: 56px;
-  margin: 0 auto 14px;
-  border-radius: 14px;
-  display: grid;
-  place-items: center;
-  background: var(--accent-soft);
-  color: var(--accent);
-  font-size: 26px; /* swap emoji for SVG if desired */
+.feature-link:hover .feature-card {
+  transform: translateY(-8px);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.11);
 }
 
-.feature-title{
-  margin: 6px 0 8px;
-  font-size: 20px;
-  line-height: 1.2;
-  color: var(--text);
+.feature-link:hover .feature-card::before {
+  transform: scaleX(1);
+}
+
+/* Sorszám (első doc) */
+.feature-number {
+  position: absolute;
+  top: 18px; right: 22px;
+  font-size: 46px;
+  font-weight: 800;
+  color: #edf2f7;
+  line-height: 1;
+  user-select: none;
+}
+
+/* ── Ikon ── */
+.feature-icon-wrapper {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 22px;
+}
+
+.feature-icon-bg {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg,
+    rgba(248, 104, 8, 0.199),
+    rgba(221, 27, 13, 0.199));
+  border-radius: 20px;
+  transition: transform 0.4s ease, background 0.4s ease;
+}
+
+.feature-link:hover .feature-icon-bg {
+  transform: scale(1.12) rotate(6deg);
+  background: linear-gradient(135deg,
+    rgba(255, 142, 98, 0.459),
+    rgba(253, 115, 115, 0.5));
+}
+
+.feature-icon {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  border-radius: 20px;
+}
+
+/* ── Szövegek ── */
+.feature-title {
+  font-size: 21px;
   font-weight: 700;
+  color: #2d3748;
+  margin: 0 0 14px;
+  line-height: 1.3;
+  transition: color 0.3s ease;
 }
 
-.feature-desc{
-  margin: 0;
-  color: var(--muted);
+.feature-link:hover .feature-title {
+  color: var(--accent, #667eea);
+}
+
+.feature-desc {
   font-size: 15px;
-  line-height: 1.6;
+  line-height: 1.65;
+  color: #718096;
+  margin: 0 0 24px;
+  flex-grow: 1;
+}
+
+/* ── Nyíl gomb (első doc arrow) ── */
+.feature-arrow {
+  width: 46px;
+  height: 46px;
+  background: linear-gradient(135deg, #f97316, #680000);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 20px;
+  margin: auto auto 0;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.feature-link:hover .feature-arrow {
+  transform: translateX(8px);
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.35);
+}
+
+/* ── Responsive ── */
+@media (max-width: 800px) {
+  .features-wrapper  { padding: 60px 0; }
+  .features-header   { margin-bottom: 48px; }
+  .feature-grid      { grid-template-columns: 1fr; gap: 20px; }
+  #featureTitle      { font-size: clamp(1.7rem, 6vw, 2.4rem); }
+}
+
+@media (max-width: 480px) {
+  .feature-card          { padding: 28px 20px 24px; }
+  .feature-icon-wrapper  { width: 64px; height: 64px; }
+  .feature-icon          { font-size: 26px; }
+  .feature-number        { font-size: 36px; }
 }
 /*#endregion*/
 
