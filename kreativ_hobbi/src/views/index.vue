@@ -11,6 +11,7 @@ library.add(faCalendar, faHeart, faArrowRight, faArrowCircleUp, faThumbsUp, faTh
 //variables
 const featureTitleRef = ref(null);
 const isInView = ref(false);
+const isHeroVisible = ref(true);
 let io = null;
 const baseURL = import.meta.env.VITE_API_URL;
 const blogPosts = ref([]);
@@ -30,6 +31,25 @@ onMounted( () => {
     { threshold: 1 } // 100% visible
   );
   if (featureTitleRef.value) io.observe(featureTitleRef.value);
+
+  const heroEl = document.querySelector('.hero-banner');
+    if (heroEl) {
+      const heroObserver = new IntersectionObserver(
+        ([entry]) => {
+          isHeroVisible.value = entry.isIntersecting;
+          const navbar = document.querySelector('.navbar');
+          if (navbar) {
+            if (entry.isIntersecting) {
+              navbar.classList.add('hero-mode');
+            } else {
+              navbar.classList.remove('hero-mode');
+            }
+          }
+        },
+        { threshold: 0 }
+      );
+      heroObserver.observe(heroEl);
+    }
 });
 
 onUnmounted(() => {
@@ -66,73 +86,73 @@ function formatDate(dateString) {
   <main>
 
     <!-- Hero Banner Section -->
-<section class="hero-banner">
-  <div class="hero-overlay"></div>
-  <div class="hero-content">
-    <div class="hero-text">
-      <h1 class="hero-title">
-        <span class="hero-title-line">Kézműves</span>
-        <span class="hero-title-line highlight">Alkotás</span>
-        <span class="hero-title-line">Minden nap</span>
-      </h1>
-      <p class="hero-subtitle">
-        Fedezd fel a kreatív lehetőségeket prémium alapanyagokkal, 
-        szakértő útmutatásokkal és egy támogató közösséggel.
-      </p>
-      <div class="hero-buttons">
-        <router-link to="/aruhaz" class="hero-btn primary">
-          <span>Vásárlás</span>
-          <svg class="btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M5 12h14M12 5l7 7-7 7"/>
-          </svg>
-        </router-link>
-        <router-link to="/mintakeszito" class="hero-btn secondary">
-          <span>Mintakészítő</span>
-          <svg class="btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-            <line x1="9" y1="9" x2="15" y2="9"></line>
-            <line x1="9" y1="15" x2="15" y2="15"></line>
-          </svg>
-        </router-link>
+    <section class="hero-banner">
+      <div class="hero-overlay"></div>
+      <div class="hero-content">
+        <div class="hero-text">
+          <h1 class="hero-title">
+            <span class="hero-title-line">Kézműves</span>
+            <span class="hero-title-line highlight">Alkotás</span>
+            <span class="hero-title-line">Minden nap</span>
+          </h1>
+          <p class="hero-subtitle">
+            Fedezd fel a kreatív lehetőségeket prémium alapanyagokkal, 
+            szakértő útmutatásokkal és egy támogató közösséggel.
+          </p>
+          <div class="hero-buttons">
+            <router-link to="/aruhaz" class="hero-btn primary">
+              <span>Vásárlás</span>
+              <svg class="btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </router-link>
+            <router-link to="/mintakeszito" class="hero-btn secondary">
+              <span>Mintakészítő</span>
+              <svg class="btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="9" y1="9" x2="15" y2="9"></line>
+                <line x1="9" y1="15" x2="15" y2="15"></line>
+              </svg>
+            </router-link>
+          </div>
+        </div>
+        <div class="hero-image">
+          <div class="floating-card card-1">
+            <div class="card-image">
+              <img src="https://picsum.photos/seed/craft1/200/150" alt="Kötés" />
+            </div>
+            <div class="card-content">
+              <h4>Kötés</h4>
+              <p>Minőségi fonalak</p>
+            </div>
+          </div>
+          <div class="floating-card card-2">
+            <div class="card-image">
+              <img src="https://picsum.photos/seed/craft2/200/150" alt="Horgolás" />
+            </div>
+            <div class="card-content">
+              <h4>Horgolás</h4>
+              <p>Kreatív ötletek</p>
+            </div>
+          </div>
+          <div class="floating-card card-3">
+            <div class="card-image">
+              <img src="https://picsum.photos/seed/craft3/200/150" alt="Hímzés" />
+            </div>
+            <div class="card-content">
+              <h4>Hímzés</h4>
+              <p>Szép minták</p>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
-    <div class="hero-image">
-      <div class="floating-card card-1">
-        <div class="card-image">
-          <img src="https://picsum.photos/seed/craft1/200/150" alt="Kötés" />
-        </div>
-        <div class="card-content">
-          <h4>Kötés</h4>
-          <p>Minőségi fonalak</p>
-        </div>
+      <div class="scroll-indicator">
+        <span>Görgess le a továbbiakért</span>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M7 10l5 5 5-5"/>
+        </svg>
       </div>
-      <div class="floating-card card-2">
-        <div class="card-image">
-          <img src="https://picsum.photos/seed/craft2/200/150" alt="Horgolás" />
-        </div>
-        <div class="card-content">
-          <h4>Horgolás</h4>
-          <p>Kreatív ötletek</p>
-        </div>
-      </div>
-      <div class="floating-card card-3">
-        <div class="card-image">
-          <img src="https://picsum.photos/seed/craft3/200/150" alt="Hímzés" />
-        </div>
-        <div class="card-content">
-          <h4>Hímzés</h4>
-          <p>Szép minták</p>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="scroll-indicator">
-    <span>Görj le</span>
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <path d="M7 10l5 5 5-5"/>
-    </svg>
-  </div>
-</section>
+    </section>
     
     <div id="mottoContainer">
       <div class="mottoInner">
@@ -293,7 +313,7 @@ function formatDate(dateString) {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #ff8a65b8 0%, #632a17cf 100%);
   overflow: hidden;
 }
 
@@ -304,7 +324,7 @@ function formatDate(dateString) {
   left: 0;
   right: 0;
   bottom: 0;
-  background-image: url('https://picsum.photos/seed/craftbg/1920/1080');
+  background-image: url('https://texturelabs.org/wp-content/uploads/Texturelabs_Fabric_155thumbnail.jpg');
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
@@ -319,8 +339,8 @@ function formatDate(dateString) {
   right: 0;
   bottom: 0;
   background: linear-gradient(135deg, 
-    rgba(102, 126, 234, 0.9) 0%, 
-    rgba(118, 75, 162, 0.9) 100%);
+    #ff8a655c 0%, 
+    #33100466 100%);
   z-index: 1;
 }
 
@@ -361,7 +381,8 @@ function formatDate(dateString) {
 .hero-title-line:nth-child(3) { animation-delay: 0.5s; }
 
 .hero-title-line.highlight {
-  background: linear-gradient(90deg, #ffd89b 0%, #19547b 100%);
+  display: inline-block;
+  background: linear-gradient(90deg, #6f3826 52.5%, #f9b798 48.5%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -400,7 +421,7 @@ function formatDate(dateString) {
 
 .hero-btn.primary {
   background: white;
-  color: #764ba2;
+  color: #a2644b;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 }
 
@@ -621,15 +642,15 @@ function formatDate(dateString) {
 /*#region Motto Container*/
 #mottoContainer {
   text-align: center;
-  margin: 1rem auto;
+  margin: 4rem auto;
   width: 60%;
-  position: relative; /* needed for pseudo-lines */
+  position: relative; 
   padding: 2rem 1rem;
   z-index: 1;
 }
 .mottoInner {
-  position: relative; /* allow inner pseudo-elements */
-  z-index: 2; /* keep text above lines */
+  position: relative; 
+  z-index: 2; 
 }
 #mottoContainer h1 {
   font-size: 2.5rem;
