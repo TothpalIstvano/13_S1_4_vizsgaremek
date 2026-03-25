@@ -1599,11 +1599,13 @@ main {
   color: white;
   padding: 30px 20px 20px;
   height: 240px;
+  overflow: hidden;
   transition: height 0.6s ease;
 }
 
 .blog-info:hover {
   height: 100%;
+  overflow-y: auto;
   align-content: space-evenly;
 }
 
@@ -1988,7 +1990,7 @@ input[type="file"] {
 .modositas {
   display: flex;
   flex-wrap: wrap;
-  gap: 32px;
+  gap: 20px;
   margin-bottom: 32px;
   padding: 16px;
   background-color: #704848e5;
@@ -2455,8 +2457,11 @@ input[type="file"] {
 }
 
 .unmatched-color .color-sample {
+  display: inline-block;
   border: 2px solid rgba(255, 255, 255, 0.3);
   border-radius: 4px;
+  width: 30px;
+  height: 30px;
 }
 
 .available-yarn-colors {
@@ -2780,21 +2785,6 @@ input[type="file"] {
   background: rgba(139, 67, 64, 0.1);
   transform: rotate(90deg);
 }
-
-@media (max-width: 768px) {
-  .fonal-details {
-    flex-direction: column;
-    text-align: center;
-  }
-  
-  .fonal-adatok {
-    text-align: center;
-  }
-  
-  .modal-gombok {
-    flex-direction: column;
-  }
-}
 /*#endregion*/
 
 /*#region Felugró ablak*/
@@ -2856,6 +2846,12 @@ input[type="file"] {
 @media (max-width: 1250px) {
   .ket-oszlop {
     grid-template-columns: 1fr;
+    margin: 0;
+    padding: 10px;
+  }
+
+  .blog-info {
+    height: 180px;
   }
 
   .harom-oszlop {
@@ -2865,6 +2861,7 @@ input[type="file"] {
   .pixelesContainer {
     grid-template-columns: 1fr;
     max-width: 100%;
+    padding: 12px;
   }
   
   .oldalsav {
@@ -2876,6 +2873,7 @@ input[type="file"] {
 @media (max-width: 1100px) {
   .pixeles-main-container {
     flex-direction: column;
+    padding: 0px;
   }
   
   .oldalsav {
@@ -2889,6 +2887,23 @@ input[type="file"] {
   .progress-step:not(:last-child)::after {
     width: 400%;
   }
+
+  #bemutato {
+    padding: 5px;
+    margin-bottom: 30px;
+  }
+
+  .progress-container {
+    margin-bottom: 0;
+  }
+
+  .radioStilus {
+    padding: 0;
+  }
+
+  .radioBelso {
+    padding: 12px;
+  }
 }
 
 @media (max-width: 768px) {
@@ -2896,12 +2911,42 @@ input[type="file"] {
     grid-template-columns: 1fr;
   }
   
-  .title {
-    font-size: 32px;
+  .blog-info {
+    position: static;
+    height: auto;
+    overflow: visible;
+    padding: 20px;
+    border-radius: 0 0 8px 8px;
+  }
+
+  .blog-info:hover {
+    height: auto;
+    overflow: visible;
+    align-content: unset;
+  }
+
+  .blog-info-kontener img {
+    max-height: 260px;
+    object-fit: cover;
+    width: 100%;
+  }
+
+    .fonal-details {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .fonal-adatok {
+    text-align: center;
+  }
+  
+  .modal-gombok {
+    flex-direction: column;
   }
   
   #adatok {
-    padding: 24px;
+    padding: 10px 10px 24px 10px;
+    width: 100%;
   }
   
   input[type="radio"] {
@@ -2920,7 +2965,7 @@ input[type="file"] {
   
   .modositas {
     flex-direction: column;
-    gap: 16px;
+    gap: 0px;
   }
   
   .valtoztatok {

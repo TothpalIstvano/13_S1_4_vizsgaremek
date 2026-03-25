@@ -1,4 +1,5 @@
   <template>
+    <h1 class="title">Áruház</h1>
     <div id="shop">
       <CartModal ref="cartModal" />
 
@@ -692,6 +693,14 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
+.title {
+  font-weight: 700;
+  font-size: 45px;
+  color: var(--mk-text-dark);
+  text-align: center;
+  padding-bottom: 6px;
+}
+
 .heart-wrapper { position: relative; }
 .heart-btn {
   position: absolute; top: 8px; right: 8px;

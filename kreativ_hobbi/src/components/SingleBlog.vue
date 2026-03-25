@@ -1233,7 +1233,7 @@ onBeforeUnmount(() => {
   }
   
   .blog-article {
-    padding: 32px;
+    padding: 15px;
   }
   
   .blog-title {
@@ -1267,10 +1267,6 @@ onBeforeUnmount(() => {
 }
 
 @media (max-width: 480px) {
-  .blog-article {
-    padding: 24px;
-  }
-  
   .blog-title {
     font-size: 28px;
   }
