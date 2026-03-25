@@ -1,7 +1,8 @@
-- törölt kommentnél szöveg "A komment törölve"
 - newpost notifications magyarul/jobban
 - reakciók poszthoz - tartsa meg a színt frissítés után
 - rólunk oldal rendes szöveg
 - főoldal posztok likeokkal
-- dashboard reszponzívitás - felhasználók oldalon - és emojik másra cserélése
+- mintakészítő felső szövegdobozok jobban reszponzív, + a nincs szín nagyobb legyen
+- belépés reszponzív animációval
+- dashboard és emojik másra cserélése
 (ha úgy gondolná h nem működik - blog képfeltöltés esetleg: https://stackoverflow.com/questions/50730143/laravel-storage-link-wont-work-on-production)

@@ -233,7 +233,7 @@ main {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 10px 50px;
+  padding: 10px 20px;
 }
 
 .kep {

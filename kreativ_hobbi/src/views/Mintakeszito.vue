@@ -1316,7 +1316,7 @@ onUnmounted(() => {
                   
                   <div v-if="szinMatchEredmeny.noMatches.length > 0" class="color-no-match">
                       <p class="no-match-title">⚠ Nem található pontosan egyező szín</p>
-                      <p class="no-match-subtitle">Az alábbi kép színekhöz nincs pontosan megegyező fonal szín:</p>
+                      <p class="no-match-subtitle">Az alábbi kép színekhez nincs pontosan megegyező fonal szín:</p>
                       <div class="unmatched-colors">
                           <div v-for="(noMatch, index) in szinMatchEredmeny.noMatches" :key="index" class="unmatched-color">
                               <span class="color-sample" :style="{ backgroundColor: noMatch.imageColor }"
@@ -2455,8 +2455,6 @@ input[type="file"] {
 }
 
 .unmatched-color .color-sample {
-  width: 25px;
-  height: 25px;
   border: 2px solid rgba(255, 255, 255, 0.3);
   border-radius: 4px;
 }
