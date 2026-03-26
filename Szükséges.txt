@@ -4,5 +4,5 @@
 - főoldal posztok likeokkal
 - belépés reszponzív animációval
 - dashboard és emojik másra cserélése
-- áruház aktív szűrők reszponzív + profil és new post
+- reszponzív profil és new post
 (ha úgy gondolná h nem működik - blog képfeltöltés esetleg: https://stackoverflow.com/questions/50730143/laravel-storage-link-wont-work-on-production)

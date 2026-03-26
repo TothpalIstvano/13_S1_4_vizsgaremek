@@ -643,6 +643,7 @@ function formatDate(d) { return new Date(d).toLocaleDateString(); }
   align-items: center;
   justify-content: center;
   z-index: 100;
+  padding: 16px;
 }
 
 .szerk-modal {
@@ -716,7 +717,7 @@ function formatDate(d) { return new Date(d).toLocaleDateString(); }
 }
 
 .form-row .form-group {
-  flex: 1 1 200px;
+  flex: 1 1 10px;
 }
 
 .form-group {
@@ -1159,6 +1160,7 @@ function formatDate(d) { return new Date(d).toLocaleDateString(); }
   align-items: center;
   justify-content: center;
   z-index: 100;
+  padding: 16px;
 }
 
 .kedvencek-modal {
@@ -1486,35 +1488,6 @@ color: #6b7280;
   content: "✎";
 }
 
-/* responsive */
-@media (max-width: 900px) {
-  .content-grid { 
-    grid-template-columns: 1fr; 
-  }
-
-  .post-cover { 
-    display: none; 
-  }
-
-  .profile-card { 
-    flex-direction: column; 
-    align-items: flex-start; 
-    transform: translateY(40px); 
-  }
-
-  .profile-actions { 
-    flex-direction: row; 
-    width: 100%; 
-    justify-content: space-between; 
-  }
-}
-
-@media (max-width: 640px) {
-  .kedvenc-lista {
-    grid-template-columns: 1fr;
-  }
-}
-
 .section-header {
   display: flex;
   justify-content: space-between;
@@ -1546,4 +1519,267 @@ color: #6b7280;
   margin-right: auto;
 }
 
+/* =====================
+   RESPONSIVE IMPROVEMENTS
+   ===================== */
+
+@media (max-width: 1024px) {
+  .content {
+    margin: 130px auto;
+  }
+  .cover {
+    height: 240px;
+  }
+  .profile-card {
+    transform: translateY(40px);
+  }
+}
+
+@media (max-width: 900px) {
+  .content-grid { 
+    grid-template-columns: 1fr; 
+  }
+
+  .post-cover { 
+    display: none; 
+  }
+
+  .profile-card { 
+    flex-direction: column; 
+    align-items: flex-start; 
+    transform: translateY(40px); 
+  }
+
+  .profile-actions { 
+    flex-direction: row; 
+    width: 100%; 
+    justify-content: space-between; 
+  }
+}
+
+@media (max-width: 768px) {
+  .cover {
+    height: 200px;
+  }
+  .cover-inner {
+    padding: 0 16px;
+    margin-bottom: -40px;
+  }
+  .profile-card {
+    padding: 12px;
+    gap: 12px;
+    transform: translateY(30px);
+  }
+  .avatar {
+    width: 80px;
+    height: 80px;
+  }
+  .name {
+    font-size: 18px;
+  }
+  .username {
+    font-size: 14px;
+  }
+  .meta {
+    font-size: 13px;
+  }
+  .profile-actions .btn {
+    padding: 6px 12px;
+    font-size: 14px;
+  }
+
+  .content {
+    margin: 100px auto;
+    padding: 0 16px;
+  }
+
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .section-header h2 {
+    font-size: 18px;
+  }
+
+  .posts {
+    gap: 16px;
+  }
+  .post-card {
+    flex-direction: column;
+  }
+  .post-cover {
+    display: block;
+    width: 100%;
+    min-width: auto;
+    height: 180px;
+  }
+  .post-body {
+    padding: 16px;
+  }
+
+  /* Modals */
+  .szerk-modal,
+  .kedvencek-modal {
+    max-width: 95%;
+    margin: 0 auto;
+  }
+  .szerk-modal-header h3,
+  .kedvencek-modal-header h3 {
+    font-size: 20px;
+  }
+  .form-section {
+    padding: 10px 16px;
+  }
+  .form-row {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .form-actions {
+    flex-direction: column;
+    gap: 12px;
+  }
+  .form-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Kedvencek */
+  .kedvenc-lista {
+    grid-template-columns: 1fr;
+    padding: 1rem;
+  }
+  .kedvenc-img {
+    height: 140px;
+  }
+
+  /* Camera preview */
+  .camera-preview video {
+    min-height: 200px;
+  }
+  .camera-controls .btn {
+    padding: 8px;
+    font-size: 14px;
+  }
+  .captured-preview img {
+    max-width: 150px;
+  }
+}
+
+@media (max-width: 480px) {
+  .cover {
+    height: 160px;
+  }
+  .cover-inner {
+    margin-bottom: -30px;
+  }
+  .profile-card {
+    padding: 10px;
+    transform: translateY(20px);
+  }
+  .avatar {
+    width: 64px;
+    height: 64px;
+  }
+  .name {
+    font-size: 16px;
+  }
+  .username {
+    font-size: 12px;
+  }
+  .bio {
+    font-size: 13px;
+  }
+  .meta {
+    font-size: 12px;
+    gap: 8px;
+  }
+  .profile-actions {
+    flex-direction: column;
+    width: 100%;
+    gap: 8px;
+  }
+  .profile-actions .btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .content {
+    margin: 80px auto;
+  }
+
+  .post-cover {
+    height: 150px;
+  }
+
+  .post-title {
+    font-size: 1rem;
+  }
+  .post-excerpt {
+    font-size: 0.9rem;
+  }
+  .post-meta {
+    font-size: 11px;
+  }
+
+  .empty-posts {
+    padding: 24px 16px;
+  }
+  .empty-posts h3 {
+    font-size: 1rem;
+  }
+  .empty-posts p {
+    font-size: 0.9rem;
+  }
+
+  /* Modals */
+  .szerk-modal-header,
+  .kedvencek-modal-header {
+    padding: 12px 16px;
+  }
+  .szerk-modal-header h3,
+  .kedvencek-modal-header h3 {
+    font-size: 18px;
+  }
+  .form-section {
+    padding: 10px 12px;
+  }
+  .form-group label {
+    font-size: 14px;
+  }
+  .form-group input[type="text"],
+  .form-group input[type="tel"],
+  .form-group input[type="number"] {
+    font-size: 14px;
+    padding: 8px;
+  }
+  .camera-preview {
+    padding: 12px;
+  }
+  .camera-preview video {
+    min-height: 160px;
+  }
+  .camera-controls .btn {
+    font-size: 13px;
+    padding: 8px;
+  }
+  .btn.upload {
+    padding: 8px 20px;
+    font-size: 14px;
+  }
+
+  /* Kedvencek */
+  .kedvenc-body {
+    padding: 0.75rem;
+  }
+  .kedvenc-title {
+    font-size: 0.9rem;
+  }
+  .kedvenc-price {
+    font-size: 1rem;
+  }
+  .kedvenc-desc {
+    font-size: 0.75rem;
+  }
+}
 </style>

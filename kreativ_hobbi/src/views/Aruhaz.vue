@@ -1,4 +1,4 @@
-  <template>
+<template>
     <h1 class="title">Áruház</h1>
     <div id="shop">
       <CartModal ref="cartModal" />
@@ -728,10 +728,11 @@ onBeforeUnmount(() => {
   background-color: white;
   border-radius: 14px;
   width: 100%;
-  height: 100px; /*Ez miatt van fentebb az Aktív kategóriák és innen kikerült a min-heights*/
-  padding: 0 24px;
-  box-shadow:0 4px 12px rgba(0, 0, 0, 0.151);
-}  
+  min-height: 70px;
+  height: auto;
+  padding: 12px 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.151);
+}
 
 
 /*#endregion*/
@@ -757,7 +758,6 @@ onBeforeUnmount(() => {
   gap: 6px;
   grid-column: 1;
   justify-self: start;
-  height: 52px; /*Ez miatt van fentebb az Aktív kategóriák*/
 }
 
 .filter-chip {
@@ -1554,28 +1554,45 @@ margin-left: 10px;
     align-items: center;
   }
 
+@media screen and (max-width: 900px) {
   #toolbar {
-    grid-template-columns: 1fr;
-    gap: 12px;
-    padding: 16px;
-    height: auto;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 16px;
+  }
+
+  .search-container {
+    order: 1;
+    flex: 1 1 160px;
+    width: auto !important;
+    margin: 0 !important;
+  }
+
+  .dropdown {
+    order: 2;
+    width: auto !important;
+    flex-shrink: 0;
+    margin: 0 !important;
+    justify-self: unset;
+  }
+
+  .filter-group {
+    order: 3;
+    width: 100%;
+    border-top: 1px solid #f0f0f0;
+    padding-top: 10px;
+    justify-self: unset;
   }
 
   .active-filters {
-    justify-content: center;
+    justify-content: flex-start;
+    flex-wrap: wrap;
     max-height: none;
     margin-bottom: 0;
   }
-
-  .search-container,
-  .dropdown {
-    width: 100% !important;
-    margin: 0 auto !important;
-  }
-
-  .dropdown {
-    justify-self: stretch;
-  }
+}
 }
 
 @media screen and (max-width: 480px) {
@@ -1607,34 +1624,6 @@ margin-left: 10px;
 }
 
 @media screen and (max-width: 400px) {
-  #toolbar {
-    grid-template-columns: 1fr;
-    gap: 15px;
-    padding: 16px;
-  }
-
-  .active-filters,
-  .search-container,
-  .dropdown {
-    grid-column: 1;
-    width: 100% !important;
-    margin: 0 auto !important;
-  }
-
-  .active-filters {
-    justify-self: center;
-    max-height: none;
-    justify-content: center;
-  }
-
-  .search-container {
-    justify-self: center;
-  }
-
-  .dropdown {
-    justify-self: stretch;
-  }
-
   .filter-chip {
     font-size: 12px;
     padding: 4px 10px;
@@ -1660,14 +1649,37 @@ margin-left: 10px;
     padding: 8px 12px;
   }
 }
+
 .tolto-kontener {
   grid-column: 1 / -1;
   display: flex; justify-content: center; align-items: center;
   min-height: 360px;
 }
+
 .tolto-content { text-align: center; }
-.tolto-icon { font-size: 48px; margin-bottom: 12px; animation: spin 3s linear infinite; }
-@keyframes spin { 0%,100%{transform:rotate(0deg)} 50%{transform:rotate(15deg)} 25%,75%{transform:rotate(-10deg)} }
-.tolto-szoveg { font-size: 16px; color: var(--clr-muted); margin-bottom: 24px; font-weight: 600; }
-.toltes { display: flex; justify-content: center; gap: 12px; }
+
+.tolto-icon { 
+  font-size: 48px; 
+  margin-bottom: 12px; 
+  animation: spin 3s linear infinite; 
+}
+
+@keyframes spin { 
+  0%,100%{transform:rotate(0deg)} 
+  50%{transform:rotate(15deg)} 
+  25%,75%{transform:rotate(-10deg)} 
+}
+
+.tolto-szoveg { 
+  font-size: 16px; 
+  color: var(--clr-muted); 
+  margin-bottom: 24px; 
+  font-weight: 600; 
+}
+
+.toltes { 
+  display: flex; 
+  justify-content: center; 
+  gap: 12px; 
+}
 </style>
