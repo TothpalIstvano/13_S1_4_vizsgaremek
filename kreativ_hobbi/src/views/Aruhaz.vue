@@ -208,14 +208,15 @@
         <div id="products">
           <div v-if="loading" class="tolto-kontener">
             <div class="tolto-content">
-              <p class="tolto-szoveg">Termékek betöltése...</p>
+              <div class="tolto-icon">🧵</div>
+              <p class="tolto-szoveg">Termékek betöltése…</p>
               <div class="toltes">
                 <div class="pulse-dot"></div>
                 <div class="pulse-dot"></div>
                 <div class="pulse-dot"></div>
-              </div>
             </div>
           </div>
+        </div>
           <div v-for="item in lapozottTermekek" :key="item.id" class="product-card" @click="router.push(`/aruhaz/${item.id}`)" style="cursor: pointer;">
             <div class="heart-wrapper">
               <button v-if="isLoggedIn" class="heart-btn" @click="toggleLike(item, $event)"
@@ -1659,4 +1660,14 @@ margin-left: 10px;
     padding: 8px 12px;
   }
 }
+.tolto-kontener {
+  grid-column: 1 / -1;
+  display: flex; justify-content: center; align-items: center;
+  min-height: 360px;
+}
+.tolto-content { text-align: center; }
+.tolto-icon { font-size: 48px; margin-bottom: 12px; animation: spin 3s linear infinite; }
+@keyframes spin { 0%,100%{transform:rotate(0deg)} 50%{transform:rotate(15deg)} 25%,75%{transform:rotate(-10deg)} }
+.tolto-szoveg { font-size: 16px; color: var(--clr-muted); margin-bottom: 24px; font-weight: 600; }
+.toltes { display: flex; justify-content: center; gap: 12px; }
 </style>
