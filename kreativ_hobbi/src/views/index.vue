@@ -1094,10 +1094,10 @@ function formatDate(dateString) {
   padding: 0 1rem;
   border-bottom: 5px solid var(--navbar-bg);
 }
-.blog-main-title{
+.blog-main-title {
   text-align: center;
-  font-size: 2.5rem;
-  margin: 10rem 1rem 1.5rem 1rem;
+  font-size: clamp(1.6rem, 5vw, 2.5rem);
+  margin: 6rem 1rem 1.5rem 1rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
@@ -1105,14 +1105,14 @@ function formatDate(dateString) {
 .content-wrapper {
   max-width: 1800px;
   margin: 0 auto;
-  padding: 0 32px;
+  padding: 0 clamp(16px, 4vw, 32px);
 }
 
 .cards-wrapper {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(480px, 1fr));
-  gap: 64px;
-  padding: 48px 0;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(16px, 2.5vw, 36px);
+  padding: clamp(24px, 4vw, 48px) 0;
 }
 
 .card-grid-space {
@@ -1156,7 +1156,7 @@ function formatDate(dateString) {
 }
 
 .card-img-holder {
-  height: 240px;
+  height: clamp(180px, 28vw, 240px);
   position: relative;
   overflow: hidden;
   border-radius: 20px;
@@ -1327,33 +1327,47 @@ function formatDate(dateString) {
 
 /* MEDIA QUERIES */
 
-@media screen and (max-width: 1100px) {
-
+@media screen and (max-width: 900px) {
   .cards-wrapper {
-    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-    gap: 24px;
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
-
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 600px) {
+  .blog-main-title {
+    margin-top: 4rem;
+  }
   .cards-wrapper {
     grid-template-columns: 1fr;
-    gap: 24px;
-    padding: 32px 0;
+    padding: 24px 0;
   }
 }
 
-@media screen and (max-width: 500px) {
-
+@media screen and (max-width: 600px) {
+  .blog-main-title {
+    margin-top: 3rem;
+  }
   .cards-wrapper {
     grid-template-columns: 1fr;
   }
   .card {
     max-width: 100%;
+    border-radius: 16px;
+    padding: 10px;
+  }
+  .card-img-holder {
+    border-radius: 12px;
+  }
+  .card-content {
+    padding: 12px;
+  }
+  .blog-title {
+    font-size: 20px;
+  }
+  .view-btn {
+    padding: 10px 18px;
+    font-size: 14px;
   }
 }
 /*#endregion*/
 </style>
-
-
