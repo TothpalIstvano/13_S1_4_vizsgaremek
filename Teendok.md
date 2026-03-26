@@ -3,6 +3,8 @@
 - \[ ] vásárlási mezők verfikációjának javítása
 - \[ ] telefon szám jobbá tétele
 - \[ ] Hybrid verifikáció
+- \[ ] Miden olyan funkció letiltása
+- \[ ] Modal estleges bedobása hogy jelentkez be ehhez
 - \[ ] Termékek modosításánál a modaba kép feltöltés és cimkék választásának javítása
 - \[ ] Miért válassz minket? ennek stílus javítása
 - \[ ] Alertek lecserélése mindenhol modellekre

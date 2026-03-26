@@ -5,30 +5,19 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
-use Illuminate\Http\Request;
-use Illuminate\Http\RedirectResponse;
-use App\Models\Felhasznalok;
 
 class VerifyEmailController extends Controller
 {
-    /**
-     * Mark the authenticated user's email address as verified.
-     */
-    public function __invoke(Request $request, $id, $hash)
+    public function __invoke(EmailVerificationRequest $request)
     {
-        $user = Felhasznalok::findOrFail($id);
-
-        if (! hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
-            return response()->json(['message' => 'Invalid verification link'], 403);
+        if ($request->user()->hasVerifiedEmail()) {
+            return redirect(env('FRONTEND_URL', 'http://localhost:5173') . '/?verified=already');
         }
 
-        if ($user->hasVerifiedEmail()) {
-            return redirect(config('app.frontend_url') . '/email-already-verified');
+        if ($request->user()->markEmailAsVerified()) {
+            event(new Verified($request->user()));
         }
 
-        $user->markEmailAsVerified();
-        event(new Verified($user));
-
-        return redirect(config('app.frontend_url') . '/email-verified');
+        return redirect(env('FRONTEND_URL', 'http://localhost:5173') . '/?verified=1');
     }
 }

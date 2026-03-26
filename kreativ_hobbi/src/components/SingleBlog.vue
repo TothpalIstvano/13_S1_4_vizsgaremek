@@ -135,8 +135,10 @@
             </div>
             
             <textarea 
+              :placeholder="!currentUser ? 'Jelentkezz be, hogy hozzászolj!' : !currentUser.email_verified_at ? 'Verifikáld az emailcímed, hogy hozzászolj!' : 'Írd ide a hozzászólásodat...'"
               v-model="newComment" 
-              placeholder="Írd ide a hozzászólásodat..."
+              :style="!currentUser || !currentUser.email_verified_at || loadingComments ? 'cursor: not-allowed; background-color: #ccc;' : ''"
+              :disabled="!currentUser || !currentUser.email_verified_at || loadingComments"
               rows="4"
               class="comment-textarea"
               :class="{ 'has-reply': replyTo }"
@@ -150,16 +152,17 @@
               </div>
               
               <button 
-                @click="addComment" 
-                :disabled="!newComment.trim() || loadingComments"
-                class="comment-submit-btn"
-                :class="{ 'is-loading': loadingComments }"
+                  @click="addComment" 
+                  :disabled="!newComment.trim() || loadingComments || !currentUser || !currentUser.email_verified_at"
+                  class="comment-submit-btn"
               >
-                <span v-if="!loadingComments">
-                  <font-awesome-icon icon="fa-solid fa-paper-plane" />
-                  Küldés
-                </span>
-                <span v-else class="loading-spinner"></span>
+                  <span v-if="!currentUser">Bejelentkezés szükséges</span>
+                  <span v-else-if="!currentUser.email_verified_at">
+                      Verifikáld az emailcímed!
+                  </span>
+                  <span v-else-if="!loadingComments">
+                      <font-awesome-icon icon="fa-solid fa-paper-plane" /> Küldés
+                  </span>
               </button>
             </div>
           </div>

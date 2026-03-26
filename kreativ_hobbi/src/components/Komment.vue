@@ -77,7 +77,11 @@ const formatDate = (dateString) => {
     </div>
     
     <div class="comment-actions">
-      <button @click="$emit('reply', comment.id)" class="reply-btn">
+      <button 
+        @click="$emit('reply', comment.id)" 
+        class="reply-btn"
+        :disabled="!currentUser || !currentUser.email_verified_at || loadingComments"
+        >
         <div class="reply-icon">
           <font-awesome-icon icon="fa-solid fa-reply" />
         </div>
