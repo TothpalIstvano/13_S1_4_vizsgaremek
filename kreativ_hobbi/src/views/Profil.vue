@@ -36,6 +36,9 @@ const objectUrl = ref(null);
 const cameraStream = ref(null);
 const uploading = ref(false);
 const likedIds = ref(new Set())
+const emailVerified = ref(true)
+const resendLoading = ref(false)
+const resendSent = ref(false)
 
 const user = reactive({
   name: '',
@@ -71,6 +74,19 @@ async function fetchUserBlogPosts() {
     return [];
   }
 }
+
+async function resendVerification() {
+  resendLoading.value = true
+  try {
+    await axios.post('/email/verification-notification')
+    resendSent.value = true
+  } catch (e) {
+    alert('Hiba történt az email küldés során.')
+  } finally {
+    resendLoading.value = false
+  }
+}
+
 
 function truncateText(text, limit) {
   if (!text) return ''
@@ -114,6 +130,7 @@ function applyAvatar(profilKep) {
 
 onMounted(async () => {
   userData.value = await fetchUserData();
+  emailVerified.value = !!userData.value?.email_verified_at
   await fetchCities();
   if (userData.value) {
     user.name = userData.value.felhasz_nev;
@@ -381,6 +398,22 @@ function formatDate(d) { return new Date(d).toLocaleDateString(); }
               <span>{{ user.stats.posts }} bejegyzés</span>
             </div>
           </div>
+          <div v-if="!emailVerified" class="verify-banner">
+            <div class="verify-banner__icon">⚠</div>
+            <div class="verify-banner__text">
+              <strong>Erősítsd meg az email címed!</strong>
+              <span>A jobb élményért (pl. posztolás, kommentelés) verifikáld az emailed. A link lejárhat — küldj újat ha szükséges.</span>
+            </div>
+            <button
+              class="verify-banner__btn"
+              @click="resendVerification"
+              :disabled="resendLoading || resendSent"
+            >
+              <span v-if="resendSent">✓ Elküldve!</span>
+              <span v-else-if="resendLoading">Küldés...</span>
+              <span v-else>Újraküldés</span>
+            </button>
+          </div>
           <div class="profile-actions">
             <button class="btn edit" @click="szerkesztes">Szerkesztés</button>
             <button type="button" class="btn logout" @click="kijelentkezes">Kijelentkezés</button>
@@ -567,9 +600,21 @@ function formatDate(d) { return new Date(d).toLocaleDateString(); }
 
         <section class="main-col">
           <header class="section-header">
-            <h2>A profilhoz tartozó cikkek</h2>
+            <div class="section-title-wrapper">
+              <p class="section-eyebrow">Alkotásaid</p>
+              <h2 class="section-main-title">
+                A profilhoz tartozó <span>cikkek</span>
+              </h2>
+            </div>
 
-            <RouterLink to="/newpost" class="btn create-post">
+            <RouterLink
+              to="/newpost"
+              class="btn create-post"
+              :class="{ 'btn-disabled': !emailVerified }"
+              @click.prevent="!emailVerified ? null : $router.push('/newpost')"
+              :aria-disabled="!emailVerified"
+              :title="!emailVerified ? 'Verifikáld az emailcímed a posztoláshoz!' : ''"
+            >
               + Új bejegyzés
             </RouterLink>
           </header>
@@ -577,12 +622,20 @@ function formatDate(d) { return new Date(d).toLocaleDateString(); }
           <div v-if="posts.length === 0" class="empty-posts">
             <h3>Még nincs egyetlen bejegyzésed sem</h3>
             <p>
-              Itt fognak megjelenni a saját cikkeid.  
+              Itt fognak megjelenni a saját cikkeid.
               Kezdd el az első bejegyzésed létrehozásával.
             </p>
 
-            <RouterLink to="/newpost" class="btn create-post">
-              + Új bejegyzés létrehozása
+            <RouterLink
+              to="/newpost"
+              class="btn create-post"
+              :class="{ 'btn-disabled': !emailVerified }"
+              @click.prevent="!emailVerified ? null : $router.push('/newpost')"
+              :aria-disabled="!emailVerified"
+              :title="!emailVerified ? 'Verifikáld az emailcímed a posztoláshoz!' : ''"
+            >
+              <span v-if="!emailVerified">🔒 Email verifikáció szükséges</span>
+              <span v-else>+ Új bejegyzés létrehozása</span>
             </RouterLink>
           </div>
 
@@ -617,6 +670,120 @@ function formatDate(d) { return new Date(d).toLocaleDateString(); }
 </template>
 
 <style scoped>
+.section-title-wrapper {
+  position: relative;
+  padding-left: 16px;
+}
+
+.section-title-wrapper::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 70%;
+  background: linear-gradient(180deg, #ff6a00, #680000);
+  border-radius: 4px;
+}
+
+.section-eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: #ad6801;
+  margin: 0 0 6px 0;
+}
+
+.section-main-title {
+  font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+  font-weight: 800;
+  margin: 0;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: #1a1a2e;
+}
+
+.section-main-title span {
+  background: linear-gradient(90deg, #914f04 0%, #ff6800 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.verify-banner {
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: #fefce8;
+  border: 1.5px solid #fbbf24;
+  border-radius: 12px;
+  padding: 14px 20px;
+  box-sizing: border-box;
+}
+
+.verify-banner__icon {
+  font-size: 22px;
+  flex-shrink: 0;
+  color: #92400e;
+}
+
+.verify-banner__text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.verify-banner__text strong {
+  font-size: 15px;
+  color: #78350f;
+}
+
+.verify-banner__text span {
+  font-size: 13px;
+  color: #92400e;
+}
+
+.verify-banner__btn {
+  flex-shrink: 0;
+  background: #f59e0b;
+  color: #451a03;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.verify-banner__btn:hover:not(:disabled) {
+  background: #d97706;
+}
+
+.verify-banner__btn:disabled {
+  opacity: 0.7;
+  cursor: default;
+}
+
+@media (max-width: 600px) {
+  .verify-banner {
+    flex-direction: column;
+    align-items: flex-start;
+    margin-top: 60px;
+  }
+  .verify-banner__btn {
+    width: 100%;
+    text-align: center;
+  }
+}
+
 .draft-badge {
   background: #fbbf24;
   color: #000;
@@ -1493,6 +1660,17 @@ color: #6b7280;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 14px;
+}
+
+/* Disabled gomb */
+.btn-disabled {
+  background: #d1d5db !important;
+  color: #35373b !important;
+  cursor: not-allowed !important;
+  pointer-events: none;
+  opacity: 0.7;
+  filter: grayscale(0.4);
+  position: relative;
 }
 
 .empty-posts {
