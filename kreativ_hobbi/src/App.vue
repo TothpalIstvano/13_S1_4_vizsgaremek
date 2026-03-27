@@ -1,12 +1,31 @@
 <script setup>
 import Navbar from '@/components/navbar.vue';
 import Footer from '@/components/footer.vue';
-import { onMounted, onUnmounted, provide, ref, watch } from 'vue';
+import { onMounted, onUnmounted, provide, ref, onBeforeUnmount } from 'vue';
 import { RouterView } from 'vue-router';
 import axios from 'axios';
+import { useAuthStore } from '@/stores/auth'
 
 const loggedIn = ref(false);
 const user = ref(null);
+
+
+const authStore = useAuthStore()
+const appUrl = import.meta.env.VITE_APP_URL || 'http://localhost:5173'
+
+const handleVerifyMessage = async (event) => {
+    if (event.origin !== appUrl) return
+    if (event.data?.type === 'EMAIL_VERIFIED') {
+        await authStore.fetchUser()
+        const redirectTo = localStorage.getItem('redirect_after_verify')
+        localStorage.removeItem('redirect_after_verify')
+        if (redirectTo) router.push(redirectTo)
+    }
+}
+
+onMounted(() => window.addEventListener('message', handleVerifyMessage))
+onBeforeUnmount(() => window.removeEventListener('message', handleVerifyMessage))
+
 onMounted(async () => {
   try {
     await axios.get('/sanctum/csrf-cookie');

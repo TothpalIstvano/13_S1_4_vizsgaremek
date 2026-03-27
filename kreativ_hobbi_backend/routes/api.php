@@ -56,7 +56,7 @@ Route::middleware('auth:sanctum')->group(function () {
                 'profilKep:id,url_Link,alt_szoveg',
                 'adatok:felhasznalo_id,vezeteknev,keresztnev,szerepkor,varos,utca,hazszam,emeletAjto,telefonszam'
             )
-            ->only(['id', 'felhasz_nev', 'email', 'profilKep', 'adatok', 'letrehozas_Datuma']);
+            ->only(['id', 'felhasz_nev', 'email', 'email_verified_at', 'profilKep', 'adatok', 'letrehozas_Datuma']);
     });
 
     Route::get('/user/navbar', function (Request $request) {
