@@ -601,7 +601,7 @@ function formatDate(d) { return new Date(d).toLocaleDateString(); }
         <section class="main-col">
           <header class="section-header">
             <div class="section-title-wrapper">
-              <p class="section-eyebrow">Alkotásaid</p>
+              <p class="section-eyebrow">Írásaid</p>
               <h2 class="section-main-title">
                 A profilhoz tartozó <span>cikkek</span>
               </h2>

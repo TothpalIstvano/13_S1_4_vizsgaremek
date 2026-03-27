@@ -1,12 +1,10 @@
 - \[/] Webshop
-- \[ ] kosár jel hozzáadása a kis méretű módhoz vhogy ez alatt azt étve hogy mikor nem fullos a navbar
 - \[ ] vásárlási mezők verfikációjának javítása
 - \[ ] telefon szám jobbá tétele
-- \[ ] Hybrid verifikáció
 - \[ ] Miden olyan funkció letiltása
-- \[ ] Modal estleges bedobása hogy jelentkez be ehhez
+- \[ ] Miden termék ahol csak egy kép van azt javítani kell mivel a kép ugrál
+- \[ ] Carousel javítása mert mikor vált össze csuklik, kosárhoz adás és ha beklikkel egy színt és rányom hogy megtekinés akkor úgy dobja be hogy az a szín aktív
 - \[ ] Termékek modosításánál a modaba kép feltöltés és cimkék választásának javítása
-- \[ ] Miért válassz minket? ennek stílus javítása
 - \[ ] Alertek lecserélése mindenhol modellekre
 - \[ ] Táblák egységesítése ez alat azt értve hogy a táblákban lévő adatok megegyezenek
 - \[ ] Posztok és további backend helyekből kivenni a letrehozas_datuma nevű felesleges taget, mivel a created_at egyszerűbb és alap
@@ -15,8 +13,10 @@
 - \[ ] Az oldal dokumenálása
 - \[ ] Optimalizálás
 - \[ ] 05-06 lecserélése b ejelentkezés és gyikra + emoiji meg everything
-- \[ ] Optimalizálás
 
+- \[X] Miért válassz minket? ennek stílus javítása✅
+- \[X] kosár jel hozzáadása a kis méretű módhoz vhogy ez alatt azt étve hogy mikor nem fullos a navbar✅
+- \[X] Hybrid verifikáció✅
 - \[X] Komenteknél cascade kivétel és törölt felhasználó✅?????????????????????????????????????????????????????????✅
 - \[X] kártya adatverifikáció✅
 - \[X] Analitika fixelés és kisebbre vétele✅
