@@ -20,7 +20,7 @@ use App\Models\Varosok;
 use App\Mail\RendelesVisszaigazolas;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Crypt;
-use App\Models\Kedvencek;
+use App\Models\Szinek;
 //User related API routes:
 
 // Check if user is logged in and return szerepkor
@@ -180,7 +180,7 @@ Route::get('/termekek/kategoriak', function () {
 });
 
 Route::get('/termekek', function () {
-    $termekek = Termekek::with('TermekKategoria', 'TermekFoKep', 'TermekSzinek', 'TermekKategoriak')
+    $termekek = Termekek::with('TermekKategoria', 'TermekFoKep', 'TermekSzinek', 'TermekKategoriak', 'TermekKepek')
         ->get(['id', 'nev', 'ar', 'leiras', 'darab', 'meter', 'kategoria_id', 'fo_kep_id']);
     return response()->json($termekek);
 });
@@ -197,6 +197,11 @@ Route::get('/termekek/{id}', function ($id) {
         return response()->json(['error' => $e->getMessage()], 500);
     }
 });
+
+Route::get('/szinek', function () {
+    return Szinek::select('id', 'nev', 'hex_kod')->orderBy('nev')->get();
+});
+
 
 Route::post('/rendeles', function (Request $request) {
     $validated = $request->validate([
@@ -640,10 +645,24 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
             'darab' => 'required|integer|min:0',
             'leiras' => 'nullable|string',
             'fo_kep_id' => 'nullable|integer',
+            'szinek' => 'nullable|array',
+            'szinek.*' => 'integer|exists:szinek,id',
         ]);
 
-        $termek = Termekek::create($validated);
-        return response()->json($termek->load('TermekKategoria', 'TermekFoKep'), 201);
+        $termek = Termekek::create(\Illuminate\Support\Arr::except($validated, ['szinek']));
+
+        if (!empty($validated['szinek'])) {
+            foreach ($validated['szinek'] as $szinId) {
+                \DB::table('termekszinek')->insert([
+                    'termek_id' => $termek->id,
+                    'szin_id' => $szinId,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+        }
+
+        return response()->json($termek->load('TermekKategoria', 'TermekFoKep', 'TermekSzinek'), 201);
     });
 
     Route::put('/termekek/{id}', function (Request $request, $id) {
@@ -656,10 +675,25 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
             'darab' => 'sometimes|integer|min:0',
             'leiras' => 'nullable|string',
             'fo_kep_id' => 'nullable|integer',
+            'szinek' => 'nullable|array',
+            'szinek.*' => 'integer|exists:szinek,id',
         ]);
 
         $termek->update($validated);
-        return response()->json($termek->load('TermekKategoria', 'TermekFoKep'));
+
+        if (array_key_exists('szinek', $validated)) {
+            \DB::table('termekszinek')->where('termek_id', $id)->delete();
+            foreach ($validated['szinek'] as $szinId) {
+                \DB::table('termekszinek')->insert([
+                    'termek_id' => $id,
+                    'szin_id' => $szinId,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+        }
+
+        return response()->json($termek->load('TermekKategoria','TermekSzinek','TermekKepek', 'TermekFoKep'));
     });
 
     Route::delete('/termekek/{id}', function ($id) {

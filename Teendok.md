@@ -1,10 +1,8 @@
 - \[/] Webshop
 - \[ ] vásárlási mezők verfikációjának javítása
 - \[ ] telefon szám jobbá tétele
-- \[ ] Miden olyan funkció letiltása
 - \[ ] Miden termék ahol csak egy kép van azt javítani kell mivel a kép ugrál
 - \[ ] Carousel javítása mert mikor vált össze csuklik, kosárhoz adás és ha beklikkel egy színt és rányom hogy megtekinés akkor úgy dobja be hogy az a szín aktív
-- \[ ] Termékek modosításánál a modaba kép feltöltés és cimkék választásának javítása
 - \[ ] Alertek lecserélése mindenhol modellekre
 - \[ ] Táblák egységesítése ez alat azt értve hogy a táblákban lévő adatok megegyezenek
 - \[ ] Posztok és további backend helyekből kivenni a letrehozas_datuma nevű felesleges taget, mivel a created_at egyszerűbb és alap
@@ -12,8 +10,11 @@
 - \[ ] Az oldal tesztelése
 - \[ ] Az oldal dokumenálása
 - \[ ] Optimalizálás
+- \[ ] Termékeknél admin ként új színt is meg lehessen adni és meg csinálni a cimkéket mert az a rész még mindig fostos
 - \[ ] 05-06 lecserélése b ejelentkezés és gyikra + emoiji meg everything
 
+- \[X] Termékek modosításánál a modaba kép feltöltés és cimkék választásának javítása✅
+- \[X] Miden olyan funkció letiltása✅
 - \[X] Miért válassz minket? ennek stílus javítása✅
 - \[X] kosár jel hozzáadása a kis méretű módhoz vhogy ez alatt azt étve hogy mikor nem fullos a navbar✅
 - \[X] Hybrid verifikáció✅

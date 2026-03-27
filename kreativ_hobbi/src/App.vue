@@ -1,15 +1,13 @@
 <script setup>
 import Navbar from '@/components/navbar.vue';
 import Footer from '@/components/footer.vue';
-import { onMounted, onUnmounted, provide, ref, onBeforeUnmount } from 'vue';
+import { onMounted, provide, ref, onBeforeUnmount } from 'vue';
 import { RouterView } from 'vue-router';
 import axios from 'axios';
 import { useAuthStore } from '@/stores/auth'
 
 const loggedIn = ref(false);
-const user = ref(null);
-
-
+const user = ref(null); 
 const authStore = useAuthStore()
 const appUrl = import.meta.env.VITE_APP_URL || 'http://localhost:5173'
 
@@ -22,6 +20,12 @@ const handleVerifyMessage = async (event) => {
         if (redirectTo) router.push(redirectTo)
     }
 }
+
+onMounted(async () => {
+  if (!authStore.authChecked) {
+    await authStore.checkAuth()
+  }
+})  
 
 onMounted(() => window.addEventListener('message', handleVerifyMessage))
 onBeforeUnmount(() => window.removeEventListener('message', handleVerifyMessage))
@@ -37,29 +41,10 @@ onMounted(async () => {
         loggedIn.value = false;
       }
   } catch (error) {
-   loggedIn.value = false;
+    loggedIn.value = false;
   }
 });
-onUnmounted(async () => {
-    try {
-    await axios.get('/sanctum/csrf-cookie');
 
-    const response = await axios.get('/api/user/check', { withCredentials: true });
-    if (response.data.loggedIn === true) {
-      loggedIn.value = true;
-      user.value = response.data.user;
-    } else {
-      loggedIn.value = false;
-        user.value = null;
-      }
-  } catch (error) {
-      loggedIn.value = false;
-   user.value = null;
-  }
-});
-/*>
-watch(loggedIn, (newValue) => {;
-});*/
 provide('loggedIn', loggedIn);
 provide('user', user);
 
