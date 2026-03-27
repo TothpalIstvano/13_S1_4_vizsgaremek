@@ -110,7 +110,7 @@
 import { onMounted, ref, watch } from 'vue'
 import axios from 'axios' 
 import router from '@/router/router'
-
+import { useAuthStore } from '@/stores/auth.js' 
 async function check (){
     try {
       const response = await axios.get('/api/user/check', { withCredentials: true })
@@ -137,6 +137,7 @@ const buttonflag = ref(false)
 const showSignInPassword = ref(false)
 const showSignUpPassword = ref(false)
 const showSignUpPasswordConfirm = ref(false)
+const authStore = useAuthStore()
 const signUpForm = ref({
   name: '',
   email: '',
@@ -242,10 +243,11 @@ const handleSignIn = async () => {
     })
 
     if (response.status === 204) {
-      router.push('/Profil') // Redirect to profile page on successful login
-      // Dispatch a custom event
-      window.dispatchEvent(new Event('user-logged-in'));
 
+      await authStore.checkAuth()
+      const redirect = router.currentRoute.value.query.redirect || '/profil'
+      router.push(redirect)
+      window.dispatchEvent(new Event('user-logged-in'))
     }
     else {
       throw new Error('Login failed. Please check your credentials.')
@@ -292,8 +294,11 @@ const handleSignUp = async () => {
 
     // backend returns noContent() (204) after registering and logging in the user
     if (response.status === 204 || response.status === 201) {
-      router.push('/Profil')
-      window.dispatchEvent(new Event('user-logged-in'));
+      await authStore.checkAuth()  // ← ez is kell!
+      
+      const redirect = router.currentRoute.value.query.redirect || '/profil'
+      router.push(redirect)
+      window.dispatchEvent(new Event('user-logged-in'))
     } else {
       throw new Error('Registration failed. Please try again.')
     }

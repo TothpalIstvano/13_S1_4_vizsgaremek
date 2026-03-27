@@ -313,6 +313,7 @@
                   </span>
                 </th>
                 <th>Státusz</th>
+                <th>Színek</th>
                 <th>Műveletek</th>
               </tr>
             </thead>
@@ -329,6 +330,22 @@
                   <span class="badge" :class="product.stock > 10 ? 'badge-success' : product.stock > 0 ? 'badge-warning' : 'badge-danger'">
                     {{ product.stock > 10 ? 'Raktáron' : product.stock > 0 ? 'Kevés' : 'Nincs készleten' }}
                   </span>
+                </td>
+                <td>
+                  <div style="display:flex; gap:4px; flex-wrap:wrap;">
+                    <span
+                      v-for="color in (product.colors ?? []).slice(0, 6)"
+                      :key="color.id"
+                      :title="color.nev"
+                      style="width:20px; height:20px; border-radius:50%; display:inline-block; border:1.5px solid #e2e8f0; cursor:default;"
+                      :style="{ background: color.hex_kod }"
+                    ></span>
+                    <span
+                      v-if="(product.colors ?? []).length > 6"
+                      style="font-size:11px; color:#94a3b8; align-self:center;"
+                    >+{{ product.colors.length - 6 }}</span>
+                    <span v-if="!(product.colors ?? []).length" style="color:#94a3b8; font-size:13px;">—</span>
+                  </div>
                 </td>
                 <td>
                   <div class="action-buttons">
@@ -710,48 +727,186 @@
       </div>
     </main>
 
-    <!-- Product Modal (Simple - kept original) -->
+    <!-- Product Modal (Updated - same style as Blog) -->
     <div v-if="showProductModal" class="modal-overlay" @click.self="showProductModal = false">
-      <div class="modal">
+      <div class="modal blog-modal-large">
         <div class="modal-header">
           <h3 class="modal-title">{{ editingProduct.id ? 'Termék Szerkesztése' : 'Új Termék' }}</h3>
           <button class="btn btn-icon" @click="showProductModal = false">✕</button>
         </div>
-        <div class="modal-body">
-          <div class="form-group">
-            <label class="form-label">Termék neve</label>
-            <input type="text" class="form-input" v-model="editingProduct.name" placeholder="pl. Kötőfonal 100g">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Kategória</label>
-            <select class="form-select" v-model="editingProduct.category">
-              <option>Fonalak</option>
-              <option>Kötőtűk</option>
-              <option>Horgolótűk</option>
-              <option>Hímzőfonalak</option>
-              <option>Kellékek</option>
-              <option>Minták</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Ár (Ft)</label>
-            <input type="number" class="form-input" v-model="editingProduct.price" placeholder="2990">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Készlet (db)</label>
-            <input type="number" class="form-input" v-model="editingProduct.stock" placeholder="50">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Kép URL</label>
-            <input type="text" class="form-input" v-model="editingProduct.image" placeholder="https://...">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Leírás</label>
-            <textarea class="form-textarea" v-model="editingProduct.description" placeholder="Termék leírása..."></textarea>
+
+        <div class="modal-body-scrollable">
+          <div class="post-form">
+
+            <!-- Név -->
+            <div class="form-section">
+              <label class="form-label">
+                Termék neve
+                <span class="required-indicator">*</span>
+              </label>
+              <InputText
+                v-model="editingProduct.name"
+                placeholder="pl. Kötőfonal 100g"
+                class="w-full mb-2"
+              />
+              <small class="form-hint">Adj egy egyértelmű, leíró nevet a terméknek</small>
+            </div>
+
+            <!-- Kategória -->
+            <div class="form-section">
+              <label class="form-label">
+                Kategória
+                <span class="required-indicator">*</span>
+              </label>
+              <Dropdown
+                v-model="selectedProductCategory"
+                :options="productCategoryOptions"
+                optionLabel="nev"
+                optionValue="id"
+                placeholder="Válassz kategóriát"
+                filter
+                class="w-full mb-2"
+              />
+              <small class="form-hint">Válassz a termékhez illő kategóriát</small>
+            </div>
+
+            <!-- Ár és Készlet -->
+            <div class="form-section" style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+              <div>
+                <label class="form-label">
+                  Ár (Ft)
+                  <span class="required-indicator">*</span>
+                </label>
+                <InputText
+                  v-model="editingProduct.price"
+                  type="number"
+                  placeholder="2990"
+                  class="w-full mb-2"
+                />
+                <small class="form-hint">Nettó ár forintban</small>
+              </div>
+              <div>
+                <label class="form-label">
+                  Készlet (db)
+                  <span class="required-indicator">*</span>
+                </label>
+                <InputText
+                  v-model="editingProduct.stock"
+                  type="number"
+                  placeholder="50"
+                  class="w-full mb-2"
+                />
+                <small class="form-hint">Aktuális raktárkészlet</small>
+              </div>
+            </div>
+
+            <!-- Leírás -->
+            <div class="form-section">
+              <label class="form-label">Leírás</label>
+              <Editor
+                v-model="editingProduct.description"
+                :key="productEditorKey"
+                ref="productEditorRef"
+                editorStyle="height: 220px"
+                class="mb-2 editor-container"
+                :pt="{
+                  toolbar: { class: 'editor-toolbar' },
+                  content: { style: { 'min-height': '180px', 'font-family': 'inherit' } }
+                }"
+              />
+              <small class="form-hint">Részletes termékleírás, anyagok, méretek, használati útmutató</small>
+            </div>
+
+            <!-- Színek -->
+            <div class="form-section">
+              <label class="form-label">
+                Elérhető színek
+                <span class="required-indicator">*</span>
+              </label>
+              <MultiSelect
+                v-model="selectedProductColors"
+                :options="availableColors"
+                optionLabel="nev"
+                placeholder="Válassz legalább 1 színt"
+                display="chip"
+                filter
+                class="w-full mb-2"
+              >
+                <template #option="{ option }">
+                  <div style="display:flex; align-items:center; gap:10px;">
+                    <span
+                      style="width:18px; height:18px; border-radius:50%; display:inline-block; border:1px solid #e2e8f0; flex-shrink:0;"
+                      :style="{ background: option.hex_kod }"
+                    ></span>
+                    <span>{{ option.nev }}</span>
+                    <span style="color:#94a3b8; font-size:12px;">{{ option.hex_kod }}</span>
+                  </div>
+                </template>
+                <template #chip="{ value }">
+                  <div style="display:flex; align-items:center; gap:6px; padding:2px 4px;">
+                    <span
+                      style="width:12px; height:12px; border-radius:50%; display:inline-block; border:1px solid rgba(0,0,0,0.1); flex-shrink:0;"
+                      :style="{ background: value.hex_kod }"
+                    ></span>
+                    <span style="font-size:12px;">{{ value.nev }}</span>
+                  </div>
+                </template>
+              </MultiSelect>
+              <small class="form-hint">Legalább 1 szín szükséges. A színes körök megjelennek a termékkártyán.</small>
+            </div>
+
+            <!-- Képek feltöltése -->
+            <div class="form-section">
+              <label class="form-label">Termékképek feltöltése</label>
+              <FileUpload
+                ref="productFileUploadRef"
+                name="images[]"
+                @select="onProductFileSelect"
+                :multiple="true"
+                accept="image/avif,image/jpeg,image/png,image/gif,image/webp"
+                :maxFileSize="5000000"
+                :auto="false"
+                :showUploadButton="false"
+                :showCancelButton="false"
+                chooseLabel="Képek kiválasztása"
+                class="mb-2"
+              >
+                <template #empty>
+                  <div class="drag-drop-area">
+                    <i class="pi pi-cloud-upload" style="font-size: 3rem; color: #667eea; margin-bottom: 1rem;"></i>
+                    <p>Húzd ide a termékképeket vagy kattints a feltöltéshez</p>
+                  </div>
+                </template>
+              </FileUpload>
+
+              <div v-if="uploadedProductImages.length > 0" class="image-preview-container">
+                <div v-for="(image, index) in uploadedProductImages" :key="index" class="image-preview">
+                  <img :src="image.preview" class="preview-image" />
+                  <button
+                    type="button"
+                    class="image-remove-btn"
+                    @click="removeProductImage(index)"
+                  >
+                    <i class="pi pi-times"></i>
+                  </button>
+                  <InputText
+                    v-model="image.alt"
+                    placeholder="Alt szöveg"
+                    class="image-alt-input"
+                  />
+                  <div v-if="index === 0" style="text-align:center; margin-top:4px;">
+                    <span style="font-size:11px; color:#f97316; font-weight:600;">⭐ Főkép</span>
+                  </div>
+                </div>
+              </div>
+              <small class="form-hint">Az első feltöltött kép lesz a termék főképe. Max. 5MB/kép.</small>
+            </div>
+
           </div>
         </div>
+
         <div class="modal-footer">
-          <button class="btn" @click="showProductModal = false">Mégse</button>
+          <button class="btn btn-secondary" @click="showProductModal = false">Mégse</button>
           <button class="btn btn-primary" @click="saveProduct">Mentés</button>
         </div>
       </div>
@@ -967,6 +1122,7 @@ import Editor from 'primevue/editor';
 import FileUpload from 'primevue/fileupload';
 import InputText from 'primevue/inputtext';
 import Checkbox from 'primevue/checkbox';
+import Dropdown from 'primevue/dropdown';
 
 const API = '/api/admin';
 
@@ -985,6 +1141,13 @@ const editorKey = ref(0);
 const editorRef = ref(null);
 const loading = ref(false);
 const sidebarOpen = ref(false)
+const selectedProductCategory = ref(null);
+const uploadedProductImages = ref([]);
+const productFileUploadRef = ref(null);
+const productEditorKey = ref(0);
+const productCategoryOptions = ref([]);
+const availableColors = ref([]);   
+const selectedProductColors = ref([]); 
 
 // Complex Form State (from new-post.vue)
 const selectedTags = ref([]); 
@@ -1052,12 +1215,65 @@ const fetchProducts = async () => {
     id: p.id,
     name: p.nev,
     category: p.termek_kategoria?.nev ?? '-',
+    kategoria_id: p.kategoria_id,
     price: p.ar,
     stock: p.darab,
-    image: p.termek_fo_kep?.url_Link
-      ? p.termek_fo_kep.url_Link
-      : 'https://placehold.co/100x100',
+    description: p.leiras ?? '',
+    image: p.termek_fo_kep?.url_Link ?? 'https://placehold.co/100x100',
+    // Képek a pivot táblából
+    imagesData: (p.termek_kepek ?? []).map(k => ({
+      id: k.id,
+      url_Link: k.url_Link,
+      alt_szoveg: k.alt_szoveg ?? ''
+    })),
+    // Színek
+    colors: (p.termek_szinek ?? []).map(s => ({
+      id: s.id,
+      nev: s.nev,
+      hex_kod: s.hex_kod
+    })),
   }));
+};
+
+const fetchColors = async () => {
+  try {
+    const { data } = await axios.get('/api/szinek');
+    availableColors.value = data;
+  } catch (e) {
+    console.error('Színek betöltése sikertelen:', e);
+  }
+};
+
+const fetchProductCategories = async () => {
+  try {
+    const { data } = await axios.get('/api/termekek/kategoriak');
+    productCategoryOptions.value = data;
+  } catch (error) {
+    console.error('Kategóriák betöltése sikertelen:', error);
+  }
+};
+
+const onProductFileSelect = (event) => {
+  const files = event.files.filter(file => file.type.startsWith('image/'));
+  files.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      uploadedProductImages.value.push({
+        file: file,
+        preview: e.target.result,
+        alt: '',
+        id: null
+      });
+    };
+    reader.readAsDataURL(file);
+  });
+  if (productFileUploadRef.value) {
+    productFileUploadRef.value.clear();
+  }
+};
+
+const removeProductImage = (index) => {
+  uploadedProductImages.value.splice(index, 1);
 };
 
 const currentUserId = ref(null);
@@ -1136,22 +1352,50 @@ const removeImage = (index) => {
 // --- CRUD ---
 
 const saveProduct = async () => {
-  const payload = {
-    nev: editingProduct.value.name,
-    kategoria_id: editingProduct.value.kategoria_id ?? 1,
-    ar: editingProduct.value.price,
-    darab: editingProduct.value.stock,
-    leiras: editingProduct.value.description ?? '',
-  };
+  try {
+    // 1. Új képek feltöltése
+    const newImageIds = [];
+    const newImages = uploadedProductImages.value.filter(img => img.file);
+    if (newImages.length > 0) {
+      const formData = new FormData();
+      newImages.forEach((img, index) => {
+        formData.append('images[]', img.file);
+        formData.append(`alt[${index}]`, img.alt || '');
+      });
+      const uploadRes = await axios.post('/api/upload-images', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+        withCredentials: true
+      });
+      uploadRes.data.images.forEach(u => newImageIds.push(u.id));
+    }
 
-  if (editingProduct.value.id) {
-    await axios.put(`${API}/termekek/${editingProduct.value.id}`, payload);
-  } else {
-    await axios.post(`${API}/termekek`, payload);
+    const existingImageIds = uploadedProductImages.value
+      .filter(img => img.id && !img.file)
+      .map(img => img.id);
+    const allImageIds = [...existingImageIds, ...newImageIds];
+
+    const payload = {
+      nev: editingProduct.value.name,
+      kategoria_id: selectedProductCategory.value ?? 1,
+      ar: Number(editingProduct.value.price),
+      darab: Number(editingProduct.value.stock),
+      leiras: editingProduct.value.description ?? '',
+      fo_kep_id: allImageIds.length > 0 ? allImageIds[0] : null,
+      szinek: selectedProductColors.value.map(c => c.id),
+    };
+
+    if (editingProduct.value.id) {
+      await axios.put(`${API}/termekek/${editingProduct.value.id}`, payload);
+    } else {
+      await axios.post(`${API}/termekek`, payload);
+    }
+
+    showProductModal.value = false;
+    await fetchProducts();
+  } catch (error) {
+    console.error('Mentési hiba:', error);
+    alert('Hiba történt a termék mentése során');
   }
-
-  showProductModal.value = false;
-  await fetchProducts();
 };
 
 const deleteProduct = async (id) => {
@@ -1283,11 +1527,66 @@ const refreshData = async () => {
 
 // --- Modals ---
 
-const openProductModal = (product = null) => {
-  editingProduct.value = product
-    ? { ...product }
-    : { name: '', category: 'Fonalak', price: 0, stock: 0, image: '', description: '' };
+const openProductModal = async (product = null) => {
+  // Reset
+  uploadedProductImages.value = [];
+  selectedProductCategory.value = null;
+  selectedProductColors.value = [];
+  productEditorKey.value++;
+
+  // Kategóriák és színek betöltése ha még nincs
+  await Promise.all([
+    productCategoryOptions.value.length === 0 ? fetchProductCategories() : Promise.resolve(),
+    availableColors.value.length === 0 ? fetchColors() : Promise.resolve(),
+  ]);
+
+  if (product) {
+    editingProduct.value = { ...product };
+    selectedProductCategory.value = product.kategoria_id ?? null;
+
+    // Meglévő képek — ugyanúgy mint a blognál
+    uploadedProductImages.value = product.imagesData?.length
+      ? product.imagesData.map(img => ({
+          id: img.id,
+          file: null,
+          preview: img.url_Link,
+          alt: img.alt_szoveg || ''
+        }))
+      : (product.image && !product.image.includes('placehold.co')
+          ? [{ id: null, file: null, preview: product.image, alt: product.name }]
+          : []);
+
+    // Meglévő színek visszatöltése
+    selectedProductColors.value = product.colors
+      ? product.colors
+          .map(c => availableColors.value.find(a => a.id === c.id))
+          .filter(Boolean)
+      : [];
+
+  } else {
+    editingProduct.value = { name: '', price: 0, stock: 0, description: '' };
+  }
+
   showProductModal.value = true;
+
+  // Editor tartalom betöltése — ugyanúgy mint a blognál
+  await nextTick();
+  // productEditorKey változott, várjuk meg a Quill inicializálódást
+  await new Promise(resolve => {
+    const interval = setInterval(() => {
+      if (productEditorRef.value?.quill) {
+        clearInterval(interval);
+        resolve();
+      }
+    }, 20);
+    setTimeout(() => { clearInterval(interval); resolve(); }, 2000);
+  });
+
+  if (productEditorRef.value?.quill) {
+    productEditorRef.value.quill.clipboard.dangerouslyPasteHTML(
+      editingProduct.value.description ?? ''
+    );
+  }
 };
 
 const openUserModal = (user = null) => {
@@ -1440,7 +1739,7 @@ const productSortKey = ref('');
 const productSortDir = ref('asc');
 const productCategoryFilter = ref('');
 const productStockFilter = ref('');
-
+const productEditorRef = ref(null);
 const toggleProductSort = (key) => {
   if (productSortKey.value === key) {
     productSortDir.value = productSortDir.value === 'asc' ? 'desc' : 'asc';
@@ -1826,7 +2125,9 @@ onMounted(async () => {
       fetchProducts(),
       fetchUsers(),
       fetchBlogPosts(),
-      fetchTagsFromDatabase() // Load tags for the blog modal
+      fetchTagsFromDatabase(),
+      fetchProductCategories(),
+      fetchColors(),
   ]);
   initCharts();
 });

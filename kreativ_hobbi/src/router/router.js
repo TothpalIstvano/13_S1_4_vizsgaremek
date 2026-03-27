@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { useAuthStore } from '@/stores/auth.js'
 import Aruhaz from '../views/Aruhaz.vue'
 import Belepes from '../views/Belepes.vue'
 import Blog from '../views/Blog.vue'
@@ -39,6 +40,7 @@ const router = createRouter({
       path: '/belepes',
       name: 'Belepes',
       component: Belepes,
+      meta:{guestOnly: true}
     },
     {
       path: '/blog',
@@ -55,12 +57,14 @@ const router = createRouter({
       path: '/newpost',
       name: 'NewPost',
       component: NewPost,
+      meta:{requiresAuth: true}
     },
     {
       path: '/editpost/:id',
       name: 'EditPost',
       component: NewPost,
-      props: route => ({ postId: route.params.id })
+      props: route => ({ postId: route.params.id }),
+      meta:{requiresAuth: true}
     },
     {
       path: '/kosar/fizetes/:id',
@@ -81,6 +85,7 @@ const router = createRouter({
       path: '/profil',
       name: 'Profil',
       component: Profil,
+      meta:{requiresAuth: true}
     },
     {
       path: '/rolunk',
@@ -90,7 +95,8 @@ const router = createRouter({
     {
       path: '/dashboard',
       name: 'Dashboard',
-      component: Dashboard
+      component: Dashboard,
+      meta: { requiresAuth: true, roles: ['admin'] }
     },
     {
       path: '/email-verified',
@@ -110,10 +116,28 @@ const router = createRouter({
   ],
 })
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
+  const authStore = useAuthStore()
+
+  const isLoggedIn = authStore.isAuthenticated 
+  const userRole = authStore.szerepkor
+
+  if (to.meta.requiresAuth && !isLoggedIn) {
+    return next({ name: 'Index' })
+  }
+
+  if (to.meta.guestOnly && isLoggedIn) {
+    return next({ name: 'Index' })
+  }
+
+  if (to.meta.roles && !to.meta.roles.includes(userRole)) {
+    return next({ name: 'NotFound' })
+  }
+  
   if (to.name === 'NotFound') {
     console.warn(`Navigation to non-existent route: ${to.fullPath}`)
   }
+
   next()
 })
 
