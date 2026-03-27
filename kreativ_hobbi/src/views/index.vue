@@ -551,21 +551,21 @@ function formatDate(dateString) {
 }
 
 .card-1 {
-  top: 20px;
-  right: 50px;
-  animation: float 6s ease-in-out infinite;
+  top: 0px;
+  right: -230px;
+  animation: float 6s ease-in-out infinite 0.3s;
 }
 
 .card-2 {
-  top: 200px;
-  left: 20px;
-  animation: float 6s ease-in-out infinite 2s;
+  bottom: 50px;
+  right: 20px;
+  animation: float 6s ease-in-out infinite 1.5s;
 }
 
 .card-3 {
-  bottom: 50px;
-  right: 20px;
-  animation: float 6s ease-in-out infinite 4s;
+  top: 200px;
+  left: 20px;
+  animation: float 6s ease-in-out infinite 2.3s;
 }
 
 .card-image {
