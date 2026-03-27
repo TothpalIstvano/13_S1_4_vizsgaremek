@@ -929,7 +929,7 @@ main {
 
 .kartya-kontener {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
   gap: 40px;
   padding: 48px 0;
 }
