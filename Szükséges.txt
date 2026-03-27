@@ -4,5 +4,6 @@
 - főoldal posztok likeokkal
 - belépés reszponzív animációval
 - dashboard és emojik másra cserélése
-- reszponzív profil és new post
+- jelentés gomb a posztokra
+- profil háttér opciók választása
 (ha úgy gondolná h nem működik - blog képfeltöltés esetleg: https://stackoverflow.com/questions/50730143/laravel-storage-link-wont-work-on-production)
