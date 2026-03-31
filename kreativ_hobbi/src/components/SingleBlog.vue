@@ -209,7 +209,7 @@ import { faCalendar, faUser, faPaperPlane, faClock, faReply, faUserCircle, faArr
 import api from '@/services/api.js'
 import axios from 'axios'
 import Komment from '@/components/Komment.vue'
-import fallbackImage from '@/assets/Public/b-pl1.jpg'
+import fallbackImage from '@/assets/Public/stars.png'
 import Image from 'primevue/image';
 
 library.add(faCalendar, faUser, faPaperPlane, faClock, faReply, faUserCircle, faArrowCircleUp)
