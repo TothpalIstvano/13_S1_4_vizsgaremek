@@ -16,9 +16,9 @@ class KepekSeeder extends Seeder
      */
     public function run(): void
     {
-        $mappak = ['profilKepek', 'blog', 'termekKepek']; //kepek mappa nevei
-        $elnevezesek = ['kep', 'placeholder', 'item']; //kepek mappa elnevezései
-        $maphosszok = [3, 10, 17]; //kepek mappa hosszai az adatbazisban induláskor
+        $mappak = ['profilKepek', 'blog', 'termekKepek', 'hatterKepek']; //kepek mappa nevei
+        $elnevezesek = ['kep', 'placeholder', 'item', 'hatter']; //kepek mappa elnevezései
+        $maphosszok = [3, 10, 17, 4]; //kepek mappa hosszai az adatbazisban induláskor
         $baseUrl = 'http://127.0.0.1:8000/storage/'; // Laravel storage URL
 
         for ($index = 0; $index < count($mappak); $index++) {

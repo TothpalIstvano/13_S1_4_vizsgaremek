@@ -35,6 +35,10 @@ const capturedBlob = ref(null);
 const objectUrl = ref(null);
 const cameraStream = ref(null);
 const uploading = ref(false);
+const coverUploading = ref(false);
+const availableCovers = ref([]);
+const showCoverPicker = ref(false);
+const coverFileInput = ref(null);
 const likedIds = ref(new Set())
 const emailVerified = ref(true)
 const resendLoading = ref(false)
@@ -148,7 +152,12 @@ onMounted(async () => {
         user.avatar = defaultAvatar;
     }
 
-    user.cover = 'https://images.unsplash.com/photo-1503264116251-35a269479413?w=1600&h=400&fit=crop';
+    if (userData.value.hatterKep?.url_Link) {
+        user.cover = userData.value.hatterKep.url_Link;
+    } else {
+        user.cover = 'https://images.unsplash.com/photo-1503264116251-35a269479413?w=1600&h=400&fit=crop';
+    }
+
     user.stats = {
       posts: userData.value.posts_count || 12
     };
@@ -171,6 +180,50 @@ onMounted(async () => {
     };
   };
 });
+
+async function loadAvailableCovers() {
+  try {
+    const res = await axios.get('/api/hatterkepek');
+    availableCovers.value = res.data;
+    showCoverPicker.value = true;
+  } catch (e) {
+    console.error('Failed to load covers', e);
+  }
+}
+
+async function selectCover(imageId, imageUrl) {
+  try {
+    await axios.put('/api/user/cover-picture', { hatterKep_id: imageId });
+    user.cover = imageUrl;
+    showCoverPicker.value = false;
+  } catch (e) {
+    console.error('Failed to set cover', e);
+    alert('Háttérkép beállítása sikertelen.');
+  }
+}
+
+async function handleCoverUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  coverUploading.value = true;
+  const formData = new FormData();
+  formData.append('image', file);
+
+  try {
+    const uploadRes = await axios.post('/api/upload-cover-picture', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    const { id, url } = uploadRes.data.image;
+    await selectCover(id, url);
+  } catch (e) {
+    console.error('Cover upload failed', e);
+    alert('Háttérkép feltöltés sikertelen.');
+  } finally {
+    coverUploading.value = false;
+    event.target.value = '';
+  }
+}
 
 onUnmounted(() => {
   if (cameraStream.value) {
@@ -507,7 +560,7 @@ function formatDate(d) { return new Date(d).toLocaleDateString(); }
             <div class="form-section">
               <h4>Profilkép</h4>
               <div class="form-group">
-                <label for="avatar">Feltöltés számítógépről</label>
+                <label for="avatar" class="image-upload">Feltöltés számítógépről</label>
                 <input type="file" id="avatar" accept="image/*" @change="handleFileUpload" />
               </div>
               <div v-if="!showCamera" class="camera-toggle">
@@ -527,6 +580,65 @@ function formatDate(d) { return new Date(d).toLocaleDateString(); }
                     {{ uploading ? 'Feltöltés...' : 'Profilkép beállítása' }}
                   </button>
                 </div>
+              </div>
+            </div>
+
+            <!-- Háttérkép választása-->
+            <div class="form-section">
+              <h4>Háttérkép</h4>
+
+              <div class="camera-toggle" style="display:flex; gap:10px; flex-wrap:wrap;">
+                <button type="button" class="btn camera-btn" @click="loadAvailableCovers">
+                  🖼️ Választás a galériából
+                </button>
+                <label class="btn camera-btn" style="cursor:pointer;">
+                  {{ coverUploading ? 'Feltöltés...' : '⬆️ Saját kép feltöltése' }}
+                  <input
+                    type="file"
+                    accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+                    style="display:none"
+                    @change="handleCoverUpload"
+                    :disabled="coverUploading"
+                  />
+                </label>
+              </div>
+
+              <!-- Gallery picker -->
+              <div v-if="showCoverPicker" style="margin-top:12px;">
+                <p style="font-size:13px; color:#666; margin-bottom:8px;">Válassz egy háttérképet:</p>
+                <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(140px,1fr)); gap:8px;">
+                  <div
+                    v-for="cover in availableCovers"
+                    :key="cover.id"
+                    @click="selectCover(cover.id, cover.url_Link)"
+                    :style="{
+                      borderRadius: '8px',
+                      cursor: 'pointer',
+                      overflow: 'hidden',
+                      border: user.cover === cover.url_Link ? '3px solid #ff6a00' : '2px solid transparent',
+                      transition: 'border 0.2s',
+                      height: '70px'
+                    }"
+                  >
+                    <img
+                      :src="cover.url_Link"
+                      :alt="cover.alt_Szoveg"
+                      style="width:100%; height:100%; object-fit:cover; display:block;"
+                      @error="$event.target.style.display='none'"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <!-- Current cover preview -->
+              <div v-if="user.cover" style="margin-top:12px;">
+                <p style="font-size:13px; color:#666; margin-bottom:6px;">Jelenlegi háttérkép:</p>
+                <img
+                  :src="user.cover"
+                  alt="Háttérkép előkép"
+                  style="width:100%; max-height:100px; object-fit:cover; border-radius:8px;"
+                  @error="$event.target.style.opacity='0.3'"
+                />
               </div>
             </div>
 
@@ -916,6 +1028,21 @@ function formatDate(d) { return new Date(d).toLocaleDateString(); }
   outline: none;
   border-color: #ad6801;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+input[type="file"] {
+  display: none;
+}
+
+.image-upload {
+  border: 1px solid #ccc;
+  display: inline-block;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+.image-upload:hover {
+  border-color: #ad6801;
 }
 
 /* Kamera rész */
@@ -1559,6 +1686,7 @@ color: #6b7280;
   overflow: hidden;
   border: 1px solid rgba(0,0,0,0.04);
   box-shadow: 0 6px 20px rgba(12,12,12,0.05);
+  max-height: 175px;
 }
 
 .post-cover {
