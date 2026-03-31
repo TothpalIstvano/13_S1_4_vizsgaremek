@@ -10,6 +10,7 @@
 - \[ ] Az oldal tesztelése
 - \[ ] Az oldal dokumenálása
 - \[ ] Optimalizálás
+- \[ ] routeban password reset levédése somehow
 - \[ ] Termékeknél admin ként új színt is meg lehessen adni és meg csinálni a cimkéket mert az a rész még mindig fostos
 - \[ ] 05-06 lecserélése b ejelentkezés és gyikra + emoiji meg everything
 

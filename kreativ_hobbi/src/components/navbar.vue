@@ -344,7 +344,7 @@ onUnmounted(() => {
   transition: border-color 0.5s;
 }
 #felsoGap{
-  height: 90px;
+  height: 85px;
 }
 
 #profilkep{
