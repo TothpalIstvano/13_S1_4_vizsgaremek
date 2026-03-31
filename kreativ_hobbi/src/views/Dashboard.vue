@@ -728,79 +728,197 @@
     </main>
 
     <!-- Product Modal (Updated - same style as Blog) -->
-    <div v-if="showProductModal" class="modal-overlay" @click.self="showProductModal = false">
+    <div v-if="showProductModal" class="modal-overlay" @click.self="closeProductModal">
       <div class="modal blog-modal-large">
         <div class="modal-header">
-          <h3 class="modal-title">{{ editingProduct.id ? 'Termék Szerkesztése' : 'Új Termék' }}</h3>
-          <button class="btn btn-icon" @click="showProductModal = false">✕</button>
+          <h3 class="modal-title">{{ editingProduct.id ? 'Termék szerkesztése' : 'Új termék' }}</h3>
+          <button class="btn btn-icon" @click="closeProductModal">✕</button>
         </div>
-
+    
         <div class="modal-body-scrollable">
           <div class="post-form">
-
-            <!-- Név -->
+    
+            <!-- ── Név ── -->
             <div class="form-section">
               <label class="form-label">
-                Termék neve
-                <span class="required-indicator">*</span>
+                Termék neve <span class="required-indicator">*</span>
               </label>
               <InputText
                 v-model="editingProduct.name"
-                placeholder="pl. Kötőfonal 100g"
+                placeholder="pl. Prémium gyapjú fonal 100g"
                 class="w-full mb-2"
               />
-              <small class="form-hint">Adj egy egyértelmű, leíró nevet a terméknek</small>
+              <small class="form-hint">Adj egyértelmű, leíró nevet a terméknek</small>
             </div>
-
-            <!-- Kategória -->
+    
+            <!-- ── Fő kategória (Dropdown) + Több kategória (MultiSelect) ── -->
             <div class="form-section">
               <label class="form-label">
-                Kategória
-                <span class="required-indicator">*</span>
+                Fő kategória <span class="required-indicator">*</span>
               </label>
-              <Dropdown
-                v-model="selectedProductCategory"
+              <div style="display:flex; gap:8px; align-items:center;">
+                <Dropdown
+                  v-model="selectedProductCategory"
+                  :options="productCategoryOptions"
+                  optionLabel="nev"
+                  optionValue="id"
+                  placeholder="Válassz fő kategóriát"
+                  filter
+                  class="w-full"
+                  style="flex:1;"
+                />
+                <button
+                  type="button"
+                  class="btn btn-sm"
+                  style="background:#f1f5f9; white-space:nowrap; flex-shrink:0;"
+                  @click="showNewCategoryInline = !showNewCategoryInline"
+                  title="Új kategória létrehozása"
+                >➕ Új</button>
+              </div>
+    
+              <!-- Inline új kategória -->
+              <div v-if="showNewCategoryInline" class="inline-create-box">
+                <input
+                  type="text"
+                  class="form-input"
+                  v-model="newCategoryName"
+                  placeholder="Kategória neve..."
+                  style="flex:1;"
+                  @keyup.enter="createCategory"
+                />
+                <select class="form-select" v-model="newCategoryParentId" style="flex:1; max-width:200px;">
+                  <option :value="null">— Főkategória (nincs szülő)</option>
+                  <option v-for="cat in productCategoryOptions.filter(c => !c.fo_kategoria_id)" :key="cat.id" :value="cat.id">
+                    {{ cat.nev }}
+                  </option>
+                </select>
+                <button type="button" class="btn btn-primary btn-sm" @click="createCategory" :disabled="!newCategoryName.trim()">
+                  Létrehozás
+                </button>
+                <button type="button" class="btn btn-sm" style="background:#f1f5f9;" @click="showNewCategoryInline = false; newCategoryName = ''">
+                  Mégse
+                </button>
+              </div>
+              <small class="form-hint">Ez jelenik meg a terméklistában és a szűrőkben</small>
+            </div>
+    
+            <!-- ── További kategóriák (MultiSelect) ── -->
+            <div class="form-section">
+              <label class="form-label">További kategóriák</label>
+              <MultiSelect
+                v-model="selectedProductCategories"
                 :options="productCategoryOptions"
                 optionLabel="nev"
-                optionValue="id"
-                placeholder="Válassz kategóriát"
+                placeholder="Válassz további kategóriákat (opcionális)"
+                display="chip"
                 filter
                 class="w-full mb-2"
-              />
-              <small class="form-hint">Válassz a termékhez illő kategóriát</small>
+              >
+                <template #option="{ option }">
+                  <div style="display:flex; align-items:center; gap:8px;">
+                    <span v-if="option.fo_kategoria_id" style="color:#94a3b8; font-size:12px; margin-left:12px;">↳</span>
+                    <span>{{ option.nev }}</span>
+                  </div>
+                </template>
+              </MultiSelect>
+              <small class="form-hint">A termék több kategóriában is megjelenhet (pl. alkategóriák)</small>
             </div>
-
-            <!-- Ár és Készlet -->
+    
+            <!-- ── Ár és Készlet ── -->
             <div class="form-section" style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
               <div>
-                <label class="form-label">
-                  Ár (Ft)
-                  <span class="required-indicator">*</span>
-                </label>
-                <InputText
-                  v-model="editingProduct.price"
-                  type="number"
-                  placeholder="2990"
-                  class="w-full mb-2"
-                />
+                <label class="form-label">Ár (Ft) <span class="required-indicator">*</span></label>
+                <InputText v-model="editingProduct.price" type="number" placeholder="2990" class="w-full mb-2" />
                 <small class="form-hint">Nettó ár forintban</small>
               </div>
               <div>
-                <label class="form-label">
-                  Készlet (db)
-                  <span class="required-indicator">*</span>
-                </label>
-                <InputText
-                  v-model="editingProduct.stock"
-                  type="number"
-                  placeholder="50"
-                  class="w-full mb-2"
-                />
+                <label class="form-label">Készlet (db) <span class="required-indicator">*</span></label>
+                <InputText v-model="editingProduct.stock" type="number" placeholder="50" class="w-full mb-2" />
                 <small class="form-hint">Aktuális raktárkészlet</small>
               </div>
             </div>
-
-            <!-- Leírás -->
+    
+            <!-- ── Színek MultiSelect + Új szín ── -->
+            <div class="form-section">
+              <label class="form-label">
+                Elérhető színek <span class="required-indicator">*</span>
+              </label>
+              <div style="display:flex; gap:8px; align-items:flex-start;">
+                <MultiSelect
+                  v-model="selectedProductColors"
+                  :options="availableColors"
+                  optionLabel="nev"
+                  placeholder="Válassz legalább 1 színt"
+                  display="chip"
+                  filter
+                  class="w-full"
+                  style="flex:1;"
+                >
+                  <template #option="{ option }">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                      <span
+                        style="width:18px; height:18px; border-radius:50%; border:1.5px solid #e2e8f0; flex-shrink:0;"
+                        :style="{ background: option.hex_kod }"
+                      ></span>
+                      <span>{{ option.nev }}</span>
+                      <span style="color:#94a3b8; font-size:12px;">{{ option.hex_kod }}</span>
+                    </div>
+                  </template>
+                  <template #chip="{ value }">
+                    <div style="display:flex; align-items:center; gap:5px;">
+                      <span
+                        style="width:12px; height:12px; border-radius:50%; border:1px solid rgba(0,0,0,0.15); flex-shrink:0;"
+                        :style="{ background: value.hex_kod }"
+                      ></span>
+                      <span style="font-size:12px;">{{ value.nev }}</span>
+                    </div>
+                  </template>
+                </MultiSelect>
+                <button
+                  type="button"
+                  class="btn btn-sm"
+                  style="background:#f1f5f9; white-space:nowrap; flex-shrink:0; margin-top:2px;"
+                  @click="showNewColorInline = !showNewColorInline"
+                >➕ Új</button>
+              </div>
+    
+              <!-- Inline új szín -->
+              <div v-if="showNewColorInline" class="inline-create-box">
+                <input
+                  type="text"
+                  class="form-input"
+                  v-model="newColorName"
+                  placeholder="Szín neve (pl. Égkék)..."
+                  style="flex:1;"
+                  @keyup.enter="createColor"
+                />
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <label style="font-size:13px; color:#4b5563; white-space:nowrap;">Hex kód:</label>
+                  <input
+                    type="color"
+                    v-model="newColorHex"
+                    style="width:44px; height:36px; border:1px solid #e2e8f0; border-radius:6px; cursor:pointer; padding:2px;"
+                  />
+                  <input
+                    type="text"
+                    class="form-input"
+                    v-model="newColorHex"
+                    placeholder="#ff5733"
+                    style="width:100px;"
+                    @keyup.enter="createColor"
+                  />
+                </div>
+                <button type="button" class="btn btn-primary btn-sm" @click="createColor" :disabled="!newColorName.trim()">
+                  Létrehozás
+                </button>
+                <button type="button" class="btn btn-sm" style="background:#f1f5f9;" @click="showNewColorInline = false; newColorName = ''; newColorHex = '#000000'">
+                  Mégse
+                </button>
+              </div>
+              <small class="form-hint">Legalább 1 szín szükséges. Megjelenik a termékkártyán.</small>
+            </div>
+    
+            <!-- ── Leírás (Editor) ── -->
             <div class="form-section">
               <label class="form-label">Leírás</label>
               <Editor
@@ -816,48 +934,10 @@
               />
               <small class="form-hint">Részletes termékleírás, anyagok, méretek, használati útmutató</small>
             </div>
-
-            <!-- Színek -->
+    
+            <!-- ── Képek feltöltése ── -->
             <div class="form-section">
-              <label class="form-label">
-                Elérhető színek
-                <span class="required-indicator">*</span>
-              </label>
-              <MultiSelect
-                v-model="selectedProductColors"
-                :options="availableColors"
-                optionLabel="nev"
-                placeholder="Válassz legalább 1 színt"
-                display="chip"
-                filter
-                class="w-full mb-2"
-              >
-                <template #option="{ option }">
-                  <div style="display:flex; align-items:center; gap:10px;">
-                    <span
-                      style="width:18px; height:18px; border-radius:50%; display:inline-block; border:1px solid #e2e8f0; flex-shrink:0;"
-                      :style="{ background: option.hex_kod }"
-                    ></span>
-                    <span>{{ option.nev }}</span>
-                    <span style="color:#94a3b8; font-size:12px;">{{ option.hex_kod }}</span>
-                  </div>
-                </template>
-                <template #chip="{ value }">
-                  <div style="display:flex; align-items:center; gap:6px; padding:2px 4px;">
-                    <span
-                      style="width:12px; height:12px; border-radius:50%; display:inline-block; border:1px solid rgba(0,0,0,0.1); flex-shrink:0;"
-                      :style="{ background: value.hex_kod }"
-                    ></span>
-                    <span style="font-size:12px;">{{ value.nev }}</span>
-                  </div>
-                </template>
-              </MultiSelect>
-              <small class="form-hint">Legalább 1 szín szükséges. A színes körök megjelennek a termékkártyán.</small>
-            </div>
-
-            <!-- Képek feltöltése -->
-            <div class="form-section">
-              <label class="form-label">Termékképek feltöltése</label>
+              <label class="form-label">Termékképek</label>
               <FileUpload
                 ref="productFileUploadRef"
                 name="images[]"
@@ -873,41 +953,59 @@
               >
                 <template #empty>
                   <div class="drag-drop-area">
-                    <i class="pi pi-cloud-upload" style="font-size: 3rem; color: #667eea; margin-bottom: 1rem;"></i>
+                    <i class="pi pi-cloud-upload" style="font-size: 2.5rem; color: #667eea; margin-bottom: 0.75rem;"></i>
                     <p>Húzd ide a termékképeket vagy kattints a feltöltéshez</p>
                   </div>
                 </template>
               </FileUpload>
-
-              <div v-if="uploadedProductImages.length > 0" class="image-preview-container">
-                <div v-for="(image, index) in uploadedProductImages" :key="index" class="image-preview">
-                  <img :src="image.preview" class="preview-image" />
-                  <button
-                    type="button"
-                    class="image-remove-btn"
-                    @click="removeProductImage(index)"
+    
+              <!-- Képek előnézete + főkép kiválasztás -->
+              <div v-if="uploadedProductImages.length > 0">
+                <p style="font-size:13px; color:#64748b; margin-bottom:8px;">
+                  🖱️ Kattints egy képre a <strong>főkép</strong> beállításához
+                </p>
+                <div class="image-preview-container">
+                  <div
+                    v-for="(image, index) in uploadedProductImages"
+                    :key="index"
+                    class="image-preview"
+                    :class="{ 'image-preview-main': productMainImageIndex === index }"
+                    @click="productMainImageIndex = index"
                   >
-                    <i class="pi pi-times"></i>
-                  </button>
-                  <InputText
-                    v-model="image.alt"
-                    placeholder="Alt szöveg"
-                    class="image-alt-input"
-                  />
-                  <div v-if="index === 0" style="text-align:center; margin-top:4px;">
-                    <span style="font-size:11px; color:#f97316; font-weight:600;">⭐ Főkép</span>
+                    <!-- Főkép koronája -->
+                    <div v-if="productMainImageIndex === index" class="main-image-badge">
+                      ⭐ Főkép
+                    </div>
+                    <img :src="image.preview" class="preview-image" />
+                    <!-- Törlés gomb -->
+                    <button
+                      type="button"
+                      class="image-remove-btn"
+                      @click.stop="removeProductImage(index)"
+                    >
+                      <i class="pi pi-times"></i>
+                    </button>
+                    <InputText
+                      v-model="image.alt"
+                      placeholder="Alt szöveg"
+                      class="image-alt-input"
+                      @click.stop
+                    />
                   </div>
                 </div>
               </div>
-              <small class="form-hint">Az első feltöltött kép lesz a termék főképe. Max. 5MB/kép.</small>
+              <small class="form-hint">Az első (vagy kiválasztott ⭐) kép lesz a főkép. Max. 5MB/kép.</small>
             </div>
-
+    
           </div>
         </div>
-
+    
         <div class="modal-footer">
-          <button class="btn btn-secondary" @click="showProductModal = false">Mégse</button>
-          <button class="btn btn-primary" @click="saveProduct">Mentés</button>
+          <button class="btn btn-secondary" @click="closeProductModal">Mégse</button>
+          <button class="btn btn-primary" @click="saveProduct" :disabled="productSaving">
+            <span v-if="productSaving">⏳ Mentés...</span>
+            <span v-else>💾 Mentés</span>
+          </button>
         </div>
       </div>
     </div>
@@ -1048,7 +1146,8 @@
         </div>
       </div>
     </div>
-        <!-- User Modal -->
+
+    <!-- User Modal -->
     <div v-if="showUserModal" class="modal-overlay" @click.self="showUserModal = false">
       <div class="modal">
         <div class="modal-header">
@@ -1116,7 +1215,6 @@
 import { ref, computed, onMounted, nextTick, watch } from 'vue';
 import Chart from 'chart.js/auto';
 import axios from 'axios';
-// PrimeVue Imports necessary for the complex form
 import MultiSelect from 'primevue/multiselect';
 import Editor from 'primevue/editor';
 import FileUpload from 'primevue/fileupload';
@@ -1140,20 +1238,31 @@ const editingBlogPost = ref({});
 const editorKey = ref(0);
 const editorRef = ref(null);
 const loading = ref(false);
-const sidebarOpen = ref(false)
-const selectedProductCategory = ref(null);
+const sidebarOpen = ref(false);
+const availableColors = ref([]);
+const selectedProductColors = ref([]);
+const selectedProductCategories = ref([]); 
+const selectedProductCategory = ref(null); 
 const uploadedProductImages = ref([]);
 const productFileUploadRef = ref(null);
 const productEditorKey = ref(0);
 const productCategoryOptions = ref([]);
-const availableColors = ref([]);   
-const selectedProductColors = ref([]); 
+const productMainImageIndex = ref(0); 
+const productSaving = ref(false);
 
 // Complex Form State (from new-post.vue)
 const selectedTags = ref([]); 
 const uploadedImages = ref([]);   // { file: File, preview: string, alt: string, id?: number }
 const tagOptions = ref([]);
 const fileUploadRef = ref(null);
+
+// Inline létrehozás state-ek
+const showNewCategoryInline = ref(false);
+const newCategoryName = ref('');
+const newCategoryParentId = ref(null);
+const showNewColorInline = ref(false);
+const newColorName = ref('');
+const newColorHex = ref('#000000');
 
 // Chart refs
 const salesChart = ref(null);
@@ -1216,22 +1325,22 @@ const fetchProducts = async () => {
     name: p.nev,
     category: p.termek_kategoria?.nev ?? '-',
     kategoria_id: p.kategoria_id,
+    fo_kep_id: p.fo_kep_id,
     price: p.ar,
     stock: p.darab,
     description: p.leiras ?? '',
     image: p.termek_fo_kep?.url_Link ?? 'https://placehold.co/100x100',
-    // Képek a pivot táblából
     imagesData: (p.termek_kepek ?? []).map(k => ({
       id: k.id,
-      url_Link: k.url_Link,
-      alt_szoveg: k.alt_szoveg ?? ''
+      url_Link: k.url_Link ?? k.url_link,
+      alt_szoveg: k.alt_szoveg ?? k.alt_Szoveg ?? ''
     })),
-    // Színek
     colors: (p.termek_szinek ?? []).map(s => ({
       id: s.id,
       nev: s.nev,
       hex_kod: s.hex_kod
     })),
+    extraCategories: (p.termek_kategoriak ?? []).map(k => k.id),
   }));
 };
 
@@ -1248,32 +1357,29 @@ const fetchProductCategories = async () => {
   try {
     const { data } = await axios.get('/api/termekek/kategoriak');
     productCategoryOptions.value = data;
-  } catch (error) {
-    console.error('Kategóriák betöltése sikertelen:', error);
+  } catch (e) {
+    console.error('Kategóriák betöltése sikertelen:', e);
   }
 };
 
 const onProductFileSelect = (event) => {
-  const files = event.files.filter(file => file.type.startsWith('image/'));
+  const files = event.files.filter(f => f.type.startsWith('image/'));
   files.forEach(file => {
     const reader = new FileReader();
     reader.onload = (e) => {
-      uploadedProductImages.value.push({
-        file: file,
-        preview: e.target.result,
-        alt: '',
-        id: null
-      });
+      uploadedProductImages.value.push({ file, preview: e.target.result, alt: '', id: null });
     };
     reader.readAsDataURL(file);
   });
-  if (productFileUploadRef.value) {
-    productFileUploadRef.value.clear();
-  }
+  if (productFileUploadRef.value) productFileUploadRef.value.clear();
 };
+
 
 const removeProductImage = (index) => {
   uploadedProductImages.value.splice(index, 1);
+  if (productMainImageIndex.value >= uploadedProductImages.value.length) {
+    productMainImageIndex.value = Math.max(0, uploadedProductImages.value.length - 1);
+  }
 };
 
 const currentUserId = ref(null);
@@ -1352,6 +1458,21 @@ const removeImage = (index) => {
 // --- CRUD ---
 
 const saveProduct = async () => {
+  if (!editingProduct.value.name?.trim()) {
+    alert('A termék neve kötelező!');
+    return;
+  }
+  if (!selectedProductCategory.value) {
+    alert('Válassz fő kategóriát!');
+    return;
+  }
+  if (selectedProductColors.value.length === 0) {
+    alert('Legalább 1 színt válassz!');
+    return;
+  }
+
+  productSaving.value = true;
+
   try {
     // 1. Új képek feltöltése
     const newImageIds = [];
@@ -1362,26 +1483,41 @@ const saveProduct = async () => {
         formData.append('images[]', img.file);
         formData.append(`alt[${index}]`, img.alt || '');
       });
-      const uploadRes = await axios.post('/api/upload-images', formData, {
+      const uploadRes = await axios.post('/api/upload-termekek-pictures', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
         withCredentials: true
       });
       uploadRes.data.images.forEach(u => newImageIds.push(u.id));
     }
 
-    const existingImageIds = uploadedProductImages.value
-      .filter(img => img.id && !img.file)
-      .map(img => img.id);
-    const allImageIds = [...existingImageIds, ...newImageIds];
+    // 2. Összes képID sorban (a feltöltési sorrend megmarad)
+    const allImages = uploadedProductImages.value.map((img, idx) => {
+      if (img.file) {
+        // Megkeressük a feltöltési sorrendben melyik index ez
+        const newIdx = uploadedProductImages.value.filter((i, j) => i.file && j <= idx).length - 1;
+        return { id: newImageIds[newIdx], isNew: true };
+      }
+      return { id: img.id, isNew: false };
+    });
 
+    const allImageIds = allImages.map(i => i.id).filter(Boolean);
+
+    // 3. Főkép ID meghatározása (a kiválasztott index alapján)
+    const foKepId = allImageIds[productMainImageIndex.value] ?? allImageIds[0] ?? null;
+
+    // 4. Payload összeállítása
     const payload = {
-      nev: editingProduct.value.name,
-      kategoria_id: selectedProductCategory.value ?? 1,
+      nev: editingProduct.value.name.trim(),
+      kategoria_id: selectedProductCategory.value,
       ar: Number(editingProduct.value.price),
       darab: Number(editingProduct.value.stock),
-      leiras: editingProduct.value.description ?? '',
-      fo_kep_id: allImageIds.length > 0 ? allImageIds[0] : null,
+      // HTML leírás: közvetlenül a Quill root innerHTML-ből olvassuk ki (ha van)
+      leiras: productEditorRef.value?.quill
+        ? productEditorRef.value.quill.root.innerHTML
+        : (editingProduct.value.description ?? ''),
+      fo_kep_id: foKepId,
       szinek: selectedProductColors.value.map(c => c.id),
+      extra_kategoriak: selectedProductCategories.value.map(c => c.id),
     };
 
     if (editingProduct.value.id) {
@@ -1394,9 +1530,12 @@ const saveProduct = async () => {
     await fetchProducts();
   } catch (error) {
     console.error('Mentési hiba:', error);
-    alert('Hiba történt a termék mentése során');
+    alert('Hiba történt a termék mentése során: ' + (error.response?.data?.message ?? error.message));
+  } finally {
+    productSaving.value = false;
   }
 };
+
 
 const deleteProduct = async (id) => {
   if (!confirm('Biztosan törölni szeretnéd ezt a terméket?')) return;
@@ -1473,7 +1612,7 @@ const saveBlogPost = async () => {
         formData.append('images[]', img.file)
         formData.append(`alt[${index}]`, img.alt || '')
       })
-      const uploadRes = await axios.post('/api/upload-images', formData, {
+      const uploadRes = await axios.post('/api/upload-termekek-pictures', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
         withCredentials: true
       })
@@ -1525,16 +1664,66 @@ const refreshData = async () => {
   loading.value = false;
 };
 
+
+const createCategory = async () => {
+  if (!newCategoryName.value.trim()) return;
+  try {
+    const { data } = await axios.post(`${API}/kategoriak`, {
+      nev: newCategoryName.value.trim(),
+      fo_kategoria_id: newCategoryParentId.value ?? null,
+    });
+    await fetchProductCategories();
+    // Automatikusan kijelöljük az újat
+    selectedProductCategory.value = data.id;
+    newCategoryName.value = '';
+    newCategoryParentId.value = null;
+    showNewCategoryInline.value = false;
+  } catch (e) {
+    alert('Hiba a kategória létrehozásakor: ' + (e.response?.data?.message ?? e.message));
+  }
+};
+
+const createColor = async () => {
+  if (!newColorName.value.trim()) return;
+  try {
+    const { data } = await axios.post(`${API}/szinek`, {
+      nev: newColorName.value.trim(),
+      hex_kod: newColorHex.value,
+    });
+    await fetchColors();
+    // Automatikusan hozzáadjuk a kiválasztottakhoz
+    const newColor = availableColors.value.find(c => c.id === data.id);
+    if (newColor) selectedProductColors.value = [...selectedProductColors.value, newColor];
+    newColorName.value = '';
+    newColorHex.value = '#000000';
+    showNewColorInline.value = false;
+  } catch (e) {
+    alert('Hiba a szín létrehozásakor: ' + (e.response?.data?.message ?? e.message));
+  }
+};
+
 // --- Modals ---
+
+const closeProductModal = () => {
+  showProductModal.value = false;
+  showNewCategoryInline.value = false;
+  showNewColorInline.value = false;
+  newCategoryName.value = '';
+  newColorName.value = '';
+};
 
 const openProductModal = async (product = null) => {
   // Reset
   uploadedProductImages.value = [];
   selectedProductCategory.value = null;
+  selectedProductCategories.value = [];
   selectedProductColors.value = [];
-  productEditorKey.value++;
+  productMainImageIndex.value = 0;
+  showNewCategoryInline.value = false;
+  showNewColorInline.value = false;
+  productEditorKey.value++; // Editor újrarendereléséhez
 
-  // Kategóriák és színek betöltése ha még nincs
+  // Adatok betöltése ha még nincs
   await Promise.all([
     productCategoryOptions.value.length === 0 ? fetchProductCategories() : Promise.resolve(),
     availableColors.value.length === 0 ? fetchColors() : Promise.resolve(),
@@ -1542,25 +1731,35 @@ const openProductModal = async (product = null) => {
 
   if (product) {
     editingProduct.value = { ...product };
+
+    // FŐ kategória
     selectedProductCategory.value = product.kategoria_id ?? null;
 
-    // Meglévő képek — ugyanúgy mint a blognál
-    uploadedProductImages.value = product.imagesData?.length
-      ? product.imagesData.map(img => ({
-          id: img.id,
-          file: null,
-          preview: img.url_Link,
-          alt: img.alt_szoveg || ''
-        }))
-      : (product.image && !product.image.includes('placehold.co')
-          ? [{ id: null, file: null, preview: product.image, alt: product.name }]
-          : []);
-
-    // Meglévő színek visszatöltése
-    selectedProductColors.value = product.colors
-      ? product.colors
-          .map(c => availableColors.value.find(a => a.id === c.id))
+    // TÖBB kategória — a pivot táblából
+    selectedProductCategories.value = product.extraCategories
+      ? product.extraCategories
+          .map(id => productCategoryOptions.value.find(c => c.id === id))
           .filter(Boolean)
+      : [];
+
+    // Képek visszatöltése
+    if (product.imagesData?.length) {
+      uploadedProductImages.value = product.imagesData.map(img => ({
+        id: img.id,
+        file: null,
+        preview: img.url_Link,
+        alt: img.alt_szoveg || ''
+      }));
+      // Főkép indexe: amelyik kép ID megegyezik a fo_kep_id-vel
+      const mainIdx = product.imagesData.findIndex(img => img.id === product.fo_kep_id);
+      productMainImageIndex.value = mainIdx >= 0 ? mainIdx : 0;
+    } else if (product.image && !product.image.includes('placehold.co')) {
+      uploadedProductImages.value = [{ id: null, file: null, preview: product.image, alt: product.name }];
+    }
+
+    // Színek visszatöltése
+    selectedProductColors.value = product.colors
+      ? product.colors.map(c => availableColors.value.find(a => a.id === c.id)).filter(Boolean)
       : [];
 
   } else {
@@ -1569,9 +1768,10 @@ const openProductModal = async (product = null) => {
 
   showProductModal.value = true;
 
-  // Editor tartalom betöltése — ugyanúgy mint a blognál
   await nextTick();
-  // productEditorKey változott, várjuk meg a Quill inicializálódást
+
+  const descriptionHtml = product?.description ?? '';
+
   await new Promise(resolve => {
     const interval = setInterval(() => {
       if (productEditorRef.value?.quill) {
@@ -1582,10 +1782,12 @@ const openProductModal = async (product = null) => {
     setTimeout(() => { clearInterval(interval); resolve(); }, 2000);
   });
 
-  if (productEditorRef.value?.quill) {
-    productEditorRef.value.quill.clipboard.dangerouslyPasteHTML(
-      editingProduct.value.description ?? ''
-    );
+  if (productEditorRef.value?.quill && descriptionHtml) {
+    const quill = productEditorRef.value.quill;
+    quill.setText(''); 
+    const editorEl = quill.root; 
+    editorEl.innerHTML = descriptionHtml; 
+    quill.update();
   }
 };
 
@@ -3038,6 +3240,108 @@ tbody tr:hover {
 
   .search-input {
     width: 180px;
+  }
+}
+
+.inline-create-box {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 10px;
+  padding: 12px 16px;
+  background: #f8fafc;
+  border: 1.5px dashed #cbd5e1;
+  border-radius: 10px;
+  animation: fadeIn 0.15s ease;
+}
+ 
+.inline-create-box .form-input,
+.inline-create-box .form-select {
+  padding: 8px 12px;
+  font-size: 13px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: white;
+}
+ 
+/* ── Főkép kijelölés ── */
+.image-preview {
+  position: relative;
+  border-radius: 10px;
+  overflow: visible; /* badge kilóghat */
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  cursor: pointer;
+  border: 2.5px solid transparent;
+  transition: border-color 0.18s, box-shadow 0.18s, transform 0.15s;
+}
+ 
+.image-preview:hover {
+  border-color: #f97316;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(249,115,22,0.18);
+}
+ 
+.image-preview-main {
+  border-color: #f97316 !important;
+  box-shadow: 0 0 0 3px rgba(249,115,22,0.25), 0 4px 16px rgba(249,115,22,0.2) !important;
+}
+ 
+.main-image-badge {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #f97316;
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 20px;
+  white-space: nowrap;
+  z-index: 5;
+  box-shadow: 0 2px 6px rgba(249,115,22,0.4);
+}
+ 
+/* ── PrimeVue Dropdown stílusozás ── */
+:deep(.p-dropdown) {
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+  width: 100%;
+}
+ 
+:deep(.p-dropdown:not(.p-disabled):hover) {
+  border-color: #cbd5e0;
+}
+ 
+:deep(.p-dropdown:not(.p-disabled).p-focus) {
+  border-color: #4d8af0;
+  box-shadow: 0 0 0 3px rgba(77, 138, 240, 0.1);
+}
+ 
+:deep(.p-dropdown-panel) {
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+ 
+:deep(.p-dropdown-item) {
+  font-size: 14px;
+  padding: 10px 16px;
+}
+ 
+/* ── Mobil reszponzív: inline-create-box ── */
+@media (max-width: 600px) {
+  .inline-create-box {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .inline-create-box .form-input,
+  .inline-create-box .form-select,
+  .inline-create-box .btn {
+    width: 100% !important;
+    max-width: unset !important;
   }
 }
 </style>
