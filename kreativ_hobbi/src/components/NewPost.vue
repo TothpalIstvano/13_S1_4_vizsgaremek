@@ -52,6 +52,13 @@
                     class="w-full mb-6"
                 />
                 <small class="form-hint">Válassz témához kapcsolódó címkéket a jobb kereshetőségért</small>
+
+                <label for="newTag">Ha nem találod amit keresel, akkor hozzá is tudod adni a saját címkédet:</label>
+                <InputText 
+                  id="newTag"
+                  placeholder="Írj egy új címkét..."
+                  class="w-full mb-6" 
+                />
             </div>
 
             <div class="form-section">

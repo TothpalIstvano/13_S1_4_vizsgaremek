@@ -28,8 +28,9 @@ class FelhasznalokSeeder extends Seeder
             'felhasz_nev' => 'Teszt Felhasználó',
             'email' => 'test@example.com',
             'email_verified_at' => now(),
-            'jelszo'=> 'Alma12345678.',
-            'profilKep_id'=> 2,
+            'jelszo' => 'Alma12345678.',
+            'profilKep_id' => 2,
+            'hatterKep_id' => 3,
             'statusz' => true,
             'letrehozas_Datuma' => '2023-01-01',
             'utolso_Belepes' => now(),
@@ -38,8 +39,9 @@ class FelhasznalokSeeder extends Seeder
         Felhasznalok::factory()->create([
             'felhasz_nev' => 'Tóthpál István',
             'email' => 'tothpal.istvan@diak.szbi-pg.hu',
-            'jelszo'=> 'Alma12345678.',
-            'profilKep_id'=> 2,
+            'jelszo' => 'Alma12345678.',
+            'profilKep_id' => 2,
+            'hatterKep_id' => 3,
             'statusz' => true,
             'letrehozas_Datuma' => '2026-02-20',
             'utolso_Belepes' => now(),
@@ -47,7 +49,7 @@ class FelhasznalokSeeder extends Seeder
 
         // Create 20 random users
         Felhasznalok::factory()->count(30)->create();
-        
+
 
         $this->command->info('Felhasznalok table seeded successfully!');
     }

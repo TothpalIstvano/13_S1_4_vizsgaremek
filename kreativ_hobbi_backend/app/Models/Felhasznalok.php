@@ -28,6 +28,7 @@ class Felhasznalok extends Authenticatable implements MustVerifyEmail
         'email',
         'jelszo',
         'profilKep_id',
+        'hatterKep_id',
         'statusz',
         'letrehozas_Datuma',
         'utolso_Belepes',
@@ -67,5 +68,10 @@ class Felhasznalok extends Authenticatable implements MustVerifyEmail
     public function kedvencek()
     {
         return $this->hasMany(Kedvencek::class, 'felhasznalo_id');
+    }
+
+    public function hatterKep()
+    {
+        return $this->belongsTo(Kepek::class, 'hatterKep_id');
     }
 }

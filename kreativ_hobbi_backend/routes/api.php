@@ -54,6 +54,7 @@ Route::middleware('auth:sanctum')->group(function () {
         return $request->user()
             ->load(
                 'profilKep:id,url_Link,alt_szoveg',
+                'hatterKep:id,url_Link',
                 'adatok:felhasznalo_id,vezeteknev,keresztnev,szerepkor,varos,utca,hazszam,emeletAjto,telefonszam'
             )
             ->only(['id', 'felhasz_nev', 'email', 'email_verified_at', 'profilKep', 'adatok', 'letrehozas_Datuma']);
@@ -93,6 +94,16 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/user/profile', [FelhasznaloController::class, 'updateProfile']);
 
     Route::put('/user/profile-picture', [FelhasznaloController::class, 'updateProfilePicture']);
+
+    Route::put('/user/cover-picture', [FelhasznaloController::class, 'updateCoverPicture']);
+
+    // Pre-seeded background images to pick from
+    Route::get('/hatterkepek', function () {
+        $kepek = \App\Models\Kepek::where('url_Link', 'like', '%hatterKepek%')
+            ->orWhere('url_Link', 'like', '%hatterkepek%')
+            ->get(['id', 'url_Link', 'alt_Szoveg']);
+        return response()->json($kepek);
+    });
 
     Route::post('/posts', [PosztController::class, 'store']);
     Route::get('/posts/{id}/edit', [PosztController::class, 'edit']);
@@ -151,6 +162,7 @@ Route::get('/varosok', function () {
 // Image upload routes
 Route::post('/upload-images', [ImageController::class, 'upload'])->middleware('auth:sanctum');
 Route::post('/upload-profile-picture', [ImageController::class, 'uploadProfilePicture'])->middleware('auth:sanctum');
+Route::post('/upload-cover-picture', [ImageController::class, 'uploadCoverPicture'])->middleware('auth:sanctum');
 
 // API routes for blog and comments:
 
@@ -209,9 +221,9 @@ Route::post('/rendeles', function (Request $request) {
         'delivery.email' => ['required', 'email:rfc'],
         'delivery.phone' => ['required', 'regex:/^[+]?[\d\s\-()]{9,15}$/'],
         'delivery.city_id' => ['required', 'integer', 'min:1', 'exists:varosok,id'],
-        'delivery.utca'      => ['required', 'string', 'min:3', 'max:255'],
-        'delivery.hazszam'   => ['required', 'integer', 'min:1'],
-        'delivery.emeletAjto'=> ['nullable', 'string', 'max:10'],
+        'delivery.utca' => ['required', 'string', 'min:3', 'max:255'],
+        'delivery.hazszam' => ['required', 'integer', 'min:1'],
+        'delivery.emeletAjto' => ['nullable', 'string', 'max:10'],
         'items' => ['required', 'array', 'min:1'],
         'items.*.id' => ['required', 'integer', 'exists:termekek,id'],
         'items.*.mennyiseg' => ['required', 'integer', 'min:1'],
@@ -307,17 +319,18 @@ Route::post('/rendeles', function (Request $request) {
 
 Route::get('/user/szallitasi-adatok', function (Request $request) {
     $adatok = $request->user()->adatok;
-    if (!$adatok) return response()->json(null);
-    
+    if (!$adatok)
+        return response()->json(null);
+
     return response()->json([
-        'vezeteknev'  => $adatok->vezeteknev,
-        'keresztnev'  => $adatok->keresztnev,
-        'varos'       => $adatok->varos,
-        'utca'        => $adatok->utca,
-        'hazszam'     => $adatok->hazszam,    
-        'emeletAjto'  => $adatok->emeletAjto,
+        'vezeteknev' => $adatok->vezeteknev,
+        'keresztnev' => $adatok->keresztnev,
+        'varos' => $adatok->varos,
+        'utca' => $adatok->utca,
+        'hazszam' => $adatok->hazszam,
+        'emeletAjto' => $adatok->emeletAjto,
         'telefonszam' => $adatok->telefonszam,
-        'email'       => $request->user()->email
+        'email' => $request->user()->email
     ]);
 });
 
@@ -327,7 +340,7 @@ Route::middleware('auth:sanctum')->post('/user/szallitasi-adatok-mentese', funct
         'keresztnev' => ['required', 'string', 'max:100'],
         'varos_id' => ['required', 'integer', 'exists:varosok,id'],
         'utca' => ['required', 'string', 'max:255'],
-        'hazszam'    => ['required', 'integer', 'min:1'],
+        'hazszam' => ['required', 'integer', 'min:1'],
         'emeletAjto' => ['nullable', 'string', 'max:10'],
         'telefonszam' => ['required', 'string', 'max:20'],
     ]);
@@ -338,7 +351,7 @@ Route::middleware('auth:sanctum')->post('/user/szallitasi-adatok-mentese', funct
     $adatok->keresztnev = $validated['keresztnev'];
     $adatok->varos = $validated['varos_id'];
     $adatok->utca = $validated['utca'];
-    $adatok->hazszam    = $validated['hazszam'];
+    $adatok->hazszam = $validated['hazszam'];
     $adatok->emeletAjto = $validated['emeletAjto'] ?? null;
     $adatok->telefonszam = $validated['telefonszam'];
     $adatok->save();
@@ -366,7 +379,7 @@ Route::middleware('auth:sanctum')->get('/user/kartya-adatok', function (Request 
             $tipus = 'amex';
         } elseif ($prefix1 === '4') {
             $tipus = 'visa';
-        } elseif (in_array($prefix2, ['51','52','53','54','55'])) {
+        } elseif (in_array($prefix2, ['51', '52', '53', '54', '55'])) {
             $tipus = 'mastercard';
         } elseif ($prefix === '6011') {
             $tipus = 'discover';
@@ -383,26 +396,26 @@ Route::middleware('auth:sanctum')->get('/user/kartya-adatok', function (Request 
     $lejart = false;
     if ($adatok->kartya_ev && $adatok->kartya_honap) {
         $now = now();
-        $lejart = $adatok->kartya_ev < $now->year || 
-                ($adatok->kartya_ev == $now->year && $adatok->kartya_honap < $now->month);
+        $lejart = $adatok->kartya_ev < $now->year ||
+            ($adatok->kartya_ev == $now->year && $adatok->kartya_honap < $now->month);
     }
     return response()->json([
-        'kartyaszam'   => $masked,
-        'kartya_tipus'  => $tipus,
-        'kartya_nev'   => $adatok->kartya_nev,
+        'kartyaszam' => $masked,
+        'kartya_tipus' => $tipus,
+        'kartya_nev' => $adatok->kartya_nev,
         'kartya_honap' => $adatok->kartya_honap,
-        'kartya_ev'    => $adatok->kartya_ev,
-        'lejart'       => $lejart
+        'kartya_ev' => $adatok->kartya_ev,
+        'lejart' => $lejart
     ]);
 });
 
 // Kártyaadatok mentése
 Route::middleware('auth:sanctum')->post('/user/kartya-mentese', function (Request $request) {
     $validated = $request->validate([
-        'kartyaszam'   => ['nullable', 'string', 'min:13', 'max:19'],
-        'kartya_nev'   => ['required', 'string', 'max:100'],
+        'kartyaszam' => ['nullable', 'string', 'min:13', 'max:19'],
+        'kartya_nev' => ['required', 'string', 'max:100'],
         'kartya_honap' => ['required', 'integer', 'min:1', 'max:12'],
-        'kartya_ev'    => ['required', 'integer', 'min:' . date('Y')],
+        'kartya_ev' => ['required', 'integer', 'min:' . date('Y')],
     ]);
 
     $adatok = FelhasznaloAdatok::firstOrNew(['felhasznalo_id' => auth()->id()]);
@@ -410,9 +423,9 @@ Route::middleware('auth:sanctum')->post('/user/kartya-mentese', function (Reques
     if ($validated['kartyaszam']) {
         $adatok->kartyaszam = encrypt($validated['kartyaszam']);
     }
-    $adatok->kartya_nev     = $validated['kartya_nev'];
-    $adatok->kartya_honap   = $validated['kartya_honap'];
-    $adatok->kartya_ev      = $validated['kartya_ev'];
+    $adatok->kartya_nev = $validated['kartya_nev'];
+    $adatok->kartya_honap = $validated['kartya_honap'];
+    $adatok->kartya_ev = $validated['kartya_ev'];
     $adatok->save();
 
     return response()->json(['message' => 'Kártyaadatok mentve']);
@@ -564,10 +577,10 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
     Route::get('/analytics', function () {
         try {
             $rawSales = Rendelesek::selectRaw('MONTH(rendeles_datuma) as honap, SUM(osszeg) as osszeg')
-            ->whereYear('rendeles_datuma', now()->year)
-            ->groupBy('honap')
-            ->orderBy('honap')
-            ->pluck('osszeg', 'honap');
+                ->whereYear('rendeles_datuma', now()->year)
+                ->groupBy('honap')
+                ->orderBy('honap')
+                ->pluck('osszeg', 'honap');
 
             $rawOrders = Rendelesek::selectRaw('MONTH(rendeles_datuma) as honap, COUNT(*) as db')
                 ->whereYear('rendeles_datuma', now()->year)
@@ -576,22 +589,24 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
                 ->pluck('db', 'honap');
 
             // 12 elemű, 0-indexelt tömbök — hiányzó hónapok = 0
-            $monthlySales  = collect(range(1, 12))->map(fn($m) => (int)($rawSales[$m]  ?? 0))->values();
-            $monthlyOrders = collect(range(1, 12))->map(fn($m) => (int)($rawOrders[$m] ?? 0))->values();
+            $monthlySales = collect(range(1, 12))->map(fn($m) => (int) ($rawSales[$m] ?? 0))->values();
+            $monthlyOrders = collect(range(1, 12))->map(fn($m) => (int) ($rawOrders[$m] ?? 0))->values();
 
             $foKategoriak = Kategoriak::whereNull('fo_kategoria_id')
-                ->with(['alkategoriak' => function ($q) {
-                    $q->withCount('termekek');
-                }])
+                ->with([
+                    'alkategoriak' => function ($q) {
+                        $q->withCount('termekek');
+                    }
+                ])
                 ->withCount('termekek')
                 ->get()
                 ->map(fn($fo) => [
                     'nev' => $fo->nev,
                     // saját termékek + összes alkategória termékei együtt
-                    'db'  => $fo->termekek_count + $fo->alkategoriak->sum('termekek_count'),
+                    'db' => $fo->termekek_count + $fo->alkategoriak->sum('termekek_count'),
                     'alkategoriak' => $fo->alkategoriak->map(fn($al) => [
                         'nev' => $al->nev,
-                        'db'  => $al->termekek_count,
+                        'db' => $al->termekek_count,
                     ]),
                 ]);
 
@@ -693,7 +708,7 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
             }
         }
 
-        return response()->json($termek->load('TermekKategoria','TermekSzinek','TermekKepek', 'TermekFoKep'));
+        return response()->json($termek->load('TermekKategoria', 'TermekSzinek', 'TermekKepek', 'TermekFoKep'));
     });
 
     Route::delete('/termekek/{id}', function ($id) {

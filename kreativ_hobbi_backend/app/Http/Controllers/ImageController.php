@@ -113,4 +113,57 @@ class ImageController extends Controller
             return response()->json(['error' => 'Failed to upload profile picture', 'message' => $e->getMessage()], 500);
         }
     }
+
+    public function uploadCoverPicture(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'image' => 'required|file|max:10240',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json(['error' => 'Validation failed', 'messages' => $validator->errors()], 422);
+            }
+
+            $allowedMimes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/x-webp', 'image/avif'];
+            $allowedExtensions = ['jpg', 'jpeg', 'png', 'webp'];
+
+            $file = $request->file('image');
+            $ext = strtolower($file->getClientOriginalExtension());
+            $mime = $file->getMimeType();
+
+            $extOk = in_array($ext, $allowedExtensions);
+            $mimeOk = in_array($mime, $allowedMimes);
+
+            if (!$extOk && !$mimeOk) {
+                return response()->json(['error' => 'Invalid file type: ' . $file->getClientOriginalName()], 422);
+            }
+
+            if (!in_array($mime, $allowedMimes) && !in_array($ext, $allowedExtensions)) {
+                return response()->json(['error' => 'Invalid file type'], 422);
+            }
+
+            $filename = time() . '_' . uniqid() . '.' . ($ext ?: 'jpg');
+            $file->move(public_path('uploads/hatterkepek'), $filename);
+            $fullUrl = asset('uploads/hatterkepek/' . $filename);
+
+            $image = Kepek::create([
+                'url_Link' => $fullUrl,
+                'alt_Szoveg' => 'Háttérkép',
+                'leiras' => 'Háttérkép – ' . (Auth::check() ? Auth::user()->felhasz_nev : 'Ismeretlen'),
+            ]);
+
+            return response()->json([
+                'message' => 'Cover picture uploaded successfully',
+                'image' => [
+                    'id' => $image->id,
+                    'url' => $fullUrl,
+                ],
+            ], 201);
+
+        } catch (\Exception $e) {
+            \Log::error('Cover picture upload error: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to upload cover picture', 'message' => $e->getMessage()], 500);
+        }
+    }
 }

@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -17,6 +16,7 @@ return new class extends Migration
             $table->string('email', 150)->unique();
             $table->string('jelszo');
             $table->unsignedInteger('profilKep_id')->default(1);
+            $table->unsignedBigInteger('hatterKep_id')->default(3);
             $table->boolean('statusz')->default(1);
             $table->timestamp('letrehozas_Datuma')->useCurrent();
             $table->timestamp('utolso_Belepes')->nullable()->useCurrent()->useCurrentOnUpdate();
