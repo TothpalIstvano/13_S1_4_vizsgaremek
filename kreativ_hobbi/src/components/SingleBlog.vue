@@ -36,6 +36,10 @@
       
       <article class="blog-article">
         <div class="article-header">
+          <div class="report-btn">
+            <font-awesome-icon icon="fa-solid fa-triangle-exclamation" class="report-icon" />
+            <span class="report-tooltip">Bejelentés</span>
+          </div>
           <div class="title-container">
             <h1 class="blog-title">{{ post.cim }}</h1>
           </div>
@@ -205,14 +209,14 @@ import {
 import { useRoute } from 'vue-router'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faCalendar, faUser, faPaperPlane, faClock, faReply, faUserCircle, faArrowCircleUp } from '@fortawesome/free-solid-svg-icons'
+import { faCalendar, faUser, faPaperPlane, faClock, faReply, faUserCircle, faArrowCircleUp, faTriangleExclamation } from '@fortawesome/free-solid-svg-icons'
 import api from '@/services/api.js'
 import axios from 'axios'
 import Komment from '@/components/Komment.vue'
 import fallbackImage from '@/assets/Public/stars.png'
 import Image from 'primevue/image';
 
-library.add(faCalendar, faUser, faPaperPlane, faClock, faReply, faUserCircle, faArrowCircleUp)
+library.add(faCalendar, faUser, faPaperPlane, faClock, faReply, faUserCircle, faArrowCircleUp, faTriangleExclamation)
 
 const route = useRoute()
 
@@ -659,6 +663,48 @@ onBeforeUnmount(() => {
   padding: 48px;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   border: 1px solid white;
+  position: relative;
+}
+
+.report-btn {
+  position: absolute;
+  top: 32px;
+  right: 40px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+}
+
+.report-icon {
+  color: rgb(145, 1, 1);
+  font-size: 27px;
+  transition: transform 0.2s ease;
+}
+
+.report-btn:hover .report-icon {
+  transform: scale(1.2);
+}
+
+.report-tooltip {
+  visibility: hidden;
+  opacity: 0;
+  background-color: #333;
+  color: #fff;
+  font-size: 13px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  white-space: nowrap;
+  position: absolute;
+  right: 28px;
+  top: 50%;
+  transform: translateY(-50%);
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+
+.report-btn:hover .report-tooltip {
+  visibility: visible;
+  opacity: 1;
 }
 
 .article-header {
@@ -1288,6 +1334,15 @@ onBeforeUnmount(() => {
   
   .add-comment {
     padding: 24px;
+  }
+
+  .report-btn {
+    top: 8px;
+    right: 10px;
+  }
+
+  .report-icon {
+    font-size: 22px;
   }
 }
 /*#endregion*/
