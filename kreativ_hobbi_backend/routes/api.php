@@ -19,7 +19,6 @@ use App\Models\Kategoriak;
 use App\Models\Varosok;
 use App\Mail\RendelesVisszaigazolas;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Crypt;
 use App\Models\Szinek;
 //User related API routes:
 

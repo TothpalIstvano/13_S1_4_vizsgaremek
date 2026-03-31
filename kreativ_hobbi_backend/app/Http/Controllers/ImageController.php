@@ -113,6 +113,7 @@ class ImageController extends Controller
             return response()->json(['error' => 'Failed to upload profile picture', 'message' => $e->getMessage()], 500);
         }
     }
+    
     public function uploadCoverPicture(Request $request)
     {
         try {
