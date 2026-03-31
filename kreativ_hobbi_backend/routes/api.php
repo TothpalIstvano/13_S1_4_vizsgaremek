@@ -149,8 +149,9 @@ Route::get('/varosok', function () {
 });
 
 // Image upload routes
-Route::post('/upload-images', [ImageController::class, 'upload'])->middleware('auth:sanctum');
+Route::post('/upload-images', [ImageController::class, 'uploadBlogPictures'])->middleware('auth:sanctum');
 Route::post('/upload-profile-picture', [ImageController::class, 'uploadProfilePicture'])->middleware('auth:sanctum');
+Route::post('/upload-termekek-pictures', [ImageController::class, 'uploadTermekPictures'])->middleware('auth:sanctum');
 
 // API routes for blog and comments:
 
@@ -180,8 +181,15 @@ Route::get('/termekek/kategoriak', function () {
 });
 
 Route::get('/termekek', function () {
-    $termekek = Termekek::with('TermekKategoria', 'TermekFoKep', 'TermekSzinek', 'TermekKategoriak', 'TermekKepek')
+    $termekek = Termekek::with(
+        'TermekKategoria',
+        'TermekFoKep',
+        'TermekSzinek',
+        'TermekKategoriak',
+        'TermekKepek'     
+    )
         ->get(['id', 'nev', 'ar', 'leiras', 'darab', 'meter', 'kategoria_id', 'fo_kep_id']);
+
     return response()->json($termekek);
 });
 
@@ -637,6 +645,25 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
     });
 
     // Termékek CRUD
+
+    Route::post('/kategoriak', function (Request $request) {
+        $validated = $request->validate([
+            'nev' => 'required|string|max:255',
+            'fo_kategoria_id' => 'nullable|integer|exists:kategoriak,id',
+        ]);
+        $kat = Kategoriak::create($validated);
+        return response()->json($kat, 201);
+    });
+
+    Route::post('/szinek', function (Request $request) {
+        $validated = $request->validate([
+            'nev' => 'required|string|max:100',
+            'hex_kod' => 'required|string|max:20',
+        ]);
+        $szin = Szinek::create($validated);
+        return response()->json($szin, 201);
+    });
+
     Route::post('/termekek', function (Request $request) {
         $validated = $request->validate([
             'nev' => 'required|string',
@@ -644,13 +671,19 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
             'ar' => 'required|integer|min:0',
             'darab' => 'required|integer|min:0',
             'leiras' => 'nullable|string',
-            'fo_kep_id' => 'nullable|integer',
+            'fo_kep_id' => 'nullable|integer|exists:kepek,id',
             'szinek' => 'nullable|array',
             'szinek.*' => 'integer|exists:szinek,id',
+            'extra_kategoriak' => 'nullable|array',
+            'extra_kategoriak.*' => 'integer|exists:kategoriak,id',
         ]);
 
-        $termek = Termekek::create(\Illuminate\Support\Arr::except($validated, ['szinek']));
+        $termek = Termekek::create(\Illuminate\Support\Arr::except(
+            $validated,
+            ['szinek', 'extra_kategoriak']
+        ));
 
+        // Színek csatolása
         if (!empty($validated['szinek'])) {
             foreach ($validated['szinek'] as $szinId) {
                 \DB::table('termekszinek')->insert([
@@ -662,7 +695,22 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
             }
         }
 
-        return response()->json($termek->load('TermekKategoria', 'TermekFoKep', 'TermekSzinek'), 201);
+        // Extra kategóriák csatolása
+        if (!empty($validated['extra_kategoriak'])) {
+            foreach ($validated['extra_kategoriak'] as $katId) {
+                \DB::table('termekKategoriak')->insertOrIgnore([
+                    'termek_id' => $termek->id,
+                    'kategoria_id' => $katId,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+        }
+
+        return response()->json(
+            $termek->load('TermekKategoria', 'TermekFoKep', 'TermekSzinek', 'TermekKategoriak'),
+            201
+        );
     });
 
     Route::put('/termekek/{id}', function (Request $request, $id) {
@@ -674,16 +722,22 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
             'ar' => 'sometimes|integer|min:0',
             'darab' => 'sometimes|integer|min:0',
             'leiras' => 'nullable|string',
-            'fo_kep_id' => 'nullable|integer',
+            'fo_kep_id' => 'nullable|integer|exists:kepek,id',
             'szinek' => 'nullable|array',
             'szinek.*' => 'integer|exists:szinek,id',
+            'extra_kategoriak' => 'nullable|array',
+            'extra_kategoriak.*' => 'integer|exists:kategoriak,id',
         ]);
 
-        $termek->update($validated);
+        $termek->update(\Illuminate\Support\Arr::except(
+            $validated,
+            ['szinek', 'extra_kategoriak']
+        ));
 
+        // Színek szinkronizálása (teljes csere)
         if (array_key_exists('szinek', $validated)) {
             \DB::table('termekszinek')->where('termek_id', $id)->delete();
-            foreach ($validated['szinek'] as $szinId) {
+            foreach ($validated['szinek'] ?? [] as $szinId) {
                 \DB::table('termekszinek')->insert([
                     'termek_id' => $id,
                     'szin_id' => $szinId,
@@ -693,7 +747,22 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
             }
         }
 
-        return response()->json($termek->load('TermekKategoria','TermekSzinek','TermekKepek', 'TermekFoKep'));
+        // Extra kategóriák szinkronizálása (teljes csere)
+        if (array_key_exists('extra_kategoriak', $validated)) {
+            \DB::table('termekKategoriak')->where('termek_id', $id)->delete();
+            foreach ($validated['extra_kategoriak'] ?? [] as $katId) {
+                \DB::table('termekKategoriak')->insertOrIgnore([
+                    'termek_id' => $id,
+                    'kategoria_id' => $katId,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+        }
+
+        return response()->json(
+            $termek->load('TermekKategoria', 'TermekFoKep', 'TermekSzinek', 'TermekKategoriak', 'TermekKepek')
+        );
     });
 
     Route::delete('/termekek/{id}', function ($id) {
