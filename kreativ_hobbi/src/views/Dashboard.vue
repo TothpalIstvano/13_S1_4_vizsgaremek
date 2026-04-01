@@ -1010,7 +1010,7 @@
       </div>
     </div>
 
-    <!-- Blog Modal (Complex - similar to new-post.vue) -->
+    <!-- Blog Modal -->
     <div v-if="showBlogModal" class="modal-overlay" @click.self="showBlogModal = false">
       <div class="modal blog-modal-large">
         <div class="modal-header">
@@ -1051,6 +1051,26 @@
                 class="w-full mb-2"
               />
               <small class="form-hint">Válassz témához kapcsolódó címkéket a jobb kereshetőségért</small>
+
+              <label for="newTag">Ha nem találod amit keresel, akkor hozzá is tudod adni a saját címkédet:</label>
+              <div class="new-tag-row">
+                <InputText 
+                  id="newTag"
+                  v-model="newTagInput"
+                  placeholder="Írj egy új címkét..."
+                  class="w-full"
+                  @keyup.enter="addNewTag"
+                />
+                <Button
+                  type="button"
+                  label="Hozzáadás"
+                  icon="pi pi-plus"
+                  class="add-tag-btn"
+                  :loading="newTagLoading"
+                  :disabled="!newTagInput.trim()"
+                  @click="addNewTag">
+                </Button>
+              </div>
             </div>
 
             <div class="form-section">
@@ -1212,7 +1232,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, nextTick, watch } from 'vue';
+import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue';
 import Chart from 'chart.js/auto';
 import axios from 'axios';
 import MultiSelect from 'primevue/multiselect';
@@ -1249,6 +1269,19 @@ const blogSearch = ref('');
 const showProductModal = ref(false);
 const showUserModal = ref(false);
 const showBlogModal = ref(false);
+
+// Scroll lock — prevents background scroll whenever any modal is open
+const isAnyModalOpen = computed(
+  () => showProductModal.value || showUserModal.value || showBlogModal.value
+);
+
+watch(isAnyModalOpen, (open) => {
+  document.body.style.overflow = open ? 'hidden' : '';
+});
+
+onUnmounted(() => {
+  document.body.style.overflow = '';
+});
 const editingProduct = ref({});
 const editingUser = ref({});
 const editingBlogPost = ref({});
@@ -1272,6 +1305,10 @@ const selectedTags = ref([]);
 const uploadedImages = ref([]);   // { file: File, preview: string, alt: string, id?: number }
 const tagOptions = ref([]);
 const fileUploadRef = ref(null);
+
+// Új tag
+const newTagInput = ref('');
+const newTagLoading = ref(false);
 
 // Inline létrehozás state-ek
 const showNewCategoryInline = ref(false);
@@ -1444,6 +1481,58 @@ const fetchBlogPosts = async () => {
     imagesData: p.kepek || [],
     foKep: p.fo_kep ?? '',
   }));
+};
+
+const notification = ref({
+    show: false,
+    message: '',
+    type: 'info'
+});
+
+const showNotification = (type, message, duration = 3500) => {
+    notification.value = {
+        show: true,
+        message,
+        type
+    };
+    
+    setTimeout(() => {
+        notification.value.show = false;
+    }, duration);
+};
+
+const addNewTag = async () => {
+    const name = newTagInput.value.trim();
+    if (!name) return;
+
+    const exists = tagOptions.value.find(t => t.name.toLowerCase() === name.toLowerCase());
+    if (exists) {
+        if (!selectedTags.value.find(t => t.id === exists.id)) {
+            selectedTags.value.push(exists);
+        }
+        newTagInput.value = '';
+        showNotification('info', `"${name}" már létező címke, kiválasztva.`);
+        return;
+    }
+
+    newTagLoading.value = true;
+    try {
+        const response = await axios.post('/api/cimkek', { nev: name }, { withCredentials: true });
+        const tag = {
+            id: response.data.id,
+            name: response.data.nev,
+            code: response.data.nev.toLowerCase().replace(/\s+/g, '_')
+        };
+        tagOptions.value.push(tag);
+        selectedTags.value.push(tag);
+        newTagInput.value = '';
+        showNotification('success', `"${name}" címke hozzáadva és kiválasztva!`);
+    } catch (error) {
+        const msg = error.response?.data?.errors?.nev?.[0] || 'Nem sikerült hozzáadni a címkét.';
+        showNotification('error', msg);
+    } finally {
+        newTagLoading.value = false;
+    }
 };
 
 // --- Image Handling Logic (from new-post.vue) ---
@@ -2714,7 +2803,7 @@ tbody tr:hover {
 }
 
 .btn-warning {
-  background: #0094dbb5;
+  background: #d6bf3c;
   color: white;
 }
 
@@ -2773,6 +2862,20 @@ tbody tr:hover {
 .blog-modal-large {
     max-width: 1000px;
     height: 90vh;
+}
+
+.new-tag-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-top: 8px;
+  margin-bottom: 24px;
+}
+
+.add-tag-btn {
+  white-space: nowrap;
+  flex-shrink: 0;
+  background-color: #9e6c2b;
 }
 
 @keyframes slideUp {

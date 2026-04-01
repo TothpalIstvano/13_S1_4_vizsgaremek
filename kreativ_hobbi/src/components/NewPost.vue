@@ -11,178 +11,178 @@
     </div>
     
     <div v-if="notification.show" 
-         :class="['notification', notification.type]"
-         @click="notification.show = false">
-        <i :class="notificationIcon" class="notification-icon"></i>
-        <span class="notification-message">{{ notification.message }}</span>
+        :class="['notification', notification.type]"
+        @click="notification.show = false">
+      <i :class="notificationIcon" class="notification-icon"></i>
+      <span class="notification-message">{{ notification.message }}</span>
     </div>
     
     <div class="container">
         <form @submit.prevent="submitForm" class="post-form">
             <div class="form-section">
-                <label for="postTitle" class="form-label">
-                    <!--<i class="pi pi-pencil form-label-icon"></i>-->
-                    Poszt címe
-                    <span class="required-indicator">*</span>
-                </label>
+              <label for="postTitle" class="form-label">
+                <!--<i class="pi pi-pencil form-label-icon"></i>-->
+                Poszt címe
+                <span class="required-indicator">*</span>
+              </label>
+              <InputText 
+                id="postTitle" 
+                v-model="post.title" 
+                placeholder="Add meg a poszt címét..." 
+                class="w-full mb-6" 
+                :class="{ 'p-invalid': post.title === '' && formTouched }"
+              />
+              <small class="form-hint">Adj egy rövid, informatív címet a posztodnak</small>
+            </div>
+
+            <div class="form-section">
+              <label for="postCimkek" class="form-label">
+                <!--<i class="pi pi-tags form-label-icon"></i>-->
+                Címkék
+                <span class="required-indicator">*</span>
+              </label>
+              <MultiSelect
+                id="postCimkek"
+                v-model="selectedTags" 
+                :options="tagOptions" 
+                optionLabel="name" 
+                placeholder="Válassz címkét (több is választható)" 
+                display="chip" 
+                filter
+                class="w-full mb-6"
+              />
+              <small class="form-hint">Válassz témához kapcsolódó címkéket a jobb kereshetőségért</small>
+
+              <label for="newTag">Ha nem találod amit keresel, akkor hozzá is tudod adni a saját címkédet:</label>
+              <div class="new-tag-row">
                 <InputText 
-                    id="postTitle" 
-                    v-model="post.title" 
-                    placeholder="Add meg a poszt címét..." 
-                    class="w-full mb-6" 
-                    :class="{ 'p-invalid': post.title === '' && formTouched }"
+                  id="newTag"
+                  v-model="newTagInput"
+                  placeholder="Írj egy új címkét..."
+                  class="w-full"
+                  @keyup.enter="addNewTag"
                 />
-                <small class="form-hint">Adj egy rövid, informatív címet a posztodnak</small>
+                <Button
+                  type="button"
+                  label="Hozzáadás"
+                  icon="pi pi-plus"
+                  class="add-tag-btn"
+                  :loading="newTagLoading"
+                  :disabled="!newTagInput.trim()"
+                  @click="addNewTag">
+                </Button>
+              </div>
             </div>
 
             <div class="form-section">
-                <label for="postCimkek" class="form-label">
-                    <!--<i class="pi pi-tags form-label-icon"></i>-->
-                    Címkék
-                    <span class="required-indicator">*</span>
-                </label>
-                <MultiSelect
-                    id="postCimkek"
-                    v-model="selectedTags" 
-                    :options="tagOptions" 
-                    optionLabel="name" 
-                    placeholder="Válassz címkét (több is választható)" 
-                    display="chip" 
-                    filter
-                    class="w-full mb-6"
-                />
-                <small class="form-hint">Válassz témához kapcsolódó címkéket a jobb kereshetőségért</small>
-
-                <label for="newTag">Ha nem találod amit keresel, akkor hozzá is tudod adni a saját címkédet:</label>
-                <div class="new-tag-row">
-                    <InputText 
-                      id="newTag"
-                      v-model="newTagInput"
-                      placeholder="Írj egy új címkét..."
-                      class="w-full"
-                      @keyup.enter="addNewTag"
-                    />
-                    <Button
-                      type="button"
-                      label="Hozzáadás"
-                      icon="pi pi-plus"
-                      class="add-tag-btn"
-                      :loading="newTagLoading"
-                      :disabled="!newTagInput.trim()"
-                      @click="addNewTag"
-                    />
-                </div>
+              <label for="postSubtext" class="form-label">
+                  <!--<i class="pi pi-pencil form-label-icon"></i>-->
+                  Poszt rövid leírása
+              </label>
+              <InputText 
+                  id="postSubtext"
+                  placeholder="Add meg a poszt leírását..."
+                  v-model="post.kivonat"
+                  class="w-full mb-6" 
+                  :class="{ 'p-invalid': post.title === '' && formTouched }"
+              />
+              <small class="form-hint">Adj egy rövid, tömör leírást a posztod tartalmáról (ennek hiányában a poszt első pár mondata kerül a helyére)</small>
             </div>
 
             <div class="form-section">
-                <label for="postSubtext" class="form-label">
-                    <!--<i class="pi pi-pencil form-label-icon"></i>-->
-                    Poszt rövid leírása
-                </label>
-                <InputText 
-                    id="postSubtext"
-                    placeholder="Add meg a poszt leírását..."
-                    v-model="post.kivonat"
-                    class="w-full mb-6" 
-                    :class="{ 'p-invalid': post.title === '' && formTouched }"
-                />
-                <small class="form-hint">Adj egy rövid, tömör leírást a posztod tartalmáról (ennek hiányában a poszt első pár mondata kerül a helyére)</small>
+              <label class="form-label">
+                  <!--<i class="pi pi-file-edit form-label-icon"></i>-->
+                  Tartalom
+                  <span class="required-indicator">*</span>
+              </label>
+              <Editor
+                  :key="editorKey"
+                  ref="editorRef"
+                  v-model="post.content" 
+                  editorStyle="height: 400px"
+                  class="mb-6 editor-container"
+                  :pt="{
+                      toolbar: { class: 'editor-toolbar' },
+                      content: { style: { 'min-height': '250px', 'font-family': 'inherit' } }
+                  }"
+              />
+              <small class="form-hint">Használhatsz formázást és linkeket a tartalomban</small>
             </div>
 
             <div class="form-section">
-                <label class="form-label">
-                    <!--<i class="pi pi-file-edit form-label-icon"></i>-->
-                    Tartalom
-                    <span class="required-indicator">*</span>
-                </label>
-                <Editor
-                    :key="editorKey"
-                    ref="editorRef"
-                    v-model="post.content" 
-                    editorStyle="height: 400px"
-                    class="mb-6 editor-container"
-                    :pt="{
-                        toolbar: { class: 'editor-toolbar' },
-                        content: { style: { 'min-height': '250px', 'font-family': 'inherit' } }
-                    }"
-                />
-                <small class="form-hint">Használhatsz formázást és linkeket a tartalomban</small>
-            </div>
-
-              <div class="form-section">
-                <label class="form-label">
-                Képek feltöltése
-                </label>
-                <FileUpload
-                ref="fileUploadRef"
-                name="images[]"
-                @select="onFileSelect"
-                :multiple="true"
-                accept="image/avif,image/jpeg,image/png,image/gif,image/webp"
-                :maxFileSize="5000000"
-                :auto="false"
-                :showUploadButton="false"
-                :showCancelButton="false"
-                chooseLabel="Képek kiválasztása"
-                class="mb-6"
-                >
-                <template #empty>
-                    <div class="drag-drop-area">
-                        <i class="pi pi-cloud-upload" style="font-size: 3rem; color: #667eea; margin-bottom: 1rem;"></i>
-                        <p>Húzd ide a képeidet vagy kattints a feltöltéshez</p>
-                    </div>
-                </template>
-                </FileUpload>
-                <div v-if="uploadedImages.length > 0" class="image-preview-container">
-                <div v-for="(image, index) in uploadedImages" :key="index" class="image-preview">
-                    <img :src="image.preview" class="preview-image" />
-                    <Button 
-                    type="button" 
-                    icon="pi pi-times" 
-                    class="p-button-rounded p-button-danger image-remove-btn"
-                    @click="removeImage(index)">
-                    </Button>
-                    <InputText 
-                    v-model="image.alt" 
-                    placeholder="Alternatív szöveg" 
-                    class="image-alt-input"
-                    />
-                    <InputText 
-                    v-model="image.description" 
-                    placeholder="Leírás" 
-                    class="image-description-input"
-                    />
-                </div>
-                </div>
-                <small class="form-hint">Támogatott formátumok: JPG, PNG, GIF, AVIF. Maximális fájlméret: 5MB.</small>
+              <label class="form-label">
+              Képek feltöltése
+              </label>
+              <FileUpload
+              ref="fileUploadRef"
+              name="images[]"
+              @select="onFileSelect"
+              :multiple="true"
+              accept="image/avif,image/jpeg,image/png,image/gif,image/webp"
+              :maxFileSize="5000000"
+              :auto="false"
+              :showUploadButton="false"
+              :showCancelButton="false"
+              chooseLabel="Képek kiválasztása"
+              class="mb-6"
+              >
+              <template #empty>
+                  <div class="drag-drop-area">
+                      <i class="pi pi-cloud-upload" style="font-size: 3rem; color: #667eea; margin-bottom: 1rem;"></i>
+                      <p>Húzd ide a képeidet vagy kattints a feltöltéshez</p>
+                  </div>
+              </template>
+              </FileUpload>
+              <div v-if="uploadedImages.length > 0" class="image-preview-container">
+              <div v-for="(image, index) in uploadedImages" :key="index" class="image-preview">
+                  <img :src="image.preview" class="preview-image" />
+                  <Button 
+                  type="button" 
+                  icon="pi pi-times" 
+                  class="p-button-rounded p-button-danger image-remove-btn"
+                  @click="removeImage(index)">
+                  </Button>
+                  <InputText 
+                  v-model="image.alt" 
+                  placeholder="Alternatív szöveg" 
+                  class="image-alt-input"
+                  />
+                  <InputText 
+                  v-model="image.description" 
+                  placeholder="Leírás" 
+                  class="image-description-input"
+                  />
+              </div>
+              </div>
+              <small class="form-hint">Támogatott formátumok: JPG, PNG, GIF, AVIF. Maximális fájlméret: 5MB.</small>
             </div>
 
             <div class="form-actions">
-                <Button
-                    type="button" 
-                    label="Mentés piszkozatként" 
-                    icon="pi pi-pencil" 
-                    class="draft-button"
-                    @click="savePost('piszkozat')">
-                </Button>
-                <Button
-                    type="submit" 
-                    label="Poszt feltöltése" 
-                    icon="pi pi-check" 
-                    class="submit-button"
-                    :disabled="!isFormValid"
-                    :class="{ 'p-button-success': isFormValid }"
-                    @click="savePost('közzétett')"
-                    >
-                </Button>
-                <Button
-                    type="button" 
-                    label="Visszaállítás" 
-                    icon="pi pi-refresh" 
-                    class="p-button-outlined reset-button"
-                    @click="resetForm"
-                    severity="secondary"> 
-                </Button>
+              <Button
+                  type="button" 
+                  label="Mentés piszkozatként" 
+                  icon="pi pi-pencil" 
+                  class="draft-button"
+                  @click="savePost('piszkozat')">
+              </Button>
+              <Button
+                  type="submit" 
+                  label="Poszt feltöltése" 
+                  icon="pi pi-check" 
+                  class="submit-button"
+                  :disabled="!isFormValid"
+                  :class="{ 'p-button-success': isFormValid }"
+                  @click="savePost('közzétett')"
+                  >
+              </Button>
+              <Button
+                  type="button" 
+                  label="Visszaállítás" 
+                  icon="pi pi-refresh" 
+                  class="p-button-outlined reset-button"
+                  @click="resetForm"
+                  severity="secondary"> 
+              </Button>
             </div>
         </form>        
     </div>
@@ -364,7 +364,6 @@ const fetchPostForEdit = async () => {
     editorKey.value++;
     await nextTick();
 
-    // Poll until Quill is ready (it initializes async after mount)
     await new Promise(resolve => {
         const interval = setInterval(() => {
             if (editorRef.value?.quill) {
@@ -372,7 +371,6 @@ const fetchPostForEdit = async () => {
                 resolve();
             }
         }, 20);
-        // Safety timeout after 2s
         setTimeout(() => { clearInterval(interval); resolve(); }, 2000);
     });
 
@@ -406,7 +404,6 @@ const savePost = async (status) => {
   }
 
   try {
-    // 1. Upload new images (those with a file)
     const newImageIds = []
     const newImages = uploadedImages.value.filter(img => img.file)
     if (newImages.length > 0) {
@@ -425,13 +422,11 @@ const savePost = async (status) => {
       })
     }
 
-    // 2. Collect all image ids (existing + new)
     const existingImageIds = uploadedImages.value
       .filter(img => img.id && !img.file)
       .map(img => img.id)
     const allImageIds = [...existingImageIds, ...newImageIds]
 
-    // 3. Prepare post data
     const postData = {
       title: post.value.title,
       content: post.value.content,
@@ -441,7 +436,6 @@ const savePost = async (status) => {
       images: allImageIds.map(id => ({ id }))
     }
 
-    // 4. Send request (POST or PUT)
     let response
     if (isEditMode.value) {
       response = await axios.put(`/api/posts/${editId.value}`, postData, {
@@ -633,7 +627,7 @@ const resetForm = () => {
 .add-tag-btn {
   white-space: nowrap;
   flex-shrink: 0;
-  background-color: #667eea;
+  background-color: #9e6c2b;
 }
 
 .form-actions {
