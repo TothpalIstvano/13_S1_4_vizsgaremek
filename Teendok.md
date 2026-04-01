@@ -10,10 +10,10 @@
 - \[ ] Az oldal tesztelése
 - \[ ] Az oldal dokumenálása
 - \[ ] Optimalizálás
-- \[ ] routeban password reset levédése somehow
-- \[ ] Termékeknél admin ként új színt is meg lehessen adni és meg csinálni a cimkéket mert az a rész még mindig fostos
+- \[ ] routeban password reset levédése somehow + Megoldani azt hogy ha lefrissiti az oldalt akkor ne dobja vissza a főoldalra ha más védett oldalon van eg. dashboard/profil -> inedx
 - \[ ] 05-06 lecserélése b ejelentkezés és gyikra + emoiji meg everything
 
+- \[X] Termékeknél admin ként új színt is meg lehessen adni és meg csinálni a cimkéket mert az a rész még mindig fostos✅
 - \[X] Táblák egységesítése ez alat azt értve hogy a táblákban lévő adatok megegyezenek✅
 - \[X] Termékek modosításánál a modaba kép feltöltés és cimkék választásának javítása✅
 - \[X] Miden olyan funkció letiltása✅
