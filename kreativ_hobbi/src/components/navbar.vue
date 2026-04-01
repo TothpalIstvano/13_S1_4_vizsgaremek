@@ -131,6 +131,9 @@ onUnmounted(() => {
               @click=open();
             />       
           </div>
+            <RouterLink to="/" id="nev">
+              <h1>Hobbitár</h1>
+            </RouterLink>
             <RouterLink to="/kosar" id="mobilKosar">
               <div class="cart-icon-wrapper">
                 <img
@@ -144,9 +147,6 @@ onUnmounted(() => {
                   {{ cartStore.cartItems.reduce((t, i) => t + i.quantity, 0) }}
                 </span>
               </div>
-            </RouterLink>
-            <RouterLink to="/" id="nev">
-              <h1>Hobbitár</h1>
             </RouterLink>
         </div>
         <RouterLink 
@@ -465,4 +465,3 @@ onUnmounted(() => {
 }
 /*#endregion*/
 </style>
-

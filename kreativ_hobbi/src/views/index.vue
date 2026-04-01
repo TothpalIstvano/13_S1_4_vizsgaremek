@@ -1,7 +1,10 @@
 <script setup>
 //imports
 import Carousel from '@/components/carousel.vue';
-import { ref, onMounted, onUnmounted, watch } from 'vue';
+import { ref, onMounted, onUnmounted, watch, computed } from 'vue';
+import { useAuthStore } from '@/stores/auth'
+import api from '@/services/api.js'
+import { useRouter } from 'vue-router'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faCalendar, faHeart, faArrowRight, faArrowCircleUp, faThumbsUp, faThumbsDown} from '@fortawesome/free-solid-svg-icons'
@@ -15,10 +18,6 @@ const isHeroVisible = ref(true);
 let io = null;
 const baseURL = import.meta.env.VITE_API_URL;
 const blogPosts = ref([]);
-
-onMounted(async () => {
-  blogPosts.value = await fetchBlogPosts();
-});
 
 onMounted( () => {
   io = new IntersectionObserver(
@@ -58,27 +57,81 @@ onUnmounted(() => {
 
 
 // blog data
-async function fetchBlogPosts() {
+const router = useRouter()
+const authStore = useAuthStore()
+const isAuthenticated = computed(() => authStore.isAuthenticated)
+
+const fetchBlogPosts = async () => {
   try {
-    const response = await fetch(`${baseURL}/api/blog/main`);
-    if (!response.ok) {
-      throw new Error('Hiba a blogposztok lekérése során');
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/blog/main`)
+    if (!response.ok) throw new Error('Hiba a blogposztok lekérése során')
+    const data = await response.json()
+    blogPosts.value = Array.isArray(data) ? data : []
+
+    if (isAuthenticated.value) {
+      await fetchReakcio()
     }
-    const data = await response.json();
-    console.log('Fetched blog posts:', data);
-    return data;
   } catch (error) {
-    console.error('Error fetching blog posts:', error);
+    console.error('Error fetching blog posts:', error)
   }
 }
 
-function formatDate(dateString) {
-  const datePart = dateString.split('T')[0]; 
-  const [year, month, day] = datePart.split('-'); // ["2026", "01", "21"]
-  const formattedDate = `${day} ${month} ${year}`;
+const fetchReakcio = async () => {
+  try {
+    const response = await api.get('/api/user/reactions')
+    const reakcios = response.data
 
-  return formattedDate;
+    blogPosts.value = blogPosts.value.map(post => ({
+      ...post,
+      reakcio: reakcios[post.id] || null
+    }))
+  } catch (err) {
+    console.error('Error fetching user reactions:', err)
+  }
 }
+
+const reakcioKezeles = async (postId, reactionType) => {
+  try {
+    const response = await api.post(`/api/blog/${postId}/reaction`, {
+      reaction: reactionType
+    })
+
+    const { likes_count, dislikes_count, user_reaction } = response.data
+
+    const index = blogPosts.value.findIndex(p => p.id === postId)
+    if (index !== -1) {
+      blogPosts.value[index].likes_count = likes_count
+      blogPosts.value[index].dislikes_count = dislikes_count
+      blogPosts.value[index].reakcio = user_reaction
+    }
+  } catch (err) {
+    if (err.response?.status === 401) {
+      alert('Kérjük, jelentkezzen be a reakciókhoz!')
+      router.push('/Belepes')
+    } else {
+      console.error('Reaction error:', err)
+    }
+  }
+}
+
+onMounted(async () => {
+  await fetchBlogPosts();
+});
+
+const formatDate = (dateString) => {
+  if (!dateString) return 'Ismeretlen dátum'
+  return dateString
+}
+
+const handleImageError = (event) => {
+  event.target.src = 'https://via.placeholder.com/400x250?text=No+Image'
+}
+
+watch(isAuthenticated, (newVal) => {
+  if (newVal && blogPosts.value.length > 0) {
+    fetchReakcio()
+  }
+})
 
 </script>
 
@@ -319,53 +372,77 @@ function formatDate(dateString) {
     </section>
 
     
-    <div class="blog-main-title-container">
+        <div class="blog-main-title-container">
       <h2 class="blog-main-title">A hét kiemelt blogposztjai</h2>
     </div>
     <div class="content-wrapper">
       <section class="cards-wrapper">
-        <div class="card-grid-space" v-for="n in blogPosts" :key="n">
+        <div class="card-grid-space" v-for="post in blogPosts" :key="post.id">
           <div class="card">
             <div class="card-glow"></div>
             <div class="card-img-holder">
-              <img 
-                :src="n.fo_kep.url_Link" 
-                :alt="n.cim"
+              <img
+                :src="post.fo_kep?.url_Link"
+                :alt="post.cim"
                 @error="handleImageError"
                 loading="lazy"
               />
             </div>
-                
+
             <div class="card-content">
               <div class="meta-info">
-                <span class="blog-time"> 
+                <span class="blog-time">
                   <div class="icon-wrapper">
-                    <font-awesome-icon icon="fa-solid fa-calendar"/> 
+                    <font-awesome-icon icon="fa-solid fa-calendar" />
                   </div>
-                  {{ formatDate(n.letrehozas_datuma) }}
+                  {{ formatDate(post.letrehozas_datuma) }}
                 </span>
               </div>
 
               <div class="card-header">
-                <h3 class="blog-title">{{ n.cim }}</h3>
+                <h3 class="blog-title">{{ post.cim }}</h3>
               </div>
 
               <p class="description">
-                {{ n.kivonat || 'Nincs leírás' }}
-                <span v-if="(n.kivonat || n.tartalom)?.length > 150">...</span>
+                {{ post.kivonat || 'Nincs leírás' }}
+                <span v-if="(post.kivonat || post.tartalom)?.length > 150">...</span>
               </p>
-                  
+
               <div class="tags">
-                <div class="tag" v-for="cimke in n.cimkek" :key="cimke.id">
-                  <span class="tag-hash">#</span>{{ cimke.nev }}
+                <div class="tag" v-for="cimke in (post.cimkek || [])" :key="cimke.id || cimke">
+                  <span class="tag-hash">#</span>{{ typeof cimke === 'object' ? cimke.nev : cimke }}
                 </div>
               </div>
-                  
+
               <div class="card-footer">
-                <button class="view-btn" @click="navigateToBlog(n.id)">
+                <div class="reakcio-kontener">
+                  <button
+                    class="reakcio-gomb like-gomb"
+                    :class="{ active: post.reakcio === 'like' }"
+                    @click="reakcioKezeles(post.id, 'like')"
+                  >
+                    <div class="like-ikon">
+                      <font-awesome-icon icon="fa-solid fa-thumbs-up" />
+                    </div>
+                    <span class="reakciok-szama">{{ post.likes_count || 0 }}</span>
+                  </button>
+
+                  <button
+                    class="reakcio-gomb dislike-gomb"
+                    :class="{ active: post.reakcio === 'dislike' }"
+                    @click="reakcioKezeles(post.id, 'dislike')"
+                  >
+                    <div class="like-ikon">
+                      <font-awesome-icon icon="fa-solid fa-thumbs-down" />
+                    </div>
+                    <span class="reakciok-szama">{{ post.dislikes_count || 0 }}</span>
+                  </button>
+                </div>
+
+                <button class="view-btn" @click="router.push(`/blog/${post.id}`)">
                   <span>Megtekintés</span>
                   <div class="arrow-icon">
-                        <font-awesome-icon icon="fa-solid fa-arrow-right"/>
+                    <font-awesome-icon icon="fa-solid fa-arrow-right" />
                   </div>
                 </button>
               </div>
@@ -1291,6 +1368,72 @@ function formatDate(dateString) {
   margin-top: auto;
   padding-top: 20px;
   border-top: 1px solid #d8c7c7;
+}
+
+.reakcio-kontener {
+  display: flex;
+  gap: 8px;
+  flex: 1;
+}
+
+.reakcio-gomb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: 1px solid #e5e7eb;
+  color: #494d55;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background-color: #f8f9fa;
+  font-size: 14px;
+}
+
+.reakcio-gomb:hover {
+  transform: translateY(-2px);
+}
+
+.like-gomb:hover {
+  background-color: #d1f7c4;
+  border-color: #22c55e;
+  color: #16a34a;
+}
+
+.dislike-gomb:hover {
+  background-color: #ffe4e6;
+  border-color: #f43f5e;
+  color: #dc2626;
+}
+
+.reakcio-gomb.active {
+  font-weight: 600;
+}
+
+.like-gomb.active {
+  background-color: #bbf7d0;
+  border-color: #16a34a;
+  color: #15803d;
+}
+
+.dislike-gomb.active {
+  background-color: #fecdd3;
+  border-color: #e11d48;
+  color: #be123c;
+}
+
+.like-ikon {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.reakciok-szama {
+  font-weight: 500;
+  min-width: 20px;
 }
 
 .view-btn {
