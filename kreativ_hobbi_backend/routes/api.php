@@ -56,7 +56,7 @@ Route::middleware('auth:sanctum')->group(function () {
                 'hatterKep:id,url_Link',
                 'adatok:felhasznalo_id,vezeteknev,keresztnev,szerepkor,varos,utca,hazszam,emeletAjto,telefonszam'
             )
-            ->only(['id', 'felhasz_nev', 'email', 'email_verified_at', 'profilKep', 'adatok', 'letrehozas_Datuma']);
+            ->only(['id', 'felhasz_nev', 'email', 'email_verified_at', 'profilKep', 'hatterKep', 'adatok', 'letrehozas_Datuma']);
     });
 
     Route::get('/user/navbar', function (Request $request) {
@@ -187,6 +187,14 @@ Route::get('/cimkek', function () {
     return response()->json($cimkek);
 });
 
+Route::middleware('auth:sanctum')->post('/cimkek', function (Request $request) {
+    $validated = $request->validate([
+        'nev' => 'required|string|max:255|unique:cimkek,nev',
+    ]);
+    $cimke = Cimkek::create($validated);
+    return response()->json($cimke, 201);
+});
+
 Route::get('/termekek/kategoriak', function () {
     $kategoriak = Kategoriak::select('id', 'nev', 'fo_kategoria_id')->get();
     return response()->json($kategoriak);
@@ -198,7 +206,7 @@ Route::get('/termekek', function () {
         'TermekFoKep',
         'TermekSzinek',
         'TermekKategoriak',
-        'TermekKepek'     
+        'TermekKepek'
     )
         ->get(['id', 'nev', 'ar', 'leiras', 'darab', 'meter', 'kategoria_id', 'fo_kep_id']);
 

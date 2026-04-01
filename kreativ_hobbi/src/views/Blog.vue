@@ -827,7 +827,7 @@ main {
   border: 2px solid #e2e8f0;
   border-radius: 8px;
   background: white;
-  z-index: 10;
+  z-index: 2;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   padding: 0;
@@ -907,7 +907,7 @@ main {
 	position: fixed;
 	bottom: 20px;
 	right: 20px;
-	z-index: 1000;
+	z-index: 10;
 	width: 60px;
 	height: 60px;
 	color: black;
