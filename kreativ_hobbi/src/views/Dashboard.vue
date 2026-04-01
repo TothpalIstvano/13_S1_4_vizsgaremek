@@ -3,36 +3,36 @@
     <!-- Sidebar -->
     <div class="sidebar" :class="{ 'sidebar-open': sidebarOpen }">
       <div class="sidebar-header">
-        <h1>🎨 Kreatív Hobbi</h1>
+        <h1>Kreatív Hobbi</h1>
         <p>Adminisztrációs felület</p>
       </div>
       <ul class="nav-menu">
         <li class="nav-item">
           <a class="nav-link" :class="{active: currentView === 'dashboard'}" @click="currentView = 'dashboard'">
-            <span class="nav-icon">📊</span>Dashboard
+            <span class="nav-icon"><FontAwesomeIcon icon="fa-poll" /></span>Dashboard
           </a>
         </li>
         <li class="nav-item">
           <a class="nav-link" :class="{active: currentView === 'products'}" @click="currentView = 'products'">
-            <span class="nav-icon">🛍️</span>
+            <span class="nav-icon"><FontAwesomeIcon icon="fa-bag-shopping" /></span>
             Termékek
           </a>
         </li>
         <li class="nav-item">
           <a class="nav-link" :class="{active: currentView === 'blog'}" @click="currentView = 'blog'">
-            <span class="nav-icon">📝</span>
+            <span class="nav-icon"><FontAwesomeIcon icon="fa-file-lines" /></span>
             Blogbejegyzések
           </a>
         </li>
         <li class="nav-item">
           <a class="nav-link" :class="{active: currentView === 'users'}" @click="currentView = 'users'">
-            <span class="nav-icon">👤</span>
+            <span class="nav-icon"><FontAwesomeIcon icon="fa-user" /></span>
             Felhasználók
           </a>
         </li>
         <li class="nav-item">
           <a class="nav-link" :class="{active: currentView === 'analytics'}" @click="currentView = 'analytics'">
-            <span class="nav-icon">📈</span>
+            <span class="nav-icon"><FontAwesomeIcon icon="fa-chart-line" /></span>
             Analitika
           </a>
         </li>
@@ -51,7 +51,7 @@
           <h2>Dashboard</h2>
           <div class="header-actions">
             <button class="btn btn-primary" @click="refreshData">
-              🔄 Frissítés
+              <FontAwesomeIcon icon="fa-refresh" /> Frissítés
             </button>
           </div>
         </div>
@@ -64,7 +64,7 @@
                 <div class="stat-title">Összes értékesítés</div>
               </div>
               <div class="stat-icon" style="background: #fff7ed; color: #c2410c;">
-                💰
+                <FontAwesomeIcon icon="fa-coins" />
               </div>
             </div>
             <div class="stat-value">{{ formatCurrency(stats.totalSales) }}</div>
@@ -77,7 +77,7 @@
                 <div class="stat-title">Rendelések</div>
               </div>
               <div class="stat-icon" style="background: #dcfce7; color: #166534;">
-                📦
+                <FontAwesomeIcon icon="fa-truck" />
               </div>
             </div>
             <div class="stat-value">{{ stats.totalOrders }}</div>
@@ -90,7 +90,7 @@
                 <div class="stat-title">Termékek</div>
               </div>
               <div class="stat-icon" style="background: #fef3c7; color: #92400e;">
-                🛍️
+                <FontAwesomeIcon icon="fa-bag-shopping" />
               </div>
             </div>
             <div class="stat-value">{{ stats.totalProducts }}</div>
@@ -103,7 +103,7 @@
                 <div class="stat-title">Vásárlók</div>
               </div>
               <div class="stat-icon" style="background: #e9d5ff; color: #6b21a8;">
-                👥
+                <FontAwesomeIcon icon="fa-users" />
               </div>
             </div>
             <div class="stat-value">{{ stats.totalCustomers }}</div>
@@ -253,7 +253,7 @@
           <h2>Termékek</h2>
           <div class="header-actions">
             <button class="btn btn-primary" @click="openProductModal()">
-              ➕ Új termék
+              <FontAwesomeIcon icon="fa-plus" /> Új termék
             </button>
           </div>
         </div>
@@ -350,10 +350,10 @@
                 <td>
                   <div class="action-buttons">
                     <button class="btn btn-sm btn-warning" @click="openProductModal(product)">
-                      ✏️
+                      <FontAwesomeIcon icon="fa-pen" />
                     </button>
                     <button class="btn btn-sm btn-danger" @click="deleteProduct(product.id)">
-                      🗑️
+                      <FontAwesomeIcon icon="fa-trash-alt" />
                     </button>
                   </div>
                 </td>
@@ -397,7 +397,7 @@
           <h2>Felhasználók</h2>
           <div class="header-actions">
             <button class="btn btn-primary" @click="openUserModal()">
-              ➕ Új felhasználó
+              <FontAwesomeIcon icon="fa-plus" /> Új felhasználó
             </button>
           </div>
         </div>
@@ -512,7 +512,7 @@
                       :style="user.id === currentUserId ? 'opacity: 0.4; cursor: not-allowed;' : ''"
                       :title="user.id === currentUserId ? 'Saját fiókod nem módosíthatod' : ''"
                     >
-                      ✏️
+                      <FontAwesomeIcon icon="fa-pen" />
                     </button>
                     <button class="btn btn-sm btn-danger" 
                       @click="deleteUser(user.id)"
@@ -520,7 +520,7 @@
                       :style="user.id === currentUserId || user.orderStats.active > 0 ? 'opacity: 0.4; cursor: not-allowed;' : ''"
                       :title="user.id === currentUserId || user.orderStats.active > 0 ? 'Saját fiókod nem törölheted' : ''"
                     >
-                      🗑️
+                      <FontAwesomeIcon icon="fa-trash-alt" />
                     </button>
                   </div>
                 </td>
@@ -564,7 +564,7 @@
           <h2>Blogbejegyzések</h2>
           <div class="header-actions">
             <button class="btn btn-primary" @click="openBlogModal()">
-              ➕ Új bejegyzés
+              <FontAwesomeIcon icon="fa-plus" /> Új bejegyzés
             </button>
           </div>
         </div>
@@ -662,10 +662,10 @@
                 <td>
                   <div class="action-buttons">
                     <button class="btn btn-sm btn-warning" @click="openBlogModal(post)">
-                      ✏️
+                      <FontAwesomeIcon icon="fa-pen" />
                     </button>
                     <button class="btn btn-sm btn-danger" @click="deleteBlogPost(post.id)">
-                      🗑️
+                      <FontAwesomeIcon icon="fa-trash-alt" />
                     </button>
                   </div>
                 </td>
@@ -773,7 +773,7 @@
                   style="background:#f1f5f9; white-space:nowrap; flex-shrink:0;"
                   @click="showNewCategoryInline = !showNewCategoryInline"
                   title="Új kategória létrehozása"
-                >➕ Új</button>
+                ><FontAwesomeIcon icon="fa-plus" /> Új</button>
               </div>
     
               <!-- Inline új kategória -->
@@ -879,7 +879,7 @@
                   class="btn btn-sm"
                   style="background:#f1f5f9; white-space:nowrap; flex-shrink:0; margin-top:2px;"
                   @click="showNewColorInline = !showNewColorInline"
-                >➕ Új</button>
+                ><FontAwesomeIcon icon="fa-plus" /> Új</button>
               </div>
     
               <!-- Inline új szín -->
@@ -1003,8 +1003,8 @@
         <div class="modal-footer">
           <button class="btn btn-secondary" @click="closeProductModal">Mégse</button>
           <button class="btn btn-primary" @click="saveProduct" :disabled="productSaving">
-            <span v-if="productSaving">⏳ Mentés...</span>
-            <span v-else>💾 Mentés</span>
+            <span v-if="productSaving"><FontAwesomeIcon icon="fa-hourglass-half" /> Mentés...</span>
+            <span v-else>Mentés</span>
           </button>
         </div>
       </div>
@@ -1221,6 +1221,23 @@ import FileUpload from 'primevue/fileupload';
 import InputText from 'primevue/inputtext';
 import Checkbox from 'primevue/checkbox';
 import Dropdown from 'primevue/dropdown';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { library } from '@fortawesome/fontawesome-svg-core'
+import {
+  faPlus, faRefresh, faCoins,
+  faTruck, faBagShopping, faUsers,
+  faUser, faPoll, faChartLine,
+  faFileLines, faPen, faTrashAlt,
+  faHourglassHalf
+} from '@fortawesome/free-solid-svg-icons'
+
+library.add(
+  faPlus, faRefresh, faCoins,
+  faTruck, faBagShopping, faUsers,
+  faUser, faPoll, faChartLine,
+  faFileLines, faPen, faTrashAlt,
+  faHourglassHalf
+)
 
 const API = '/api/admin';
 

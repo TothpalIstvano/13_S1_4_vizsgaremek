@@ -39,6 +39,7 @@ const coverUploading = ref(false);
 const availableCovers = ref([]);
 const showCoverPicker = ref(false);
 const coverFileInput = ref(null);
+const pendingCover = ref(null);
 const likedIds = ref(new Set())
 const emailVerified = ref(true)
 const resendLoading = ref(false)
@@ -153,7 +154,12 @@ onMounted(async () => {
     }
 
     if (userData.value.hatterKep?.url_Link) {
-        user.cover = userData.value.hatterKep.url_Link;
+        const coverUrl = userData.value.hatterKep.url_Link;
+        const looksLikeCover = coverUrl.toLowerCase().includes('hatter') 
+            || coverUrl.includes('unsplash');
+        user.cover = looksLikeCover 
+            ? coverUrl 
+            : 'https://images.unsplash.com/photo-1503264116251-35a269479413?w=1600&h=400&fit=crop';
     } else {
         user.cover = 'https://images.unsplash.com/photo-1503264116251-35a269479413?w=1600&h=400&fit=crop';
     }
@@ -191,15 +197,10 @@ async function loadAvailableCovers() {
   }
 }
 
-async function selectCover(imageId, imageUrl) {
-  try {
-    await axios.put('/api/user/cover-picture', { hatterKep_id: imageId });
-    user.cover = imageUrl;
-    showCoverPicker.value = false;
-  } catch (e) {
-    console.error('Failed to set cover', e);
-    alert('Háttérkép beállítása sikertelen.');
-  }
+function selectCover(imageId, imageUrl) {
+  pendingCover.value = { id: imageId, url: imageUrl };
+  user.cover = imageUrl;
+  showCoverPicker.value = false;
 }
 
 async function handleCoverUpload(event) {
@@ -215,7 +216,7 @@ async function handleCoverUpload(event) {
       headers: { 'Content-Type': 'multipart/form-data' }
     });
     const { id, url } = uploadRes.data.image;
-    await selectCover(id, url);
+    selectCover(id, url);
   } catch (e) {
     console.error('Cover upload failed', e);
     alert('Háttérkép feltöltés sikertelen.');
@@ -226,6 +227,7 @@ async function handleCoverUpload(event) {
 }
 
 onUnmounted(() => {
+  document.body.style.overflow = '';
   if (cameraStream.value) {
     cameraStream.value.getTracks().forEach(track => track.stop());
   }
@@ -234,7 +236,6 @@ onUnmounted(() => {
   }
 });
 
-// Save profile
 async function saveProfile() {
   saving.value = true;
   try {
@@ -242,7 +243,14 @@ async function saveProfile() {
     userData.value = response.data.user;
     user.name = userData.value.felhasz_nev;
     user.username = userData.value.felhasz_nev;
+
+    if (pendingCover.value) {
+      await axios.put('/api/user/cover-picture', { hatterKep_id: pendingCover.value.id });
+      pendingCover.value = null;
+    }
+
     showSzerkesztes.value = false;
+    document.body.style.overflow = '';
     alert('Profil sikeresen frissítve!');
   } catch (error) {
     console.error('Error saving profile:', error);
@@ -387,7 +395,7 @@ const kedvencTermekek = ref([])
 async function loadKedvencek() {
   showKedvencekModal.value = true;
   showKedvencek.value = true;
-
+  document.body.style.overflow = 'hidden';
   try {
     const res = await axios.get('/api/user/kedvencek/termekek');
     kedvencTermekek.value = res.data;
@@ -415,13 +423,29 @@ async function toggleLike(item, event) {
 function cancelKedvencek() {
   showKedvencekModal.value = false;
   showKedvencek.value = false;
+  document.body.style.overflow = '';
 }
 
-function kijelentkezes() { showLogout.value = true; }
-function szerkesztes() { showSzerkesztes.value = true; }
-function cancelSzerkesztes() { showSzerkesztes.value = false; }
+function kijelentkezes() {
+  showLogout.value = true;
+  document.body.style.overflow = 'hidden';
+}
+function szerkesztes() {
+  showSzerkesztes.value = true;
+  document.body.style.overflow = 'hidden';
+}
+function cancelSzerkesztes() {
+  if (pendingCover.value) {
+    user.cover = userData.value.hatterKep?.url_Link
+      || 'https://images.unsplash.com/photo-1503264116251-35a269479413?w=1600&h=400&fit=crop';
+    pendingCover.value = null;
+  }
+  showSzerkesztes.value = false;
+  document.body.style.overflow = '';
+}
 async function confirmLogout() {
   showLogout.value = false;
+  document.body.style.overflow = '';
   try {
     await axios.post('/logout', { withCredentials: true });
   } catch (e) {
@@ -432,7 +456,10 @@ async function confirmLogout() {
   }
 }
 
-function cancelLogout() { showLogout.value = false; }
+function cancelLogout() {
+  showLogout.value = false;
+  document.body.style.overflow = '';
+}
 function formatDate(d) { return new Date(d).toLocaleDateString(); }
 </script>
 
@@ -534,6 +561,7 @@ function formatDate(d) { return new Date(d).toLocaleDateString(); }
                   id="varos"
                   v-model="editForm.varos"
                   :options="cities"
+                  :appendTo="self"
                   optionLabel="varos_nev"
                   optionValue="id"
                   placeholder="Válassz vagy írj be egy várost"
@@ -615,7 +643,7 @@ function formatDate(d) { return new Date(d).toLocaleDateString(); }
                       borderRadius: '8px',
                       cursor: 'pointer',
                       overflow: 'hidden',
-                      border: user.cover === cover.url_Link ? '3px solid #ff6a00' : '2px solid transparent',
+                      border: pendingCover?.id === cover.id ? '3px solid #ff6a00' : '2px solid transparent',
                       transition: 'border 0.2s',
                       height: '70px'
                     }"
@@ -639,6 +667,9 @@ function formatDate(d) { return new Date(d).toLocaleDateString(); }
                   style="width:100%; max-height:100px; object-fit:cover; border-radius:8px;"
                   @error="$event.target.style.opacity='0.3'"
                 />
+                <p v-if="pendingCover" style="font-size:12px; color:#ff6a00; margin-top:4px;">
+                  ⚠️ A háttérkép csak a "Mentés" gombra kattintva kerül elmentésre.
+                </p>
               </div>
             </div>
 

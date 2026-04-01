@@ -113,7 +113,7 @@ class ImageController extends Controller
             return response()->json(['error' => 'Failed to upload profile picture', 'message' => $e->getMessage()], 500);
         }
     }
-    
+
     public function uploadCoverPicture(Request $request)
     {
         try {
@@ -137,10 +137,6 @@ class ImageController extends Controller
 
             if (!$extOk && !$mimeOk) {
                 return response()->json(['error' => 'Invalid file type: ' . $file->getClientOriginalName()], 422);
-            }
-
-            if (!in_array($mime, $allowedMimes) && !in_array($ext, $allowedExtensions)) {
-                return response()->json(['error' => 'Invalid file type'], 422);
             }
 
             $filename = time() . '_' . uniqid() . '.' . ($ext ?: 'jpg');
@@ -167,7 +163,7 @@ class ImageController extends Controller
         }
     }
 
-        public function uploadTermekPictures(Request $request)
+    public function uploadTermekPictures(Request $request)
     {
         try {
             $validator = Validator::make($request->all(), [
