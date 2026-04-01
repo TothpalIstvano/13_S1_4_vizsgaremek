@@ -699,11 +699,13 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
             'szinek.*' => 'integer|exists:szinek,id',
             'extra_kategoriak' => 'nullable|array',
             'extra_kategoriak.*' => 'integer|exists:kategoriak,id',
+            'kepek' => 'nullable|array',
+            'kepek.*' => 'integer|exists:kepek,id',
         ]);
 
         $termek = Termekek::create(\Illuminate\Support\Arr::except(
             $validated,
-            ['szinek', 'extra_kategoriak']
+            ['szinek', 'extra_kategoriak', 'kepek']
         ));
 
         // Színek csatolása
@@ -730,8 +732,21 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
             }
         }
 
+        // ── ÚJ: Képek csatolása a termekKepek pivot táblába ──────
+        if (!empty($validated['kepek'])) {
+            foreach ($validated['kepek'] as $rendezes => $kepId) {
+                \DB::table('termekKepek')->insertOrIgnore([
+                    'termek_id' => $termek->id,
+                    'kep_id' => $kepId,
+                    'rendezes' => $rendezes + 1,  
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+        }
+
         return response()->json(
-            $termek->load('TermekKategoria', 'TermekFoKep', 'TermekSzinek', 'TermekKategoriak'),
+            $termek->load('TermekKategoria', 'TermekFoKep', 'TermekSzinek', 'TermekKategoriak', 'TermekKepek'),
             201
         );
     });
@@ -750,11 +765,13 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
             'szinek.*' => 'integer|exists:szinek,id',
             'extra_kategoriak' => 'nullable|array',
             'extra_kategoriak.*' => 'integer|exists:kategoriak,id',
+            'kepek' => 'nullable|array',
+            'kepek.*' => 'integer|exists:kepek,id',
         ]);
 
         $termek->update(\Illuminate\Support\Arr::except(
             $validated,
-            ['szinek', 'extra_kategoriak']
+            ['szinek', 'extra_kategoriak', 'kepek']
         ));
 
         // Színek szinkronizálása (teljes csere)
@@ -783,8 +800,23 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
             }
         }
 
+        // ── ÚJ: Képek szinkronizálása (teljes csere) ─────────────
+        // Ha küldtek kepek tömböt, teljesen cseréljük
+        if (array_key_exists('kepek', $validated)) {
+            \DB::table('termekKepek')->where('termek_id', $id)->delete();
+            foreach ($validated['kepek'] ?? [] as $rendezes => $kepId) {
+                \DB::table('termekKepek')->insertOrIgnore([
+                    'termek_id' => $id,
+                    'kep_id' => $kepId,
+                    'rendezes' => $rendezes + 1,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+        }
+
         return response()->json(
-            $termek->load('TermekKategoria', 'TermekFoKep', 'TermekSzinek', 'TermekKategoriak', 'TermekKepek')
+            $termek->fresh()->load('TermekKategoria', 'TermekFoKep', 'TermekSzinek', 'TermekKategoriak', 'TermekKepek')
         );
     });
 

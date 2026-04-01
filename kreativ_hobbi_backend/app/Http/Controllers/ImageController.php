@@ -186,6 +186,11 @@ class ImageController extends Controller
                 }
             }
 
+            $uploadDir = public_path('uploads/termekKepek');
+            if (!is_dir($uploadDir)) {
+                mkdir($uploadDir, 0755, true);
+            }
+
             $uploadedImages = [];
             $files = $request->file('images');
             $alts = $request->input('alt', []);
@@ -195,7 +200,7 @@ class ImageController extends Controller
                 $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
                 $file->move(public_path('uploads/termekKepek'), $filename);
 
-                $fullUrl = asset('uploads/termekKepek' . $filename);
+                $fullUrl = asset('uploads/termekKepek/' . $filename);
 
                 $image = Kepek::create([
                     'url_Link' => $fullUrl,

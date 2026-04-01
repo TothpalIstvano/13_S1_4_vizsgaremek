@@ -23,7 +23,14 @@ class Termekek extends Model
     }
     public function TermekKepek()
     {
-        return $this->belongsToMany(Kepek::class, 'termekKepek', 'termek_id', 'kep_id');
+        return $this->belongsToMany(
+            Kepek::class,
+            'termekKepek',   
+            'termek_id',    
+            'kep_id'        
+        )
+            ->withPivot('rendezes')
+            ->orderBy('termekKepek.rendezes', 'asc');
     }
 
     public function TermekSzinek()
