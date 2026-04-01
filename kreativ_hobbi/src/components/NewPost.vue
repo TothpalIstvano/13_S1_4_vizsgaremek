@@ -52,6 +52,25 @@
                     class="w-full mb-6"
                 />
                 <small class="form-hint">Válassz témához kapcsolódó címkéket a jobb kereshetőségért</small>
+                <label for="newTag">Ha nem találod amit keresel, akkor hozzá is tudod adni a saját címkédet:</label>
+                <div class="new-tag-row">
+                    <InputText 
+                      id="newTag"
+                      v-model="newTagInput"
+                      placeholder="Írj egy új címkét..."
+                      class="w-full"
+                      @keyup.enter="addNewTag"
+                    />
+                    <Button
+                      type="button"
+                      label="Hozzáadás"
+                      icon="pi pi-plus"
+                      class="add-tag-btn"
+                      :loading="newTagLoading"
+                      :disabled="!newTagInput.trim()"
+                      @click="addNewTag"
+                    />
+                </div>
             </div>
 
             <div class="form-section">
@@ -205,6 +224,42 @@ const formTouched = ref(false);
 const editorKey = ref(0);
 const tagOptions = ref([]);
 const fileUploadRef = ref(null);
+const newTagInput = ref('');
+const newTagLoading = ref(false);
+
+const addNewTag = async () => {
+    const name = newTagInput.value.trim();
+    if (!name) return;
+
+    const exists = tagOptions.value.find(t => t.name.toLowerCase() === name.toLowerCase());
+    if (exists) {
+        if (!selectedTags.value.find(t => t.id === exists.id)) {
+            selectedTags.value.push(exists);
+        }
+        newTagInput.value = '';
+        showNotification('info', `"${name}" már létező címke, kiválasztva.`);
+        return;
+    }
+
+    newTagLoading.value = true;
+    try {
+        const response = await axios.post('/api/cimkek', { nev: name }, { withCredentials: true });
+        const tag = {
+            id: response.data.id,
+            name: response.data.nev,
+            code: response.data.nev.toLowerCase().replace(/\s+/g, '_')
+        };
+        tagOptions.value.push(tag);
+        selectedTags.value.push(tag);
+        newTagInput.value = '';
+        showNotification('success', `"${name}" címke hozzáadva és kiválasztva!`);
+    } catch (error) {
+        const msg = error.response?.data?.errors?.nev?.[0] || 'Nem sikerült hozzáadni a címkét.';
+        showNotification('error', msg);
+    } finally {
+        newTagLoading.value = false;
+    }
+};
 
 const isFormValid = computed(() => {
     return post.value.title.trim() !== '' && post.value.content.trim() !== '';
@@ -436,6 +491,8 @@ const resetForm = () => {
   align-items: center;
   justify-content: flex-start;
   margin-bottom: 16px;
+  margin: auto;
+  max-width: 80%;
 }
 
 .back-btn {
@@ -453,7 +510,6 @@ const resetForm = () => {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   white-space: nowrap;
-  /* Remove fixed margin-left */
   margin-left: 0;
 }
 
@@ -563,6 +619,20 @@ const resetForm = () => {
   width: 100%;
   margin-top: 5px;
   font-size: 14px;
+}
+
+.new-tag-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-top: 8px;
+  margin-bottom: 24px;
+}
+
+.add-tag-btn {
+  white-space: nowrap;
+  flex-shrink: 0;
+  background-color: #667eea;
 }
 
 .form-actions {
@@ -765,13 +835,15 @@ const resetForm = () => {
   }
 }
 
-/* =====================
-   RESPONSIVE BREAKPOINTS
-   ===================== */
+/* Responsive */
 @media (min-width: 768px) {
   .container {
-    max-width: 90%;
+    /*max-width: 90%;*/
     padding: 40px;
+  }
+
+  .header-row {
+    max-width: 80%;
   }
 
   .title {
@@ -792,6 +864,12 @@ const resetForm = () => {
 
   .title {
     font-size: 3rem;
+  }
+}
+
+@media (max-width: 1024px) {
+    .header-row {
+    max-width: 100%;
   }
 }
 

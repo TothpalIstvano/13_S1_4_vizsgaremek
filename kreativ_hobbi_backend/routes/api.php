@@ -19,7 +19,6 @@ use App\Models\Kategoriak;
 use App\Models\Varosok;
 use App\Mail\RendelesVisszaigazolas;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Crypt;
 use App\Models\Szinek;
 //User related API routes:
 
@@ -56,7 +55,7 @@ Route::middleware('auth:sanctum')->group(function () {
                 'profilKep:id,url_Link,alt_szoveg',
                 'adatok:felhasznalo_id,vezeteknev,keresztnev,szerepkor,varos,utca,hazszam,emeletAjto,telefonszam'
             )
-            ->only(['id', 'felhasz_nev', 'email', 'email_verified_at', 'profilKep', 'adatok', 'letrehozas_Datuma']);
+            ->only(['id', 'felhasz_nev', 'email', 'email_verified_at', 'profilKep', 'hatterKep', 'adatok', 'letrehozas_Datuma']);
     });
 
     Route::get('/user/navbar', function (Request $request) {
@@ -151,7 +150,9 @@ Route::get('/varosok', function () {
 // Image upload routes
 Route::post('/upload-images', [ImageController::class, 'uploadBlogPictures'])->middleware('auth:sanctum');
 Route::post('/upload-profile-picture', [ImageController::class, 'uploadProfilePicture'])->middleware('auth:sanctum');
+Route::post('/upload-cover-picture', [ImageController::class, 'uploadCoverPicture'])->middleware('auth:sanctum');
 Route::post('/upload-termekek-pictures', [ImageController::class, 'uploadTermekPictures'])->middleware('auth:sanctum');
+
 
 // API routes for blog and comments:
 
@@ -175,6 +176,14 @@ Route::get('/cimkek', function () {
     return response()->json($cimkek);
 });
 
+Route::middleware('auth:sanctum')->post('/cimkek', function (Request $request) {
+    $validated = $request->validate([
+        'nev' => 'required|string|max:255|unique:cimkek,nev',
+    ]);
+    $cimke = Cimkek::create($validated);
+    return response()->json($cimke, 201);
+});
+
 Route::get('/termekek/kategoriak', function () {
     $kategoriak = Kategoriak::select('id', 'nev', 'fo_kategoria_id')->get();
     return response()->json($kategoriak);
@@ -186,7 +195,7 @@ Route::get('/termekek', function () {
         'TermekFoKep',
         'TermekSzinek',
         'TermekKategoriak',
-        'TermekKepek'     
+        'TermekKepek'
     )
         ->get(['id', 'nev', 'ar', 'leiras', 'darab', 'meter', 'kategoria_id', 'fo_kep_id']);
 
@@ -676,11 +685,13 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
             'szinek.*' => 'integer|exists:szinek,id',
             'extra_kategoriak' => 'nullable|array',
             'extra_kategoriak.*' => 'integer|exists:kategoriak,id',
+            'kepek' => 'nullable|array',
+            'kepek.*' => 'integer|exists:kepek,id',
         ]);
 
         $termek = Termekek::create(\Illuminate\Support\Arr::except(
             $validated,
-            ['szinek', 'extra_kategoriak']
+            ['szinek', 'extra_kategoriak', 'kepek']
         ));
 
         // Színek csatolása
@@ -707,8 +718,21 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
             }
         }
 
+        // ── ÚJ: Képek csatolása a termekKepek pivot táblába ──────
+        if (!empty($validated['kepek'])) {
+            foreach ($validated['kepek'] as $rendezes => $kepId) {
+                \DB::table('termekKepek')->insertOrIgnore([
+                    'termek_id' => $termek->id,
+                    'kep_id' => $kepId,
+                    'rendezes' => $rendezes + 1,  
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+        }
+
         return response()->json(
-            $termek->load('TermekKategoria', 'TermekFoKep', 'TermekSzinek', 'TermekKategoriak'),
+            $termek->load('TermekKategoria', 'TermekFoKep', 'TermekSzinek', 'TermekKategoriak', 'TermekKepek'),
             201
         );
     });
@@ -727,11 +751,13 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
             'szinek.*' => 'integer|exists:szinek,id',
             'extra_kategoriak' => 'nullable|array',
             'extra_kategoriak.*' => 'integer|exists:kategoriak,id',
+            'kepek' => 'nullable|array',
+            'kepek.*' => 'integer|exists:kepek,id',
         ]);
 
         $termek->update(\Illuminate\Support\Arr::except(
             $validated,
-            ['szinek', 'extra_kategoriak']
+            ['szinek', 'extra_kategoriak', 'kepek']
         ));
 
         // Színek szinkronizálása (teljes csere)
@@ -760,8 +786,23 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
             }
         }
 
+        // ── ÚJ: Képek szinkronizálása (teljes csere) ─────────────
+        // Ha küldtek kepek tömböt, teljesen cseréljük
+        if (array_key_exists('kepek', $validated)) {
+            \DB::table('termekKepek')->where('termek_id', $id)->delete();
+            foreach ($validated['kepek'] ?? [] as $rendezes => $kepId) {
+                \DB::table('termekKepek')->insertOrIgnore([
+                    'termek_id' => $id,
+                    'kep_id' => $kepId,
+                    'rendezes' => $rendezes + 1,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+        }
+
         return response()->json(
-            $termek->load('TermekKategoria', 'TermekFoKep', 'TermekSzinek', 'TermekKategoriak', 'TermekKepek')
+            $termek->fresh()->load('TermekKategoria', 'TermekFoKep', 'TermekSzinek', 'TermekKategoriak', 'TermekKepek')
         );
     });
 

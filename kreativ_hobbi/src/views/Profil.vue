@@ -35,6 +35,11 @@ const capturedBlob = ref(null);
 const objectUrl = ref(null);
 const cameraStream = ref(null);
 const uploading = ref(false);
+const coverUploading = ref(false);
+const availableCovers = ref([]);
+const showCoverPicker = ref(false);
+const coverFileInput = ref(null);
+const pendingCover = ref(null);
 const likedIds = ref(new Set())
 const emailVerified = ref(true)
 const resendLoading = ref(false)
@@ -147,8 +152,16 @@ onMounted(async () => {
     } else {
         user.avatar = defaultAvatar;
     }
-
-    user.cover = 'https://images.unsplash.com/photo-1503264116251-35a269479413?w=1600&h=400&fit=crop';
+    if (userData.value.hatterKep?.url_Link) {
+        const coverUrl = userData.value.hatterKep.url_Link;
+        const looksLikeCover = coverUrl.toLowerCase().includes('hatter') 
+            || coverUrl.includes('unsplash');
+        user.cover = looksLikeCover 
+            ? coverUrl 
+            : 'https://images.unsplash.com/photo-1503264116251-35a269479413?w=1600&h=400&fit=crop';
+    } else {
+        user.cover = 'https://images.unsplash.com/photo-1503264116251-35a269479413?w=1600&h=400&fit=crop';
+    }
     user.stats = {
       posts: userData.value.posts_count || 12
     };
@@ -172,7 +185,47 @@ onMounted(async () => {
   };
 });
 
+async function loadAvailableCovers() {
+  try {
+    const res = await axios.get('/api/hatterkepek');
+    availableCovers.value = res.data;
+    showCoverPicker.value = true;
+  } catch (e) {
+    console.error('Failed to load covers', e);
+  }
+}
+
+function selectCover(imageId, imageUrl) {
+  pendingCover.value = { id: imageId, url: imageUrl };
+  user.cover = imageUrl;
+  showCoverPicker.value = false;
+}
+
+async function handleCoverUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  coverUploading.value = true;
+  const formData = new FormData();
+  formData.append('image', file);
+
+  try {
+    const uploadRes = await axios.post('/api/upload-cover-picture', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    const { id, url } = uploadRes.data.image;
+    selectCover(id, url);
+  } catch (e) {
+    console.error('Cover upload failed', e);
+    alert('Háttérkép feltöltés sikertelen.');
+  } finally {
+    coverUploading.value = false;
+    event.target.value = '';
+  }
+}
+
 onUnmounted(() => {
+  document.body.style.overflow = '';
   if (cameraStream.value) {
     cameraStream.value.getTracks().forEach(track => track.stop());
   }
@@ -181,7 +234,6 @@ onUnmounted(() => {
   }
 });
 
-// Save profile
 async function saveProfile() {
   saving.value = true;
   try {
@@ -189,7 +241,14 @@ async function saveProfile() {
     userData.value = response.data.user;
     user.name = userData.value.felhasz_nev;
     user.username = userData.value.felhasz_nev;
+
+    if (pendingCover.value) {
+      await axios.put('/api/user/cover-picture', { hatterKep_id: pendingCover.value.id });
+      pendingCover.value = null;
+    }
+
     showSzerkesztes.value = false;
+    document.body.style.overflow = '';
     alert('Profil sikeresen frissítve!');
   } catch (error) {
     console.error('Error saving profile:', error);
@@ -334,7 +393,7 @@ const kedvencTermekek = ref([])
 async function loadKedvencek() {
   showKedvencekModal.value = true;
   showKedvencek.value = true;
-
+  document.body.style.overflow = 'hidden';
   try {
     const res = await axios.get('/api/user/kedvencek/termekek');
     kedvencTermekek.value = res.data;
@@ -362,13 +421,29 @@ async function toggleLike(item, event) {
 function cancelKedvencek() {
   showKedvencekModal.value = false;
   showKedvencek.value = false;
+  document.body.style.overflow = '';
 }
 
-function kijelentkezes() { showLogout.value = true; }
-function szerkesztes() { showSzerkesztes.value = true; }
-function cancelSzerkesztes() { showSzerkesztes.value = false; }
+function kijelentkezes() {
+  showLogout.value = true;
+  document.body.style.overflow = 'hidden';
+}
+function szerkesztes() {
+  showSzerkesztes.value = true;
+  document.body.style.overflow = 'hidden';
+}
+function cancelSzerkesztes() {
+  if (pendingCover.value) {
+    user.cover = userData.value.hatterKep?.url_Link
+      || 'https://images.unsplash.com/photo-1503264116251-35a269479413?w=1600&h=400&fit=crop';
+    pendingCover.value = null;
+  }
+  showSzerkesztes.value = false;
+  document.body.style.overflow = '';
+}
 async function confirmLogout() {
   showLogout.value = false;
+  document.body.style.overflow = '';
   try {
     await axios.post('/logout', { withCredentials: true });
   } catch (e) {
@@ -379,7 +454,10 @@ async function confirmLogout() {
   }
 }
 
-function cancelLogout() { showLogout.value = false; }
+function cancelLogout() {
+  showLogout.value = false;
+  document.body.style.overflow = '';
+}
 function formatDate(d) { return new Date(d).toLocaleDateString(); }
 </script>
 
@@ -481,6 +559,7 @@ function formatDate(d) { return new Date(d).toLocaleDateString(); }
                   id="varos"
                   v-model="editForm.varos"
                   :options="cities"
+                  :appendTo="self"
                   optionLabel="varos_nev"
                   optionValue="id"
                   placeholder="Válassz vagy írj be egy várost"
@@ -527,6 +606,68 @@ function formatDate(d) { return new Date(d).toLocaleDateString(); }
                     {{ uploading ? 'Feltöltés...' : 'Profilkép beállítása' }}
                   </button>
                 </div>
+              </div>
+            </div>
+
+            <!-- Háttérkép választása-->
+            <div class="form-section">
+              <h4>Háttérkép</h4>
+
+              <div class="camera-toggle" style="display:flex; gap:10px; flex-wrap:wrap;">
+                <button type="button" class="btn camera-btn" @click="loadAvailableCovers">
+                  🖼️ Választás a galériából
+                </button>
+                <label class="btn camera-btn" style="cursor:pointer;">
+                  {{ coverUploading ? 'Feltöltés...' : '⬆️ Saját kép feltöltése' }}
+                  <input
+                    type="file"
+                    accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+                    style="display:none"
+                    @change="handleCoverUpload"
+                    :disabled="coverUploading"
+                  />
+                </label>
+              </div>
+
+              <!-- Gallery picker -->
+              <div v-if="showCoverPicker" style="margin-top:12px;">
+                <p style="font-size:13px; color:#666; margin-bottom:8px;">Válassz egy háttérképet:</p>
+                <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(140px,1fr)); gap:8px;">
+                  <div
+                    v-for="cover in availableCovers"
+                    :key="cover.id"
+                    @click="selectCover(cover.id, cover.url_Link)"
+                    :style="{
+                      borderRadius: '8px',
+                      cursor: 'pointer',
+                      overflow: 'hidden',
+                      border: pendingCover?.id === cover.id ? '3px solid #ff6a00' : '2px solid transparent',
+                      transition: 'border 0.2s',
+                      height: '70px'
+                    }"
+                  >
+                    <img
+                      :src="cover.url_Link"
+                      :alt="cover.alt_Szoveg"
+                      style="width:100%; height:100%; object-fit:cover; display:block;"
+                      @error="$event.target.style.display='none'"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <!-- Current cover preview -->
+              <div v-if="user.cover" style="margin-top:12px;">
+                <p style="font-size:13px; color:#666; margin-bottom:6px;">Jelenlegi háttérkép:</p>
+                <img
+                  :src="user.cover"
+                  alt="Háttérkép előkép"
+                  style="width:100%; max-height:100px; object-fit:cover; border-radius:8px;"
+                  @error="$event.target.style.opacity='0.3'"
+                />
+                <p v-if="pendingCover" style="font-size:12px; color:#ff6a00; margin-top:4px;">
+                  ⚠️ A háttérkép csak a "Mentés" gombra kattintva kerül elmentésre.
+                </p>
               </div>
             </div>
 

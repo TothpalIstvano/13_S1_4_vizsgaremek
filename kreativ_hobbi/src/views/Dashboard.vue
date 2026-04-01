@@ -3,36 +3,36 @@
     <!-- Sidebar -->
     <div class="sidebar" :class="{ 'sidebar-open': sidebarOpen }">
       <div class="sidebar-header">
-        <h1>🎨 Kreatív Hobbi</h1>
+        <h1>Kreatív Hobbi</h1>
         <p>Adminisztrációs felület</p>
       </div>
       <ul class="nav-menu">
         <li class="nav-item">
           <a class="nav-link" :class="{active: currentView === 'dashboard'}" @click="currentView = 'dashboard'">
-            <span class="nav-icon">📊</span>Dashboard
+            <span class="nav-icon"><FontAwesomeIcon icon="fa-poll" /></span>Dashboard
           </a>
         </li>
         <li class="nav-item">
           <a class="nav-link" :class="{active: currentView === 'products'}" @click="currentView = 'products'">
-            <span class="nav-icon">🛍️</span>
+            <span class="nav-icon"><FontAwesomeIcon icon="fa-bag-shopping" /></span>
             Termékek
           </a>
         </li>
         <li class="nav-item">
           <a class="nav-link" :class="{active: currentView === 'blog'}" @click="currentView = 'blog'">
-            <span class="nav-icon">📝</span>
+            <span class="nav-icon"><FontAwesomeIcon icon="fa-file-lines" /></span>
             Blogbejegyzések
           </a>
         </li>
         <li class="nav-item">
           <a class="nav-link" :class="{active: currentView === 'users'}" @click="currentView = 'users'">
-            <span class="nav-icon">👤</span>
+            <span class="nav-icon"><FontAwesomeIcon icon="fa-user" /></span>
             Felhasználók
           </a>
         </li>
         <li class="nav-item">
           <a class="nav-link" :class="{active: currentView === 'analytics'}" @click="currentView = 'analytics'">
-            <span class="nav-icon">📈</span>
+            <span class="nav-icon"><FontAwesomeIcon icon="fa-chart-line" /></span>
             Analitika
           </a>
         </li>
@@ -51,7 +51,7 @@
           <h2>Dashboard</h2>
           <div class="header-actions">
             <button class="btn btn-primary" @click="refreshData">
-              🔄 Frissítés
+              <FontAwesomeIcon icon="fa-refresh" /> Frissítés
             </button>
           </div>
         </div>
@@ -64,7 +64,7 @@
                 <div class="stat-title">Összes értékesítés</div>
               </div>
               <div class="stat-icon" style="background: #fff7ed; color: #c2410c;">
-                💰
+                <FontAwesomeIcon icon="fa-coins" />
               </div>
             </div>
             <div class="stat-value">{{ formatCurrency(stats.totalSales) }}</div>
@@ -77,7 +77,7 @@
                 <div class="stat-title">Rendelések</div>
               </div>
               <div class="stat-icon" style="background: #dcfce7; color: #166534;">
-                📦
+                <FontAwesomeIcon icon="fa-truck" />
               </div>
             </div>
             <div class="stat-value">{{ stats.totalOrders }}</div>
@@ -90,7 +90,7 @@
                 <div class="stat-title">Termékek</div>
               </div>
               <div class="stat-icon" style="background: #fef3c7; color: #92400e;">
-                🛍️
+                <FontAwesomeIcon icon="fa-bag-shopping" />
               </div>
             </div>
             <div class="stat-value">{{ stats.totalProducts }}</div>
@@ -103,7 +103,7 @@
                 <div class="stat-title">Vásárlók</div>
               </div>
               <div class="stat-icon" style="background: #e9d5ff; color: #6b21a8;">
-                👥
+                <FontAwesomeIcon icon="fa-users" />
               </div>
             </div>
             <div class="stat-value">{{ stats.totalCustomers }}</div>
@@ -253,7 +253,7 @@
           <h2>Termékek</h2>
           <div class="header-actions">
             <button class="btn btn-primary" @click="openProductModal()">
-              ➕ Új termék
+              <FontAwesomeIcon icon="fa-plus" /> Új termék
             </button>
           </div>
         </div>
@@ -350,10 +350,10 @@
                 <td>
                   <div class="action-buttons">
                     <button class="btn btn-sm btn-warning" @click="openProductModal(product)">
-                      ✏️
+                      <FontAwesomeIcon icon="fa-pen" />
                     </button>
                     <button class="btn btn-sm btn-danger" @click="deleteProduct(product.id)">
-                      🗑️
+                      <FontAwesomeIcon icon="fa-trash-alt" />
                     </button>
                   </div>
                 </td>
@@ -397,7 +397,7 @@
           <h2>Felhasználók</h2>
           <div class="header-actions">
             <button class="btn btn-primary" @click="openUserModal()">
-              ➕ Új felhasználó
+              <FontAwesomeIcon icon="fa-plus" /> Új felhasználó
             </button>
           </div>
         </div>
@@ -512,7 +512,7 @@
                       :style="user.id === currentUserId ? 'opacity: 0.4; cursor: not-allowed;' : ''"
                       :title="user.id === currentUserId ? 'Saját fiókod nem módosíthatod' : ''"
                     >
-                      ✏️
+                      <FontAwesomeIcon icon="fa-pen" />
                     </button>
                     <button class="btn btn-sm btn-danger" 
                       @click="deleteUser(user.id)"
@@ -520,7 +520,7 @@
                       :style="user.id === currentUserId || user.orderStats.active > 0 ? 'opacity: 0.4; cursor: not-allowed;' : ''"
                       :title="user.id === currentUserId || user.orderStats.active > 0 ? 'Saját fiókod nem törölheted' : ''"
                     >
-                      🗑️
+                      <FontAwesomeIcon icon="fa-trash-alt" />
                     </button>
                   </div>
                 </td>
@@ -564,7 +564,7 @@
           <h2>Blogbejegyzések</h2>
           <div class="header-actions">
             <button class="btn btn-primary" @click="openBlogModal()">
-              ➕ Új bejegyzés
+              <FontAwesomeIcon icon="fa-plus" /> Új bejegyzés
             </button>
           </div>
         </div>
@@ -662,10 +662,10 @@
                 <td>
                   <div class="action-buttons">
                     <button class="btn btn-sm btn-warning" @click="openBlogModal(post)">
-                      ✏️
+                      <FontAwesomeIcon icon="fa-pen" />
                     </button>
                     <button class="btn btn-sm btn-danger" @click="deleteBlogPost(post.id)">
-                      🗑️
+                      <FontAwesomeIcon icon="fa-trash-alt" />
                     </button>
                   </div>
                 </td>
@@ -773,7 +773,7 @@
                   style="background:#f1f5f9; white-space:nowrap; flex-shrink:0;"
                   @click="showNewCategoryInline = !showNewCategoryInline"
                   title="Új kategória létrehozása"
-                >➕ Új</button>
+                ><FontAwesomeIcon icon="fa-plus" /> Új</button>
               </div>
     
               <!-- Inline új kategória -->
@@ -879,7 +879,7 @@
                   class="btn btn-sm"
                   style="background:#f1f5f9; white-space:nowrap; flex-shrink:0; margin-top:2px;"
                   @click="showNewColorInline = !showNewColorInline"
-                >➕ Új</button>
+                ><FontAwesomeIcon icon="fa-plus" /> Új</button>
               </div>
     
               <!-- Inline új szín -->
@@ -1003,8 +1003,8 @@
         <div class="modal-footer">
           <button class="btn btn-secondary" @click="closeProductModal">Mégse</button>
           <button class="btn btn-primary" @click="saveProduct" :disabled="productSaving">
-            <span v-if="productSaving">⏳ Mentés...</span>
-            <span v-else>💾 Mentés</span>
+            <span v-if="productSaving"><FontAwesomeIcon icon="fa-hourglass-half" /> Mentés...</span>
+            <span v-else>Mentés</span>
           </button>
         </div>
       </div>
@@ -1221,6 +1221,23 @@ import FileUpload from 'primevue/fileupload';
 import InputText from 'primevue/inputtext';
 import Checkbox from 'primevue/checkbox';
 import Dropdown from 'primevue/dropdown';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { library } from '@fortawesome/fontawesome-svg-core'
+import {
+  faPlus, faRefresh, faCoins,
+  faTruck, faBagShopping, faUsers,
+  faUser, faPoll, faChartLine,
+  faFileLines, faPen, faTrashAlt,
+  faHourglassHalf
+} from '@fortawesome/free-solid-svg-icons'
+
+library.add(
+  faPlus, faRefresh, faCoins,
+  faTruck, faBagShopping, faUsers,
+  faUser, faPoll, faChartLine,
+  faFileLines, faPen, faTrashAlt,
+  faHourglassHalf
+)
 
 const API = '/api/admin';
 
@@ -1321,28 +1338,29 @@ const fetchAnalytics = async () => {
 const fetchProducts = async () => {
   const { data } = await axios.get('/api/termekek');
   products.value = data.map(p => ({
-    id: p.id,
-    name: p.nev,
-    category: p.termek_kategoria?.nev ?? '-',
-    kategoria_id: p.kategoria_id,
-    fo_kep_id: p.fo_kep_id,
-    price: p.ar,
-    stock: p.darab,
-    description: p.leiras ?? '',
-    image: p.termek_fo_kep?.url_Link ?? 'https://placehold.co/100x100',
-    imagesData: (p.termek_kepek ?? []).map(k => ({
-      id: k.id,
-      url_Link: k.url_Link ?? k.url_link,
-      alt_szoveg: k.alt_szoveg ?? k.alt_Szoveg ?? ''
+    id:             p.id,
+    name:           p.nev,
+    category:       p.termek_kategoria?.nev ?? '-',
+    kategoria_id:   p.kategoria_id,
+    fo_kep_id:      p.fo_kep_id,
+    price:          p.ar,
+    stock:          p.darab,
+    description:    p.leiras ?? '',
+    image:          p.termek_fo_kep?.url_Link ?? 'https://placehold.co/100x100',
+    imagesData:     (p.termek_kepek ?? []).map(k => ({
+      id:        k.id,
+      url_Link:  k.url_Link ?? k.pivot?.url_Link ?? '',
+      alt_szoveg: k.alt_Szoveg ?? k.alt_szoveg ?? ''
     })),
     colors: (p.termek_szinek ?? []).map(s => ({
-      id: s.id,
-      nev: s.nev,
+      id:      s.id,
+      nev:     s.nev,
       hex_kod: s.hex_kod
     })),
     extraCategories: (p.termek_kategoriak ?? []).map(k => k.id),
   }));
 };
+
 
 const fetchColors = async () => {
   try {
@@ -1474,9 +1492,10 @@ const saveProduct = async () => {
   productSaving.value = true;
 
   try {
-    // 1. Új képek feltöltése
+    // ── 1. Csak az ÚJ képeket töltjük fel a szerverre ────────
     const newImageIds = [];
     const newImages = uploadedProductImages.value.filter(img => img.file);
+
     if (newImages.length > 0) {
       const formData = new FormData();
       newImages.forEach((img, index) => {
@@ -1490,44 +1509,50 @@ const saveProduct = async () => {
       uploadRes.data.images.forEach(u => newImageIds.push(u.id));
     }
 
-    // 2. Összes képID sorban (a feltöltési sorrend megmarad)
-    const allImages = uploadedProductImages.value.map((img, idx) => {
+    // ── 2. Összes kép ID-jét összegyűjtjük a helyes sorrendben
+    // uploadedProductImages sorrendje meghatározza a rendezes-t
+    let newImageIdxCounter = 0;
+    const allImageIds = uploadedProductImages.value.map(img => {
       if (img.file) {
-        // Megkeressük a feltöltési sorrendben melyik index ez
-        const newIdx = uploadedProductImages.value.filter((i, j) => i.file && j <= idx).length - 1;
-        return { id: newImageIds[newIdx], isNew: true };
+        // Új feltöltött kép — a newImageIds tömbből vesszük sorban
+        return newImageIds[newImageIdxCounter++] ?? null;
       }
-      return { id: img.id, isNew: false };
-    });
+      // Meglévő kép — az id-je már van
+      return img.id ?? null;
+    }).filter(id => id !== null);
 
-    const allImageIds = allImages.map(i => i.id).filter(Boolean);
-
-    // 3. Főkép ID meghatározása (a kiválasztott index alapján)
+    // ── 3. Főkép ID — a kiválasztott index alapján ────────────
     const foKepId = allImageIds[productMainImageIndex.value] ?? allImageIds[0] ?? null;
 
-    // 4. Payload összeállítása
+    // ── 4. Payload összeállítása ──────────────────────────────
     const payload = {
-      nev: editingProduct.value.name.trim(),
-      kategoria_id: selectedProductCategory.value,
-      ar: Number(editingProduct.value.price),
-      darab: Number(editingProduct.value.stock),
-      // HTML leírás: közvetlenül a Quill root innerHTML-ből olvassuk ki (ha van)
-      leiras: productEditorRef.value?.quill
-        ? productEditorRef.value.quill.root.innerHTML
-        : (editingProduct.value.description ?? ''),
-      fo_kep_id: foKepId,
-      szinek: selectedProductColors.value.map(c => c.id),
+      nev:           editingProduct.value.name.trim(),
+      kategoria_id:  selectedProductCategory.value,
+      ar:            Number(editingProduct.value.price),
+      darab:         Number(editingProduct.value.stock),
+      leiras:        productEditorRef.value?.quill
+                        ? productEditorRef.value.quill.root.innerHTML
+                        : (editingProduct.value.description ?? ''),
+      fo_kep_id:     foKepId,
+      szinek:        selectedProductColors.value.map(c => c.id),
       extra_kategoriak: selectedProductCategories.value.map(c => c.id),
+      kepek:         allImageIds,
     };
 
+    let savedId;
     if (editingProduct.value.id) {
       await axios.put(`${API}/termekek/${editingProduct.value.id}`, payload);
+      savedId = editingProduct.value.id;
     } else {
-      await axios.post(`${API}/termekek`, payload);
+      const { data } = await axios.post(`${API}/termekek`, payload);
+      savedId = data.id;
     }
 
     showProductModal.value = false;
+
+    // ── 5. Teljes lista frissítése a szerverről ───────────────
     await fetchProducts();
+
   } catch (error) {
     console.error('Mentési hiba:', error);
     alert('Hiba történt a termék mentése során: ' + (error.response?.data?.message ?? error.message));
@@ -1673,13 +1698,34 @@ const createCategory = async () => {
       fo_kategoria_id: newCategoryParentId.value ?? null,
     });
     await fetchProductCategories();
-    // Automatikusan kijelöljük az újat
     selectedProductCategory.value = data.id;
     newCategoryName.value = '';
     newCategoryParentId.value = null;
     showNewCategoryInline.value = false;
   } catch (e) {
-    alert('Hiba a kategória létrehozásakor: ' + (e.response?.data?.message ?? e.message));
+    const status = e.response?.status;
+    const dbMsg  = e.response?.data?.message ?? '';
+    if (status === 422 || (status === 500 && dbMsg.includes('Duplicate entry'))) {
+      let existing = productCategoryOptions.value.find(
+        c => c.nev.toLowerCase() === newCategoryName.value.trim().toLowerCase()
+      );
+      if (!existing) {
+        await fetchProductCategories();
+        existing = productCategoryOptions.value.find(
+          c => c.nev.toLowerCase() === newCategoryName.value.trim().toLowerCase()
+        );
+      }
+      if (existing) {
+        selectedProductCategory.value = existing.id;
+        newCategoryName.value = '';
+        newCategoryParentId.value = null;
+        showNewCategoryInline.value = false;
+      } else {
+        alert(`"${newCategoryName.value}" kategória már létezik, de nem sikerült megtalálni.`);
+      }
+    } else {
+      alert('Hiba a kategória létrehozásakor: ' + (dbMsg || e.message));
+    }
   }
 };
 
@@ -1691,14 +1737,40 @@ const createColor = async () => {
       hex_kod: newColorHex.value,
     });
     await fetchColors();
-    // Automatikusan hozzáadjuk a kiválasztottakhoz
     const newColor = availableColors.value.find(c => c.id === data.id);
     if (newColor) selectedProductColors.value = [...selectedProductColors.value, newColor];
     newColorName.value = '';
     newColorHex.value = '#000000';
     showNewColorInline.value = false;
   } catch (e) {
-    alert('Hiba a szín létrehozásakor: ' + (e.response?.data?.message ?? e.message));
+    const status = e.response?.status;
+    const dbMsg  = e.response?.data?.message ?? '';
+    if (status === 422 || (status === 500 && dbMsg.includes('Duplicate entry'))) {
+      // Meglévő szín keresése
+      let existing = availableColors.value.find(
+        c => c.nev.toLowerCase() === newColorName.value.trim().toLowerCase()
+      );
+      if (!existing) {
+        await fetchColors();
+        existing = availableColors.value.find(
+          c => c.nev.toLowerCase() === newColorName.value.trim().toLowerCase()
+        );
+      }
+      if (existing) {
+        // Csak akkor adjuk hozzá, ha még nincs kijelölve
+        const alreadySelected = selectedProductColors.value.some(c => c.id === existing.id);
+        if (!alreadySelected) {
+          selectedProductColors.value = [...selectedProductColors.value, existing];
+        }
+        newColorName.value = '';
+        newColorHex.value = '#000000';
+        showNewColorInline.value = false;
+      } else {
+        alert(`"${newColorName.value}" szín már létezik, de nem sikerült megtalálni.`);
+      }
+    } else {
+      alert('Hiba a szín létrehozásakor: ' + (dbMsg || e.message));
+    }
   }
 };
 
@@ -1753,8 +1825,9 @@ const openProductModal = async (product = null) => {
       // Főkép indexe: amelyik kép ID megegyezik a fo_kep_id-vel
       const mainIdx = product.imagesData.findIndex(img => img.id === product.fo_kep_id);
       productMainImageIndex.value = mainIdx >= 0 ? mainIdx : 0;
-    } else if (product.image && !product.image.includes('placehold.co')) {
-      uploadedProductImages.value = [{ id: null, file: null, preview: product.image, alt: product.name }];
+    } else if (product.fo_kep_id && product.image && !product.image.includes('placehold.co')) {
+      uploadedProductImages.value = [{ id: product.fo_kep_id, file: null, preview: product.image, alt: product.name }];
+      productMainImageIndex.value = 0;
     }
 
     // Színek visszatöltése
