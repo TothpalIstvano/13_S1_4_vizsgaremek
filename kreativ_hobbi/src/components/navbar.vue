@@ -279,7 +279,7 @@ onUnmounted(() => {
   width: 100%;
   height: 70px;
   padding: 43px 10px;
-  z-index: 10;
+  z-index: 1100;
   box-shadow: var(--shadow);
   border-bottom:2px solid var(--router-link-color);
 }
