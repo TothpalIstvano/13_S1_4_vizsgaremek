@@ -227,23 +227,24 @@
                 <span v-if="phoneError" class="error-indicator">⚠</span>
                 <span v-else-if="phoneValid" class="success-indicator">✓</span>
               </label>
-              <input 
-                id="phone" 
-                v-model="deliveryDetails.phone" 
-                placeholder="+36 30 123 4567"
-                type="tel"
-                pattern="^\+\d{2}\s\d{3}\s\d{3}\s\d{4}$"
-                maxlength="15"
-                autocomplete="tel"
-                required
-                @blur="validatePhone"
-                @keyup.enter="validatePhone"
-                :class="{ 'input-error': phoneError, 'input-success': phoneValid }"
-                inputmode="tel"
-                aria-describedby="phoneHelp"
-              />
+                <input 
+                  id="phone" 
+                  v-model="deliveryDetails.phone" 
+                  placeholder="+36 30 123 4567"
+                  type="tel"
+                  maxlength="20"
+                  autocomplete="tel"
+                  required
+                  @blur="validatePhone"
+                  @input="validatePhone"
+                  :class="{ 'input-error': phoneError, 'input-success': phoneValid }"
+                  inputmode="tel"
+                  aria-describedby="phoneHelp"
+                />
               <span v-if="phoneError" class="error-message">{{ phoneError }}</span>
-              <small id="phoneHelp" class="help-text">Formátum: min. 9 számjegy; szóköz, + és - engedélyezett.</small>
+              <small id="phoneHelp" class="help-text">
+                Pl. +36 30 123 4567 vagy +1 800 555 0100 — 7–15 számjegy
+              </small>
             </div>
             <div class="form-group toggle-group" v-if="userLogged">
               <label class="toggle-label" for="mentes">Szállítási adatok mentése</label>
@@ -285,6 +286,7 @@ import { useRouter } from 'vue-router'
 import { useCartStore } from '@/stores/cartStore'
 import axios from 'axios';
 import Dropdown from 'primevue/dropdown';
+import { parsePhoneNumberFromString, isValidPhoneNumber } from 'libphonenumber-js';
 
 const router = useRouter()
 const cartStore = useCartStore()
@@ -471,33 +473,87 @@ function validateFirstName() {
   firstNameValid.value = true
 }
 
+function formatPhone(raw) {
+  // Csak számok és vezető +
+  let digits = raw.replace(/[^\d+]/g, '')
+
+  // 06... → +36...
+  if (digits.startsWith('06')) {
+    digits = '+36' + digits.slice(2)
+  }
+
+  // +36XXXXXXXXX → +36 XX XXX XXXX
+  if (digits.startsWith('+36') && digits.length === 12) {
+    return `+36 ${digits.slice(3, 5)} ${digits.slice(5, 8)} ${digits.slice(8, 12)}`
+  }
+
+  return raw // ha nem illeszkedik, hagyjuk ahogy van
+}
+
+function normalizePhone(value) {
+  const trimmed = value.trim()
+  // 06-os magyar szám → +36
+  if (/^06/.test(trimmed)) {
+    return '+36' + trimmed.slice(2)
+  }
+  return trimmed
+}
+
 function validatePhone() {
-  const value = deliveryDetails.value.phone.trim()  // ← d.phone helyett
-  const phoneRegex = /^[+]?[\d\s\-()]{9,15}$/
-  
-  if (!value) {
+  const raw = deliveryDetails.value.phone.trim()
+
+  if (!raw) {
     phoneError.value = ''
     phoneValid.value = false
     return
   }
 
-  if (!phoneRegex.test(value)) {
-    phoneError.value = 'Érvénytelen telefonszám formátum!'
+  const allowedChars = /^[+\d\s\-().]+$/
+  if (!allowedChars.test(raw)) {
+    phoneError.value = 'Csak számok, +, -, szóköz és zárójelek engedélyezettek'
     phoneValid.value = false
     return
   }
 
-  const digits = value.replace(/\D/g, '')
-  if (digits.length < 9) {
-    phoneError.value = `Túl rövid (${digits.length}/9 számjegy)`
+  const digits = raw.replace(/\D/g, '')
+  if (digits.length < 7) {
+    phoneError.value = 'Túl rövid – legalább 7 számjegy szükséges'
     phoneValid.value = false
     return
   }
 
-  phoneError.value = ''
-  phoneValid.value = true
+  try {
+    const normalized = normalizePhone(raw)
+    const parsed = parsePhoneNumberFromString(normalized)
+
+    if (!parsed) {
+      phoneError.value = 'Nem felismerhető telefonszám formátum'
+      phoneValid.value = false
+      return
+    }
+
+    if (!parsed.isValid()) {
+      const country = parsed.country
+      if (country) {
+        phoneError.value = `Érvénytelen ${country} telefonszám – ellenőrizd a számjegyeket`
+      } else {
+        phoneError.value = 'Érvénytelen telefonszám – adj meg országkódot is (pl. +36...)'
+      }
+      phoneValid.value = false
+      return
+    }
+
+    // Formázás és visszaírás
+    deliveryDetails.value.phone = parsed.formatInternational()
+
+    phoneError.value = ''
+    phoneValid.value = true
+
+  } catch {
+    phoneError.value = 'Nem felismerhető telefonszám formátum'
+    phoneValid.value = false
+  }
 }
-
 function validateEmail() {
   const value = deliveryDetails.value.email.trim()
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/

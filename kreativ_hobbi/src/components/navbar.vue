@@ -103,7 +103,7 @@ onUnmounted(() => {
   <div>
     <div id="felsoGap" v-if="route.path !== '/'"></div>
     <header>
-      <nav class="navbar" ref="navbarRef">
+      <nav class="navbar" ref="navbarRef" :class="{ 'hamburger-open': latszik }" >
         <div id="nevDiv">
           <div id="logoDiv">
             <img
@@ -430,6 +430,10 @@ onUnmounted(() => {
     position: relative;
     display: inline-flex;
     align-items: center;
+  }
+
+  .navbar.hamburger-open {
+      background-color: #532600da;
   }
 
   #nev {
