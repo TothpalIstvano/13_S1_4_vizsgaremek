@@ -1,6 +1,4 @@
 - \[/] Webshop
-- \[ ] vásárlási mezők verfikációjának javítása
-- \[ ] telefon szám jobbá tétele
 - \[ ] Alertek lecserélése mindenhol modellekre
 - \[ ] Posztok és további backend helyekből kivenni a letrehozas_datuma nevű felesleges taget, mivel a created_at egyszerűbb és alap
 - \[ ] Az oldal kódjának tisztázás
@@ -9,8 +7,10 @@
 - \[ ] Optimalizálás
 - \[ ] Fejlesztési lehetőségekhez fel venni azt hogy a blogposzthoz felehessen venni hozzá tartozó termékeket + akkor lehessen termékekre is szűrni
 - \[ ] routeban password reset levédése somehow + Megoldani azt hogy ha lefrissiti az oldalt akkor ne dobja vissza a főoldalra ha más védett oldalon van eg. dashboard/profil -> inedx
-- \[ ] 05-06 lecserélése b ejelentkezés és gyikra + emoiji meg everything
+- \[ ] 05-06 lecserélése bejelentkezés és gyikra + emoiji meg everything
 
+- \[X] vásárlási mezők verfikációjának javítása✅
+- \[X] telefon szám jobbá tétele✅
 - \[X] Miden termék ahol csak egy kép van azt javítani kell mivel a kép ugrál✅
 - \[X] Carousel javítása mert mikor vált össze csuklik,✅
   - kosárhoz adás és ha beklikkel egy színt és rányom hogy megtekinés akkor úgy dobja be hogy az a szín aktív✅
