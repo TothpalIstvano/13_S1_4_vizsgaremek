@@ -3,7 +3,8 @@
 - rólunk oldal rendes szöveg
 - profil háttér opciók választása - webp-t fel lehet tölteni, de adatbázisból átforceolja .jpg-re
 - belépés reszponzív animációval
-- dashboard modalt lentebb vinni
+- dashboard modalt lentebb vinni (+ felhasználók bugos laptopon?)
+- nem tudok kommentre válaszolni (??)
 - newpost címke hozzáadása reszponzivitás
 - profil frissítésekor főoldalra dob
 - főoldal mutasson is számokat a likeokhoz (api route)
