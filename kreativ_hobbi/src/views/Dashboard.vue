@@ -2581,6 +2581,7 @@ watch(currentView, async (newView, oldView) => {
 .main-content {
   flex: 1;
   padding: 24px;
+  min-width: 0;
 }
 
 .header {
@@ -2856,6 +2857,8 @@ tbody tr:hover {
   animation: slideUp 0.3s;
   display: flex;
   flex-direction: column;
+  margin-top: 100px;
+  margin-bottom: 20px;
 }
 
 .blog-modal-large {
@@ -3284,6 +3287,10 @@ tbody tr:hover {
     width: 100%;
     max-height: 95vh;
     border-radius: 16px 16px 0 0;
+  }
+
+  .modal {
+    margin-top: 80px;
   }
 
   /* Tables */

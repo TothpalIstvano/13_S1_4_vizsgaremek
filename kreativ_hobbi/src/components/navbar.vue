@@ -454,6 +454,7 @@ onUnmounted(() => {
     float: none;
     position: static;
   }
+
   .menu_link.hamburgerElem, .vonal {
     float: none !important;
     margin: 0 0 10px 0;
@@ -462,22 +463,27 @@ onUnmounted(() => {
     text-align: center;
     display: none;
   }
+
   .menu_link {
     font-size: 1.1rem;
   }
+
   .menu_link:last-child {
     margin-right: 10px;
     margin-left: 10px;
   }
+
   .vonal {
     display: none !important;
   }
+
   #balraTolas{
     margin-left: 0;
     margin-right: 0;
   }
+  
   #felsoGap{
-    height: 160px;
+    height: 80px;
   }
 }
 /*#endregion*/

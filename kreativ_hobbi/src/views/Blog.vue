@@ -492,7 +492,11 @@ const kepHiba = (event) => {
 
 const formatDate = (dateString) => {
   if (!dateString) return 'Ismeretlen dátum'
-  return dateString
+  return new Date(dateString).toLocaleDateString('hu-HU', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  })
 }
 
 const fetchCimkek = async () => {

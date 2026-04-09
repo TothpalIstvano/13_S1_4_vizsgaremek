@@ -190,6 +190,7 @@
                 :key="comment.id" 
                 :comment="comment"
                 :currentUserId="currentUser?.id"
+                :currentUser="currentUser"
                 @reply="handleReply"
                 @delete="handleDelete"
                 class="comment-item-animate"

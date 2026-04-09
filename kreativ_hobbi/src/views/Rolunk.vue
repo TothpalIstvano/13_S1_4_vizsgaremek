@@ -23,20 +23,20 @@ export default {
           <img class="kep" src="@\assets\public\rolunk_asztal.avif">
           <div class="piros-doboz">
             <p class="piros-doboz-szoveg">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Eget purus lectus viverra in semper nec pretium mus.
+              Kézzel fogható kreativitás – barkácskellékek, hobbiötletek és inspiráció minden mennyiségben. Nálunk megtalálsz mindent, amivel egyedi alkotásokat hozhatsz létre.
             </p>
             <img class="stars" src="https://workik-widget-assets.s3.amazonaws.com/widget-assets/images/mp5.svg">
           </div>
         </div>
         <div class="szovegek">
           <p class="szoveg-stilus cimszoveg">
-            About Us
+            Rólunk
           </p>
           <p class="szoveg-stilus also-cimszoveg">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+            Kreatív műhely, ahol az ötletek formát öltenek
           </p>
           <p class="szoveg-stilus leiras">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fermentum pulvinar ullamcorper suspendisse ac eget. Pellentesque tempus leo in ullamcorper quis vestibulum ligula elementum ut. Lorem ipsum dolor sit amet consectetur adipisicing elit. Optio odit inventore, obcaecati dolore atque modi doloribus, deleniti quae, quis rem totam. Magnam distinctio esse adipisci qui delectus repellendus in corporis?
+            A Fiók Shop nem csupán egy barkácsáruház: közösségi tér és inspirációs forrás mindazoknak, akik szeretnek alkotni. Legyen szó DIY lakberendezésről, újrahasznosított anyagokból készült dekorációról, vagy akár saját készítésű ajándékokról – nálunk megtalálod a hozzávalókat, az eszközöket és a tippeket is. Emellett rendszeresen frissülő blogunkban bepillanthatsz a legújabb trendekbe, lépésről lépésre követhető útmutatókkal és kreatív ötletekkel várunk.
           </p>
           <RouterLink to="/aruhaz" class="gomb">
             View Services
@@ -132,8 +132,8 @@ export default {
           
           <div class="bottom">
               <div class="content">
-                  <span class="name">My Name</span>
-                  <span class="about-me">Lorem ipsum dolor sit amet consectetur adipiscing</span>
+                  <span class="name">Kovács Edit</span>
+                  <span class="about-me">Szenvedélyesen alkotunk, és segítünk, hogy Te is megtaláld a saját kreatív utadat.</span>
               </div>
               <div class="bottom-bottom">
                   <div class="social-links-container">
@@ -166,8 +166,8 @@ export default {
           
           <div class="alsosav">
               <div class="content">
-                  <span class="name">My Name</span>
-                  <span class="about-me">Lorem ipsum dolor sit amet consectetur adipiscing</span>
+                  <span class="name">Tóthpál István</span>
+                  <span class="about-me">Szenvedélyesen alkotunk, és segítünk, hogy Te is megtaláld a saját kreatív utadat.</span>
               </div>
               <div class="alsosav-alsosav">
                   <div class="social-links-container">
