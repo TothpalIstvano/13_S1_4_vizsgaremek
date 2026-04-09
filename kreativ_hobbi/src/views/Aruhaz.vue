@@ -1,5 +1,7 @@
 <template>
-    <h1 class="title">Áruház</h1>
+    <div style="text-align: center;">
+      <h1 class="title">Áruház</h1>
+    </div>
     <div id="shop">
       <CartModal ref="cartModal" />
 
@@ -204,93 +206,86 @@
         </div>
       </div>
 
-        <!-- PRODUCT GRID -->
-        <div id="products">
-          <div v-if="loading" class="tolto-kontener">
-            <div class="tolto-content">
-              <div class="tolto-icon">🧵</div>
-              <p class="tolto-szoveg">Termékek betöltése…</p>
-              <div class="toltes">
-                <div class="pulse-dot"></div>
-                <div class="pulse-dot"></div>
-                <div class="pulse-dot"></div>
+      <!-- PRODUCT GRID -->
+      <div v-if="loading" class="tolto-kontener">
+        <AppLoader />
+      </div>
+      <div id="products" :class="{ 'loading-state': loading }">
+        <div v-for="item in lapozottTermekek" :key="item.id" class="product-card" @click="router.push(`/aruhaz/${item.id}`)" style="cursor: pointer;">
+          <div class="heart-wrapper">
+            <button v-if="isLoggedIn" class="heart-btn" @click="toggleLike(item, $event)"
+                    :class="{ liked: likedIds.has(item.id) }">
+              <FontAwesomeIcon :icon="likedIds.has(item.id) ? ['fas', 'heart'] : ['far', 'heart']" />
+            </button>
+          </div>
+          <img :src="item.termek_fo_kep.url_Link" :alt="item.termek_fo_kep.alt_szoveg" class="product-image" />
+
+          <div class="product-body">
+            <h3 class="product-title">{{ item.nev }}</h3>
+            <p class="product-price">{{ item.ar }} Ft</p>
+
+            <p class="product-desc" :style="item.termek_kategoriak.length == 0 ? 'margin-bottom: 25px;' : ''">{{ item.leiras }}</p>
+
+            <div class="tag-container">
+              <span
+                v-for="kategoria in item.termek_kategoriak"
+                :key="kategoria.id"
+                class="item-tag-sm"
+                :class="{ 'main-category': kategoria.fo_kategoria_id === null }"
+              >
+                {{ kategoria.nev }}
+              </span>
             </div>
+
+            <button class="add-btn" @click="addToCart(item)" @click.stop>
+              Kosárba
+            </button>
           </div>
         </div>
-          <div v-for="item in lapozottTermekek" :key="item.id" class="product-card" @click="router.push(`/aruhaz/${item.id}`)" style="cursor: pointer;">
-            <div class="heart-wrapper">
-              <button v-if="isLoggedIn" class="heart-btn" @click="toggleLike(item, $event)"
-                      :class="{ liked: likedIds.has(item.id) }">
-                <FontAwesomeIcon :icon="likedIds.has(item.id) ? ['fas', 'heart'] : ['far', 'heart']" />
-              </button>
-            </div>
-            <img :src="item.termek_fo_kep.url_Link" :alt="item.termek_fo_kep.alt_szoveg" class="product-image" />
-
-            <div class="product-body">
-              <h3 class="product-title">{{ item.nev }}</h3>
-              <p class="product-price">{{ item.ar }} Ft</p>
-
-              <p class="product-desc" :style="item.termek_kategoriak.length == 0 ? 'margin-bottom: 25px;' : ''">{{ item.leiras }}</p>
-
-              <div class="tag-container">
-                <span
-                  v-for="kategoria in item.termek_kategoriak"
-                  :key="kategoria.id"
-                  class="item-tag-sm"
-                  :class="{ 'main-category': kategoria.fo_kategoria_id === null }"
-                >
-                  {{ kategoria.nev }}
-                </span>
-              </div>
-
-              <button class="add-btn" @click="addToCart(item)" @click.stop>
-                Kosárba
-              </button>
-            </div>
+        <div v-if="filteredItems.length == 0 && !loading" style="grid-column: 1/-1; text-align: center; color: #555; font-size: 24px; padding: 2rem 0;">
+          Nincs találat
+        </div>
+        <div class="lapozas-sor" v-if="osszesenLap > 0 && !loading">
+          <div class="oldal-meret">
+            <label for="perPage">Megjelenítés:</label>
+            <select id="perPage" v-model="oldalMeret" @change="oldalra(1)">
+              <option :value="12">12</option>
+              <option :value="24">24</option>
+              <option :value="48">48</option>
+            </select>
           </div>
-          <div v-if="filteredItems.length == 0 && !loading" style="grid-column: 1/-1; text-align: center; color: #555; font-size: 24px; padding: 2rem 0;">
-            Nincs találat
-          </div>
-          <div class="lapozas-sor" v-if="osszesenLap > 0 && !loading">
-            <div class="oldal-meret">
-              <label for="perPage">Megjelenítés:</label>
-              <select id="perPage" v-model="oldalMeret" @change="oldalra(1)">
-                <option :value="12">12</option>
-                <option :value="24">24</option>
-                <option :value="48">48</option>
-              </select>
-            </div>
 
-            <div class="lapozas" v-if="osszesenLap > 1">
-              <button class="lap-gomb" @click="oldalra(aktualisOldal - 1)" :disabled="aktualisOldal === 1">
-                <font-awesome-icon icon="fa-solid fa-chevron-left" />
+          <div class="lapozas" v-if="osszesenLap > 1">
+            <button class="lap-gomb" @click="oldalra(aktualisOldal - 1)" :disabled="aktualisOldal === 1">
+              <font-awesome-icon icon="fa-solid fa-chevron-left" />
+            </button>
+
+            <template v-for="lap in lathatolapok" :key="lap">
+              <span v-if="lap === '...'" class="lapozas-ellipsis">…</span>
+              <button
+                v-else
+                class="lap-gomb"
+                :class="{ 'aktiv-lap': lap === aktualisOldal }"
+                @click="oldalra(lap)"
+              >
+                {{ lap }}
               </button>
+            </template>
 
-              <template v-for="lap in lathatolapok" :key="lap">
-                <span v-if="lap === '...'" class="lapozas-ellipsis">…</span>
-                <button
-                  v-else
-                  class="lap-gomb"
-                  :class="{ 'aktiv-lap': lap === aktualisOldal }"
-                  @click="oldalra(lap)"
-                >
-                  {{ lap }}
-                </button>
-              </template>
-
-              <button class="lap-gomb" @click="oldalra(aktualisOldal + 1)" :disabled="aktualisOldal === osszesenLap">
-                <font-awesome-icon icon="fa-solid fa-chevron-right" />
-              </button>
-            </div>
+            <button class="lap-gomb" @click="oldalra(aktualisOldal + 1)" :disabled="aktualisOldal === osszesenLap">
+              <font-awesome-icon icon="fa-solid fa-chevron-right" />
+            </button>
           </div>
         </div>
       </div>
     </div>
-  </template>
+  </div>
+</template>
 
 
 <script setup>
   //#region imports
+  import AppLoader from '@/components/AppLoader.vue'
   import { ref, onMounted, onBeforeUnmount, watch, computed, provide, inject, onUnmounted } from 'vue'
   import axios from 'axios'
   import { useRouter } from 'vue-router'
@@ -699,6 +694,14 @@ onBeforeUnmount(() => {
   color: var(--mk-text-dark);
   text-align: center;
   padding-bottom: 6px;
+  animation: slideDown 0.6s ease-out;
+
+  /* ── aláhúzás ── */
+  display: inline-block;
+  background-image: linear-gradient(90deg, #ff6c06, #720101);
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 100% 4px;
 }
 
 .heart-wrapper { position: relative; }
@@ -1337,6 +1340,13 @@ margin-left: 10px;
   gap: 24px;
 }
 
+#products.loading-state {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+}
+
 /* ===== PRODUCT CARD ===== */
 .product-card {
   background: white;
@@ -1440,45 +1450,14 @@ margin-left: 10px;
 /*#endregion*/
 
 /* ===== BETÖLTÉS ===== */
+
 .tolto-kontener {
   grid-column: 1 / -1;
+  width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 400px;
-}
-
-.tolto-content {
-  text-align: center;
-}
-
-.tolto-szoveg {
-  font-size: 18px;
-  color: #363636;
-  margin-bottom: 32px;
-  font-weight: 500;
-}
-
-.toltes {
-  display: flex;
-  justify-content: center;
-  gap: 16px;
-}
-
-.pulse-dot {
-  width: 12px;
-  height: 12px;
-  background: linear-gradient(135deg, #b55b3f 0%, #81442f 100%);
-  border-radius: 50%;
-  animation: pulse 1.4s infinite ease-in-out;
-}
-
-.pulse-dot:nth-child(2) { animation-delay: 0.2s; }
-.pulse-dot:nth-child(3) { animation-delay: 0.4s; }
-
-@keyframes pulse {
-  0%, 100% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(0.6); opacity: 0.5; }
+  min-height: 60vh;
 }
 
 @media screen and (max-width: 1024px) {
@@ -1650,19 +1629,6 @@ margin-left: 10px;
   }
 }
 
-.tolto-kontener {
-  grid-column: 1 / -1;
-  display: flex; justify-content: center; align-items: center;
-  min-height: 360px;
-}
-
-.tolto-content { text-align: center; }
-
-.tolto-icon { 
-  font-size: 48px; 
-  margin-bottom: 12px; 
-  animation: spin 3s linear infinite; 
-}
 
 @keyframes spin { 
   0%,100%{transform:rotate(0deg)} 
@@ -1670,16 +1636,4 @@ margin-left: 10px;
   25%,75%{transform:rotate(-10deg)} 
 }
 
-.tolto-szoveg { 
-  font-size: 16px; 
-  color: var(--clr-muted); 
-  margin-bottom: 24px; 
-  font-weight: 600; 
-}
-
-.toltes { 
-  display: flex; 
-  justify-content: center; 
-  gap: 12px; 
-}
 </style>

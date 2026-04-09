@@ -106,7 +106,8 @@ const router = createRouter({
     {
       path: '/reset-password',
       name: 'ResetJelszo',
-      component: ResetJelszo
+      component: ResetJelszo,
+      meta: { guestOnly: true }
     },
     {
       path: '/:pathMatch(.*)*',
@@ -114,16 +115,39 @@ const router = createRouter({
       component: NotFound
     },
   ],
+  scrollBehavior(to, from, savedPosition) {
+    if (savedPosition) {
+      return savedPosition
+    }
+    if (to.hash) {
+      return {
+        el: to.hash,
+        top: 100
+      }
+    }
+    return { top: 0}
+  }
 })
 
-router.beforeEach(async (to, from, next) => {
+router.beforeEach((to, from, next) => {  
   const authStore = useAuthStore()
 
-  const isLoggedIn = authStore.isAuthenticated 
+  if (!authStore.authChecked) {
+    authStore.checkAuth().then(() => next())
+    return
+  }
+
+  const isLoggedIn = authStore.isAuthenticated
   const userRole = authStore.szerepkor
 
+  if (to.name === 'ResetJelszo') {
+    if (!to.query.token || !to.query.email) {
+      return next({ name: 'Index' })
+    }
+  }
+
   if (to.meta.requiresAuth && !isLoggedIn) {
-    return next({ name: 'Index' })
+    return next({ name: 'Belepes', query: { redirect: to.fullPath } })
   }
 
   if (to.meta.guestOnly && isLoggedIn) {
@@ -133,12 +157,7 @@ router.beforeEach(async (to, from, next) => {
   if (to.meta.roles && !to.meta.roles.includes(userRole)) {
     return next({ name: 'NotFound' })
   }
-  
-  if (to.name === 'NotFound') {
-    console.warn(`Navigation to non-existent route: ${to.fullPath}`)
-  }
 
   next()
 })
-
 export default router

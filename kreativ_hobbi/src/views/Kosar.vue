@@ -144,18 +144,17 @@
                   <span v-if="hazszamError" class="error-indicator">⚠</span>
                   <span v-else-if="hazszamValid" class="success-indicator">✓</span>
                 </label>
-                <input
-                  id="hazszam"
-                  v-model.number="deliveryDetails.hazszam"
-                  type="number"
-                  min="1"
-                  placeholder="Pl. 12"
-                  autocomplete="address-line2"
-                  required
-                  @blur="validateHazszam"
-                  @keyup.enter="validateHazszam"
-                  :class="{ 'input-error': hazszamError, 'input-success': hazszamValid }"
-                />
+                  <input
+                    id="hazszam"
+                    v-model="deliveryDetails.hazszam"
+                    type="text"
+                    placeholder="Pl. 12, 12/A, 14B"
+                    autocomplete="address-line2"
+                    required
+                    @blur="validateHazszam"
+                    @keyup.enter="validateHazszam"
+                    :class="{ 'input-error': hazszamError, 'input-success': hazszamValid }"
+                  />
                 <span v-if="hazszamError" class="error-message">{{ hazszamError }}</span>
               </div>
 
@@ -227,23 +226,24 @@
                 <span v-if="phoneError" class="error-indicator">⚠</span>
                 <span v-else-if="phoneValid" class="success-indicator">✓</span>
               </label>
-              <input 
-                id="phone" 
-                v-model="deliveryDetails.phone" 
-                placeholder="+36 30 123 4567"
-                type="tel"
-                pattern="^\+\d{2}\s\d{3}\s\d{3}\s\d{4}$"
-                maxlength="15"
-                autocomplete="tel"
-                required
-                @blur="validatePhone"
-                @keyup.enter="validatePhone"
-                :class="{ 'input-error': phoneError, 'input-success': phoneValid }"
-                inputmode="tel"
-                aria-describedby="phoneHelp"
-              />
+                <input 
+                  id="phone" 
+                  v-model="deliveryDetails.phone" 
+                  placeholder="+36 30 123 4567"
+                  type="tel"
+                  maxlength="20"
+                  autocomplete="tel"
+                  required
+                  @blur="validatePhone"
+                  @input="validatePhone"
+                  :class="{ 'input-error': phoneError, 'input-success': phoneValid }"
+                  inputmode="tel"
+                  aria-describedby="phoneHelp"
+                />
               <span v-if="phoneError" class="error-message">{{ phoneError }}</span>
-              <small id="phoneHelp" class="help-text">Formátum: min. 9 számjegy; szóköz, + és - engedélyezett.</small>
+              <small id="phoneHelp" class="help-text">
+                Pl. +36 30 123 4567 vagy +1 800 555 0100 — 7–15 számjegy
+              </small>
             </div>
             <div class="form-group toggle-group" v-if="userLogged">
               <label class="toggle-label" for="mentes">Szállítási adatok mentése</label>
@@ -285,6 +285,7 @@ import { useRouter } from 'vue-router'
 import { useCartStore } from '@/stores/cartStore'
 import axios from 'axios';
 import Dropdown from 'primevue/dropdown';
+import { parsePhoneNumberFromString, isValidPhoneNumber } from 'libphonenumber-js';
 
 const router = useRouter()
 const cartStore = useCartStore()
@@ -409,27 +410,75 @@ function validateCity() {
 
 function validateUtca() {
   const value = deliveryDetails.value.utca.trim()
-  if (!value) { utcaError.value = ''; utcaValid.value = false; return }
-  if (value.length < 3) { utcaError.value = 'Túl rövid (min. 3 karakter)'; utcaValid.value = false; return }
-  utcaError.value = ''; utcaValid.value = true
+
+  if (!value) {
+    utcaError.value = ''
+    utcaValid.value = false
+    return
+  }
+  if (value.length < 3) {
+    utcaError.value = 'Túl rövid (min. 3 karakter)'
+    utcaValid.value = false
+    return
+  }
+  if (value.length > 100) {
+    utcaError.value = 'Túl hosszú (max. 100 karakter)'
+    utcaValid.value = false
+    return
+  }
+  // Csak betű, szám, szóköz, pont, kötőjel engedélyezett
+  const utcaRegex = /^[A-Za-záéíóöőúüűÁÉÍÓÖŐÚÜŰ0-9\s.\-\/]+$/
+  if (!utcaRegex.test(value)) {
+    utcaError.value = 'Érvénytelen karakter az utca nevében'
+    utcaValid.value = false
+    return
+  }
+  // Legalább egy betű legyen benne
+  if (!/[A-Za-záéíóöőúüűÁÉÍÓÖŐÚÜŰ]/.test(value)) {
+    utcaError.value = 'Az utca nevének tartalmaznia kell legalább egy betűt'
+    utcaValid.value = false
+    return
+  }
+  utcaError.value = ''
+  utcaValid.value = true
 }
 
 function validateHazszam() {
-  const value = deliveryDetails.value.hazszam
-  if (!value) { hazszamError.value = ''; hazszamValid.value = false; return }
-  if (!Number.isInteger(Number(value)) || Number(value) < 1) {
-    hazszamError.value = 'Érvénytelen házszám'
-    hazszamValid.value = false; return
+  const value = String(deliveryDetails.value.hazszam ?? '').trim()
+
+  if (!value) {
+    hazszamError.value = ''
+    hazszamValid.value = false
+    return
   }
-  hazszamError.value = ''; hazszamValid.value = true
+  // Elfogad: 12, 12A, 12/A, 12-14, 14/B, 2a stb.
+  const hazszamRegex = /^[1-9]\d{0,4}([\/\-]?[A-Za-z0-9]{1,4})?$/
+  if (!hazszamRegex.test(value)) {
+    hazszamError.value = 'Érvénytelen házszám (pl. 12, 12/A, 14B, 12-14)'
+    hazszamValid.value = false
+    return
+  }
+  hazszamError.value = ''
+  hazszamValid.value = true
 }
 
 function validateEmeletAjto() {
   const value = deliveryDetails.value.emeletAjto.trim()
-  if (!value) { emeletAjtoError.value = ''; emeletAjtoValid.value = false; return } // opcionális, üres = ok
-  const regex = /^[A-Za-z0-9\/\.\-]{1,10}$/
-  if (!regex.test(value)) {
-    emeletAjtoError.value = 'Csak betű, szám, /, . és - engedélyezett'
+
+  if (!value) {
+    emeletAjtoError.value = ''
+    emeletAjtoValid.value = false
+    return
+  }
+  if (value.length > 20) {
+    emeletAjtoError.value = 'Túl hosszú (max. 20 karakter)'
+    emeletAjtoValid.value = false
+    return
+  }
+  // Elfogad: 2/B, 3. emelet, fsz., I/4, 12a stb.
+  const emeletRegex = /^[A-Za-záéíóöőúüűÁÉÍÓÖŐÚÜŰ0-9\s\/.\-]{1,20}$/
+  if (!emeletRegex.test(value)) {
+    emeletAjtoError.value = 'Érvénytelen karakter (betű, szám, /, ., - és szóköz engedélyezett)'
     emeletAjtoValid.value = false
     return
   }
@@ -437,7 +486,7 @@ function validateEmeletAjto() {
   emeletAjtoValid.value = true
 }
 
-const nameRegex = /^[A-Za-záéíóöőúüűÁÉÍÓÖŐÚÜŰ\-]{2,}(\s[A-Za-záéíóöőúüűÁÉÍÓÖŐÚÜŰ\-]{2,}){0,3}$/
+const nameRegex = /^[A-Za-záéíóöőúüűÁÉÍÓÖŐÚÜŰ]{2,}([- ][A-Za-záéíóöőúüűÁÉÍÓÖŐÚÜŰ]{2,}){0,4}$/
 
 function validateLastName() {
   const value = deliveryDetails.value.lastName.trim()
@@ -446,8 +495,18 @@ function validateLastName() {
     lastNameValid.value = false
     return
   }
+  if (value.length > 50) {
+    lastNameError.value = 'Túl hosszú (max. 50 karakter)'
+    lastNameValid.value = false
+    return
+  }
+  if (/[-]{2,}/.test(value) || /\s{2,}/.test(value)) {
+    lastNameError.value = 'Nem szerepelhet egymás után két kötőjel vagy szóköz'
+    lastNameValid.value = false
+    return
+  }
   if (!nameRegex.test(value)) {
-    lastNameError.value = 'Csak betűk és max. 3 szóköz engedélyezett (min. 2 karakter)'
+    lastNameError.value = 'Csak betűk, kötőjel és szóköz engedélyezett (min. 2 karakter)'
     lastNameValid.value = false
     return
   }
@@ -462,8 +521,18 @@ function validateFirstName() {
     firstNameValid.value = false
     return
   }
+  if (value.length > 50) {
+    firstNameError.value = 'Túl hosszú (max. 50 karakter)'
+    firstNameValid.value = false
+    return
+  }
+  if (/[-]{2,}/.test(value) || /\s{2,}/.test(value)) {
+    firstNameError.value = 'Nem szerepelhet egymás után két kötőjel vagy szóköz'
+    firstNameValid.value = false
+    return
+  }
   if (!nameRegex.test(value)) {
-    firstNameError.value = 'Csak betűk és max. 3 szóköz engedélyezett (min. 2 karakter)'
+    firstNameError.value = 'Csak betűk, kötőjel és szóköz engedélyezett (min. 2 karakter)'
     firstNameValid.value = false
     return
   }
@@ -471,45 +540,123 @@ function validateFirstName() {
   firstNameValid.value = true
 }
 
+function normalizePhone(raw) {
+  const trimmed = raw.trim()
+  // 06-os magyar → +36
+  if (/^06\d/.test(trimmed)) return '+36' + trimmed.slice(2)
+  // 006-os → +6 (pl. 0036 → +36)
+  if (/^006\d/.test(trimmed)) return '+' + trimmed.slice(2)
+  // 00-ás nemzetközi prefix → +
+  if (/^00\d/.test(trimmed)) return '+' + trimmed.slice(2)
+  return trimmed
+}
+
 function validatePhone() {
-  const value = deliveryDetails.value.phone.trim()  // ← d.phone helyett
-  const phoneRegex = /^[+]?[\d\s\-()]{9,15}$/
-  
-  if (!value) {
+  const raw = deliveryDetails.value.phone.trim()
+
+  if (!raw) {
     phoneError.value = ''
     phoneValid.value = false
     return
   }
 
-  if (!phoneRegex.test(value)) {
-    phoneError.value = 'Érvénytelen telefonszám formátum!'
+  const allowedChars = /^[+\d\s\-().]+$/
+  if (!allowedChars.test(raw)) {
+    phoneError.value = 'Csak számok, +, -, szóköz és zárójelek engedélyezettek'
     phoneValid.value = false
     return
   }
 
-  const digits = value.replace(/\D/g, '')
-  if (digits.length < 9) {
-    phoneError.value = `Túl rövid (${digits.length}/9 számjegy)`
+  const digits = raw.replace(/\D/g, '')
+  if (digits.length < 7) {
+    phoneError.value = 'Túl rövid – legalább 7 számjegy szükséges'
     phoneValid.value = false
     return
   }
 
-  phoneError.value = ''
-  phoneValid.value = true
+  // Nyilvánvalóan hamis számok kiszűrése (000...., 111..., 123456...)
+  const localDigits = digits.slice(-8)
+  if (/^(\d)\1{6,}$/.test(localDigits)) {
+    phoneError.value = 'Érvénytelen telefonszám – ne használj ismétlődő számjegyeket'
+    phoneValid.value = false
+    return
+  }
+  if (/^(0123456|1234567|12345678|0000000|1111111)/.test(localDigits)) {
+    phoneError.value = 'Érvénytelen telefonszám – ne használj szekvenciális számjegyeket'
+    phoneValid.value = false
+    return
+  }
+
+  try {
+    const normalized = normalizePhone(raw)
+    const parsed = parsePhoneNumberFromString(normalized)
+
+    if (!parsed) {
+      phoneError.value = 'Nem felismerhető telefonszám formátum'
+      phoneValid.value = false
+      return
+    }
+
+    if (!parsed.isValid()) {
+      phoneError.value = parsed.country
+        ? `Érvénytelen ${parsed.country} telefonszám – ellenőrizd a számjegyeket`
+        : 'Érvénytelen telefonszám – adj meg országkódot is (pl. +36...)'
+      phoneValid.value = false
+      return
+    }
+
+    deliveryDetails.value.phone = parsed.formatInternational()
+    phoneError.value = ''
+    phoneValid.value = true
+
+  } catch {
+    phoneError.value = 'Nem felismerhető telefonszám formátum'
+    phoneValid.value = false
+  }
 }
-
 function validateEmail() {
   const value = deliveryDetails.value.email.trim()
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  
+
   if (!value) {
     emailError.value = ''
     emailValid.value = false
     return
   }
 
+  // Szigorúbb regex: valós TLD (min. 2 karakter), nincs dupla pont, nincs pont @ előtt/után
+  const emailRegex = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/
+
   if (!emailRegex.test(value)) {
-    emailError.value = 'Érvenytelen email cím!'
+    emailError.value = 'Érvénytelen email cím!'
+    emailValid.value = false
+    return
+  }
+
+  // Dupla pont kiszűrése (pl. teszt..nev@gmail.com)
+  if (value.includes('..')) {
+    emailError.value = 'Az email cím nem tartalmazhat egymást követő pontokat!'
+    emailValid.value = false
+    return
+  }
+
+  // Pont nem lehet közvetlenül @ előtt (pl. teszt.@gmail.com)
+  if (value.indexOf('.@') !== -1) {
+    emailError.value = 'Nem állhat pont közvetlenül a @ előtt!'
+    emailValid.value = false
+    return
+  }
+
+  // Pont nem lehet közvetlenül @ után (pl. teszt@.gmail.com)
+  const atIndex = value.indexOf('@')
+  if (value[atIndex + 1] === '.') {
+    emailError.value = 'Nem állhat pont közvetlenül a @ után!'
+    emailValid.value = false
+    return
+  }
+
+  // Maximum egy @ jel
+  if ((value.match(/@/g) || []).length > 1) {
+    emailError.value = 'Az email cím csak egy @ jelet tartalmazhat!'
     emailValid.value = false
     return
   }
@@ -1156,18 +1303,6 @@ async function checkout() {
   max-width: 100%;
   margin: 0 auto;
   display: inline-flex;
-}
-
-/* Animations */
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 
 /* Responsive */

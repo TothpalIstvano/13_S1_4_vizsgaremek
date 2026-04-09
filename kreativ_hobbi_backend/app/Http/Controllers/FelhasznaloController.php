@@ -69,48 +69,47 @@ class FelhasznaloController
         ]);
     }
 
-    public function index()
-    {
-        $users = Felhasznalok::with('profilKep:id,url_Link,alt_szoveg', 'adatok')
-            ->get()
-            ->map(function ($user) {
-                $lastOrder = \DB::table('rendelesek')
-                    ->where('felhasznalo_id', $user->id)
-                    ->orderBy('rendeles_datuma', 'desc')
-                    ->first();
+public function index(){
+    $users = Felhasznalok::with('profilKep:id,url_Link,alt_szoveg', 'adatok')
+        ->get()
+        ->map(function ($user) {
+            $lastOrder = \DB::table('rendelesek')
+                ->where('felhasznalo_id', $user->id)
+                ->orderBy('rendeles_datuma', 'desc')
+                ->first();
 
-                $completedOrders = \DB::table('rendelesek')
-                    ->where('felhasznalo_id', $user->id)
-                    ->where('statusz', 'teljesítve')
-                    ->count();
+            $completedOrders = \DB::table('rendelesek')
+                ->where('felhasznalo_id', $user->id)
+                ->where('statusz', 'teljesítve')
+                ->count();
 
-                $activeOrders = \DB::table('rendelesek')
-                    ->where('felhasznalo_id', $user->id)
-                    ->whereNotIn('statusz', ['teljesítve', 'törölve'])
-                    ->count();
+            $activeOrders = \DB::table('rendelesek')
+                ->where('felhasznalo_id', $user->id)
+                ->whereNotIn('statusz', ['teljesítve', 'törölve'])
+                ->count();
 
-                return [
-                    'id' => $user->id,
-                    'name' => $user->felhasz_nev,
-                    'email' => $user->email,
-                    'role' => $user->adatok->szerepkor ?? 'sima',
-                    'statusz' => (bool) $user->statusz,
-                    'profileImage' => $user->profilKep
-                        ? $user->profilKep->url_Link
-                        : 'localhost:8000/storage/profilkepek/default.jpg',
-                    'created_at' => $user->created_at,
-                    'utolso_Belepes' => $user->utolso_Belepes,
-                    'orderStats' => [
-                        'completed' => $completedOrders,
-                        'active' => $activeOrders,
-                        'total' => $completedOrders + $activeOrders,
-                        'lastStatus' => $lastOrder?->statusz ?? null,
-                    ],
-                ];
-            });
+            return [
+                'id' => $user->id,
+                'name' => $user->felhasz_nev,
+                'email' => $user->email,
+                'role' => $user->adatok->szerepkor ?? 'sima',
+                'statusz' => (bool) $user->statusz,
+                'profileImage' => $user->profilKep 
+                    ? $user->profilKep->url_Link 
+                    : 'localhost:8000/storage/profilkepek/default.jpg',
+                'created_at' => $user->created_at,
+                'utolso_Belepes' => $user->utolso_Belepes,
+                'orderStats' => [
+                    'completed' => $completedOrders,
+                    'active' => $activeOrders,
+                    'total' => $completedOrders + $activeOrders,
+                    'lastStatus' => $lastOrder?->statusz ?? null,
+                ],
+            ];
+        });
 
-        return response()->json($users);
-    }
+    return response()->json($users);
+}
     /**
      * Store a newly created user in storage.
      */
@@ -136,7 +135,7 @@ class FelhasznaloController
                 'email' => $request->email,
                 'jelszo' => Hash::make($request->password), // Assuming 'jelszo' is the password column
                 'felhasz_nev' => $request->felhasz_nev,
-                'statusz' => $request->boolean('statusz') ? 1 : 0,
+                'statusz' => $request-> boolean('statusz') ? 1 : 0,
             ]);
 
             // Create User Details (FelhasznaloAdatok)
@@ -221,8 +220,8 @@ class FelhasznaloController
             ];
 
             // Handle Profile Picture Reset
-            if ($request->has('resetProfilePic') && $request->resetProfilePic) {
-                $userData['profilKep_id'] = 1;
+            if ($request->has('resetProfilePic') && $request->resetProfilePic ) {
+                $userData['profilKep_id'] = 1; 
             }
 
             $user->update($userData);
@@ -256,7 +255,7 @@ class FelhasznaloController
         }
     }
 
-    /**
+        /**
      * Remove the specified user from storage.
      */
     public function destroy($id)
@@ -306,21 +305,5 @@ class FelhasznaloController
             \Log::error('User deletion failed: ' . $e->getMessage());
             return response()->json(['error' => 'Hiba történt a törlés során: ' . $e->getMessage()], 500);
         }
-    }
-
-    public function updateCoverPicture(Request $request)
-    {
-        $request->validate([
-            'hatterKep_id' => 'required|integer|exists:kepek,id'
-        ]);
-
-        $user = $request->user();
-        $user->hatterKep_id = $request->hatterKep_id;
-        $user->save();
-
-        return response()->json([
-            'message' => 'Cover picture updated',
-            'user' => $user->load('profilKep', 'hatterKep', 'adatok')
-        ]);
     }
 }

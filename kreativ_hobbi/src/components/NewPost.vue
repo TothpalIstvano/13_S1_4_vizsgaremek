@@ -75,6 +75,41 @@
             </div>
 
             <div class="form-section">
+                <label for="postCimkek" class="form-label">
+                    <!--<i class="pi pi-tags form-label-icon"></i>-->
+                    Címkék
+                    <span class="required-indicator">*</span>
+                </label>
+                <MultiSelect
+                    id="postCimkek"
+                    v-model="selectedTags" 
+                    :options="tagOptions" 
+                    optionLabel="name" 
+                    placeholder="Válassz címkét (több is választható)" 
+                    display="chip" 
+                    filter
+                    class="w-full mb-6"
+                />
+                <small class="form-hint">Válassz témához kapcsolódó címkéket a jobb kereshetőségért</small>
+                <label for="newTag">Ha nem találod amit keresel, akkor hozzá is tudod adni a saját címkédet:</label>
+                <div class="new-tag-row">
+                    <InputText 
+                      id="newTag"
+                      v-model="newTagInput"
+                      placeholder="Írj egy új címkét..."
+                      class="w-full"
+                      @keyup.enter="addNewTag"
+                    />
+                    <Button
+                      type="button"
+                      label="Hozzáadás"
+                      icon="pi pi-plus"
+                      class="add-tag-btn"
+                      :loading="newTagLoading"
+                      :disabled="!newTagInput.trim()"
+                      @click="addNewTag"
+                    />
+                </div>
               <label for="postSubtext" class="form-label">
                   <!--<i class="pi pi-pencil form-label-icon"></i>-->
                   Poszt rövid leírása

@@ -229,7 +229,7 @@ library.add(faCalendar, faHeart, faArrowRight,
   faArrowUp, faSortAlphaUp, faSortAlphaDown,
   faFilter, faChevronLeft, faChevronRight)
 
-import potKep from '@/assets/Public/stars.png'
+import potKep from '@/assets/Public/b-pl1.jpg'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -567,6 +567,7 @@ main {
   background-position: 0 100%;
   background-size: 100% 4px;
   padding-bottom: 6px;
+  animation: slideDown 0.6s ease-out;
 }
 
 .container {

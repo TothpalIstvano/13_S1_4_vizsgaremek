@@ -83,6 +83,12 @@ async function checkUser() {
   }
 }
 
+const atLap = ref(true) // kezdetben a lap tetején vagyunk
+
+function handleScroll() {
+  atLap.value = window.scrollY < 800
+}
+
 onMounted(() => {
   //if (logged.value) {
     checkUser();
@@ -90,11 +96,13 @@ onMounted(() => {
   window.addEventListener('user-logged-in', checkUser);
   window.addEventListener('resize', handleResize);
   document.addEventListener('mousedown', handleClickOutside); 
+  window.addEventListener('scroll', handleScroll);
 });
 onUnmounted(() => { 
   window.removeEventListener('user-logged-in', checkUser);
   window.removeEventListener('resize', handleResize);
   document.removeEventListener('mousedown', handleClickOutside);
+  window.removeEventListener('scroll', handleScroll);
 });
 
 </script>
@@ -103,7 +111,9 @@ onUnmounted(() => {
   <div>
     <div id="felsoGap" v-if="route.path !== '/'"></div>
     <header>
-      <nav class="navbar" ref="navbarRef">
+      <nav class="navbar" ref="navbarRef" :class="{ 
+        'hamburger-open': latszik && route.path === '/' && atLap,
+        'hero-mode': route.path === '/' && atLap && !latszik }">
         <div id="nevDiv">
           <div id="logoDiv">
             <img
@@ -430,6 +440,13 @@ onUnmounted(() => {
     position: relative;
     display: inline-flex;
     align-items: center;
+  }
+
+  .navbar.hamburger-open {
+    background-color: #532600da;
+  }
+  .navbar.hero-mode:not(.hamburger-open) {
+    background-color: #370f0269;
   }
 
   #nev {

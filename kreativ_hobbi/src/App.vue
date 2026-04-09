@@ -2,15 +2,18 @@
 import Navbar from '@/components/navbar.vue';
 import Footer from '@/components/footer.vue';
 import { onMounted, provide, ref, onBeforeUnmount } from 'vue';
-import { RouterView } from 'vue-router';
+import { RouterView, useRouter } from 'vue-router';
 import axios from 'axios';
 import { useAuthStore } from '@/stores/auth'
+import AppLoader from '@/components/AppLoader.vue'
 
+const authStore = useAuthStore();
+const router = useRouter();
 const loggedIn = ref(false);
 const user = ref(null); 
-const authStore = useAuthStore()
 const appUrl = import.meta.env.VITE_APP_URL || 'http://localhost:5173'
 
+// Email verifikáció kezelése
 const handleVerifyMessage = async (event) => {
     if (event.origin !== appUrl) return
     if (event.data?.type === 'EMAIL_VERIFIED') {
@@ -21,29 +24,18 @@ const handleVerifyMessage = async (event) => {
     }
 }
 
+// ── Csak a loggedIn provide-hoz kell, a checkAuth már lefutott main.js-ben ──
 onMounted(async () => {
-  if (!authStore.authChecked) {
-    await authStore.checkAuth()
+  try {
+    await axios.get('/sanctum/csrf-cookie')
+    loggedIn.value = authStore.isAuthenticated
+  } catch {
+    loggedIn.value = false
   }
-})  
+})
 
 onMounted(() => window.addEventListener('message', handleVerifyMessage))
 onBeforeUnmount(() => window.removeEventListener('message', handleVerifyMessage))
-
-onMounted(async () => {
-  try {
-    await axios.get('/sanctum/csrf-cookie');
-
-    const response = await axios.get('/api/user/check', { withCredentials: true });
-    if (response.data.loggedIn === true) {
-      loggedIn.value = true;
-    } else {
-        loggedIn.value = false;
-      }
-  } catch (error) {
-    loggedIn.value = false;
-  }
-});
 
 provide('loggedIn', loggedIn);
 provide('user', user);
@@ -55,6 +47,9 @@ provide('user', user);
     <Navbar></Navbar>
     <main class="main-content">
       <RouterView></RouterView>
+      <div v-if="!authStore.authChecked" class="app-loader">
+        <AppLoader />
+      </div>
     </main>
     <Footer></Footer>
   </div>

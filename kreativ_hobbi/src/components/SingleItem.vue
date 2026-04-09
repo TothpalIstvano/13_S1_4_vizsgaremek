@@ -192,6 +192,12 @@ async function fetchProduct() {
     if (res.data.termek_szinek && res.data.termek_szinek.length > 0) {
       selectedColor.value = res.data.termek_szinek[0]
     }
+
+    const szinId = Number(route.query.szin)
+    if (szinId && res.data.termek_szinek?.length) {
+      const match = res.data.termek_szinek.find(s => s.id === szinId)
+      if (match) selectedColor.value = match
+    }
     loading.value = false
   } catch (e) {
     console.error(e)
@@ -298,7 +304,7 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   gap: 14px;
-  position: sticky;
+  position: static;
   top: 24px;
 }
 

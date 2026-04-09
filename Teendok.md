@@ -1,19 +1,22 @@
 - \[/] Webshop
-- \[ ] vásárlási mezők verfikációjának javítása
-- \[ ] telefon szám jobbá tétele
-- \[ ] Miden termék ahol csak egy kép van azt javítani kell mivel a kép ugrál
-- \[X] Carousel javítása mert mikor vált össze csuklik,✅
-  - kosárhoz adás és ha beklikkel egy színt és rányom hogy megtekinés akkor úgy dobja be hogy az a szín aktív
 - \[ ] Alertek lecserélése mindenhol modellekre
 - \[ ] Posztok és további backend helyekből kivenni a letrehozas_datuma nevű felesleges taget, mivel a created_at egyszerűbb és alap
 - \[ ] Az oldal kódjának tisztázás
 - \[ ] Az oldal tesztelése
 - \[ ] Az oldal dokumenálása
 - \[ ] Optimalizálás
-- \[ ] routeban password reset levédése somehow
-- \[ ] Termékeknél admin ként új színt is meg lehessen adni és meg csinálni a cimkéket mert az a rész még mindig fostos
-- \[ ] 05-06 lecserélése b ejelentkezés és gyikra + emoiji meg everything
+- \[ ] Laravel base emailok át designolása
+- \[ ] Fejlesztési lehetőségekhez fel venni azt hogy a blogposzthoz felehessen venni hozzá tartozó termékeket + akkor lehessen termékekre is szűrni
+- \[ ] Az egész magyarosítása és a szövegek cseréje
 
+- \[X] 05-06 lecserélése bejelentkezés és gyikra + emoiji meg everything✅
+- \[X] routeban password reset levédése somehow + Megoldani azt hogy ha lefrissiti az oldalt akkor ne dobja vissza a főoldalra ha más védett oldalon van eg. dashboard/profil -> inedx✅
+- \[X] vásárlási mezők verfikációjának javítása✅
+- \[X] telefon szám jobbá tétele✅
+- \[X] Miden termék ahol csak egy kép van azt javítani kell mivel a kép ugrál✅
+- \[X] Carousel javítása mert mikor vált össze csuklik,✅
+  - kosárhoz adás és ha beklikkel egy színt és rányom hogy megtekinés akkor úgy dobja be hogy az a szín aktív✅
+- \[X] Termékeknél admin ként új színt is meg lehessen adni és meg csinálni a cimkéket mert az a rész még mindig fostos✅
 - \[X] Táblák egységesítése ez alat azt értve hogy a táblákban lévő adatok megegyezenek✅
 - \[X] Termékek modosításánál a modaba kép feltöltés és cimkék választásának javítása✅
 - \[X] Miden olyan funkció letiltása✅

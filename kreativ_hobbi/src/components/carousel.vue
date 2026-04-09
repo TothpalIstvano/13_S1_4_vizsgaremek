@@ -77,7 +77,10 @@
 
               <button
                 class="slide-cta"
-                @click="router.push(`/aruhaz/${kepek[currentIndex].id}`)"
+                @click="router.push({
+                  path: `/aruhaz/${kepek[currentIndex].id}`,
+                  query: selectedColor ? { szin: selectedColor.id } : {}
+                })"
               >
                 <span>Termék megtekintése</span>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
