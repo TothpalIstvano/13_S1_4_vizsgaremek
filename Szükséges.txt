@@ -1,11 +1,5 @@
 - newpost notifications magyarul/jobban
-- reakciók poszthoz - tartsa meg a színt frissítés után
-- rólunk oldal rendes szöveg
-- profil háttér opciók választása - webp-t fel lehet tölteni, de adatbázisból átforceolja .jpg-re
+- profil telefonszám
 - belépés reszponzív animációval
-- dashboard modalt lentebb vinni (+ felhasználók bugos laptopon?)
-- nem tudok kommentre válaszolni (??)
-- newpost címke hozzáadása reszponzivitás
-- profil frissítésekor főoldalra dob
-- főoldal mutasson is számokat a likeokhoz (api route)
+- főoldal posztok cím normálisabban, hero banner reszponzív
 (ha úgy gondolná h nem működik - blog képfeltöltés esetleg: https://stackoverflow.com/questions/50730143/laravel-storage-link-wont-work-on-production)

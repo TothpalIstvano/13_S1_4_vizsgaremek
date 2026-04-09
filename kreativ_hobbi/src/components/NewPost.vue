@@ -898,7 +898,7 @@ const resetForm = () => {
     justify-content: center;
   }
 
-  :deep(.p-button) {
+  :deep(.p-button:not(.add-tag-btn)) {
     width: 100%;
     justify-content: center;
   }
@@ -946,6 +946,17 @@ const resetForm = () => {
   .back-btn {
     padding: 8px 16px;
     font-size: 0.9rem;
+  }
+
+  .new-tag-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .add-tag-btn {
+    width: 100%;
+    justify-content: center;
+    white-space: normal;
   }
 }
 </style>

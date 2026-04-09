@@ -18,6 +18,10 @@ const props = defineProps({
     type: Number,
     default: null
   },
+  currentUser: {
+    type: Object,
+    default: null
+  },
 })
 
 const emit = defineEmits(['reply', 'delete'])
@@ -96,6 +100,7 @@ const formatDate = (dateString) => {
         :comment="reply"
         :isReply="true"
         :currentUserId="currentUserId"
+        :currentUser="currentUser"
         @reply="$emit('reply', $event)"
         @delete="$emit('delete', $event)"
       />
