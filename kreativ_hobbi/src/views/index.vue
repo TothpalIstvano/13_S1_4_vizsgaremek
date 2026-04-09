@@ -327,7 +327,7 @@ watch(isAuthenticated, (newVal) => {
 
           <router-link
             class="feature-link"
-            to="/"
+            :to="authStore.isAuthenticated ? '/profil' : '/belepes'"
             :class="{ 'in-view': isInView }"
             style="--delay: 0.5s"
           >
@@ -335,12 +335,18 @@ watch(isAuthenticated, (newVal) => {
               <span class="feature-number">05</span>
               <div class="feature-icon-wrapper">
                 <div class="feature-icon-bg"></div>
-                <div class="feature-icon" aria-hidden="true">⭐</div>
+                <div class="feature-icon" aria-hidden="true">
+                  {{ authStore.isAuthenticated ? '👤' : '🔐' }}
+                </div>
               </div>
-              <h3 class="feature-title">Elégedettség garancia</h3>
+              <h3 class="feature-title">
+                {{ authStore.isAuthenticated ? 'Ugrás a profilomra' : 'Egyszerű regisztráció' }}
+              </h3>
               <p class="feature-desc">
-                Ha nem vagy elégedett a termékkel, 30 napon belül
-                visszaküldheted.
+                {{ authStore.isAuthenticated 
+                  ? 'Tekintsd meg profilodat, kövesd rendeléseidet és kezeld kedvenc termékeidet egy helyen.' 
+                  : 'Hozz létre fiókot percek alatt, kövesd rendeléseidet, mentsd el kedvenc termékeidet és még sok más.' 
+                }}
               </p>
               <div class="feature-arrow">→</div>
             </article>
@@ -348,7 +354,7 @@ watch(isAuthenticated, (newVal) => {
 
           <router-link
             class="feature-link"
-            to="/"
+            to="/rolunk#gyik"
             :class="{ 'in-view': isInView }"
             style="--delay: 0.6s"
           >
@@ -356,12 +362,12 @@ watch(isAuthenticated, (newVal) => {
               <span class="feature-number">06</span>
               <div class="feature-icon-wrapper">
                 <div class="feature-icon-bg"></div>
-                <div class="feature-icon" aria-hidden="true">🚚</div>
+                <div class="feature-icon" aria-hidden="true">❓</div>
               </div>
-              <h3 class="feature-title">Gyors szállítás</h3>
+              <h3 class="feature-title">Gyakori kérdések</h3>
               <p class="feature-desc">
-                Rendeléseket 2–3 munkanapon belül házhoz szállítjuk
-                országszerte.
+                Válaszokat találsz a leggyakrabban felmerülő kérdésekre
+                szállítással, visszaküldéssel és fizetéssel kapcsolatban.
               </p>
               <div class="feature-arrow">→</div>
             </article>

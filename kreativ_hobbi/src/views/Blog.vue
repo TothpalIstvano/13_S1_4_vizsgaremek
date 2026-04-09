@@ -563,6 +563,7 @@ main {
   background-position: 0 100%;
   background-size: 100% 4px;
   padding-bottom: 6px;
+  animation: slideDown 0.6s ease-out;
 }
 
 .container {

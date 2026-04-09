@@ -1468,7 +1468,6 @@ const fetchTagsFromDatabase = async () => {
 
 const fetchBlogPosts = async () => {
   const { data } = await axios.get('/api/admin/blog');
-  console.log(data);
   blogPosts.value = data.map(p => ({
     id: p.id,
     title: p.cim,

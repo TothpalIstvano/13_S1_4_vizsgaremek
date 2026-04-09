@@ -1,5 +1,4 @@
 import './assets/main.css'
-
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 
@@ -7,13 +6,25 @@ import { createPinia } from 'pinia'
 import PrimeVue from 'primevue/config'
 import 'primevue/resources/themes/aura-light-green/theme.css'
 import 'primevue/resources/primevue.min.css' // Poszt hozzáadás form stílusa
-import 'primeicons/primeicons.css' // Ikonok
+import 'primeicons/primeicons.css' 
 import 'quill/dist/quill.core.css'
 import 'quill/dist/quill.snow.css'
 
 import App from './App.vue'
 import router from './router/router'
 import axios from 'axios';
+
+// PrimeVue components
+import Button from 'primevue/button';
+import InputText from 'primevue/inputtext';
+import MultiSelect from 'primevue/multiselect';
+import Editor from 'primevue/editor';
+import Image from 'primevue/image';
+import Stepper from 'primevue/stepper';
+import StepperPanel from 'primevue/stepperpanel';
+
+//auth store
+import { useAuthStore } from '@/stores/auth.js'
 
 axios.defaults.baseURL = import.meta.env.VITE_API_URL;
 axios.defaults.withCredentials = true;
@@ -22,9 +33,7 @@ axios.defaults.withXSRFToken = true;
 // Add token to all requests
 axios.interceptors.request.use(config => {
     const token = localStorage.getItem('auth_token');
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-    }
+    if (token) config.headers.Authorization = `Bearer ${token}`;
     return config;
 });
 
@@ -43,21 +52,18 @@ axios.interceptors.response.use(
 
 
 const app = createApp(App)
+const pinia = createPinia()
 
-app.use(createPinia())
+app.use(pinia)
+
+// ── Auth check egyszer, app induláskor ──
+const authStore = useAuthStore()
+await authStore.checkAuth()
 
 app.use(router)
 app.use(PrimeVue)
 
 //hogy minden szépen/jól működjön
-import Button from 'primevue/button';
-import InputText from 'primevue/inputtext';
-import MultiSelect from 'primevue/multiselect';
-import Editor from 'primevue/editor';
-import Image from 'primevue/image';
-import Stepper from 'primevue/stepper';
-import StepperPanel from 'primevue/stepperpanel';
-
 app.component('Button', Button);
 app.component('InputText', InputText);
 app.component('MultiSelect', MultiSelect);

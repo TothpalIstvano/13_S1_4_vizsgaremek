@@ -46,7 +46,7 @@ export default {
 
       <hr>
       <div class="gyik">
-        <h1>Gyakran ismételt kérdések</h1>
+        <h1 id="gyik">Gyakran ismételt kérdések</h1>
         <div class="gyik-lista">
 
           <details class="gyik-elem">
@@ -209,6 +209,7 @@ main {
   background-position: 0 100%;
   background-size: 100% 4px;
   padding-bottom: 6px;
+  animation: slideDown 0.6s ease-out;
 }
 
 /* #region felső boxok */
@@ -738,7 +739,7 @@ hr::after {
 .card:hover .profile-pic img {
   transform: scale(2.5);
   -o-object-position: 0px 25px;
-  object-position: 0px 25px;
+  object-position: 2px 14px;
   transition: all 0.5s ease-in-out 0.5s;
 }
 

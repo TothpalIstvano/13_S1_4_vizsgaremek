@@ -5,10 +5,12 @@
 - \[ ] Az oldal tesztelése
 - \[ ] Az oldal dokumenálása
 - \[ ] Optimalizálás
+- \[ ] Laravel base emailok át designolása
 - \[ ] Fejlesztési lehetőségekhez fel venni azt hogy a blogposzthoz felehessen venni hozzá tartozó termékeket + akkor lehessen termékekre is szűrni
-- \[ ] routeban password reset levédése somehow + Megoldani azt hogy ha lefrissiti az oldalt akkor ne dobja vissza a főoldalra ha más védett oldalon van eg. dashboard/profil -> inedx
-- \[ ] 05-06 lecserélése bejelentkezés és gyikra + emoiji meg everything
+- \[ ] Az egész magyarosítása és a szövegek cseréje
 
+- \[X] 05-06 lecserélése bejelentkezés és gyikra + emoiji meg everything✅
+- \[X] routeban password reset levédése somehow + Megoldani azt hogy ha lefrissiti az oldalt akkor ne dobja vissza a főoldalra ha más védett oldalon van eg. dashboard/profil -> inedx✅
 - \[X] vásárlási mezők verfikációjának javítása✅
 - \[X] telefon szám jobbá tétele✅
 - \[X] Miden termék ahol csak egy kép van azt javítani kell mivel a kép ugrál✅
