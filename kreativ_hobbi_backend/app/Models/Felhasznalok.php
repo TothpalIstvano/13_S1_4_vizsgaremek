@@ -68,4 +68,9 @@ class Felhasznalok extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany(Kedvencek::class, 'felhasznalo_id');
     }
+
+    public function hatterKep()
+    {
+        return $this->belongsTo(Kepek::class, 'hatterKep_id');
+    }
 }

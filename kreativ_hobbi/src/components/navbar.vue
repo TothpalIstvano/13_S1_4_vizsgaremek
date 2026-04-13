@@ -20,7 +20,7 @@ let altSzoveg = 'Profilkép';
 const jogosult = ref(false);
 
 function open() {
-  if (window.innerWidth > 1200) {
+  if (window.innerWidth > 1150) {
       router.push('/');
   }
   else{ 
@@ -29,7 +29,7 @@ function open() {
   }
 }
 function handleResize() {
-  if (window.innerWidth > 1200 && latszik.value) {
+  if (window.innerWidth > 1150 && latszik.value) {
     latszik.value = false;
     xbeValtas.value = false;
   }
@@ -141,9 +141,10 @@ onUnmounted(() => {
               @click=open();
             />       
           </div>
-            <RouterLink to="/" id="nev">
-              <h1>Hobbitár</h1>
-            </RouterLink>
+          <RouterLink to="/" id="nev">
+            <h1>Hobbitár</h1>
+          </RouterLink>
+          <div id="mobilIkonok"> <!--na így nem tetszik akkor ezt a divet kell kivenni-->
             <RouterLink to="/kosar" id="mobilKosar">
               <div class="cart-icon-wrapper">
                 <img
@@ -158,6 +159,12 @@ onUnmounted(() => {
                 </span>
               </div>
             </RouterLink>
+            <RouterLink :to="userPath" id="mobilProfil">
+              <p v-if="isLoggedIn === 'Bejelentkezés'">{{ isLoggedIn }}</p>
+              <img id="profilkepMobil" v-else :src="isLoggedIn" :alt="altSzoveg" />
+            </RouterLink>
+          </div>
+
         </div>
         <RouterLink 
           class="menu_link" 
@@ -212,10 +219,12 @@ onUnmounted(() => {
         </RouterLink>
 
         <RouterLink
-          class="menu_link" 
+          class="menu_link belepes" 
           :class="{ hamburgerElem: !latszik }"
           :to="userPath"
-        ><p v-if="isLoggedIn === 'Bejelentkezés'">{{ isLoggedIn }}</p> <img id="profilkep" v-else :src="isLoggedIn" :alt="altSzoveg" />
+          >
+          <p v-if="isLoggedIn === 'Bejelentkezés'">{{ isLoggedIn }}</p> 
+          <img id="profilkep" v-else :src="isLoggedIn" :alt="altSzoveg"/>
         </RouterLink>
         
         <RouterLink 
@@ -394,7 +403,11 @@ onUnmounted(() => {
 /*#endregion*/
 
 /*#region Reszponzív nav bar + hamburger menü */
-@media (max-width: 1200px) {
+#mobilProfil {
+  display: none;
+}
+
+@media (max-width: 1150px) {
   .navbar {
     flex-direction: column;
     align-items: center;
@@ -427,11 +440,11 @@ onUnmounted(() => {
   }
   #nevDiv{
     display: flex;
-    justify-content: space-between; /* This will push logo left and name right */
+    justify-content: space-between;
     align-items: center;
     width: 100%;
     margin-left: 0;
-    padding: 0 20px; /* Add some padding on sides */
+    padding: 0 20px;
     position: relative;
   }
   #mobilKosar {
@@ -453,6 +466,33 @@ onUnmounted(() => {
     margin: 0;
     float: none;
     position: static;
+  }
+
+  #mobilIkonok {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-right: 15px;
+  }
+
+  #mobilProfil {
+    display: inline-flex;
+    align-items: center;
+    margin-right: 10px;
+    text-decoration: none;
+    color: var(--router-link-muted-color);
+    font-size: 0.95rem;
+  }
+
+  #profilkepMobil {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .belepes {
+    display: none;
   }
 
   .menu_link.hamburgerElem, .vonal {
@@ -484,6 +524,12 @@ onUnmounted(() => {
   
   #felsoGap{
     height: 80px;
+  }
+}
+
+@media (max-width: 400px) {
+  #mobilKosar {
+    margin-right: 0px;
   }
 }
 /*#endregion*/

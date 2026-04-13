@@ -532,7 +532,14 @@ function formatDate(d) { return new Date(d).toLocaleDateString(); }
               </div>
               <div class="form-group">
                 <label for="telefon">Telefonszám</label>
-                <input type="tel" pattern="(06|+36)\d{9}" id="telefon" v-model="editForm.telefonszam" placeholder="+36 20 123 4567" />
+                <input
+                  type="tel"
+                  id="telefon"
+                  v-model="editForm.telefonszam"
+                  pattern="(06|\+36)[\s\-]?\d{2}[\s\-]?\d{3}[\s\-]?\d{4}"
+                  placeholder="+36 20 123 4567"
+                  title="Adj meg egy érvényes magyar telefonszámot (pl. +36 20 123 4567 vagy 06201234567)"
+                />
               </div>
             </div>
 
@@ -948,10 +955,10 @@ function formatDate(d) { return new Date(d).toLocaleDateString(); }
   inset: 0;
   background: rgba(0, 0, 0, 0.5);
   display: flex;
-  align-items: center;
+  align-items: flex-start;        /* was: center */
   justify-content: center;
   z-index: 100;
-  padding: 16px;
+  padding: 80px 16px 16px;        /* was: 16px — top value moves it down */
 }
 
 .szerk-modal {
@@ -1465,10 +1472,9 @@ function formatDate(d) { return new Date(d).toLocaleDateString(); }
   inset: 0;
   background: rgba(0, 0, 0, 0.5);
   display: flex;
-  align-items: center;
+  align-items: flex-start;        /* was: center */
   justify-content: center;
   z-index: 100;
-  padding: 16px;
 }
 
 .kedvencek-modal {
@@ -1476,10 +1482,11 @@ function formatDate(d) { return new Date(d).toLocaleDateString(); }
   border-radius: 20px;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
   width: 100%;
-  max-width: 600px;
+  max-width: 800px;
   max-height: 95vh;
   overflow-y: auto;
   animation: modalFadeIn 0.2s ease;
+  margin-top: 80px;
 }
 
 @keyframes modalFadeIn {
@@ -1502,10 +1509,6 @@ function formatDate(d) { return new Date(d).toLocaleDateString(); }
   font-size: 24px;
   font-weight: 600;
   color: #1a1e24;
-}
-
-.kedvencek-modal {
-  max-width: 800px;
 }
 
 .kedvenc-lista {
@@ -2108,6 +2111,10 @@ color: #6b7280;
     font-size: 18px;
   }
 
+  .szerk-modal {
+    padding-top: 20px;
+  }
+
   .form-section {
     padding: 10px 12px;
   }
@@ -2142,6 +2149,10 @@ color: #6b7280;
   }
 
   /* Kedvencek */
+  .kedvencek-modal {
+    margin-top: 40px;
+  }
+
   .kedvenc-body {
     padding: 0.75rem;
   }
