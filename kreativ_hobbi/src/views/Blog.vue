@@ -207,7 +207,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount, computed, watch } from 'vue'
+import { ref, onMounted, onBeforeUnmount, computed, watch, inject } from 'vue'
 import { useRouter } from 'vue-router'
 import MultiSelect from 'primevue/multiselect';
 import axios from 'axios';
@@ -242,7 +242,7 @@ const valasztottCimkek = ref([]);
 const cimkeOpciok = ref([]);
 const aktualisOldal = ref(1)
 const oldalMeret = ref(9)
-
+const { showToast } = inject('toast')
 const isAuthenticated = computed(() => authStore.isAuthenticated)
 
 watch(isAuthenticated, (newVal) => {
@@ -478,7 +478,7 @@ const reakcioKezeles = async (postId, reactionType) => {
     }
   } catch (err) {
     if (err.response?.status === 401) {
-      alert('Kérjük, jelentkezzen be a reakciókhoz!');
+      showToast('Kérjük, jelentkezzen be a reakciókhoz!','info');
       router.push('/Belepes');
     } else {
       console.error('Reaction error:', err);

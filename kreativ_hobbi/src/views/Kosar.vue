@@ -276,11 +276,22 @@
         <span>→</span> Vissza az Áruházba
       </router-link>
     </div>
+    <Teleport to="body">
+      <div v-if="confirmModal.visible" class="confirm-backdrop" @click.self="confirmNo">
+        <div class="confirm-modal">
+          <p class="confirm-message">{{ confirmModal.message }}</p>
+          <div class="confirm-actions">
+            <button class="confirm-btn cancel" @click="confirmNo">Mégse</button>
+            <button class="confirm-btn danger" @click="confirmYes">Törlés</button>
+          </div>
+        </div>
+      </div>
+    </Teleport>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, inject } from 'vue'
 import { useRouter } from 'vue-router'
 import { useCartStore } from '@/stores/cartStore'
 import axios from 'axios';
@@ -318,10 +329,22 @@ const hazszamError = ref('')
 const hazszamValid = ref(false)
 const emeletAjtoError = ref('')
 const emeletAjtoValid = ref(false)
+const { showToast, showErrorModal } = inject('toast')
 
 const cartTotal = computed(() => {
   return cartItems.value.reduce((s, i) => s + (Number(i.ar || i.price) * Number(i.quantity || 0)), 0)
 })
+
+// Confirm modal saját állapot
+const confirmModal = ref({ visible: false, message: '', resolve: null })
+
+function showConfirm(message) {
+  return new Promise((resolve) => {
+    confirmModal.value = { visible: true, message, resolve }
+  })
+}
+function confirmYes() { confirmModal.value.resolve(true);  confirmModal.value.visible = false }
+function confirmNo()  { confirmModal.value.resolve(false); confirmModal.value.visible = false }
 
 function addOne(id) {
   cartStore.updateQuantity(id, (cartStore.cartItems.find(i => i.id === id)?.quantity || 0) + 1)
@@ -348,8 +371,11 @@ function removeFromCart(id) {
   cartStore.removeFromCart(id)
 }
 
-function emptyCart(confirmPrompt = true) {
-  if (confirmPrompt && !confirm('Biztosan üríteni szeretnéd a kosarat?')) return
+async function emptyCart(confirmPrompt = true) {
+  if (confirmPrompt) {
+    const confirmed = await showConfirm('Biztosan üríteni szeretnéd a kosarat?')
+    if (!confirmed) return
+  }
   cartStore.clearCart()
 }
 
@@ -670,7 +696,7 @@ const payload = ref({})
 async function checkout() {
   const currentCart = (cartItems && cartItems.value) ? cartItems.value : (cartStore && cartStore.cartItems ? cartStore.cartItems : [])
   if (!currentCart.length) {
-    alert('A kosarad üres')
+    showToast('A kosarad üres.', 'error')
     return
   }
 
@@ -680,7 +706,11 @@ async function checkout() {
       const res = await axios.get(`/api/termekek/${item.id}`)
       const freshItem = res.data
       if (freshItem.darab < item.quantity) {
-        alert(`"${item.nev}" termékből csak ${freshItem.darab} db érhető el, de ${item.quantity} db van a kosárban!`)
+        showToast(
+          `"${item.nev}" termékből csak ${freshItem.darab} db érhető el.`,
+          'error',
+          `A kosárban ${item.quantity} db szerepelt.`
+        )
         // Frissítsd a kosarat a valós készlettel
         if (freshItem.darab === 0) {
           cartStore.removeFromCart(item.id)
@@ -691,68 +721,68 @@ async function checkout() {
       }
     }
   } catch (e) {
-    alert('Hiba történt a készlet ellenőrzése közben!')
+    showToast('Hiba történt a készlet ellenőrzése közben.', 'error')
     return
   }
 
   const d = deliveryDetails.value
   if (!d.firstName || !d.lastName || !d.email || !d.utca || !d.hazszam || !d.cityId || !d.phone) {
-    alert('Kérlek töltsd ki az összes szállítási adatot')
+    showErrorModal(['Kérlek töltsd ki az összes szállítási adatot.'])
     return
   }
 
   // Vezetéknév validáció
   validateFirstName()
   if (!firstNameValid.value) {
-    alert('A vezetéknév nem érvényes!')
+    showErrorModal('A vezetéknév nem érvényes!')
     return
   }
 
   // Keresztéknév validáció
   validateLastName()
   if (!lastNameValid.value) {
-    alert('A keresztéknév nem érvenytes!')
+    showErrorModal('A keresztéknév nem érvenytes!')
     return
   }
 
   // Város validáció
   validateCity()
   if (!cityValid.value) {
-    alert('A város nem érvényes!')
+    showErrorModal('A város nem érvényes!')
     return
   }
 
   // Utca validáció
   validateUtca()
   if (!utcaValid.value) {
-    alert('A megadott utca nem érvényes!')
+    showErrorModal('A megadott utca nem érvényes!')
     return
   }
 
   // Házsorzás validáció
   validateHazszam()
   if (!hazszamValid.value) {
-    alert('A házszám nem érvényes!')
+    showErrorModal('A házszám nem érvényes!')
     return
   }
 
   // Emelet/ajtó validáció
   if (deliveryDetails.value.emeletAjto) {
     validateEmeletAjto()
-    if (!emeletAjtoValid.value) { alert('Az emelet/ajtó formátuma nem érvényes!'); return }
+    if (!emeletAjtoValid.value) { showErrorModal('Az emelet/ajtó formátuma nem érvényes!'); return }
   }
 
   // Egyszerű telefonszám ellenőrzés: legalább 9 számjegy
   validatePhone()
   if (!phoneValid.value) {
-    alert('A telefonszám nem érvényes!')
+    showErrorModal('A telefonszám nem érvényes!')
     return
   }
 
   // Email ellenörzés
   validateEmail()
   if (!emailValid.value) {
-    alert('Az email ciém nem érvenytelen!')
+    showErrorModal('Az email ciém nem érvenytelen!')
     return
   }
 
@@ -792,6 +822,7 @@ async function checkout() {
     }
     router.push({ path: `/kosar/fizetes/${res.data.rendeles_id}`});
   } catch (e) {
+    showToast('Hiba történt a rendelés leadásakor.', 'error')
     console.warn('bug:', e)
   }
 }
@@ -1478,4 +1509,53 @@ async function checkout() {
   font-weight: 600;
   flex-shrink: 0;
 }
+
+.confirm-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 16px;
+}
+
+.confirm-modal {
+  background: #fff;
+  border-radius: 14px;
+  padding: 28px 24px 20px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+  width: 100%;
+  max-width: 360px;
+}
+
+.confirm-message {
+  font-size: 16px;
+  color: #1e293b;
+  margin: 0 0 24px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.confirm-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.confirm-btn {
+  padding: 8px 20px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.confirm-btn.cancel { background: #e5e7eb; color: #374151; }
+.confirm-btn.cancel:hover { background: #d1d5db; }
+.confirm-btn.danger { background: #dc2626; color: white; }
+.confirm-btn.danger:hover { background: #b91c1c; }
 </style>

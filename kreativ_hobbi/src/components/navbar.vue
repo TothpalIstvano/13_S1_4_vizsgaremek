@@ -65,7 +65,7 @@ async function checkUser() {
       if (response.data) {
         const user = response.data;
         const baseUrl = import.meta.env.VITE_API_URL;
-        const hasProfileImage =  user.profilKep;
+        const hasProfileImage = user.profilKep?.url_Link?.trim()
         userPath.value = '/Profil';
         if (hasProfileImage) {
           isLoggedIn.value = user.profilKep.url_Link;

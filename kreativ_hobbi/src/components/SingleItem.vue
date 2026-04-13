@@ -133,7 +133,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted,inject } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import axios from 'axios'
 import { useCartStore } from '@/stores/cartStore'
@@ -143,7 +143,7 @@ const route = useRoute()
 const router = useRouter()
 const cartStore = useCartStore()
 const cartModal = ref(null)
-
+const { showToast } = inject('toast')
 const product = ref(null)
 const loading = ref(true)
 const qty = ref(1)
@@ -224,7 +224,7 @@ function addToCart() {
     cartModal.value?.open(product.value, result.added)
     qty.value = 1
   } else if (!result.success) {
-    alert(`⚠️ ${result.message}`)
+    showToast(`⚠️ ${result.message}`, 'error')
   }
 }
 

@@ -1,12 +1,24 @@
 <script setup>
 import axios from 'axios';
-import { ref, reactive, onMounted, watch, onUnmounted, nextTick } from 'vue';
+import { ref, reactive, onMounted, watch, onUnmounted, nextTick, inject } from 'vue';
 import { RouterLink } from 'vue-router';
 import Dropdown from 'primevue/dropdown';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faHeart as fasHeart } from '@fortawesome/free-solid-svg-icons'
 import { faHeart as farHeart } from '@fortawesome/free-regular-svg-icons'
+import { parsePhoneNumberFromString } from 'libphonenumber-js'
+
+const nameRegex = /^[A-Za-záéíóöőúüűÁÉÍÓÖŐÚÜŰ]{2,}([- ][A-Za-záéíóöőúüűÁÉÍÓÖŐÚÜŰ]{2,}){0,4}$/
+
+const vErrors = reactive({
+  vezeteknev: '', keresztnev: '', telefonszam: '',
+  utca: '', hazszam: '', emeletAjto: ''
+})
+const vValid = reactive({
+  vezeteknev: false, keresztnev: false, telefonszam: false,
+  utca: false, hazszam: false, emeletAjto: false
+})
 
 library.add(fasHeart, farHeart)
 
@@ -39,12 +51,13 @@ const coverUploading = ref(false);
 const availableCovers = ref([]);
 const showCoverPicker = ref(false);
 const coverFileInput = ref(null);
+const selectedFileName = ref('')
 const pendingCover = ref(null);
 const likedIds = ref(new Set())
 const emailVerified = ref(true)
 const resendLoading = ref(false)
 const resendSent = ref(false)
-
+const { showToast, showErrorModal } = inject('toast')
 const user = reactive({
   name: '',
   username: '',
@@ -86,7 +99,7 @@ async function resendVerification() {
     await axios.post('/email/verification-notification')
     resendSent.value = true
   } catch (e) {
-    alert('Hiba történt az email küldés során.')
+    showToast('Hiba történt az email küldés során.', 'error')
   } finally {
     resendLoading.value = false
   }
@@ -217,7 +230,7 @@ async function handleCoverUpload(event) {
     selectCover(id, url);
   } catch (e) {
     console.error('Cover upload failed', e);
-    alert('Háttérkép feltöltés sikertelen.');
+    showToast('Háttérkép feltöltés sikertelen.', 'error');
   } finally {
     coverUploading.value = false;
     event.target.value = '';
@@ -234,7 +247,99 @@ onUnmounted(() => {
   }
 });
 
+function validateNev(mezo) {
+  const value = editForm[mezo].trim()
+  if (!value) { vErrors[mezo] = ''; vValid[mezo] = false; return false }
+  if (value.length > 50) { vErrors[mezo] = 'Max. 50 karakter'; vValid[mezo] = false; return false }
+  if (/[-]{2,}/.test(value) || /\s{2,}/.test(value)) {
+    vErrors[mezo] = 'Nem szerepelhet egymás után két kötőjel vagy szóköz'
+    vValid[mezo] = false; return false
+  }
+  if (!nameRegex.test(value)) {
+    vErrors[mezo] = 'Csak betűk, kötőjel és szóköz (min. 2 karakter)'
+    vValid[mezo] = false; return false
+  }
+  vErrors[mezo] = ''; vValid[mezo] = true; return true
+}
+
+function validateUtcaForm() {
+  const value = editForm.utca.trim()
+  if (!value) { vErrors.utca = ''; vValid.utca = false; return true } // opcionális
+  if (value.length < 3) { vErrors.utca = 'Min. 3 karakter'; vValid.utca = false; return false }
+  if (value.length > 100) { vErrors.utca = 'Max. 100 karakter'; vValid.utca = false; return false }
+  if (!/^[A-Za-záéíóöőúüűÁÉÍÓÖŐÚÜŰ0-9\s.\-\/]+$/.test(value)) {
+    vErrors.utca = 'Érvénytelen karakter'; vValid.utca = false; return false
+  }
+  if (!/[A-Za-záéíóöőúüűÁÉÍÓÖŐÚÜŰ]/.test(value)) {
+    vErrors.utca = 'Legalább egy betűt tartalmaznia kell'; vValid.utca = false; return false
+  }
+  vErrors.utca = ''; vValid.utca = true; return true
+}
+
+function validateHazszamForm() {
+  const value = String(editForm.hazszam ?? '').trim()
+  if (!value) { vErrors.hazszam = ''; vValid.hazszam = false; return true } // opcionális
+  if (!/^[1-9]\d{0,4}([\/\-]?[A-Za-z0-9]{1,4})?$/.test(value)) {
+    vErrors.hazszam = 'Érvénytelen házszám (pl. 12, 12/A, 14B)'; vValid.hazszam = false; return false
+  }
+  vErrors.hazszam = ''; vValid.hazszam = true; return true
+}
+
+function validateEmeletAjtoForm() {
+  const value = editForm.emeletAjto.trim()
+  if (!value) { vErrors.emeletAjto = ''; vValid.emeletAjto = false; return true } // opcionális
+  if (value.length > 20) { vErrors.emeletAjto = 'Max. 20 karakter'; vValid.emeletAjto = false; return false }
+  if (!/^[A-Za-záéíóöőúüűÁÉÍÓÖŐÚÜŰ0-9\s\/.\-]{1,20}$/.test(value)) {
+    vErrors.emeletAjto = 'Érvénytelen karakter'; vValid.emeletAjto = false; return false
+  }
+  vErrors.emeletAjto = ''; vValid.emeletAjto = true; return true
+}
+
+function normalizePhoneForm(raw) {
+  const t = raw.trim()
+  if (/^06\d/.test(t)) return '+36' + t.slice(2)
+  if (/^006\d/.test(t)) return '+' + t.slice(2)
+  if (/^00\d/.test(t)) return '+' + t.slice(2)
+  return t
+}
+
+function validateTelefonForm() {
+  const raw = editForm.telefonszam.trim()
+  if (!raw) { vErrors.telefonszam = ''; vValid.telefonszam = false; return true } // opcionális
+  if (!/^[+\d\s\-().]+$/.test(raw)) {
+    vErrors.telefonszam = 'Csak számok, +, -, szóköz és zárójelek'; vValid.telefonszam = false; return false
+  }
+  const digits = raw.replace(/\D/g, '')
+  if (digits.length < 7) { vErrors.telefonszam = 'Min. 7 számjegy szükséges'; vValid.telefonszam = false; return false }
+  try {
+    const parsed = parsePhoneNumberFromString(normalizePhoneForm(raw))
+    if (!parsed || !parsed.isValid()) {
+      vErrors.telefonszam = 'Érvénytelen telefonszám'; vValid.telefonszam = false; return false
+    }
+    editForm.telefonszam = parsed.formatInternational()
+    vErrors.telefonszam = ''; vValid.telefonszam = true; return true
+  } catch {
+    vErrors.telefonszam = 'Nem felismerhető formátum'; vValid.telefonszam = false; return false
+  }
+}
+
+function validateAllProfile() {
+  const results = [
+    validateNev('vezeteknev'),
+    validateNev('keresztnev'),
+    validateTelefonForm(),
+    validateUtcaForm(),
+    validateHazszamForm(),
+    validateEmeletAjtoForm(),
+  ]
+  return results.every(Boolean)
+}
+
 async function saveProfile() {
+  if (!validateAllProfile()) {
+    showErrorModal(['Kérlek javítsd a hibás mezőket a mentés előtt!'])
+    return
+  }
   saving.value = true;
   try {
     const response = await axios.put('/api/user/profile', editForm);
@@ -249,11 +354,12 @@ async function saveProfile() {
 
     showSzerkesztes.value = false;
     document.body.style.overflow = '';
-    alert('Profil sikeresen frissítve!');
+    showToast('Profil sikeresen frissítve!');
   } catch (error) {
     console.error('Error saving profile:', error);
     if (error.response && error.response.status === 422) {
-      alert('Hibás adatok: ' + JSON.stringify(error.response.data.errors));
+      const errors = Object.values(error.response.data.errors).flat()
+      showErrorModal(errors)   
     }
   } finally {
     saving.value = false;
@@ -303,7 +409,7 @@ async function startCamera() {
     }
   } catch (err) {
     console.error('Camera access denied', err);
-    alert('Nem sikerült elérni a kamerát.');
+    showToast('Nem sikerült elérni a kamerát.', 'error', 'Ellenőrizd a jogosultságokat.');
   }
 }
 
@@ -369,9 +475,10 @@ async function uploadProfilePhoto() {
     userData.value = await fetchUserData();
     applyAvatar(userData.value.profilKep);
     stopCamera();
+    window.dispatchEvent(new Event('user-logged-in')) 
   } catch (error) {
     console.error('Upload failed', error);
-    alert('Kép feltöltés sikertelen.');
+    showToast('Kép feltöltés sikertelen.', 'error', 'Próbáld újra, vagy válassz másik fájlt.');
   } finally {
     uploading.value = false;
   }
@@ -380,6 +487,7 @@ async function uploadProfilePhoto() {
 const handleFileUpload = async (event) => {
   const file = event.target.files[0];
   if (!file) return;
+  selectedFileName.value = file.name;
   console.log('File selected:', file.name, file.size);
   capturedBlob.value = file;
   console.log('capturedBlob set, now uploading...');
@@ -522,24 +630,50 @@ function formatDate(d) { return new Date(d).toLocaleDateString(); }
               <h4>Személyes adatok</h4>
               <div class="form-row">
                 <div class="form-group">
-                  <label for="vezeteknev">Vezetéknév</label>
-                  <input type="text" id="vezeteknev" v-model="editForm.vezeteknev" placeholder="Pl. Nagy" />
+                  <label for="vezeteknev">
+                    Vezetéknév
+                    <span v-if="vErrors.vezeteknev" style="color:#dc2626; margin-left:4px;">⚠</span>
+                    <span v-else-if="vValid.vezeteknev" style="color:#059669; margin-left:4px;">✓</span>
+                  </label>
+                  <input type="text" id="vezeteknev" v-model="editForm.vezeteknev"
+                    placeholder="Pl. Nagy"
+                    @blur="validateNev('vezeteknev')"
+                    :class="{ 'field-error': vErrors.vezeteknev, 'field-ok': vValid.vezeteknev }"
+                  />
+                  <span v-if="vErrors.vezeteknev" class="v-error">{{ vErrors.vezeteknev }}</span>
                 </div>
                 <div class="form-group">
-                  <label for="keresztnev">Keresztnév</label>
-                  <input type="text" id="keresztnev" v-model="editForm.keresztnev" placeholder="Pl. Anna" />
+                  <label for="keresztnev">
+                    Keresztnév
+                    <span v-if="vErrors.keresztnev" style="color:#dc2626; margin-left:4px;">⚠</span>
+                    <span v-else-if="vValid.keresztnev" style="color:#059669; margin-left:4px;">✓</span>
+                  </label>
+                  <input type="text" id="keresztnev" v-model="editForm.keresztnev"
+                    placeholder="Pl. Anna"
+                    @blur="validateNev('keresztnev')"
+                    :class="{ 'field-error': vErrors.keresztnev, 'field-ok': vValid.keresztnev }"
+                  />
+                  <span v-if="vErrors.keresztnev" class="v-error">{{ vErrors.keresztnev }}</span>
                 </div>
               </div>
               <div class="form-group">
-                <label for="telefon">Telefonszám</label>
+                <label for="telefon">
+                  Telefonszám
+                  <span v-if="vErrors.telefonszam" style="color:#dc2626; margin-left:4px;">⚠</span>
+                  <span v-else-if="vValid.telefonszam" style="color:#059669; margin-left:4px;">✓</span>
+                </label>
                 <input
                   type="tel"
                   id="telefon"
                   v-model="editForm.telefonszam"
-                  pattern="(06|\+36)[\s\-]?\d{2}[\s\-]?\d{3}[\s\-]?\d{4}"
                   placeholder="+36 20 123 4567"
-                  title="Adj meg egy érvényes magyar telefonszámot (pl. +36 20 123 4567 vagy 06201234567)"
+                  maxlength="20"
+                  inputmode="tel"
+                  @blur="validateTelefonForm"
+                  @input="validateTelefonForm"
+                  :class="{ 'field-error': vErrors.telefonszam, 'field-ok': vValid.telefonszam }"
                 />
+                <span v-if="vErrors.telefonszam" class="v-error">{{ vErrors.telefonszam }}</span>
               </div>
             </div>
 
@@ -547,26 +681,66 @@ function formatDate(d) { return new Date(d).toLocaleDateString(); }
             <div class="form-section">
               <h4>Lakcím</h4>
               <div class="form-group">
-                <label for="utca">Utca</label>
-                <input type="text" id="utca" v-model="editForm.utca" placeholder="Kossuth Lajos utca" />
+                <label for="utca">
+                  Utca
+                  <span v-if="vErrors.utca" style="color:#dc2626; margin-left:4px;">⚠</span>
+                  <span v-else-if="vValid.utca" style="color:#059669; margin-left:4px;">✓</span>
+                </label>
+                <input
+                  type="text"
+                  id="utca"
+                  v-model="editForm.utca"
+                  placeholder="Kossuth Lajos utca"
+                  @blur="validateUtcaForm"
+                  :class="{ 'field-error': vErrors.utca, 'field-ok': vValid.utca }"
+                />
+                <span v-if="vErrors.utca" class="v-error">{{ vErrors.utca }}</span>
               </div>
+
               <div class="form-row">
                 <div class="form-group">
-                  <label for="hazszam">Házszám</label>
-                  <input type="number" id="hazszam" v-model="editForm.hazszam" placeholder="12" />
+                  <label for="hazszam">
+                    Házszám
+                    <span v-if="vErrors.hazszam" style="color:#dc2626; margin-left:4px;">⚠</span>
+                    <span v-else-if="vValid.hazszam" style="color:#059669; margin-left:4px;">✓</span>
+                  </label>
+                  <input
+                    type="text"
+                    id="hazszam"
+                    v-model="editForm.hazszam"
+                    placeholder="Pl. 12, 12/A, 14B"
+                    @blur="validateHazszamForm"
+                    :class="{ 'field-error': vErrors.hazszam, 'field-ok': vValid.hazszam }"
+                  />
+                  <span v-if="vErrors.hazszam" class="v-error">{{ vErrors.hazszam }}</span>
                 </div>
+
                 <div class="form-group">
-                  <label for="emeletAjto">Emelet/Ajtó</label>
-                  <input type="text" id="emeletAjto" v-model="editForm.emeletAjto" placeholder="2/5" />
+                  <label for="emeletAjto">
+                    Emelet/Ajtó
+                    <span v-if="vErrors.emeletAjto" style="color:#dc2626; margin-left:4px;">⚠</span>
+                    <span v-else-if="vValid.emeletAjto" style="color:#059669; margin-left:4px;">✓</span>
+                  </label>
+                  <input
+                    type="text"
+                    id="emeletAjto"
+                    v-model="editForm.emeletAjto"
+                    placeholder="2/5"
+                    maxlength="20"
+                    @blur="validateEmeletAjtoForm"
+                    @input="validateEmeletAjtoForm"
+                    :class="{ 'field-error': vErrors.emeletAjto, 'field-ok': vValid.emeletAjto }"
+                  />
+                  <span v-if="vErrors.emeletAjto" class="v-error">{{ vErrors.emeletAjto }}</span>
                 </div>
               </div>
               <div class="form-group">
                 <label for="varos">Város</label>
                 <Dropdown
-                  id="varos"
+                  inputId="varos"
                   v-model="editForm.varos"
                   :options="cities"
-                  :appendTo="self"
+                  appendTo="self"
                   optionLabel="varos_nev"
                   optionValue="id"
                   placeholder="Válassz vagy írj be egy várost"
@@ -592,10 +766,23 @@ function formatDate(d) { return new Date(d).toLocaleDateString(); }
             <!-- Profilkép -->
             <div class="form-section">
               <h4>Profilkép</h4>
-              <div class="form-group">
-                <label for="avatar">Feltöltés számítógépről</label>
-                <input type="file" id="avatar" accept="image/*" @change="handleFileUpload" />
-              </div>
+                <div class="form-group">
+                  <label>Feltöltés számítógépről</label>
+                  <label for="avatar" class="file-upload-btn" :class="{ 'file-selected': selectedFileName }">
+                    <span class="file-upload-icon">📁</span>
+                    <span class="file-upload-text">
+                      {{ selectedFileName || 'Fájl kiválasztása' }}
+                    </span>
+                    <input
+                      type="file"
+                      id="avatar"
+                      name="avatar"
+                      accept="image/*"
+                      @change="handleFileUpload"
+                      class="file-input-hidden"
+                    />
+                  </label>
+                </div>
               <div v-if="!showCamera" class="camera-toggle">
                 <button type="button" class="btn camera-btn" @click="startCamera">📷 Kamera használata</button>
               </div>
@@ -627,6 +814,7 @@ function formatDate(d) { return new Date(d).toLocaleDateString(); }
                 <label class="btn camera-btn" style="cursor:pointer;">
                   {{ coverUploading ? 'Feltöltés...' : '⬆️ Saját kép feltöltése' }}
                   <input
+                    id="coverUpload"
                     type="file"
                     accept=".jpg,.jpeg,.png,.webp,.avif,image/jpeg,image/png,image/webp,image/avif"
                     style="display:none"
@@ -2168,5 +2356,85 @@ color: #6b7280;
   .kedvenc-desc {
     font-size: 0.75rem;
   }
+}
+
+.field-error {
+  border-color: #dc2626 !important;
+  background: #fef2f2 !important;
+}
+.field-ok {
+  border-color: #059669 !important;
+  background: #f0fdf4 !important;
+}
+.v-error {
+  font-size: 12px;
+  color: #dc2626;
+  font-weight: 600;
+  margin-top: 2px;
+  display: block;
+  animation: shake 0.3s ease-in-out;
+}
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+
+.file-input-hidden {
+  display: none;
+}
+
+.file-upload-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 18px;
+  border: 2px dashed #c4a882;
+  border-radius: 12px;
+  background: #fdf8f4;
+  color: #6b4c2a;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.file-upload-btn.file-selected {
+  border-color: #059669;
+  border-style: solid;
+  background: #f0fdf4;
+  color: #059669;
+}
+
+.file-upload-btn.file-selected:hover {
+  background: #dcfce7;
+  border-color: #047857;
+  color: #047857;
+  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.15);
+}
+
+.file-upload-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 220px;
+}
+
+.file-upload-btn:hover {
+  background: #f5ece3;
+  border-color: #ad6801;
+  color: #ad6801;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(173, 104, 1, 0.15);
+}
+
+.file-upload-btn:active {
+  transform: translateY(0);
+}
+
+.file-upload-icon {
+  font-size: 18px;
 }
 </style>
