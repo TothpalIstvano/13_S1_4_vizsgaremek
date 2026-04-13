@@ -7,9 +7,9 @@ import api from '@/services/api.js'
 import { useRouter } from 'vue-router'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faCalendar, faHeart, faArrowRight, faArrowCircleUp, faThumbsUp, faThumbsDown} from '@fortawesome/free-solid-svg-icons'
+import { faCalendar, faHeart, faArrowRight, faArrowCircleUp, faThumbsUp, faThumbsDown, faWandMagicSparkles} from '@fortawesome/free-solid-svg-icons'
 
-library.add(faCalendar, faHeart, faArrowRight, faArrowCircleUp, faThumbsUp, faThumbsDown)
+library.add(faCalendar, faHeart, faArrowRight, faArrowCircleUp, faThumbsUp, faThumbsDown, faWandMagicSparkles)
 
 //variables
 const featureTitleRef = ref(null);
@@ -159,17 +159,11 @@ watch(isAuthenticated, (newVal) => {
           <div class="hero-buttons">
             <router-link to="/aruhaz" class="hero-btn primary">
               <span>Vásárlás</span>
-              <svg class="btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M5 12h14M12 5l7 7-7 7"/>
-              </svg>
+              <font-awesome-icon icon="fa-solid fa-arrow-right" class="btn-icon"/>
             </router-link>
             <router-link to="/mintakeszito" class="hero-btn secondary">
               <span>Mintakészítő</span>
-              <svg class="btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                <line x1="9" y1="9" x2="15" y2="9"></line>
-                <line x1="9" y1="15" x2="15" y2="15"></line>
-              </svg>
+              <font-awesome-icon icon="fa-solid fa-wand-magic-sparkles" class="btn-icon" />
             </router-link>
           </div>
         </div>
@@ -399,7 +393,7 @@ watch(isAuthenticated, (newVal) => {
               />
             </div>
 
-            <div class="card-content">
+            <div class="blog-content">
               <div class="meta-info">
                 <span class="blog-time">
                   <div class="icon-wrapper">
@@ -745,63 +739,6 @@ watch(isAuthenticated, (newVal) => {
   }
 }
 
-/* Responsive Hero Banner */
-@media (max-width: 968px) {
-  .hero-content {
-    grid-template-columns: 1fr;
-    gap: 40px;
-    text-align: center;
-  }
-  
-  .hero-image {
-    height: 400px;
-  }
-  
-  .hero-buttons {
-    justify-content: center;
-  }
-  
-  .floating-card {
-    transform: scale(0.8);
-  }
-  
-  .card-1 { top: 0; right: 10px; }
-  .card-2 { top: 150px; left: 50px; }
-  .card-3 { bottom: 0; right: 50px; }
-}
-
-@media (max-width: 640px) {
-  .hero-banner {
-    min-height: 100vh;
-  }
-  
-  .hero-content {
-    padding: 0 20px;
-  }
-  
-  .hero-title {
-    font-size: clamp(2.5rem, 10vw, 4rem);
-  }
-  
-  .hero-subtitle {
-    font-size: 1.1rem;
-  }
-  
-  .hero-buttons {
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .hero-btn {
-    width: 100%;
-    max-width: 300px;
-    justify-content: center;
-  }
-  
-  .hero-image {
-    display: none;
-  }
-}
 /*#endregion*/
 
 /*#region Motto Container*/
@@ -1479,11 +1416,50 @@ watch(isAuthenticated, (newVal) => {
 /*#endregion*/
 
 /* MEDIA QUERIES */
+@media (max-width: 1400px) {
+  .card-1 {top: -15px; right: -15px;}
+
+  .card-2 {bottom: -105px; right: 135px;}
+
+  .card-3 {top: 10px}
+}
 
 @media screen and (max-width: 1240px) {
   .cards-wrapper {
     grid-template-columns: repeat(2, 1fr);
   }
+}
+
+@media (max-width: 1120px) {
+  .card-3 {left: -55px;}
+}
+
+@media (max-width: 968px) {
+  .hero-content {
+    grid-template-columns: 1fr;
+    gap: 40px;
+    text-align: center;
+  }
+  
+  .hero-image {
+    height: 400px;
+  }
+  
+  .hero-buttons {
+    justify-content: center;
+  }
+  
+  .floating-card {
+    transform: scale(0.8);
+  }
+  
+  .card-1 { top: 0; right: 10px; }
+  .card-2 { top: auto; right: 310px; left: auto; bottom: 40px;}
+  .card-3 { top: 0; left: auto; right: auto; bottom: auto;}
+}
+
+@media (max-width: 885px) {
+  .card-2 {right: 200px;}  
 }
 
 @media screen and (max-width: 756px) {
@@ -1501,7 +1477,7 @@ watch(isAuthenticated, (newVal) => {
   .card-img-holder {
     border-radius: 12px;
   }
-  .card-content {
+  .blog-content {
     padding: 12px;
   }
   .blog-title {
@@ -1513,11 +1489,75 @@ watch(isAuthenticated, (newVal) => {
   }
 }
 
+@media (max-width: 700px) {
+  .floating-card {
+    padding: 10px;
+    width: 180px;
+  }
+
+  .card-image {
+    width: auto;
+    height: auto;
+  }
+
+  .card-content {padding: 10px;}
+}
+
+@media (max-width: 640px) {
+  .hero-banner {
+    min-height: 100vh;
+  }
+  
+  .hero-content {
+    padding: 0 20px;
+  }
+  
+  .hero-title {
+    font-size: clamp(2.5rem, 10vw, 4rem);
+  }
+  
+  .hero-subtitle {
+    font-size: 1.1rem;
+  }
+  
+  .hero-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .hero-btn {
+    width: 100%;
+    max-width: 300px;
+    justify-content: center;
+  }
+}
+
 @media screen and (max-width: 630px) {
   .cards-wrapper {
     grid-template-columns: 1fr;
     padding: 24px 0;
   }
+}
+
+@media (max-width: 580px) {
+  .card-2 {right: 150px;}
+}
+
+@media (max-width: 500px) {
+  /*.floating-card {
+    width: auto;
+    display: flex;
+  }*/
+
+  .card-image {display: none;}
+
+  .card-content {padding: 0px;}
+
+  .card-2 {top: 40px; bottom: auto;}
+
+  .floating-card {padding: 0px; width: 140px;}
+
+  .hero-image {height: 270px;}
 }
 
 @media screen and (max-width: 480px) {
@@ -1535,6 +1575,16 @@ watch(isAuthenticated, (newVal) => {
   .reakcio-kontener {
     justify-content: flex-start;
   }
+}
+
+@media (max-width: 420px) {
+  .card-2 {right: 110px;}  
+}
+
+@media (max-width: 360px) {
+  .floating-card {width: 120px;}
+
+  .card-2 {top: 95px;}
 }
 /*#endregion*/
 </style>

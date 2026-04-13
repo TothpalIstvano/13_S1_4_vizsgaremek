@@ -1,5 +1,2 @@
-- newpost notifications magyarul/jobban
-- profil telefonszám
 - belépés reszponzív animációval
-- főoldal posztok cím normálisabban, hero banner reszponzív
 (ha úgy gondolná h nem működik - blog képfeltöltés esetleg: https://stackoverflow.com/questions/50730143/laravel-storage-link-wont-work-on-production)
