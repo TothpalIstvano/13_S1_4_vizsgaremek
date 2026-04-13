@@ -39,7 +39,7 @@ export default {
             A Fiók Shop nem csupán egy barkácsáruház: közösségi tér és inspirációs forrás mindazoknak, akik szeretnek alkotni. Legyen szó DIY lakberendezésről, újrahasznosított anyagokból készült dekorációról, vagy akár saját készítésű ajándékokról – nálunk megtalálod a hozzávalókat, az eszközöket és a tippeket is. Emellett rendszeresen frissülő blogunkban bepillanthatsz a legújabb trendekbe, lépésről lépésre követhető útmutatókkal és kreatív ötletekkel várunk.
           </p>
           <RouterLink to="/aruhaz" class="gomb">
-            View Services
+            Nézd meg az áruházunkat
           </RouterLink>
         </div>
       </div>

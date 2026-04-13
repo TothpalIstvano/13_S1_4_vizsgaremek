@@ -229,7 +229,7 @@ library.add(faCalendar, faHeart, faArrowRight,
   faArrowUp, faSortAlphaUp, faSortAlphaDown,
   faFilter, faChevronLeft, faChevronRight)
 
-import potKep from '@/assets/Public/b-pl1.jpg'
+import potKep from '@/assets/Public/pot.jpg'
 
 const router = useRouter()
 const authStore = useAuthStore()
