@@ -1,14 +1,18 @@
 - \[/] Webshop
-- \[ ] Alertek lecserélése mindenhol modellekre
 - \[ ] Posztok és további backend helyekből kivenni a letrehozas_datuma nevű felesleges taget, mivel a created_at egyszerűbb és alap
 - \[ ] Az oldal kódjának tisztázás
 - \[ ] Az oldal tesztelése
 - \[ ] Az oldal dokumenálása
 - \[ ] Optimalizálás
+- \[ ] Kommentek törlése
+- \[ ] Kommentek tábla megjelenitése dashboardon
+- \[ ] navbar átnézése + claude chat
+- \[ ] Rendelés törlése
 - \[ ] Laravel base emailok át designolása
 - \[ ] Fejlesztési lehetőségekhez fel venni azt hogy a blogposzthoz felehessen venni hozzá tartozó termékeket + akkor lehessen termékekre is szűrni
 - \[ ] Az egész magyarosítása és a szövegek cseréje
 
+- \[X] Alertek lecserélése mindenhol modellekre✅
 - \[X] 05-06 lecserélése bejelentkezés és gyikra + emoiji meg everything✅
 - \[X] routeban password reset levédése somehow + Megoldani azt hogy ha lefrissiti az oldalt akkor ne dobja vissza a főoldalra ha más védett oldalon van eg. dashboard/profil -> inedx✅
 - \[X] vásárlási mezők verfikációjának javítása✅

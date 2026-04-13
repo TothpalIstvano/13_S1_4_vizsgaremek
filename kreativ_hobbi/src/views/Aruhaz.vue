@@ -363,6 +363,7 @@
   const dropdown = ref(null)
   const aktualisOldal = ref(1)
   const oldalMeret = ref(12)
+  const { showToast } = inject('toast')
 
   function toggle() {
     open.value = !open.value
@@ -484,7 +485,7 @@
     if (result.success && result.added > 0) {
       cartModal.value?.open(item, result.added)
     } else if (!result.success) {
-      alert(`⚠️ ${result.message}`)
+      showToast(`⚠️ ${result.message}`, 'error')
     }
   }
 

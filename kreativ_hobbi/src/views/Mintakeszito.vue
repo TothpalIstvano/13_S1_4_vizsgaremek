@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive, onMounted, onUnmounted, nextTick, computed, watch } from "vue"
+import { ref, reactive, onMounted, onUnmounted, nextTick, computed, watch, inject } from "vue"
 import axios from 'axios';
 import { useCartStore } from "@/stores/cartStore";
 
@@ -17,6 +17,7 @@ const szuksegesGombolyagok = ref(0)
 const kosarModal = ref(false)
 const kosarHozzaadva = ref(false)
 const kosarBetoltes = ref(false)
+const { showToast } = inject('toast')
 
 const tipusok = ["Horgolás", "Kötés", "Hímzés"]
 const fonalak = [
@@ -855,7 +856,7 @@ const fonalHossz = computed(() => {
 
 async function fonalHozzaadasKosarhoz() {
     if (!fonalTermek.value || szuksegesGombolyagok.value <= 0) {
-        alert('Kérjük, először válassz fonaltípust!')
+        showToast('Kérjük, először válassz fonaltípust!', 'error');
         return
     }
     
@@ -880,12 +881,16 @@ async function fonalHozzaadasKosarhoz() {
             kosarHozzaadva.value = true
             kosarModal.value = true
         } else {
-            alert('Hiba: ' + result.message)
+            showToast('Hiba a kosárhoz adásnál.', 'error', result.message);
         }
         
     } catch (error) {
         console.error('Kosárhoz adás sikertelen:', error)
-        alert('Hiba történt a kosárhoz adás során: ' + (error.response?.data?.error || error.message))
+          showToast(
+            'Hiba történt a kosárhoz adás során.', 
+            'error', 
+            error.response?.data?.error || error.message
+          )
     } finally {
         kosarBetoltes.value = false
     }

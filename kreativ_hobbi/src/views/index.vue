@@ -1,7 +1,7 @@
 <script setup>
 //imports
 import Carousel from '@/components/carousel.vue';
-import { ref, onMounted, onUnmounted, watch, computed } from 'vue';
+import { ref, onMounted, onUnmounted, watch, computed, inject } from 'vue';
 import { useAuthStore } from '@/stores/auth'
 import api from '@/services/api.js'
 import { useRouter } from 'vue-router'
@@ -18,6 +18,7 @@ const isHeroVisible = ref(true);
 let io = null;
 const baseURL = import.meta.env.VITE_API_URL;
 const blogPosts = ref([]);
+const { showToast } = inject('toast');
 
 onMounted( () => {
   io = new IntersectionObserver(
@@ -106,7 +107,7 @@ const reakcioKezeles = async (postId, reactionType) => {
     }
   } catch (err) {
     if (err.response?.status === 401) {
-      alert('Kérjük, jelentkezzen be a reakciókhoz!')
+      showToast('Jelentkezz be a reakciókhoz!', 'info')
       router.push('/Belepes')
     } else {
       console.error('Reaction error:', err)

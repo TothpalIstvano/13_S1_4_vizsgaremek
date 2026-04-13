@@ -1,5 +1,6 @@
 <script setup>
 import Navbar from '@/components/navbar.vue';
+import ToastPortal from '@/components/ToastPortal.vue';
 import Footer from '@/components/footer.vue';
 import { onMounted, provide, ref, onBeforeUnmount } from 'vue';
 import { RouterView, useRouter } from 'vue-router';
@@ -12,6 +13,13 @@ const router = useRouter();
 const loggedIn = ref(false);
 const user = ref(null); 
 const appUrl = import.meta.env.VITE_APP_URL || 'http://localhost:5173'
+
+const toast = ref(null)
+
+provide('toast', {
+  showToast: (...args) => toast.value?.showToast(...args),
+  showErrorModal: (...args) => toast.value?.showErrorModal(...args),
+})
 
 // Email verifikáció kezelése
 const handleVerifyMessage = async (event) => {
@@ -45,6 +53,7 @@ provide('user', user);
 <template>
   <div id="app">
     <Navbar></Navbar>
+    <ToastPortal ref="toast" />
     <main class="main-content">
       <RouterView></RouterView>
       <div v-if="!authStore.authChecked" class="app-loader">

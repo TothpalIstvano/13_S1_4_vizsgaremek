@@ -1228,11 +1228,22 @@
     class="sidebar-overlay" 
     @click="sidebarOpen = false"
   ></div>
+    <Teleport to="body">
+      <div v-if="confirmModal.visible" class="confirm-backdrop" @click.self="confirmNo">
+        <div class="confirm-modal">
+          <p class="confirm-message">{{ confirmModal.message }}</p>
+          <div class="confirm-actions">
+            <button class="confirm-btn cancel" @click="confirmNo">Mégse</button>
+            <button class="confirm-btn danger" @click="confirmYes">Törlés</button>
+          </div>
+        </div>
+      </div>
+    </Teleport>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue';
+import { ref, computed, onMounted, onUnmounted, nextTick, watch, inject } from 'vue';
 import Chart from 'chart.js/auto';
 import axios from 'axios';
 import MultiSelect from 'primevue/multiselect';
@@ -1299,6 +1310,18 @@ const productEditorKey = ref(0);
 const productCategoryOptions = ref([]);
 const productMainImageIndex = ref(0); 
 const productSaving = ref(false);
+
+const { showToast, showErrorModal } = inject('toast')
+
+// Confirm modal
+const confirmModal = ref({ visible: false, message: '', resolve: null })
+function showConfirm(message) {
+  return new Promise(resolve => {
+    confirmModal.value = { visible: true, message, resolve }
+  })
+}
+function confirmYes() { confirmModal.value.resolve(true);  confirmModal.value.visible = false }
+function confirmNo()  { confirmModal.value.resolve(false); confirmModal.value.visible = false }
 
 // Complex Form State (from new-post.vue)
 const selectedTags = ref([]); 
@@ -1565,15 +1588,15 @@ const removeImage = (index) => {
 
 const saveProduct = async () => {
   if (!editingProduct.value.name?.trim()) {
-    alert('A termék neve kötelező!');
+    showToast('A termék neve kötelező!', 'error');
     return;
   }
   if (!selectedProductCategory.value) {
-    alert('Válassz fő kategóriát!');
+    showToast('Válassz fő kategóriát!', 'error');
     return;
   }
   if (selectedProductColors.value.length === 0) {
-    alert('Legalább 1 színt válassz!');
+    showToast('Legalább 1 színt válassz!', 'error');
     return;
   }
 
@@ -1643,7 +1666,11 @@ const saveProduct = async () => {
 
   } catch (error) {
     console.error('Mentési hiba:', error);
-    alert('Hiba történt a termék mentése során: ' + (error.response?.data?.message ?? error.message));
+    showToast(
+      'Hiba történt a termék mentése során.',
+      'error',
+      error.response?.data?.message ?? error.message
+    )
   } finally {
     productSaving.value = false;
   }
@@ -1651,18 +1678,20 @@ const saveProduct = async () => {
 
 
 const deleteProduct = async (id) => {
-  if (!confirm('Biztosan törölni szeretnéd ezt a terméket?')) return;
+  const confirmed = await showConfirm('Biztosan törölni szeretnéd ezt a terméket?')
+  if (!confirmed) return;
   await axios.delete(`${API}/termekek/${id}`);
   await fetchProducts();
+  showToast('Termék törölve.', 'info')
 };
 
 const saveUser = async () => {
   if (editingUser.value.id && editingUser.value.id === currentUserId.value) {
-    alert('Saját fiókodat nem módosíthatod az admin felületen!');
+    showToast('Saját fiókodat nem módosíthatod az admin felületen!', 'error');
     return;
   }
   if(!editingUser.value.id && !editingUser.value.password) {
-    alert('A jelszó meg kell adni a felhasznált felhasználoknak!');
+    showToast('Új felhasználónál a jelszó megadása kötelező.', 'error');
     return;
   }
   const payload = {
@@ -1690,26 +1719,31 @@ const saveUser = async () => {
 
     showUserModal.value = false;
     await fetchUsers();
+    showToast('Felhasználó sikeresen mentve.')
   } catch (error) {
-    alert('Hiba történt a felhasználók feltöltése:', error);
+    showToast('Hiba történt a felhasználó mentése során.', 'error');
   }
 
 };
 
 const deleteUser = async (id) => {
-  if (!confirm('Biztosan törölni szeretnéd ezt a felhasználót?')) return;
+  const confirmed = await showConfirm('Biztosan törölni szeretnéd ezt a felhasználót?')
+  if (!confirmed) return;
   
   try {
     const response = await axios.delete(`${API}/users/${id}`);
     
     // If successful, refresh list and show success message
     await fetchUsers();
-    alert(response.data.message || 'Sikeresen törölve!');
+    showToast(response.data.message || 'Sikeresen törölve!');
     
   } catch (error) {
     // If error (like 403 for active orders), show the backend error message
-    const errorMessage = error.response?.data?.error || 'Ismeretlen hiba történt';
-    alert(errorMessage);
+    showToast(
+      'Nem sikerült törölni.',
+      'error',
+      error.response?.data?.error || 'Ismeretlen hiba történt.'
+    )
   }
 };
 
@@ -1759,16 +1793,19 @@ const saveBlogPost = async () => {
 
     showBlogModal.value = false;
     await fetchBlogPosts();
+    showToast('Bejegyzés sikeresen mentve.')
   } catch (error) {
     console.error('Save error:', error);
-    alert('Hiba történt a mentés során');
+    showToast('Hiba történt a mentés során.', 'error')
   }
 };
 
 const deleteBlogPost = async (id) => {
-  if (!confirm('Biztosan törölni szeretnéd ezt a bejegyzést?')) return;
+  const confirmed = await showConfirm('Biztosan törölni szeretnéd ezt a bejegyzést?')
+  if (!confirmed) return;
   await axios.delete(`/api/posts/${id}`);
   await fetchBlogPosts();
+  showToast('Bejegyzés törölve.', 'info')
 };
 
 const refreshData = async () => {
@@ -1809,10 +1846,10 @@ const createCategory = async () => {
         newCategoryParentId.value = null;
         showNewCategoryInline.value = false;
       } else {
-        alert(`"${newCategoryName.value}" kategória már létezik, de nem sikerült megtalálni.`);
+        showToast(`"${newCategoryName.value}" kategória már létezik, de nem sikerült megtalálni.`, 'error');
       }
     } else {
-      alert('Hiba a kategória létrehozásakor: ' + (dbMsg || e.message));
+      showToast('Hiba a kategória létrehozásakor.', 'error', dbMsg || e.message);
     }
   }
 };
@@ -1854,10 +1891,10 @@ const createColor = async () => {
         newColorHex.value = '#000000';
         showNewColorInline.value = false;
       } else {
-        alert(`"${newColorName.value}" szín már létezik, de nem sikerült megtalálni.`);
+        showToast(`"${newColorName.value}" szín már létezik, de nem sikerült megtalálni.`, 'error');
       }
     } else {
-      alert('Hiba a szín létrehozásakor: ' + (dbMsg || e.message));
+      showToast('Hiba a szín létrehozásakor.', 'error', dbMsg || e.message)
     }
   }
 };
@@ -3526,4 +3563,53 @@ tbody tr:hover {
     max-width: unset !important;
   }
 }
+
+.confirm-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 16px;
+}
+
+.confirm-modal {
+  background: #fff;
+  border-radius: 14px;
+  padding: 28px 24px 20px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+  width: 100%;
+  max-width: 360px;
+}
+
+.confirm-message {
+  font-size: 16px;
+  color: #1e293b;
+  margin: 0 0 24px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.confirm-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.confirm-btn {
+  padding: 8px 20px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.confirm-btn.cancel { background: #e5e7eb; color: #374151; }
+.confirm-btn.cancel:hover { background: #d1d5db; }
+.confirm-btn.danger { background: #dc2626; color: white; }
+.confirm-btn.danger:hover { background: #b91c1c; }
 </style>

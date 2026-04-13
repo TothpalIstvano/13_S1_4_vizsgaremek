@@ -200,13 +200,30 @@
         </div>
       </article>
     </div>
+    <!-- Megerősítő modal -->
+    <Teleport to="body">
+      <div
+        v-if="confirmModal.visible"
+        class="confirm-backdrop"
+        @click.self="confirmNo"
+      >
+        <div class="confirm-modal">
+          <p class="confirm-message">{{ confirmModal.message }}</p>
+          <div class="confirm-actions">
+            <button class="confirm-btn cancel" @click="confirmNo">Mégse</button>
+            <button class="confirm-btn danger" @click="confirmYes">Törlés</button>
+          </div>
+        </div>
+      </div>
+    </Teleport>
   </main>
 </template>
 
 <script setup>
 import {
-  ref, onMounted, onBeforeUnmount, watch, computed
+  ref, onMounted, onBeforeUnmount, watch, computed, inject
 } from 'vue'
+
 import { useRoute } from 'vue-router'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { library } from '@fortawesome/fontawesome-svg-core'
@@ -249,6 +266,27 @@ const fetchPost = async () => {
   } finally {
     loading.value = false
   }
+}
+
+const { showToast } = inject('toast')
+
+// Megerősítő modal saját állapota
+const confirmModal = ref({ visible: false, message: '', resolve: null })
+
+function showConfirm(message) {
+  return new Promise((resolve) => {
+    confirmModal.value = { visible: true, message, resolve }
+  })
+}
+
+function confirmYes() {
+  confirmModal.value.resolve(true)
+  confirmModal.value.visible = false
+}
+
+function confirmNo() {
+  confirmModal.value.resolve(false)
+  confirmModal.value.visible = false
 }
 
 const calculateReadTime = (content) => {
@@ -344,11 +382,11 @@ const addComment = async () => {
   } catch (err) {
     
     if (err.response?.status === 419) {
-      alert('CSRF token hiba. Próbáld újra az oldal frissítésével (F5).');
+      showToast('CSRF token hiba.', 'error', 'Frissítsd az oldalt (F5) és próbáld újra.');
     } else if (err.response?.status === 401) {
-      alert('Kérjük, jelentkezz be a hozzászóláshoz!');
+      showToast('Bejelentkezés szükséges a hozzászóláshoz.', 'error');
     } else {
-      alert('Hiba történt a hozzászólás küldése közben: ' + (err.response?.data?.error || err.message));
+      showToast('Hiba történt a hozzászólás küldésekor.', 'error', err.response?.data?.error || err.message);
     }
   } finally {
     loadingComments.value = false
@@ -356,21 +394,22 @@ const addComment = async () => {
 }
 
 const handleDelete = async (commentId) => {
-  if (!confirm('Biztosan törölni szeretnéd ezt a hozzászólást?')) return
+  const confirmed = await showConfirm('Biztosan törölni szeretnéd ezt a hozzászólást?')
+  if (!confirmed) return
   
   try {
     await ensureCsrfToken()
     
     await api.delete(`/api/comments/${commentId}`)
     removeComment(commentId)
+    showToast('Hozzászólás törölve.', 'info')
   } catch (err) {
-    
     if (err.response?.status === 419) {
-      alert('CSRF token hiba. Kérjük, próbáld újra.')
+      showToast('CSRF token hiba.', 'error', 'Próbáld újra.')
     } else if (err.response?.status === 401 || err.response?.status === 403) {
-      alert('Nincs jogosultságod ezt a hozzászólást törölni!')
+      showToast('Nincs jogosultságod törölni ezt a hozzászólást.', 'error')
     } else {
-      alert('Hiba történt a hozzászólás törlése közben.')
+      showToast('Hiba történt a törlés során.', 'error')
     }
   }
 }
@@ -1347,4 +1386,63 @@ onBeforeUnmount(() => {
   }
 }
 /*#endregion*/
+
+.confirm-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 16px;
+}
+
+.confirm-modal {
+  background: #fff;
+  border-radius: 14px;
+  padding: 28px 24px 20px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+  width: 100%;
+  max-width: 360px;
+  animation: slideIn 0.2s ease;
+}
+
+.confirm-message {
+  font-size: 16px;
+  color: #1e293b;
+  margin: 0 0 24px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.confirm-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.confirm-btn {
+  padding: 8px 20px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.confirm-btn.cancel {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.confirm-btn.cancel:hover { background: #d1d5db; }
+
+.confirm-btn.danger {
+  background: #dc2626;
+  color: white;
+}
+
+.confirm-btn.danger:hover { background: #b91c1c; }
 </style>
