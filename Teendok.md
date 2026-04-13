@@ -8,6 +8,7 @@
 - \[ ] Kommentek tábla megjelenitése dashboardon
 - \[ ] navbar átnézése + claude chat
 - \[ ] Rendelés törlése
+- \[ ] Email-already-verified page
 - \[ ] Laravel base emailok át designolása
 - \[ ] Fejlesztési lehetőségekhez fel venni azt hogy a blogposzthoz felehessen venni hozzá tartozó termékeket + akkor lehessen termékekre is szűrni
 - \[ ] Az egész magyarosítása és a szövegek cseréje

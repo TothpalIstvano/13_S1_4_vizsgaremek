@@ -13,8 +13,13 @@ class VerifyEmailController extends Controller
     {
         $user = Felhasznalok::findOrFail($id);
 
+        // Signature ellenőrzés (lejárat is benne van)
+        if (! $request->hasValidSignature()) {
+            return response()->json(['message' => 'Érvénytelen vagy lejárt link'], 403);
+        }
+
         if (! hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
-            return response()->json(['message' => 'Invalid verification link'], 403);
+            return response()->json(['message' => 'Érvénytelen link'], 403);
         }
 
         if ($user->hasVerifiedEmail()) {
