@@ -61,9 +61,12 @@ const formatDate = (dateString) => {
           </div>
         </div>
       </div>
-      
       <button
-        v-if="currentUserId && comment.felhasznalo?.id === currentUserId"
+        v-if="currentUserId && (
+          comment.felhasznalo?.id === currentUserId ||
+          currentUser?.adatok?.szerepkor === 'admin' ||
+          currentUser?.adatok?.szerepkor === 'moderator'
+        )"
         @click="$emit('delete', comment.id)" 
         class="delete-btn"
         title="Törlés"
