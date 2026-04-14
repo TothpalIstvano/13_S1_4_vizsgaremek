@@ -726,15 +726,11 @@
                 v-model="commentSearch"
               >
               <select
-                v-model="commentPostFilter"
-                style="padding:8px 12px; font-size:14px; border:1px solid #e2e8f0; border-radius:8px; height:38px; background:white; cursor:pointer; max-width:220px;"
+                v-model="commentPostSortMode"
+                style="padding:8px 12px; font-size:14px; border:1px solid #e2e8f0; border-radius:8px; height:38px; background:white; cursor:pointer;"
               >
-                <option value="">Összes poszt</option>
-                <option
-                  v-for="opt in commentPostOptions"
-                  :key="opt.id"
-                  :value="String(opt.id)"
-                >{{ opt.cim }}</option>
+                <option value="abc">Poszt: A → Z</option>
+                <option value="id">Poszt: ID szerint</option>
               </select>
             </div>
           </div>
@@ -742,7 +738,16 @@
           <table>
             <thead>
               <tr>
-                <th style="width:48px;">ID</th>
+                <th
+                  @click="toggleCommentSort('id')"
+                  style="width:48px; cursor:pointer; user-select:none; white-space:nowrap;"
+                >
+                  ID
+                  <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
+                    <span :style="commentSortKey === 'id' && commentSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
+                    <span :style="commentSortKey === 'id' && commentSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
+                  </span>
+                </th>
                 <th
                   @click="toggleCommentSort('iro')"
                   style="cursor:pointer; user-select:none; white-space:nowrap;"
@@ -769,8 +774,8 @@
                 >
                   Poszt
                   <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
-                    <span :style="commentSortKey === 'poszt_cim' && commentSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
-                    <span :style="commentSortKey === 'poszt_cim' && commentSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
+                    <span :style="commentSortKey === 'letrehozas_datuma' && commentSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
+                    <span :style="commentSortKey === 'letrehozas_datuma' && commentSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
                   </span>
                 </th>
                 <th style="white-space:nowrap;">Típus</th>
@@ -1487,8 +1492,6 @@ const productSaving = ref(false);
 const comments = ref([]);
 const commentSearch = ref('');
 const commentPostFilter = ref('');
-const commentSortKey = ref('letrehozas_datuma');
-const commentSortDir = ref('desc');
 const currentCommentPage = ref(1);
 const { showToast, showErrorModal } = inject('toast')
 
@@ -1693,16 +1696,19 @@ const notification = ref({
 const fetchComments = async () => {
   try {
     const { data } = await axios.get(`${API}/kommentek`);
-    console.log('API válasz:', data);
-    console.log('Hossz:', data.length);
     comments.value = data;
-    console.log('comments.value:', comments.value);
   } catch(e) {
     console.error('Fetch hiba:', e);
   }
 };
 
+const commentUserSorted = ref(false);
+const commentPostSortMode = ref('abc');
+const commentSortKey = ref('');
+const commentSortDir = ref('asc');
+
 const toggleCommentSort = (key) => {
+  commentUserSorted.value = true;
   if (commentSortKey.value === key) {
     commentSortDir.value = commentSortDir.value === 'asc' ? 'desc' : 'asc';
   } else {
@@ -1712,9 +1718,13 @@ const toggleCommentSort = (key) => {
   currentCommentPage.value = 1;
 };
 
+// A commentPostSortMode watcherbe add hozzá:
+watch(commentPostSortMode, () => {
+  commentUserSorted.value = false;  // poszt mód váltásakor reset
+  currentCommentPage.value = 1;
+});
+
 const filteredComments = computed(() => {
-  console.log('comments.value hossz:', comments.value.length);
-  console.log('commentSearch:', commentSearch.value);
   let result = comments.value.filter(c => {
     const s = commentSearch.value.toLowerCase();
     const matchesSearch = !s ||
@@ -1723,19 +1733,39 @@ const filteredComments = computed(() => {
       c.poszt_cim.toLowerCase().includes(s) ||
       String(c.poszt_id).includes(s) ||
       String(c.id).includes(s);
-        const matchesPost = !commentPostFilter.value ||
+    const matchesPost = !commentPostFilter.value ||
       String(c.poszt_id) === commentPostFilter.value;
     return matchesSearch && matchesPost;
   });
 
   result = [...result].sort((a, b) => {
+    if (!commentUserSorted.value || !commentSortKey.value) {
+      if (commentPostSortMode.value === 'id') {
+        return a.poszt_id - b.poszt_id;
+      }
+      return a.poszt_cim.localeCompare(b.poszt_cim, 'hu');
+    }
+
+    // Ha poszt oszlopra kattintott, a commentPostSortMode dönti el ID vagy ABC
+    if (commentSortKey.value === 'poszt_cim') {
+      if (commentPostSortMode.value === 'id') {
+        return commentSortDir.value === 'asc'
+          ? a.poszt_id - b.poszt_id
+          : b.poszt_id - a.poszt_id;
+      }
+      return commentSortDir.value === 'asc'
+        ? a.poszt_cim.localeCompare(b.poszt_cim, 'hu')
+        : b.poszt_cim.localeCompare(a.poszt_cim, 'hu');
+    }
+
     let aVal = a[commentSortKey.value];
     let bVal = b[commentSortKey.value];
     if (commentSortKey.value === 'letrehozas_datuma') {
       aVal = new Date(aVal || 0);
       bVal = new Date(bVal || 0);
-    } else if (commentSortKey.value === 'valaszok_szama') {
-      aVal = Number(aVal); bVal = Number(bVal);
+    } else if (commentSortKey.value === 'valaszok_szama' || commentSortKey.value === 'id') {
+      aVal = Number(aVal);
+      bVal = Number(bVal);
     } else {
       aVal = String(aVal ?? '').toLowerCase();
       bVal = String(bVal ?? '').toLowerCase();
@@ -1758,11 +1788,6 @@ const paginatedComments = computed(() => {
 });
 
 // Poszt szűrő dropdown-hoz egyedi posztok listája
-const commentPostOptions = computed(() =>
-  [...new Map(comments.value.map(c => [c.poszt_id, c.poszt_cim])).entries()]
-    .map(([id, cim]) => ({ id, cim }))
-    .sort((a, b) => a.cim.localeCompare(b.cim))
-);
 
 const showNotification = (type, message, duration = 3500) => {
     notification.value = {
@@ -2572,6 +2597,7 @@ watch(blogPublishedFilter, () => { currentBlogPage.value = 1; });
 watch(blogTagFilter, () => { currentBlogPage.value = 1; });
 watch(commentSearch, () => { currentCommentPage.value = 1; });
 watch(commentPostFilter, () => { currentCommentPage.value = 1; });
+watch(commentPostSortMode, () => { currentCommentPage.value = 1; });
 // --- Helpers ---
 
 const formatDate = (dateString) => {

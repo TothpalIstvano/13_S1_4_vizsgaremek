@@ -4,14 +4,14 @@
 - \[ ] Az oldal tesztelése
 - \[ ] Az oldal dokumenálása
 - \[ ] Optimalizálás
-- \[ ] Kommentek törlése
-- \[ ] Kommentek tábla megjelenitése dashboardon
+- \[ ] Kommentek törlése - tehát, ha komenthez tartozik egy komment pl. 3 alkomment és kitöröljük akkor a komment azt jelenitse meg hogy a komment törölve és ha nincs komment alatta akkor csa k smá törölje a kommmentet
 - \[ ] navbar átnézése + claude chat
 - \[ ] Rendelés törlése
 - \[ ] rendelések kimozditása külön menü pontba
-- \[ ] Laravel base emailok át designolása
 - \[ ] Az egész magyarosítása és a szövegek cseréje
 
+- \[X] Kommentek tábla megjelenitése dashboardon✅
+- \[X] Laravel base emailok át designolása✅
 - \[X] Fejlesztési lehetőségekhez fel venni azt hogy a blogposzthoz felehessen venni hozzá tartozó termékeket + akkor lehessen termékekre is szűrni✅
 - \[X] Email-already-verified page✅
 - \[X] Alertek lecserélése mindenhol modellekre✅
