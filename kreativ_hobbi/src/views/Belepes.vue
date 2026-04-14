@@ -1,5 +1,5 @@
 <template>
-  <div class="main">
+  <div class="main" :class="{ 'is-signin': isSignInMode}">
     <!-- Sign Up Container -->
     <div class="container a-container" :class="{ 'is-txl': isSignInMode }">
       <form class="form" @submit.prevent="handleSignUp">
@@ -386,7 +386,7 @@ const handleSignUp = async () => {
     position: relative;
     width: 1000px;
     min-width: 1000px;
-    min-height: 600px;
+    min-height: 650px;
     height: 650px;
     padding: 25px;
     background-color: #ecf0f3;
@@ -774,32 +774,22 @@ const handleSignUp = async () => {
 }
 
 @media (max-width: 768px) {
- .main {
+  .main {
     width: 90vw;
     min-width: unset;
     height: auto;
-    min-height: unset;
+    min-height: 680px;
     transform: none;
     margin: 20px auto;
     padding: 0;
     display: flex;
     flex-direction: column;
-    overflow: visible;
+    overflow: hidden;                /* keep the switch inside rounded corners */
+    border-radius: 12px;
+    position: relative;              /* for absolute positioning of the switch */
   }
 
-  .switch {
-    position: relative !important;
-    width: 100% !important;
-    height: auto !important;
-    min-height: 160px;
-    left: 0 !important;
-    transform: none !important;
-    transition: background-color 0.4s ease !important;
-    padding: 32px 24px;
-    order: -1;
-    border-radius: 12px 12px 0 0;
-  }
-
+  /* Both form containers – stacked normally, hidden with display:none when inactive */
   .container {
     position: relative !important;
     width: 100% !important;
@@ -807,45 +797,110 @@ const handleSignUp = async () => {
     left: 0 !important;
     top: 0 !important;
     padding: 32px 24px 40px;
-    transition: opacity 0.35s ease, transform 0.35s ease !important;
+    transition: none;                /* we’ll control visibility with display */
   }
 
-  .a-container.is-txl,
-  .b-container:not(.is-z200) {
-    opacity: 0 !important;
-    pointer-events: none !important;
-    transform: translateY(-14px) !important;
-    max-height: 0 !important;
-    overflow: hidden !important;
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
+  .a-container {
+    display: block;
   }
 
-  .b-container.is-z200,
-  .a-container:not(.is-txl) {
-    animation: mobileFormIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  .b-container {
+    display: none;
   }
 
+  /* When sign‑in mode is active, show the sign‑in form */
+  .main.is-signin .a-container {
+    display: none;
+  }
+
+  .main.is-signin .b-container {
+    display: block;
+  }
+
+  /* The switch panel – now absolutely positioned and slides vertically */
+  .switch {
+    position: absolute !important;
+    top: 0;
+    left: 0;
+    width: 100% !important;
+    min-height: 280px;               /* use min-height instead of fixed height */
+    height: auto;                    /* let it grow if needed */
+    padding: 32px 24px;
+    background-color: #ecf0f3;
+    box-shadow: 4px 4px 10px #d1d9e6, -4px -4px 10px #f9f9f9;
+    border-radius: 12px 12px 0 0;
+    transition: transform 0.6s cubic-bezier(0.2, 0.9, 0.4, 1);
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: translateY(0);
+    box-sizing: border-box;
+  }
+
+  /* When sign‑in is active, slide the switch to the bottom */
+  .main.is-signin .switch {
+    transform: translateY(calc(100% + 40px)); /* slides down below the form */
+    border-radius: 0 0 12px 12px;
+  }
+
+  /* Switch content containers – cross‑fade inside the sliding panel */
+  .switch__container {
+    position: relative !important;    /* changed from absolute */
+    width: 100%;
+    padding: 0;
+    text-align: center;
+    transition: opacity 0.25s ease, visibility 0.25s ease;
+  }
+
+  .is-hidden {
+    display: none !important;
+  }
+
+  .switch .title {
+    font-size: 28px;
+    line-height: 1.3;
+    margin-bottom: 12px;
+  }
+
+  .switch .description {
+    font-size: 13px;
+    margin-bottom: 20px;
+    padding: 0 10px;
+  }
+
+  .switch .button {
+    margin-top: 10px;
+    width: 160px;
+  }
+
+  /* Remove desktop circles */
   .switch__circle,
   .switch__circle--t {
     display: none;
   }
 
-  .switch__container {
-    position: relative;
-    width: 100%;
-    padding: 0 16px;
+  /* Push the form down to make room for the switch when it's at the top */
+  .container {
+    margin-top: 280px;               /* same as switch height */
   }
 
-  .is-hidden {
-    display: block !important;
-    visibility: hidden !important;
-    opacity: 0 !important;
-    pointer-events: none;
-    position: absolute !important;
-    transition: opacity 0.4s ease, visibility 0.4s ease !important;
+  /* When switch slides to bottom, remove top margin so form sits at top */
+  .main.is-signin .container {
+    margin-top: 0;
   }
 
+  .main.is-signin .switch {
+    transform: translateY(380px); /* adjust to slide below form */
+    border-radius: 0 0 12px 12px;
+  }
+
+  /* Ensure the main container has enough height to show everything */
+  .main {
+    min-height: 600px;               /* prevent collapsing */
+  }
+
+  /* Form elements full width */
   .form__input,
   .input-wrapper,
   .error-message {
@@ -856,6 +911,12 @@ const handleSignUp = async () => {
 
   .button {
     margin-top: 24px;
+  }
+
+  /* Remove old left/right classes effects */
+  .is-txr, .is-txl, .is-z200 {
+    left: 0 !important;
+    transition: none !important;
   }
 }
 

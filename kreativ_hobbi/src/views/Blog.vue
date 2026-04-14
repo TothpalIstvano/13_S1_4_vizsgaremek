@@ -435,7 +435,8 @@ const posztokLekerese = async () => {
     posztok.value = [...mindenPoszt.value];
     rendezes();
 
-    // If already authenticated, fetch reactions immediately
+    loading.value = false; //
+
     if (isAuthenticated.value) {
       await fetchReakcio();
     }
