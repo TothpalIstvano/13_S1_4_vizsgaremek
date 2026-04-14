@@ -269,11 +269,11 @@
 
     <!-- Empty State -->
     <div v-else class="empty-state">
-      <div class="empty-icon">🛒</div>
+      <div class="empty-icon"><FontAwesomeIcon icon="fa-basket-shopping" /></div>
       <h2>A kosarad üres</h2>
       <p>Még nincs termék a kosárban. Nézz körül a boltban és válassz szét, amit szívesen megvennél!</p>
       <router-link to="/aruhaz" class="btn-primary">
-        <span>→</span> Vissza az Áruházba
+        <span><FontAwesomeIcon icon="fa-arrow-left" /></span> Vissza az Áruházba
       </router-link>
     </div>
     <Teleport to="body">
@@ -297,6 +297,11 @@ import { useCartStore } from '@/stores/cartStore'
 import axios from 'axios';
 import Dropdown from 'primevue/dropdown';
 import { parsePhoneNumberFromString, isValidPhoneNumber } from 'libphonenumber-js';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { faBasketShopping, faArrowLeft} from '@fortawesome/free-solid-svg-icons'
+
+library.add(faBasketShopping, faArrowLeft)
 
 const router = useRouter()
 const cartStore = useCartStore()
@@ -1348,10 +1353,6 @@ async function checkout() {
     position: static;
   }
 
-  .cart-header h1 {
-    font-size: 2rem;
-  }
-
   .form-row {
     grid-template-columns: 1fr;
   }
@@ -1427,10 +1428,6 @@ async function checkout() {
 @media (max-width: 600px) {
   .cart-page {
     padding: 24px 16px;
-  }
-
-  .cart-header h1 {
-    font-size: 1.5rem;
   }
 
   .summary-card,

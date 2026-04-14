@@ -192,7 +192,7 @@
           <button @click="submit" class="card-form__button" type="button" 
             :disabled="(kartyaLejart && !kartyaszamModositva) || !kartyaCheck"
             :class="{ 'button-disabled': (kartyaLejart && !kartyaszamModositva) || !kartyaCheck}">
-            Submit
+            Fizetés
           </button>
         </div>
       </div>

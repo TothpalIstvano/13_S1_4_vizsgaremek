@@ -208,10 +208,9 @@ watch(isAuthenticated, (newVal) => {
     
     <div id="mottoContainer">
       <div class="mottoInner">
-        <h1>Webáruházunk vmije</h1>
+        <h1>Üdvözölünk a Hobbitár weboldalán!</h1>
         <p>
-          "Lorem ipsum dolor sit amet consectetur adipisicing elit. Magnam rerum beatae sunt, laboriosam minima nam sapiente reprehenderit quisquam repellat asperiores minus quis, fuga natus ipsum ipsam quod molestiae corporis incidunt!
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, natus.LOREM ipsum dolor sit amet consectetur adipisicing elit."
+          Egy hely, ahol mindent megtalálsz, amire csak szükséged lehet sokfajta szabadidős tevékenységhez, legyen szó kertészetről, barkácsolásról, horgolásról, kötésről, hímzésről vagy éppen ékszerkészítésről. Áruházunk célja hogy minden eszközt az otthonod kényelméből tudj megrendelni, és ezeket akár a küszöbödig szállítani.
         </p>
       </div>
     </div>
