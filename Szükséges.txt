@@ -1,2 +1,12 @@
 - belépés reszponzív animációval
+- dokumentáció: 
+    - adatbázis javítások (doku + ppt)
+    - algoritmus javítások (ha kell)
+    - tesztesetek update
+    - hiányzó kis részek
+    - maybe keret a képekre?
+    - eldönteni hogy hogy legyen a címsor
+    - források
+    - fejlesztési lehetőségek
+- teszteket majd beletenni a fő mappába
 (ha úgy gondolná h nem működik - blog képfeltöltés esetleg: https://stackoverflow.com/questions/50730143/laravel-storage-link-wont-work-on-production)

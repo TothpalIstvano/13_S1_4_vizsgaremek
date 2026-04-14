@@ -1112,6 +1112,13 @@ onBeforeUnmount(() => {
   overflow: hidden;
 }
 
+.form-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
 #user-icon {
   font-size: 42px;
 }
