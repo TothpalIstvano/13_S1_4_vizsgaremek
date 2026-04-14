@@ -7,6 +7,7 @@
 - \[ ] Kommentek törlése - tehát, ha komenthez tartozik egy komment pl. 3 alkomment és kitöröljük akkor a komment azt jelenitse meg hogy a komment törölve és ha nincs komment alatta akkor csa k smá törölje a kommmentet
 - \[ ] navbar átnézése + claude chat
 - \[ ] Rendelés törlése
+- \[ ] blogok + kommentek bejelentése + táblázat az admin felületre vagy úgy hogy jelentetek vagy úgy, hogy be lehessen kapcsolni mint szűrés vagy külön tábla vagy mindkettő + migrációk és stb- hozzá ja és vagy egy lennyiló menű vagy egy modal
 - \[ ] rendelések kimozditása külön menü pontba
 - \[ ] Az egész magyarosítása és a szövegek cseréje
 

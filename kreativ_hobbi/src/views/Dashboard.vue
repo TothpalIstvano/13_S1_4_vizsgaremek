@@ -19,6 +19,12 @@
           </a>
         </li>
         <li class="nav-item">
+          <a class="nav-link" :class="{active: currentView === 'orders'}" @click="currentView = 'orders'">
+            <span class="nav-icon"><FontAwesomeIcon icon="fa-truck" /></span>
+            Rendelések
+          </a>
+        </li>
+        <li class="nav-item">
           <a class="nav-link" :class="{active: currentView === 'blog'}" @click="currentView = 'blog'">
             <span class="nav-icon"><FontAwesomeIcon icon="fa-file-lines" /></span>
             Blogbejegyzések
@@ -200,6 +206,7 @@
                     <span :style="orderSortKey === 'date' && orderSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
                   </span>
                 </th>
+                <th>Műveletek</th>
               </tr>
             </thead>
             <tbody>
@@ -214,6 +221,17 @@
                   </span>
                 </td>
                 <td>{{ order.date }}</td>
+                <td>
+                  <button
+                    class="btn btn-sm btn-danger"
+                    @click="deleteOrder(order)"
+                    :disabled="order.status === 'szállítás alatt'"
+                    :style="order.status === 'szállítás alatt' ? 'opacity:0.35; cursor:not-allowed;' : ''"
+                    :title="order.status === 'szállítás alatt' ? 'Szállítás alatt lévő rendelés nem törölhető' : 'Rendelés törlése'"
+                  >
+                    <FontAwesomeIcon icon="fa-trash-alt" />
+                  </button>
+                </td>
               </tr>
             </tbody>
           </table>
@@ -392,6 +410,139 @@
             
             <span style="color:#64748b; font-size:13px; margin-left:8px;">
               {{ filteredProducts.length }} felhasználó / {{ currentProductPage }}.oldal
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Orders View -->
+      <div v-if="currentView === 'orders'">
+        <div class="header">
+          <h2>Rendelések</h2>
+        </div>
+
+        <div class="table-container">
+          <div class="table-header">
+            <h3 class="table-title">Összes rendelés</h3>
+            <div class="filters-row">
+              <div class="search-box">
+                <input 
+                  type="text" 
+                  class="search-input" 
+                  placeholder="Keresés (név vagy ID alapján)..."
+                  v-model="orderSearch"
+                >
+              </div>
+              <select 
+                v-model="orderStatusFilter" 
+                style="padding:8px 12px; font-size:14px; border:1px solid #e2e8f0; border-radius:8px; height:38px; min-width:160px; background:white; cursor:pointer;"
+              >
+                <option value="">Összes státusz</option>
+                <option value="teljesítve">✅ Teljesítve</option>
+                <option value="függőben">⏳ Függőben</option>
+                <option value="szállítás alatt">🚚 Szállítás alatt</option>
+                <option value="törölve">🚫 Törölve</option>
+              </select>
+            </div>
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th @click="toggleOrderSort('id')" style="cursor:pointer; user-select:none; white-space:nowrap;">
+                  Rendelés ID
+                  <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
+                    <span :style="orderSortKey === 'id' && orderSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
+                    <span :style="orderSortKey === 'id' && orderSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
+                  </span>
+                </th>
+                <th @click="toggleOrderSort('customer')" style="cursor:pointer; user-select:none; white-space:nowrap;">
+                  Vásárló
+                  <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
+                    <span :style="orderSortKey === 'customer' && orderSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
+                    <span :style="orderSortKey === 'customer' && orderSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
+                  </span>
+                </th>
+                <th @click="toggleOrderSort('items')" style="cursor:pointer; user-select:none; white-space:nowrap;">
+                  Termékek
+                  <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
+                    <span :style="orderSortKey === 'items' && orderSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
+                    <span :style="orderSortKey === 'items' && orderSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
+                  </span>
+                </th>
+                <th @click="toggleOrderSort('total')" style="cursor:pointer; user-select:none; white-space:nowrap;">
+                  Összeg
+                  <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
+                    <span :style="orderSortKey === 'total' && orderSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
+                    <span :style="orderSortKey === 'total' && orderSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
+                  </span>
+                </th>
+                <th>Státusz</th>
+                <th @click="toggleOrderSort('date')" style="cursor:pointer; user-select:none; white-space:nowrap;">
+                  Dátum
+                  <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
+                    <span :style="orderSortKey === 'date' && orderSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
+                    <span :style="orderSortKey === 'date' && orderSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
+                  </span>
+                </th>
+                <th>Műveletek</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="order in paginatedOrders" :key="order.id">
+                <td><strong>#{{ order.id }}</strong></td>
+                <td>{{ order.customer }}</td>
+                <td>{{ order.items }}</td>
+                <td><strong>{{ formatCurrency(order.total) }}</strong></td>
+                <td>
+                  <span class="badge" :class="getOrderBadgeClass(order.status)">
+                    {{ order.status }}
+                  </span>
+                </td>
+                <td>{{ order.date }}</td>
+                <td><button
+                    class="btn btn-sm btn-danger"
+                    @click="deleteOrder(order)"
+                    :disabled="order.status === 'szállítás alatt'"
+                    :style="order.status === 'szállítás alatt' ? 'opacity:0.35; cursor:not-allowed;' : ''"
+                    :title="order.status === 'szállítás alatt' ? 'Szállítás alatt lévő rendelés nem törölhető' : 'Rendelés törlése'"
+                  >
+                    <FontAwesomeIcon icon="fa-trash-alt" />
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div v-if="filteredOrders.length === 0" style="text-align:center; padding:40px; color:#94a3b8;">
+            Nincs találat a megadott feltételekre.
+          </div>
+
+          <div v-if="totalOrderPages > 1" style="display:flex; justify-content:center; align-items:center; gap:8px; padding:16px; border-top:1px solid #e2e8f0;">
+            <button 
+              class="btn btn-sm" 
+              @click="currentOrderPage--" 
+              :disabled="currentOrderPage === 1"
+              style="background:#f1f5f9;"
+            >← Előző</button>
+            
+            <template v-for="page in totalOrderPages" :key="page">
+              <button 
+                class="btn btn-sm"
+                @click="currentOrderPage = page"
+                :style="currentOrderPage === page ? 'background:#f97316; color:white;' : 'background:#f1f5f9;'"
+              >{{ page }}</button>
+            </template>
+            
+            <button 
+              class="btn btn-sm" 
+              @click="currentOrderPage++" 
+              :disabled="currentOrderPage === totalOrderPages"
+              style="background:#f1f5f9;"
+            >Következő →</button>
+            
+            <span style="color:#64748b; font-size:13px; margin-left:8px;">
+              {{ filteredOrders.length }} rendelés / {{ currentOrderPage }}.oldal
             </span>
           </div>
         </div>
@@ -1559,7 +1710,8 @@ const fetchStats = async () => {
 const fetchOrders = async () => {
   const { data } = await axios.get(`${API}/rendelesek`);
   recentOrders.value = data.map(r => ({
-    id: r.id,
+    id: r.id,           
+    rawId: parseInt(String(r.id).replace(/[^0-9]/g, ''), 10), 
     customer: r.felhasznalo?.nev ?? 'Vendég',
     items: r.termekek_szama,
     total: r.osszeg,
@@ -1961,6 +2113,23 @@ const deleteProduct = async (id) => {
   await axios.delete(`${API}/termekek/${id}`);
   await fetchProducts();
   showToast('Termék törölve.', 'info')
+};
+
+const deleteOrder = async (order) => {
+  const confirmed = await showConfirm(`Biztosan törölni szeretnéd a(z) #${order.id} rendelést?`);
+  if (!confirmed) return;
+
+  try {
+    await axios.delete(`${API}/rendelesek/${order.rawId}`);
+    await fetchOrders();
+    showToast('Rendelés törölve.', 'info');
+  } catch (error) {
+    showToast(
+      'Nem sikerült törölni.',
+      'error',
+      error.response?.data?.error || 'Ismeretlen hiba.'
+    );
+  }
 };
 
 const saveUser = async () => {

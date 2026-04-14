@@ -891,4 +891,28 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
         \DB::table('kommentek')->where('id', $id)->delete();
         return response()->json(['message' => 'Komment törölve']);
     });
+
+    Route::delete('/rendelesek/{id}', function ($id) {
+        $rendeles = Rendelesek::findOrFail($id);
+
+        if ($rendeles->statusz === 'szállítás alatt') {
+            return response()->json([
+                'error' => 'Szállítás alatt lévő rendelés nem törölhető.'
+            ], 403);
+        }
+
+        // Csak függőben lévőknél állítjuk vissza a készletet
+        if ($rendeles->statusz === 'függőben') {
+            $rendeles->rendeltTermekek()->with('termekek')->each(function ($tetel) {
+                if ($tetel->termekek) {
+                    $tetel->termekek->increment('darab', $tetel->mennyiseg);
+                }
+            });
+        }
+
+        $rendeles->rendeltTermekek()->delete();
+        $rendeles->delete();
+
+        return response()->json(['message' => 'Rendelés törölve.']);
+    });
 });
