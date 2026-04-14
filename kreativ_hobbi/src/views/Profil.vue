@@ -1891,7 +1891,7 @@ color: #6b7280;
 
 .post-cover {
   width: 240px;
-  min-width: 240px;
+  max-height: 180px;
 }
 
 .post-cover img {
@@ -2220,7 +2220,7 @@ color: #6b7280;
 
   .profile-card {
     padding: 10px;
-    transform: translateY(20px);
+    transform: translateY(140px);
   }
 
   .avatar {
@@ -2257,7 +2257,7 @@ color: #6b7280;
   }
 
   .content {
-    margin: 80px auto;
+    margin: 190px auto;
   }
 
   .post-cover {

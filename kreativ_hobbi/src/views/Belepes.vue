@@ -767,80 +767,106 @@ const handleSignUp = async () => {
 .fade-enter-from, .fade-leave-to { opacity: 0; }
 
 @media (max-width: 1200px) {
-    .main {
-        transform: scale(.85);
-        transform-origin: top center;
-    }
+  .main {
+    transform: scale(.85);
+    transform-origin: top center;
+  }
 }
 
 @media (max-width: 768px) {
-    .main {
-        width: 90vw;
-        min-width: unset;
-        height: auto;
-        min-height: unset;
-        transform: none;
-        margin: 20px auto;
-        padding: 0;
-        display: flex;
-        flex-direction: column;
-        overflow: visible;
-    }
+ .main {
+    width: 90vw;
+    min-width: unset;
+    height: auto;
+    min-height: unset;
+    transform: none;
+    margin: 20px auto;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: visible;
+  }
 
-    .switch {
-        position: relative !important;
-        width: 100% !important;
-        height: auto !important;
-        min-height: 160px;
-        left: 0 !important;
-        transform: none !important;
-        transition: none !important;
-        padding: 32px 24px;
-        order: -1;
-        border-radius: 12px 12px 0 0;
-    }
+  .switch {
+    position: relative !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 160px;
+    left: 0 !important;
+    transform: none !important;
+    transition: background-color 0.4s ease !important;
+    padding: 32px 24px;
+    order: -1;
+    border-radius: 12px 12px 0 0;
+  }
 
-    .container {
-        position: relative !important;
-        width: 100% !important;
-        height: auto !important;
-        left: 0 !important;
-        top: 0 !important;
-        padding: 32px 24px 40px;
-        transition: none !important;
-        transform: none !important;
-    }
+  .container {
+    position: relative !important;
+    width: 100% !important;
+    height: auto !important;
+    left: 0 !important;
+    top: 0 !important;
+    padding: 32px 24px 40px;
+    transition: opacity 0.35s ease, transform 0.35s ease !important;
+  }
 
-    .a-container.is-txl,
-    .b-container:not(.is-z200) {
-        display: none !important;
-    }
+  .a-container.is-txl,
+  .b-container:not(.is-z200) {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transform: translateY(-14px) !important;
+    max-height: 0 !important;
+    overflow: hidden !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+  }
 
-    .switch__circle,
-    .switch__circle--t {
-        display: none;
-    }
+  .b-container.is-z200,
+  .a-container:not(.is-txl) {
+    animation: mobileFormIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
 
-    .switch__container {
-        position: relative;
-        width: 100%;
-        padding: 0 16px;
-    }
+  .switch__circle,
+  .switch__circle--t {
+    display: none;
+  }
 
-    .is-hidden {
-        display: none !important;
-    }
+  .switch__container {
+    position: relative;
+    width: 100%;
+    padding: 0 16px;
+  }
 
-    .form__input,
-    .input-wrapper,
-    .error-message {
-        width: 100%;
-        max-width: 100%;
-        box-sizing: border-box;
-    }
+  .is-hidden {
+    display: block !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none;
+    position: absolute !important;
+    transition: opacity 0.4s ease, visibility 0.4s ease !important;
+  }
 
-    .button {
-        margin-top: 24px;
-    }
+  .form__input,
+  .input-wrapper,
+  .error-message {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .button {
+    margin-top: 24px;
+  }
+}
+
+@keyframes mobileFormIn {
+  from {
+    opacity: 0;
+    transform: translateY(-22px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 </style>

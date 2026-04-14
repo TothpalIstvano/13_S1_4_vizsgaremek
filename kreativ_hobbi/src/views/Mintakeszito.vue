@@ -962,7 +962,7 @@ onUnmounted(() => {
     <div id="bemutato">
       <div class="ket-oszlop">
         <div class="blog-info-kontener">
-          <img src="../assets/public/mk-kep.jpg" alt="">
+          <img src="../assets/public/pot.jpg" alt="">
           <div class="blog-info">
             <h3>Mi is ez pontosan?</h3>
             <p>Angol nevén <b>tapestry</b>, magyarul pedig a <b>gobelin/faliszőnyeg</b> szavakat használjuk rá, bár horgolós körökbe a 'tapestry' kifejezéssel élnek inkább. Ezzel a techinkával uyganis nem csak nagy, részletes képeket lehet alkotni, hanem kisebb, csupán képkeretnyi méretű alkotás is készíthető.</p>
