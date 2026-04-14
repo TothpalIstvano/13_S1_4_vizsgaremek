@@ -21,6 +21,7 @@ use App\Mail\RendelesVisszaigazolas;
 use Illuminate\Support\Facades\Mail;
 use App\Models\Szinek;
 use App\Models\Kepek;
+use App\Models\Kommentek;
 //User related API routes:
 
 // Check if user is logged in and return szerepkor
@@ -845,4 +846,49 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
     Route::post('/blog', [BlogController::class, 'store']);
     Route::put('/blog/{id}', [BlogController::class, 'update']);
     Route::delete('/blog/{id}', [BlogController::class, 'destroy']);
+
+    //kommentek
+    Route::get('/kommentek', function () {
+        $kommentek = \DB::table('kommentek as k')
+            ->leftJoin('felhasznalok as f', 'f.id', '=', 'k.kommentelo')
+            ->leftJoin('posztok as p', 'p.id', '=', 'k.poszt_id')
+            ->select(
+                'k.id',
+                'k.komment',
+                'k.poszt_id',
+                'k.kommentelo as iro_id',
+                'k.elozetes_komment_id as szulo_id',
+                'k.letrehozas_datuma',
+                'f.felhasz_nev as iro',
+                'p.cim as poszt_cim'
+            )
+            ->orderBy('k.letrehozas_datuma', 'desc')
+            ->get()
+            ->map(function ($k) {
+                $valaszok = \DB::table('kommentek')
+                    ->where('elozetes_komment_id', $k->id)
+                    ->count();
+                return [
+                    'id' => $k->id,
+                    'komment' => $k->komment,
+                    'iro' => $k->iro ?? 'Vendég',
+                    'iro_id' => $k->iro_id,
+                    'poszt_cim' => $k->poszt_cim ?? '-',
+                    'poszt_id' => $k->poszt_id,
+                    'szulo_id' => $k->szulo_id,
+                    'valaszok_szama' => $valaszok,
+                    'letrehozas_datuma' => $k->letrehozas_datuma,
+                ];
+            });
+
+        return response()->json($kommentek);
+    });
+
+    Route::delete('/kommentek/{id}', function ($id) {
+        \DB::table('kommentek')
+            ->where('elozetes_komment_id', $id)
+            ->update(['elozetes_komment_id' => null]);
+        \DB::table('kommentek')->where('id', $id)->delete();
+        return response()->json(['message' => 'Komment törölve']);
+    });
 });

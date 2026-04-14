@@ -25,6 +25,12 @@
           </a>
         </li>
         <li class="nav-item">
+          <a class="nav-link" :class="{active: currentView === 'comments'}" @click="currentView = 'comments'">
+            <span class="nav-icon"><FontAwesomeIcon icon="fa-comment" /></span>
+            Kommentek
+          </a>
+        </li>
+        <li class="nav-item">
           <a class="nav-link" :class="{active: currentView === 'users'}" @click="currentView = 'users'">
             <span class="nav-icon"><FontAwesomeIcon icon="fa-user" /></span>
             Felhasználók
@@ -703,6 +709,174 @@
         </div>
       </div>
 
+      <!-- Comments View -->
+      <div v-if="currentView === 'comments'">
+        <div class="header">
+          <h2>Kommentek</h2>
+        </div>
+
+        <div class="table-container">
+          <div class="table-header">
+            <h3 class="table-title">Összes komment</h3>
+            <div class="filters-row">
+              <input
+                type="text"
+                class="search-input"
+                placeholder="Keresés (tartalom, szerző, poszt)..."
+                v-model="commentSearch"
+              >
+              <select
+                v-model="commentPostFilter"
+                style="padding:8px 12px; font-size:14px; border:1px solid #e2e8f0; border-radius:8px; height:38px; background:white; cursor:pointer; max-width:220px;"
+              >
+                <option value="">Összes poszt</option>
+                <option
+                  v-for="opt in commentPostOptions"
+                  :key="opt.id"
+                  :value="String(opt.id)"
+                >{{ opt.cim }}</option>
+              </select>
+            </div>
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th style="width:48px;">ID</th>
+                <th
+                  @click="toggleCommentSort('iro')"
+                  style="cursor:pointer; user-select:none; white-space:nowrap;"
+                >
+                  Szerző
+                  <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
+                    <span :style="commentSortKey === 'iro' && commentSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
+                    <span :style="commentSortKey === 'iro' && commentSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
+                  </span>
+                </th>
+                <th
+                  @click="toggleCommentSort('komment')"
+                  style="cursor:pointer; user-select:none;"
+                >
+                  Tartalom
+                  <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
+                    <span :style="commentSortKey === 'komment' && commentSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
+                    <span :style="commentSortKey === 'komment' && commentSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
+                  </span>
+                </th>
+                <th
+                  @click="toggleCommentSort('poszt_cim')"
+                  style="cursor:pointer; user-select:none; white-space:nowrap;"
+                >
+                  Poszt
+                  <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
+                    <span :style="commentSortKey === 'poszt_cim' && commentSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
+                    <span :style="commentSortKey === 'poszt_cim' && commentSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
+                  </span>
+                </th>
+                <th style="white-space:nowrap;">Típus</th>
+                <th
+                  @click="toggleCommentSort('valaszok_szama')"
+                  style="cursor:pointer; user-select:none; white-space:nowrap;"
+                >
+                  Válaszok
+                  <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
+                    <span :style="commentSortKey === 'valaszok_szama' && commentSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
+                    <span :style="commentSortKey === 'valaszok_szama' && commentSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
+                  </span>
+                </th>
+                <th
+                  @click="toggleCommentSort('letrehozas_datuma')"
+                  style="cursor:pointer; user-select:none; white-space:nowrap;"
+                >
+                  Dátum
+                  <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
+                    <span :style="commentSortKey === 'letrehozas_datuma' && commentSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
+                    <span :style="commentSortKey === 'letrehozas_datuma' && commentSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
+                  </span>
+                </th>
+                <th>Műveletek</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="comment in paginatedComments" :key="comment.id">
+                <td style="color:#94a3b8; font-size:12px;">#{{ comment.id }}</td>
+                <td><strong>{{ comment.iro }}</strong></td>
+                <td style="max-width:280px;">
+                  <span
+                    :title="comment.komment"
+                    style="display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;"
+                  >{{ comment.komment }}</span>
+                </td>
+                <td>
+                  <div style="display:flex; flex-direction:column; gap:2px;">
+                    <a 
+                      :href="`/blog/${comment.poszt_id}`" 
+                      target="_blank"
+                      style="color:#f97316; font-size:13px; text-decoration:none; cursor:pointer;"
+                      @mouseover="$event.target.style.textDecoration='underline'"
+                      @mouseleave="$event.target.style.textDecoration='none'"
+                    >{{ comment.poszt_cim }}</a>
+                    <span style="color:#94a3b8; font-size:11px;">#{{ comment.poszt_id }}</span>
+                  </div>
+                </td>
+                <td>
+                  <span
+                    class="badge"
+                    :class="comment.szulo_id ? 'badge-blue' : 'badge-success'"
+                  >
+                    {{ comment.szulo_id ? 'Válasz' : 'Főkomment' }}
+                  </span>
+                </td>
+                <td style="text-align:center;">
+                  <span v-if="comment.valaszok_szama > 0" class="badge badge-warning">
+                    {{ comment.valaszok_szama }} db
+                  </span>
+                  <span v-else style="color:#94a3b8; font-size:13px;">—</span>
+                </td>
+                <td style="white-space:nowrap;">{{ comment.letrehozas_datuma ? formatDate(comment.letrehozas_datuma) : '-' }}</td>
+                <td>
+                  <button class="btn btn-sm btn-danger" @click="deleteComment(comment.id)">
+                    <FontAwesomeIcon icon="fa-trash-alt" />
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div v-if="filteredComments.length === 0" style="text-align:center; padding:40px; color:#94a3b8;">
+            Nincs találat a megadott feltételekre.
+          </div>
+
+          <div v-if="totalCommentPages > 1" style="display:flex; justify-content:center; align-items:center; gap:8px; padding:16px; border-top:1px solid #e2e8f0;">
+            <button
+              class="btn btn-sm"
+              @click="currentCommentPage--"
+              :disabled="currentCommentPage === 1"
+              style="background:#f1f5f9;"
+            >← Előző</button>
+
+            <template v-for="page in totalCommentPages" :key="page">
+              <button
+                class="btn btn-sm"
+                @click="currentCommentPage = page"
+                :style="currentCommentPage === page ? 'background:#f97316; color:white;' : 'background:#f1f5f9;'"
+              >{{ page }}</button>
+            </template>
+
+            <button
+              class="btn btn-sm"
+              @click="currentCommentPage++"
+              :disabled="currentCommentPage === totalCommentPages"
+              style="background:#f1f5f9;"
+            >Következő →</button>
+
+            <span style="color:#64748b; font-size:13px; margin-left:8px;">
+              {{ filteredComments.length }} komment / {{ currentCommentPage }}.oldal
+            </span>
+          </div>
+        </div>
+      </div>
+
       <!-- Analytics View -->
       <div v-if="currentView === 'analytics'">
         <div class="header">
@@ -1259,7 +1433,7 @@ import {
   faTruck, faBagShopping, faUsers,
   faUser, faPoll, faChartLine,
   faFileLines, faPen, faTrashAlt,
-  faHourglassHalf
+  faHourglassHalf, faComment
 } from '@fortawesome/free-solid-svg-icons'
 
 library.add(
@@ -1267,7 +1441,7 @@ library.add(
   faTruck, faBagShopping, faUsers,
   faUser, faPoll, faChartLine,
   faFileLines, faPen, faTrashAlt,
-  faHourglassHalf
+  faHourglassHalf, faComment
 )
 
 const API = '/api/admin';
@@ -1310,7 +1484,12 @@ const productEditorKey = ref(0);
 const productCategoryOptions = ref([]);
 const productMainImageIndex = ref(0); 
 const productSaving = ref(false);
-
+const comments = ref([]);
+const commentSearch = ref('');
+const commentPostFilter = ref('');
+const commentSortKey = ref('letrehozas_datuma');
+const commentSortDir = ref('desc');
+const currentCommentPage = ref(1);
 const { showToast, showErrorModal } = inject('toast')
 
 // Confirm modal
@@ -1510,6 +1689,80 @@ const notification = ref({
     message: '',
     type: 'info'
 });
+
+const fetchComments = async () => {
+  try {
+    const { data } = await axios.get(`${API}/kommentek`);
+    console.log('API válasz:', data);
+    console.log('Hossz:', data.length);
+    comments.value = data;
+    console.log('comments.value:', comments.value);
+  } catch(e) {
+    console.error('Fetch hiba:', e);
+  }
+};
+
+const toggleCommentSort = (key) => {
+  if (commentSortKey.value === key) {
+    commentSortDir.value = commentSortDir.value === 'asc' ? 'desc' : 'asc';
+  } else {
+    commentSortKey.value = key;
+    commentSortDir.value = 'asc';
+  }
+  currentCommentPage.value = 1;
+};
+
+const filteredComments = computed(() => {
+  console.log('comments.value hossz:', comments.value.length);
+  console.log('commentSearch:', commentSearch.value);
+  let result = comments.value.filter(c => {
+    const s = commentSearch.value.toLowerCase();
+    const matchesSearch = !s ||
+      c.komment.toLowerCase().includes(s) ||
+      c.iro.toLowerCase().includes(s) ||
+      c.poszt_cim.toLowerCase().includes(s) ||
+      String(c.poszt_id).includes(s) ||
+      String(c.id).includes(s);
+        const matchesPost = !commentPostFilter.value ||
+      String(c.poszt_id) === commentPostFilter.value;
+    return matchesSearch && matchesPost;
+  });
+
+  result = [...result].sort((a, b) => {
+    let aVal = a[commentSortKey.value];
+    let bVal = b[commentSortKey.value];
+    if (commentSortKey.value === 'letrehozas_datuma') {
+      aVal = new Date(aVal || 0);
+      bVal = new Date(bVal || 0);
+    } else if (commentSortKey.value === 'valaszok_szama') {
+      aVal = Number(aVal); bVal = Number(bVal);
+    } else {
+      aVal = String(aVal ?? '').toLowerCase();
+      bVal = String(bVal ?? '').toLowerCase();
+    }
+    if (aVal < bVal) return commentSortDir.value === 'asc' ? -1 : 1;
+    if (aVal > bVal) return commentSortDir.value === 'asc' ? 1 : -1;
+    return 0;
+  });
+
+  return result;
+});
+
+const totalCommentPages = computed(() =>
+  Math.ceil(filteredComments.value.length / ITEMS_PER_PAGE)
+);
+
+const paginatedComments = computed(() => {
+  const start = (currentCommentPage.value - 1) * ITEMS_PER_PAGE;
+  return filteredComments.value.slice(start, start + ITEMS_PER_PAGE);
+});
+
+// Poszt szűrő dropdown-hoz egyedi posztok listája
+const commentPostOptions = computed(() =>
+  [...new Map(comments.value.map(c => [c.poszt_id, c.poszt_cim])).entries()]
+    .map(([id, cim]) => ({ id, cim }))
+    .sort((a, b) => a.cim.localeCompare(b.cim))
+);
 
 const showNotification = (type, message, duration = 3500) => {
     notification.value = {
@@ -1806,6 +2059,14 @@ const deleteBlogPost = async (id) => {
   await axios.delete(`/api/posts/${id}`);
   await fetchBlogPosts();
   showToast('Bejegyzés törölve.', 'info')
+};
+
+const deleteComment = async (id) => {
+  const confirmed = await showConfirm('Biztosan törölni szeretnéd ezt a kommentet?');
+  if (!confirmed) return;
+  await axios.delete(`${API}/kommentek/${id}`);
+  await fetchComments();
+  showToast('Komment törölve.', 'info');
 };
 
 const refreshData = async () => {
@@ -2309,6 +2570,8 @@ watch(userActiveFilter, () => { currentPage.value = 1; });
 watch(userOrderFilter, () => { currentPage.value = 1; });
 watch(blogPublishedFilter, () => { currentBlogPage.value = 1; });
 watch(blogTagFilter, () => { currentBlogPage.value = 1; });
+watch(commentSearch, () => { currentCommentPage.value = 1; });
+watch(commentPostFilter, () => { currentCommentPage.value = 1; });
 // --- Helpers ---
 
 const formatDate = (dateString) => {
@@ -2528,6 +2791,7 @@ onMounted(async () => {
       fetchTagsFromDatabase(),
       fetchProductCategories(),
       fetchColors(),
+      fetchComments(),
   ]);
   initCharts();
 });
@@ -2535,6 +2799,9 @@ onMounted(async () => {
 watch(currentView, async (newView, oldView) => {
   if (newView === 'blog' && tagOptions.value.length === 0) {
     await fetchTagsFromDatabase();
+  }
+  if (newView === 'comments' && comments.value.length === 0) {
+    await fetchComments(); 
   }
   if (oldView === 'dashboard') destroyDashboardCharts();
   if (oldView === 'analytics') destroyAnalyticsCharts();

@@ -14,6 +14,7 @@ import Index from '@/views/index.vue'
 import NotFound from "@/views/NotFound.vue";
 import NewPost from '@/components/NewPost.vue'
 import EmailVerified from '@/components/EmailVerified.vue'
+import EmailAlreadyVerified from '@/components/EmailAlreadyVerified.vue'
 import Dashboard from '@/views/Dashboard.vue'
 import ResetJelszo from '@/views/ResetJelszo.vue'
 
@@ -103,6 +104,12 @@ const router = createRouter({
       name: 'EmailVerified',
       component: EmailVerified
     },
+    {
+      path: '/email-already-verified',
+      name: 'EmailAlreadyVerified',
+      component: EmailAlreadyVerified
+    },
+
     {
       path: '/reset-password',
       name: 'ResetJelszo',
