@@ -36,7 +36,7 @@
       
       <article class="blog-article">
         <div class="article-header">
-          <div class="report-btn">
+          <div class="report-btn" @click="openPostReport">
             <font-awesome-icon icon="fa-solid fa-triangle-exclamation" class="report-icon" />
             <span class="report-tooltip">Bejelentés</span>
           </div>
@@ -193,6 +193,7 @@
                 :currentUser="currentUser"
                 @reply="handleReply"
                 @delete="handleDelete"
+                @report="handleCommentReport"
                 class="comment-item-animate"
               />
             </div>
@@ -216,6 +217,13 @@
         </div>
       </div>
     </Teleport>
+
+    <ReportModal
+      :visible="reportModal.visible"
+      :type="reportModal.type"
+      :target-id="reportModal.targetId"
+      @close="reportModal.visible = false"
+    />
   </main>
 </template>
 
@@ -233,6 +241,7 @@ import axios from 'axios'
 import Komment from '@/components/Komment.vue'
 import fallbackImage from '@/assets/Public/pot.jpg'
 import Image from 'primevue/image';
+import ReportModal from '@/components/ReportModal.vue'
 
 library.add(faCalendar, faUser, faPaperPlane, faClock, faReply, faUserCircle, faArrowCircleUp, faTriangleExclamation)
 
@@ -246,6 +255,16 @@ const newComment = ref('')
 const loadingComments = ref(false)
 const replyTo = ref(null)
 const currentUser = ref(null)
+
+const reportModal = ref({ visible: false, type: 'post', targetId: null })
+
+const openPostReport = () => {
+  reportModal.value = { visible: true, type: 'post', targetId: postId.value }
+}
+
+const handleCommentReport = (commentId) => {
+  reportModal.value = { visible: true, type: 'comment', targetId: commentId }
+}
 
 const postId = computed(() => route.params.id)
 

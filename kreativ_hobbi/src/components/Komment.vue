@@ -1,9 +1,8 @@
 <script setup>
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faUserCircle, faReply, faTrash } from '@fortawesome/free-solid-svg-icons'
-
-library.add(faUserCircle, faReply, faTrash)
+import { faUserCircle, faReply, faTrash, faTriangleExclamation } from '@fortawesome/free-solid-svg-icons'
+library.add(faUserCircle, faReply, faTrash, faTriangleExclamation)
 
 const props = defineProps({
   comment: {
@@ -24,7 +23,7 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(['reply', 'delete'])
+const emit = defineEmits(['reply', 'delete', 'report'])
 
 const formatDate = (dateString) => {
   if (!dateString) return ''
@@ -61,20 +60,32 @@ const formatDate = (dateString) => {
           </div>
         </div>
       </div>
-      <button
-        v-if="currentUserId && (
-          comment.felhasznalo?.id === currentUserId ||
-          currentUser?.adatok?.szerepkor === 'admin' ||
-          currentUser?.adatok?.szerepkor === 'moderator'
-        )"
-        @click="$emit('delete', comment.id)" 
-        class="delete-btn"
-        title="Törlés"
-      >
-        <div class="delete-icon">
-          <font-awesome-icon icon="fa-solid fa-trash" />
-        </div>
-      </button>
+      <div class="header-actions">
+        <button
+          v-if="currentUser"
+          @click="$emit('report', comment.id)"
+          class="report-btn"
+          title="Bejelentés"
+        >
+          <div class="report-icon-wrap">
+            <font-awesome-icon icon="fa-solid fa-triangle-exclamation" />
+          </div>
+        </button>
+        <button
+          v-if="currentUserId && (
+            comment.felhasznalo?.id === currentUserId ||
+            currentUser?.adatok?.szerepkor === 'admin' ||
+            currentUser?.adatok?.szerepkor === 'moderator'
+          )"
+          @click="$emit('delete', comment.id)" 
+          class="delete-btn"
+          title="Törlés"
+        >
+          <div class="delete-icon">
+            <font-awesome-icon icon="fa-solid fa-trash" />
+          </div>
+        </button>
+      </div>
     </div>
     
     <div class="comment-content">
@@ -106,6 +117,7 @@ const formatDate = (dateString) => {
         :currentUser="currentUser"
         @reply="$emit('reply', $event)"
         @delete="$emit('delete', $event)"
+        @report="$emit('report', $event)"
       />
     </div>
   </div>
@@ -297,6 +309,37 @@ const formatDate = (dateString) => {
 
 .comment-item-enter-active {
   animation: slideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* a comment-header jobb oldalán lévő gombok egymás mellé */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.report-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  color: rgb(146, 64, 14);
+  background-color: #ffedd5;
+}
+
+.report-btn:hover {
+  background: #fff7ed;
+  color: #c2410c;
+}
+
+.report-icon-wrap {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 @keyframes slideIn {
