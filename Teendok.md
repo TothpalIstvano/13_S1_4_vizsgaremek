@@ -8,11 +8,12 @@
 - \[ ] Kommentek tábla megjelenitése dashboardon
 - \[ ] navbar átnézése + claude chat
 - \[ ] Rendelés törlése
-- \[ ] Email-already-verified page
+- \[ ] rendelések kimozditása külön menü pontba
 - \[ ] Laravel base emailok át designolása
-- \[ ] Fejlesztési lehetőségekhez fel venni azt hogy a blogposzthoz felehessen venni hozzá tartozó termékeket + akkor lehessen termékekre is szűrni
 - \[ ] Az egész magyarosítása és a szövegek cseréje
 
+- \[X] Fejlesztési lehetőségekhez fel venni azt hogy a blogposzthoz felehessen venni hozzá tartozó termékeket + akkor lehessen termékekre is szűrni✅
+- \[X] Email-already-verified page✅
 - \[X] Alertek lecserélése mindenhol modellekre✅
 - \[X] 05-06 lecserélése bejelentkezés és gyikra + emoiji meg everything✅
 - \[X] routeban password reset levédése somehow + Megoldani azt hogy ha lefrissiti az oldalt akkor ne dobja vissza a főoldalra ha más védett oldalon van eg. dashboard/profil -> inedx✅
