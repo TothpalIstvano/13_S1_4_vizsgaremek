@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Models\Szinek;
 use App\Models\Kepek;
 use App\Models\Kommentek;
+use App\Models\Jelentesek;
 //User related API routes:
 
 // Check if user is logged in and return szerepkor
@@ -180,6 +181,51 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/comments/{id}', [KommentController::class, 'destroy']);
 });
 Route::get('/blog/{id}/comments', [KommentController::class, 'index']);
+
+// POST /api/report  –  bejelentés küldése (auth opcionális, vendég is küldhet)
+Route::middleware('auth:sanctum')->post('/report', function (Request $request) {
+    $validated = $request->validate([
+        'type'        => ['required', 'in:post,comment'],
+        'target_id'   => ['required', 'integer'],
+        'reason'      => ['required', 'in:serto,spam,18plus,szemelyes,jogsertes,egyeb'],
+        'description' => ['nullable', 'string', 'max:1000'],
+    ]);
+ 
+    // Ellenőrzés: létezik-e a bejelentett tartalom
+    if ($validated['type'] === 'post') {
+        $letezik = \App\Models\Posztok::where('id', $validated['target_id'])->exists();
+        if (!$letezik) {
+            return response()->json(['message' => 'A poszt nem található.'], 404);
+        }
+    } else {
+        $letezik = \App\Models\Kommentek::where('id', $validated['target_id'])->exists();
+        if (!$letezik) {
+            return response()->json(['message' => 'A komment nem található.'], 404);
+        }
+    }
+ 
+    // Duplikáció-ellenőrzés (ugyanaz a user, ugyanaz a tartalom)
+    $mar_bejelentette = Jelentesek::where('bejelento_id', auth()->id())
+        ->where('tipus', $validated['type'])
+        ->when($validated['type'] === 'post',    fn($q) => $q->where('poszt_id',    $validated['target_id']))
+        ->when($validated['type'] === 'comment', fn($q) => $q->where('komment_id',  $validated['target_id']))
+        ->exists();
+ 
+    if ($mar_bejelentette) {
+        return response()->json(['message' => 'Ezt a tartalmat már bejelentetted.'], 409);
+    }
+ 
+    Jelentesek::create([
+        'bejelento_id' => auth()->id(),
+        'tipus'        => $validated['type'],
+        'poszt_id'     => $validated['type'] === 'post'    ? $validated['target_id'] : null,
+        'komment_id'   => $validated['type'] === 'comment' ? $validated['target_id'] : null,
+        'ok'           => $validated['reason'],
+        'leiras'       => $validated['description'] ?? null,
+    ]);
+ 
+    return response()->json(['message' => 'Bejelentés elküldve, köszönjük!'], 201);
+});
 
 // Címkék az új poszthoz
 Route::get('/cimkek', function () {
@@ -945,5 +991,47 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
         $rendeles->delete();
 
         return response()->json(['message' => 'Rendelés törölve.']);
+    });
+
+    // GET /api/admin/jelentesek  –  összes bejelentés listája
+    Route::get('/jelentesek', function (Request $request) {
+        $statusz = $request->query('statusz'); // pl. ?statusz=fuggoben
+    
+        $query = Jelentesek::with([
+            'bejelento:id,felhasz_nev',
+            'poszt:id,cim',
+            'komment:id,komment,poszt_id',
+            'kezeloAdmin:id,felhasz_nev',
+        ])
+        ->orderBy('created_at', 'desc');
+    
+        if ($statusz) {
+            $query->where('statusz', $statusz);
+        }
+    
+        return response()->json($query->paginate(25));
+    });
+    
+    // PATCH /api/admin/jelentesek/{id}/statusz  –  státusz frissítés
+    Route::patch('/jelentesek/{id}/statusz', function (Request $request, $id) {
+        $validated = $request->validate([
+            'statusz'          => ['required', 'in:fuggoben,atnezte,megoldva,elvetve'],
+            'admin_megjegyzes' => ['nullable', 'string', 'max:1000'],
+        ]);
+    
+        $jelentes = Jelentesek::findOrFail($id);
+        $jelentes->statusz          = $validated['statusz'];
+        $jelentes->admin_megjegyzes = $validated['admin_megjegyzes'] ?? $jelentes->admin_megjegyzes;
+        $jelentes->kezelo_admin_id  = auth()->id();
+        $jelentes->kezeles_datuma   = now();
+        $jelentes->save();
+    
+        return response()->json(['message' => 'Státusz frissítve.', 'jelentes' => $jelentes]);
+    });
+    
+    // DELETE /api/admin/jelentesek/{id}  –  bejelentés törlése
+    Route::delete('/jelentesek/{id}', function ($id) {
+        Jelentesek::findOrFail($id)->delete();
+        return response()->json(['message' => 'Bejelentés törölve.']);
     });
 });
