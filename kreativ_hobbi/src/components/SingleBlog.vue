@@ -36,7 +36,11 @@
       
       <article class="blog-article">
         <div class="article-header">
-          <div class="report-btn" @click="openPostReport">
+          <div v-if="isOwnPost" class="report-btn" @click="router.push(`/editpost/${postId}`)">
+            <font-awesome-icon icon="fa-solid fa-pen-to-square" class="report-icon" />
+            <span class="report-tooltip">Szerkesztés</span>
+          </div>
+          <div v-else class="report-btn" @click="openPostReport">
             <font-awesome-icon icon="fa-solid fa-triangle-exclamation" class="report-icon" />
             <span class="report-tooltip">Bejelentés</span>
           </div>
@@ -232,10 +236,14 @@ import {
   ref, onMounted, onBeforeUnmount, watch, computed, inject
 } from 'vue'
 
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faCalendar, faUser, faPaperPlane, faClock, faReply, faUserCircle, faArrowCircleUp, faTriangleExclamation } from '@fortawesome/free-solid-svg-icons'
+import {
+  faCalendar, faUser, faPaperPlane,
+  faClock, faReply, faUserCircle,
+  faArrowCircleUp, faTriangleExclamation, faPenToSquare
+} from '@fortawesome/free-solid-svg-icons'
 import api from '@/services/api.js'
 import axios from 'axios'
 import Komment from '@/components/Komment.vue'
@@ -243,9 +251,13 @@ import fallbackImage from '@/assets/Public/pot.jpg'
 import Image from 'primevue/image';
 import ReportModal from '@/components/ReportModal.vue'
 
-library.add(faCalendar, faUser, faPaperPlane, faClock, faReply, faUserCircle, faArrowCircleUp, faTriangleExclamation)
+library.add(faCalendar, faUser, faPaperPlane,
+  faClock, faReply, faUserCircle,
+  faArrowCircleUp, faTriangleExclamation, faPenToSquare
+)
 
 const route = useRoute()
+const router = useRouter()
 
 const post = ref({})
 const loading = ref(true)
@@ -267,6 +279,10 @@ const handleCommentReport = (commentId) => {
 }
 
 const postId = computed(() => route.params.id)
+
+const isOwnPost = computed(() => {
+  return currentUser.value && post.value?.szerzo_id === currentUser.value.id
+})
 
 const fetchPost = async () => {
   try {
@@ -467,8 +483,7 @@ const removeComment = (commentId) => {
     const result = []
 
     for (const comment of commentList) {
-      if (comment.id === commentId) {
-        // Don't keep the deleted comment, but promote its children
+      if (comment.id === commentId) {ű
         if (comment.gyermekKommentek?.length > 0) {
           const promoted = comment.gyermekKommentek.map(child => ({
             ...child,
@@ -477,7 +492,6 @@ const removeComment = (commentId) => {
           }))
           result.push(...promoted)
         }
-        // Skip the deleted comment itself
         continue
       }
 
