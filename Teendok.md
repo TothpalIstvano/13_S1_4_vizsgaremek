@@ -1,17 +1,20 @@
-- \[/] Webshop
-- \[ ] Posztok és további backend helyekből kivenni a letrehozas_datuma nevű felesleges taget, mivel a created_at egyszerűbb és alap
 - \[ ] Az oldal kódjának tisztázás
 - \[ ] Az oldal tesztelése
 - \[ ] Az oldal dokumenálása
 - \[ ] Optimalizálás
-- \[ ] Kommentek törlése - tehát, ha komenthez tartozik egy komment pl. 3 alkomment és kitöröljük akkor a komment azt jelenitse meg hogy a komment törölve és ha nincs komment alatta akkor csa k smá törölje a kommmentet
-- \[ ] navbar átnézése + claude chat
-- \[ ] Rendelés törlése
-- \[ ] zöld/prios text a növekedés a dashboardon
-- \[ ] blogok + kommentek bejelentése + táblázat az admin felületre vagy úgy hogy jelentetek vagy úgy, hogy be lehessen kapcsolni mint szűrés vagy külön tábla vagy mindkettő + migrációk és stb- hozzá ja és vagy egy lennyiló menű vagy egy modal
-- \[ ] rendelések kimozditása külön menü pontba
+- \[ ] Moderátor felület
 - \[ ] Az egész magyarosítása és a szövegek cseréje
 
+- \[ ] Sikertelen fizetések törlése egy idő után 
+- \[ ] ha felvan függesztve a user akkor ne tudjon feltölteni semmit se blogolni és a képe legyen def vagy i guess a basic-ekből tudjon választani
+- \[ ] Kommentek törlése - tehát, ha komenthez tartozik egy komment pl. 3 alkomment és kitöröljük akkor a komment azt jelenitse meg hogy a komment törölve és ha nincs komment alatta akkor csa k smá törölje a kommmentet
+- \[ ] blogok + kommentek bejelentése + táblázat az admin felületre vagy úgy hogy jelentetek vagy úgy, hogy be lehessen kapcsolni mint szűrés vagy külön tábla vagy mindkettő + migrációk és stb- hozzá ja és vagy egy lennyiló menű vagy egy modal
+
+- \[X] zöld/prios text a növekedés a dashboardon✅
+- \[X] Webshop✅
+- \[X] Rendelés törlése✅
+- \[X] rendelések kimozditása külön menü pontba✅
+- \[X] navbar átnézése✅
 - \[X] Kommentek tábla megjelenitése dashboardon✅
 - \[X] Laravel base emailok át designolása✅
 - \[X] Fejlesztési lehetőségekhez fel venni azt hogy a blogposzthoz felehessen venni hozzá tartozó termékeket + akkor lehessen termékekre is szűrni✅

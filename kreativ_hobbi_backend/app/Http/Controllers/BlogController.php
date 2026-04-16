@@ -243,6 +243,7 @@ class BlogController extends Controller
                         'alt_Szoveg' => $k->alt_Szoveg,
                     ])->toArray(),
                     'szerző' => $post->szerzo?->felhasz_nev ?? 'Ismeretlen',
+                    'szerzo_id' => $post->szerzo_id,
                     'statusz' => $post->statusz,
                     'likes_count' => $post->likes_count,
                     'dislikes_count' => $post->dislikes_count,
