@@ -1,8 +1,7 @@
 - belépés reszponzív animációval
 - dokumentáció: 
-    - adatbázis javítások (doku + ppt)
+    - adatbázis javítások (ppt)
     - algoritmus javítások (ha kell)
-    - tesztesetek update - plusz rossz eredmények is
     - hiányzó kis részek
     - maybe keret a képekre?
     - források
