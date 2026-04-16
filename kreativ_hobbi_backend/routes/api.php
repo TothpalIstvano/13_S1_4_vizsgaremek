@@ -581,14 +581,37 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
 
     // Stats
     Route::get('/stats', function () {
+        $now = now();
+        $thisMonth = $now->month;
+        $thisYear = $now->year;
+        $lastMonth = $now->copy()->subMonth()->month;
+        $lastMonthYear = $now->copy()->subMonth()->year;
+
+        $salesThis = Rendelesek::whereMonth('rendeles_datuma', $thisMonth)->whereYear('rendeles_datuma', $thisYear)->sum('osszeg');
+        $salesLast = Rendelesek::whereMonth('rendeles_datuma', $lastMonth)->whereYear('rendeles_datuma', $lastMonthYear)->sum('osszeg');
+
+        $ordersThis = Rendelesek::whereMonth('rendeles_datuma', $thisMonth)->whereYear('rendeles_datuma', $thisYear)->count();
+        $ordersLast = Rendelesek::whereMonth('rendeles_datuma', $lastMonth)->whereYear('rendeles_datuma', $lastMonthYear)->count();
+
+        $productsThis = Termekek::whereMonth('created_at', $thisMonth)->whereYear('created_at', $thisYear)->count();
+        $productsLast = Termekek::whereMonth('created_at', $lastMonth)->whereYear('created_at', $lastMonthYear)->count();
+
+        $customersThis = Felhasznalok::whereMonth('created_at', $thisMonth)->whereYear('created_at', $thisYear)->count();
+        $customersLast = Felhasznalok::whereMonth('created_at', $lastMonth)->whereYear('created_at', $lastMonthYear)->count();
+
         return response()->json([
-            'totalSales' => Rendelesek::sum('osszeg'),
-            'totalOrders' => Rendelesek::count(),
-            'totalProducts' => Termekek::count(),
+            'totalSales'     => Rendelesek::sum('osszeg'),
+            'totalOrders'    => Rendelesek::count(),
+            'totalProducts'  => Termekek::count(),
             'totalCustomers' => Felhasznalok::count(),
+            'changes' => [
+                'sales'     => ['this' => $salesThis,     'last' => $salesLast],
+                'orders'    => ['this' => $ordersThis,     'last' => $ordersLast],
+                'products'  => ['this' => $productsThis,   'last' => $productsLast],
+                'customers' => ['this' => $customersThis,  'last' => $customersLast],
+            ],
         ]);
     });
-
     // Analytics
     Route::get('/analytics', function () {
         try {
@@ -646,11 +669,19 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
             ->get()
             ->map(fn($r) => [
                 'id' => 'ORD-' . $r->id,
-                'felhasznalo' => ['nev' => $r->felhasznalo?->felhasz_nev ?? 'Vendég'],
+                'felhasznalo' => [
+                    'id' => $r->felhasznalo_id,
+                    'nev' => $r->felhasznalo?->felhasz_nev ?? 'Vendég'
+                    ],
                 'termekek_szama' => $r->rendelt_termekek_count,
                 'osszeg' => $r->osszeg,
                 'statusz' => $r->statusz,
                 'rendeles_datuma' => $r->rendeles_datuma,
+                'szallitasi_nev' => $r->szallitasi_nev,
+                'szallitasi_varos_nev' => $r->szallitasi_varos_nev,
+                'szallitasi_utca' => $r->szallitasi_utca,
+                'szallitasi_hazszam' => $r->szallitasi_hazszam,
+                'szallitasi_emeletAjto' => $r->szallitasi_emeletAjto,
             ]);
 
         return response()->json($rendelesek);

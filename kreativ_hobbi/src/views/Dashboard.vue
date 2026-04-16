@@ -54,1004 +54,1018 @@
 
     <!-- Main Content -->
     <main class="main-content">
+      <!-- Loading -->
       <button class="sidebar-toggle" @click="sidebarOpen = !sidebarOpen">
         {{ sidebarOpen ? '✕' : '☰' }}
       </button>
-      <!-- Dashboard View -->
-      <div v-if="currentView === 'dashboard'">
-        <div class="header">
-          <h2>Dashboard</h2>
-          <div class="header-actions">
-            <button class="btn btn-primary" @click="refreshData">
-              <FontAwesomeIcon icon="fa-refresh" /> Frissítés
-            </button>
-          </div>
-        </div>
-
-        <!-- Stats Cards -->
-        <div class="stats-grid">
-          <div class="stat-card">
-            <div class="stat-header">
-              <div>
-                <div class="stat-title">Összes értékesítés</div>
-              </div>
-              <div class="stat-icon" style="background: #fff7ed; color: #c2410c;">
-                <FontAwesomeIcon icon="fa-coins" />
-              </div>
-            </div>
-            <div class="stat-value">{{ formatCurrency(stats.totalSales) }}</div>
-            <div class="stat-change positive">↑ 12.5% az elmúlt hónaphoz képest</div>
-          </div>
-
-          <div class="stat-card">
-            <div class="stat-header">
-              <div>
-                <div class="stat-title">Rendelések</div>
-              </div>
-              <div class="stat-icon" style="background: #dcfce7; color: #166534;">
-                <FontAwesomeIcon icon="fa-truck" />
-              </div>
-            </div>
-            <div class="stat-value">{{ stats.totalOrders }}</div>
-            <div class="stat-change positive">↑ 8.2% az elmúlt hónaphoz képest</div>
-          </div>
-
-          <div class="stat-card">
-            <div class="stat-header">
-              <div>
-                <div class="stat-title">Termékek</div>
-              </div>
-              <div class="stat-icon" style="background: #fef3c7; color: #92400e;">
-                <FontAwesomeIcon icon="fa-bag-shopping" />
-              </div>
-            </div>
-            <div class="stat-value">{{ stats.totalProducts }}</div>
-            <div class="stat-change positive">↑ 3 új termék</div>
-          </div>
-
-          <div class="stat-card">
-            <div class="stat-header">
-              <div>
-                <div class="stat-title">Vásárlók</div>
-              </div>
-              <div class="stat-icon" style="background: #e9d5ff; color: #6b21a8;">
-                <FontAwesomeIcon icon="fa-users" />
-              </div>
-            </div>
-            <div class="stat-value">{{ stats.totalCustomers }}</div>
-            <div class="stat-change positive">↑ 15.3% új regisztrációk</div>
-          </div>
-        </div>
-
-        <!-- Charts -->
-        <div class="charts-grid">
-          <div class="chart-card">
-            <div class="chart-header">
-              <h3 class="chart-title">Havi értékesítés</h3>
-            </div>
-            <canvas ref="salesChart"></canvas>
-          </div>
-
-          <div class="chart-card">
-            <div class="chart-header">
-              <h3 class="chart-title">Kategóriák szerinti termék megosztás</h3>
-            </div>
-            <canvas ref="categoryChart"></canvas>
-          </div>
-        </div>
-
-        <!-- Recent Orders -->
-        <div class="table-container">
-          <div class="table-header">
-            <h3 class="table-title">Rendelések</h3>
-            <div class="filters-row">
-              <div class="search-box">
-                <input 
-                  type="text" 
-                  class="search-input" 
-                  placeholder="Keresés (név vagy ID alapján)..."
-                  v-model="orderSearch"
-                >
-              </div>
-              <select 
-                v-model="orderStatusFilter" 
-                style="padding:8px 12px; font-size:14px; border:1px solid #e2e8f0; border-radius:8px; height:38px; min-width:160px; background:white; cursor:pointer;"
-              >
-                <option value="">Összes státusz</option>
-                <option value="teljesítve">✅ Teljesítve</option>
-                <option value="függőben">⏳ Függőben</option>
-                <option value="szállítás alatt">🚚 Szállítás alatt</option>
-                <option value="törölve">🚫 Törölve</option>
-              </select>
-            </div>
-          </div>
-          <table>
-            <thead>
-              <tr>
-                <th @click="toggleOrderSort('id')" style="cursor:pointer; user-select:none; white-space:nowrap;">
-                  Rendelés ID
-                  <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
-                    <span :style="orderSortKey === 'id' && orderSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
-                    <span :style="orderSortKey === 'id' && orderSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
-                  </span>
-                </th>
-                <th @click="toggleOrderSort('customer')" style="cursor:pointer; user-select:none; white-space:nowrap;">
-                  Vásárló
-                  <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
-                    <span :style="orderSortKey === 'customer' && orderSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
-                    <span :style="orderSortKey === 'customer' && orderSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
-                  </span>
-                </th>
-                <th @click="toggleOrderSort('items')" style="cursor:pointer; user-select:none; white-space:nowrap;">
-                  Termékek
-                  <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
-                    <span :style="orderSortKey === 'items' && orderSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
-                    <span :style="orderSortKey === 'items' && orderSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
-                  </span>
-                </th>
-                <th @click="toggleOrderSort('total')" style="cursor:pointer; user-select:none; white-space:nowrap;">
-                  Összeg
-                  <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
-                    <span :style="orderSortKey === 'total' && orderSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
-                    <span :style="orderSortKey === 'total' && orderSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
-                  </span>
-                </th>
-                <th style="cursor:pointer; user-select:none; white-space:nowrap;">
-                  Státusz
-                </th>
-                <th @click="toggleOrderSort('date')" style="cursor:pointer; user-select:none; white-space:nowrap;">
-                  Dátum
-                  <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
-                    <span :style="orderSortKey === 'date' && orderSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
-                    <span :style="orderSortKey === 'date' && orderSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
-                  </span>
-                </th>
-                <th>Műveletek</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="order in paginatedOrders" :key="order.id">
-                <td><strong>#{{ order.id }}</strong></td>
-                <td>{{ order.customer }}</td>
-                <td>{{ order.items }}</td>
-                <td><strong>{{ formatCurrency(order.total) }}</strong></td>
-                <td>
-                  <span class="badge" :class="getOrderBadgeClass(order.status)">
-                    {{ order.status }}
-                  </span>
-                </td>
-                <td>{{ order.date }}</td>
-                <td>
-                  <button
-                    class="btn btn-sm btn-danger"
-                    @click="deleteOrder(order)"
-                    :disabled="order.status === 'szállítás alatt'"
-                    :style="order.status === 'szállítás alatt' ? 'opacity:0.35; cursor:not-allowed;' : ''"
-                    :title="order.status === 'szállítás alatt' ? 'Szállítás alatt lévő rendelés nem törölhető' : 'Rendelés törlése'"
-                  >
-                    <FontAwesomeIcon icon="fa-trash-alt" />
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          <!-- Üres állapot -->
-          <div v-if="filteredOrders.length === 0" style="text-align:center; padding:40px; color:#94a3b8;">
-            Nincs találat a megadott feltételekre.
-          </div>
-
-          <!-- Rendelések pagináció -->
-          <div v-if="totalOrderPages > 1" style="display:flex; justify-content:center; align-items:center; gap:8px; padding:16px; border-top:1px solid #e2e8f0;">
-            <button 
-              class="btn btn-sm" 
-              @click="currentOrderPage--" 
-              :disabled="currentOrderPage === 1"
-              style="background:#f1f5f9;"
-            >← Előző</button>
-            
-            <template v-for="page in totalOrderPages" :key="page">
-              <button 
-                class="btn btn-sm"
-                @click="currentOrderPage = page"
-                :style="currentOrderPage === page ? 'background:#f97316; color:white;' : 'background:#f1f5f9;'"
-              >{{ page }}</button>
-            </template>
-            
-            <button 
-              class="btn btn-sm" 
-              @click="currentOrderPage++" 
-              :disabled="currentOrderPage === totalOrderPages"
-              style="background:#f1f5f9;"
-            >Következő →</button>
-            
-            <span style="color:#64748b; font-size:13px; margin-left:8px;">
-              {{ filteredOrders.length }} rendelés / {{ currentOrderPage }}.oldal
-            </span>
-          </div>
-        </div>
+      <div v-if="loading" style="
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 60vh;
+        gap: 16px;
+      ">
+        <div class="spinner"></div>
+        <p style="color: #7a402d; font-weight: 600; font-size: 15px;">Adatok betöltése...</p>
       </div>
+      <div v-else>
+        <!-- Dashboard View -->
+        <div v-if="currentView === 'dashboard'">
+          <div class="header">
+            <h2>Dashboard</h2>
+            <div class="header-actions">
+              <button class="btn btn-primary" @click="refreshData">
+                <FontAwesomeIcon icon="fa-refresh" /> Frissítés
+              </button>
+            </div>
+          </div>
 
-      <!-- Products View -->
-      <div v-if="currentView === 'products'">
-        <div class="header">
-          <h2>Termékek</h2>
-          <div class="header-actions">
-            <button class="btn btn-primary" @click="openProductModal()">
-              <FontAwesomeIcon icon="fa-plus" /> Új termék
-            </button>
+          <!-- Stats Cards -->
+          <div class="stats-grid">
+            <template v-if="statsLoading">
+              <div v-for="i in 4" :key="i" class="stat-card">
+                <div class="skeleton skeleton-title"></div>
+                <div class="skeleton skeleton-value"></div>
+                <div class="skeleton skeleton-text"></div>
+              </div>
+            </template>
+            <template v-else>
+              <div class="stat-card">
+                <div class="stat-header">
+                  <div><div class="stat-title">Összes értékesítés</div></div>
+                  <div class="stat-icon" style="background: #fff7ed; color: #c2410c;">
+                    <FontAwesomeIcon icon="fa-coins" />
+                  </div>
+                </div>
+                <div class="stat-value">{{ formatCurrency(stats.totalSales) }}</div>
+                <div class="stat-change" :class="calcChange(stats.changes?.sales?.this, stats.changes?.sales?.last).dir === 'up' ? 'positive' : calcChange(stats.changes?.sales?.this, stats.changes?.sales?.last).dir === 'down' ? 'negative' : 'neutral'">
+                  <template v-if="calcChange(stats.changes?.sales?.this, stats.changes?.sales?.last).dir === 'up'">
+                    ↑ {{ calcChange(stats.changes?.sales?.this, stats.changes?.sales?.last).pct }}% az elmúlt hónaphoz képest
+                  </template>
+                  <template v-else-if="calcChange(stats.changes?.sales?.this, stats.changes?.sales?.last).dir === 'down'">
+                    ↓ {{ calcChange(stats.changes?.sales?.this, stats.changes?.sales?.last).pct }}% az elmúlt hónaphoz képest
+                  </template>
+                  <template v-else>
+                    → Stagnál az elmúlt hónaphoz képest
+                  </template>
+                </div>
+              </div>
+
+              <div class="stat-card">
+                <div class="stat-header">
+                  <div><div class="stat-title">Rendelések</div></div>
+                  <div class="stat-icon" style="background: #dcfce7; color: #166534;">
+                    <FontAwesomeIcon icon="fa-truck" />
+                  </div>
+                </div>
+                <div class="stat-value">{{ stats.totalOrders }}</div>
+                <div class="stat-change" :class="calcChange(stats.changes?.orders?.this, stats.changes?.orders?.last).dir === 'up' ? 'positive' : calcChange(stats.changes?.orders?.this, stats.changes?.orders?.last).dir === 'down' ? 'negative' : 'neutral'">
+                  <template v-if="calcChange(stats.changes?.orders?.this, stats.changes?.orders?.last).dir === 'up'">
+                    ↑ {{ calcChange(stats.changes?.orders?.this, stats.changes?.orders?.last).pct }}% az elmúlt hónaphoz képest
+                  </template>
+                  <template v-else-if="calcChange(stats.changes?.orders?.this, stats.changes?.orders?.last).dir === 'down'">
+                    ↓ {{ calcChange(stats.changes?.orders?.this, stats.changes?.orders?.last).pct }}% az elmúlt hónaphoz képest
+                  </template>
+                  <template v-else>
+                    → Stagnál az elmúlt hónaphoz képest
+                  </template>
+                </div>
+              </div>
+
+              <div class="stat-card">
+                <div class="stat-header">
+                  <div><div class="stat-title">Termékek</div></div>
+                  <div class="stat-icon" style="background: #fef3c7; color: #92400e;">
+                    <FontAwesomeIcon icon="fa-bag-shopping" />
+                  </div>
+                </div>
+                <div class="stat-value">{{ stats.totalProducts }}</div>
+                  <div class="stat-change" :class="calcChange(stats.changes?.products?.this, stats.changes?.products?.last).dir === 'up' ? 'positive' : calcChange(stats.changes?.products?.this, stats.changes?.products?.last).dir === 'down' ? 'negative' : 'neutral'">
+                    <template v-if="calcChange(stats.changes?.products?.this, stats.changes?.products?.last).dir === 'up'">
+                      ↑ {{ calcChange(stats.changes?.products?.this, stats.changes?.products?.last).pct }}% az elmúlt hónaphoz képest
+                    </template>
+                    <template v-else-if="calcChange(stats.changes?.products?.this, stats.changes?.products?.last).dir === 'down'">
+                      ↓ {{ calcChange(stats.changes?.products?.this, stats.changes?.products?.last).pct }}% az elmúlt hónaphoz képest
+                    </template>
+                    <template v-else>
+                      → Stagnál az elmúlt hónaphoz képest
+                    </template>
+                  </div>
+                </div>
+
+              <div class="stat-card">
+                <div class="stat-header">
+                  <div><div class="stat-title">Felhasználók</div></div>
+                  <div class="stat-icon" style="background: #e9d5ff; color: #6b21a8;">
+                    <FontAwesomeIcon icon="fa-users" />
+                  </div>
+                </div>
+                <div class="stat-value">{{ stats.totalCustomers }}</div>
+                <div class="stat-change" :class="calcChange(stats.changes?.customers?.this, stats.changes?.customers?.last).dir === 'up' ? 'positive' : calcChange(stats.changes?.customers?.this, stats.changes?.customers?.last).dir === 'down' ? 'negative' : 'neutral'">
+                  <template v-if="calcChange(stats.changes?.customers?.this, stats.changes?.customers?.last).dir === 'up'">
+                    ↑ {{ calcChange(stats.changes?.customers?.this, stats.changes?.customers?.last).pct }}% az elmúlt hónaphoz képest
+                  </template>
+                  <template v-else-if="calcChange(stats.changes?.customers?.this, stats.changes?.customers?.last).dir === 'down'">
+                    ↓ {{ calcChange(stats.changes?.customers?.this, stats.changes?.customers?.last).pct }}% az elmúlt hónaphoz képest
+                  </template>
+                  <template v-else>
+                    → Stagnál az elmúlt hónaphoz képest
+                  </template>
+                </div>
+              </div>
+            </template>
+          </div>
+
+          <!-- Charts -->
+          <div class="charts-grid">
+            <div class="chart-card">
+              <div class="chart-header"><h3 class="chart-title">Havi értékesítés</h3></div>
+              <div v-if="chartsLoading" class="skeleton skeleton-chart"></div>
+              <canvas v-else ref="salesChart"></canvas>
+            </div>            
+
+            <div class="chart-card">
+              <div class="chart-header"><h3 class="chart-title">Kategóriák szerinti termék megosztás</h3></div>
+              <div v-if="chartsLoading" class="skeleton skeleton-chart"></div>
+              <canvas v-else ref="categoryChart"></canvas>
+            </div>
           </div>
         </div>
 
-        <div class="table-container">
-          <div class="table-header">
-            <h3 class="table-title">Összes termék</h3>
-            <div class="filters-row">
-              <input type="text" class="search-input" placeholder="Keresés termékek között..." v-model="productSearch">
-              <select v-model="productCategoryFilter" style="padding:8px 12px; font-size:14px; border:1px solid #e2e8f0; border-radius:8px; height:38px; background:white; cursor:pointer;">
-                <option value="">Összes kategória</option>
-                <option>Fonalak</option>
-                <option>Kötőtűk</option>
-                <option>Horgolótűk</option>
-                <option>Hímzőfonalak</option>
-                <option>Kellékek</option>
-                <option>Minták</option>
-              </select>
-              <select v-model="productStockFilter" style="padding:8px 12px; font-size:14px; border:1px solid #e2e8f0; border-radius:8px; height:38px; background:white; cursor:pointer;">
-                <option value="">Összes készlet</option>
-                <option value="raktaron">✅ Raktáron</option>
-                <option value="keves">⚠️ Kevés</option>
-                <option value="nincs">🚫 Nincs készleten</option>
-              </select>
+        <!-- Products View -->
+        <div v-if="currentView === 'products'">
+          <div class="header">
+            <h2>Termékek</h2>
+            <div class="header-actions">
+              <button class="btn btn-primary" @click="openProductModal()">
+                <FontAwesomeIcon icon="fa-plus" /> Új termék
+              </button>
             </div>
           </div>
-          <table>
-            <thead>
-              <tr>
-                <th>Kép</th>
-                <th @click="toggleProductSort('name')" style="cursor:pointer; user-select:none; white-space:nowrap;">
-                  Név
-                  <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
-                    <span :style="productSortKey === 'name' && productSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
-                    <span :style="productSortKey === 'name' && productSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
-                  </span>
-                </th>
-                <th @click="toggleProductSort('category')" style="cursor:pointer; user-select:none; white-space:nowrap;">
-                  Kategória
-                  <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
-                    <span :style="productSortKey === 'category' && productSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
-                    <span :style="productSortKey === 'category' && productSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
-                  </span>
-                </th>
-                <th @click="toggleProductSort('price')" style="cursor:pointer; user-select:none; white-space:nowrap;">
-                  Ár
-                  <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
-                    <span :style="productSortKey === 'price' && productSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
-                    <span :style="productSortKey === 'price' && productSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
-                  </span>
-                </th>
-                <th @click="toggleProductSort('stock')" style="cursor:pointer; user-select:none; white-space:nowrap;">
-                  Készlet
-                  <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
-                    <span :style="productSortKey === 'stock' && productSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
-                    <span :style="productSortKey === 'stock' && productSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
-                  </span>
-                </th>
-                <th>Státusz</th>
-                <th>Színek</th>
-                <th>Műveletek</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="product in paginatedProducts" :key="product.id">
-                <td>
-                  <img :src="product.image" :alt="product.name" class="product-img">
-                </td>
-                <td><strong>{{ product.name }}</strong></td>
-                <td>{{ product.category }}</td>
-                <td><strong>{{ formatCurrency(product.price) }}</strong></td>
-                <td>{{ product.stock }} db</td>
-                <td>
-                  <span class="badge" :class="product.stock > 10 ? 'badge-success' : product.stock > 0 ? 'badge-warning' : 'badge-danger'">
-                    {{ product.stock > 10 ? 'Raktáron' : product.stock > 0 ? 'Kevés' : 'Nincs készleten' }}
-                  </span>
-                </td>
-                <td>
-                  <div style="display:flex; gap:4px; flex-wrap:wrap;">
+
+          <div class="table-container">
+            <div class="table-header">
+              <h3 class="table-title">Összes termék</h3>
+              <div class="filters-row">
+                <input type="text" class="search-input" placeholder="Keresés termékek között..." v-model="productSearch">
+                <select v-model="productCategoryFilter" style="padding:8px 12px; font-size:14px; border:1px solid #e2e8f0; border-radius:8px; height:38px; background:white; cursor:pointer;">
+                  <option value="">Összes kategória</option>
+                  <option>Fonalak</option>
+                  <option>Kötőtűk</option>
+                  <option>Horgolótűk</option>
+                  <option>Hímzőfonalak</option>
+                  <option>Kellékek</option>
+                  <option>Minták</option>
+                </select>
+                <select v-model="productStockFilter" style="padding:8px 12px; font-size:14px; border:1px solid #e2e8f0; border-radius:8px; height:38px; background:white; cursor:pointer;">
+                  <option value="">Összes készlet</option>
+                  <option value="raktaron">✅ Raktáron</option>
+                  <option value="keves">⚠️ Kevés</option>
+                  <option value="nincs">🚫 Nincs készleten</option>
+                </select>
+              </div>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Kép</th>
+                  <th @click="toggleProductSort('name')" style="cursor:pointer; user-select:none; white-space:nowrap;">
+                    Név
+                    <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
+                      <span :style="productSortKey === 'name' && productSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
+                      <span :style="productSortKey === 'name' && productSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
+                    </span>
+                  </th>
+                  <th @click="toggleProductSort('category')" style="cursor:pointer; user-select:none; white-space:nowrap;">
+                    Kategória
+                    <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
+                      <span :style="productSortKey === 'category' && productSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
+                      <span :style="productSortKey === 'category' && productSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
+                    </span>
+                  </th>
+                  <th @click="toggleProductSort('price')" style="cursor:pointer; user-select:none; white-space:nowrap;">
+                    Ár
+                    <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
+                      <span :style="productSortKey === 'price' && productSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
+                      <span :style="productSortKey === 'price' && productSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
+                    </span>
+                  </th>
+                  <th @click="toggleProductSort('stock')" style="cursor:pointer; user-select:none; white-space:nowrap;">
+                    Készlet
+                    <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
+                      <span :style="productSortKey === 'stock' && productSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
+                      <span :style="productSortKey === 'stock' && productSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
+                    </span>
+                  </th>
+                  <th>Státusz</th>
+                  <th>Színek</th>
+                  <th>Műveletek</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="product in paginatedProducts" :key="product.id">
+                  <td>
+                    <img :src="product.image" :alt="product.name" class="product-img">
+                  </td>
+                  <td><strong>{{ product.name }}</strong></td>
+                  <td>{{ product.category }}</td>
+                  <td><strong>{{ formatCurrency(product.price) }}</strong></td>
+                  <td>{{ product.stock }} db</td>
+                  <td>
+                    <span class="badge" :class="product.stock > 10 ? 'badge-success' : product.stock > 0 ? 'badge-warning' : 'badge-danger'">
+                      {{ product.stock > 10 ? 'Raktáron' : product.stock > 0 ? 'Kevés' : 'Nincs készleten' }}
+                    </span>
+                  </td>
+                  <td>
+                    <div style="display:flex; gap:4px; flex-wrap:wrap;">
+                      <span
+                        v-for="color in (product.colors ?? []).slice(0, 6)"
+                        :key="color.id"
+                        :title="color.nev"
+                        style="width:20px; height:20px; border-radius:50%; display:inline-block; border:1.5px solid #e2e8f0; cursor:default;"
+                        :style="{ background: color.hex_kod }"
+                      ></span>
+                      <span
+                        v-if="(product.colors ?? []).length > 6"
+                        style="font-size:11px; color:#94a3b8; align-self:center;"
+                      >+{{ product.colors.length - 6 }}</span>
+                      <span v-if="!(product.colors ?? []).length" style="color:#94a3b8; font-size:13px;">—</span>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="action-buttons">
+                      <button class="btn btn-sm btn-warning" @click="openProductModal(product)">
+                        <FontAwesomeIcon icon="fa-pen" />
+                      </button>
+                      <button class="btn btn-sm btn-danger" @click="deleteProduct(product.id)">
+                        <FontAwesomeIcon icon="fa-trash-alt" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <!-- Users pagináció -->
+            <div v-if="totalProductPages > 1" style="display:flex; justify-content:center; align-items:center; gap:8px; padding:16px; border-top:1px solid #e2e8f0;">
+              <button 
+                class="btn btn-sm" 
+                @click="currentProductPage--" 
+                :disabled="currentProductPage === 1"
+                style="background:#f1f5f9;"
+              >← Előző</button>
+              
+              <template v-for="page in totalProductPages" :key="page">
+                <button 
+                  class="btn btn-sm"
+                  @click="currentProductPage = page"
+                  :style="currentProductPage === page ? 'background:#f97316; color:white;' : 'background:#f1f5f9;'"
+                >{{ page }}</button>
+              </template>
+              
+              <button 
+                class="btn btn-sm" 
+                @click="currentProductPage++" 
+                :disabled="currentProductPage === totalProductPages"
+                style="background:#f1f5f9;"
+              >Következő →</button>
+              
+              <span style="color:#64748b; font-size:13px; margin-left:8px;">
+                {{ filteredProducts.length }} felhasználó / {{ currentProductPage }}.oldal
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Orders View -->
+        <div v-if="currentView === 'orders'">
+          <div class="header">
+            <h2>Rendelések</h2>
+          </div>
+
+          <div class="table-container">
+            <div class="table-header">
+              <h3 class="table-title">Összes rendelés</h3>
+              <div class="filters-row">
+                <div class="search-box">
+                  <input 
+                    type="text" 
+                    class="search-input" 
+                    placeholder="Keresés (név vagy ID alapján)..."
+                    v-model="orderSearch"
+                  >
+                </div>
+                <select 
+                  v-model="orderStatusFilter" 
+                  style="padding:8px 12px; font-size:14px; border:1px solid #e2e8f0; border-radius:8px; height:38px; min-width:160px; background:white; cursor:pointer;"
+                >
+                  <option value="">Összes státusz</option>
+                  <option value="teljesítve">✅ Teljesítve</option>
+                  <option value="függőben">⏳ Függőben</option>
+                  <option value="szállítás alatt">🚚 Szállítás alatt</option>
+                  <option value="törölve">🚫 Törölve</option>
+                </select>
+              </div>
+            </div>
+
+            <table>
+              <thead>
+                <tr>
+                  <th @click="toggleOrderSort('id')" style="cursor:pointer; user-select:none; white-space:nowrap;">
+                    Rendelés ID
+                    <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
+                      <span :style="orderSortKey === 'id' && orderSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
+                      <span :style="orderSortKey === 'id' && orderSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
+                    </span>
+                  </th>
+                  <th @click="toggleOrderSort('customer')" style="cursor:pointer; user-select:none; white-space:nowrap;">
+                    Vásárló
+                    <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
+                      <span :style="orderSortKey === 'customer' && orderSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
+                      <span :style="orderSortKey === 'customer' && orderSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
+                    </span>
+                  </th>
+                  <th>Szállítási cím és név</th>
+                  <th @click="toggleOrderSort('items')" style="cursor:pointer; user-select:none; white-space:nowrap;">
+                    Termékek
+                    <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
+                      <span :style="orderSortKey === 'items' && orderSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
+                      <span :style="orderSortKey === 'items' && orderSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
+                    </span>
+                  </th>
+                  <th @click="toggleOrderSort('total')" style="cursor:pointer; user-select:none; white-space:nowrap;">
+                    Összeg
+                    <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
+                      <span :style="orderSortKey === 'total' && orderSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
+                      <span :style="orderSortKey === 'total' && orderSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
+                    </span>
+                  </th>
+                  <th>Státusz</th>
+                  <th @click="toggleOrderSort('date')" style="cursor:pointer; user-select:none; white-space:nowrap;">
+                    Dátum
+                    <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
+                      <span :style="orderSortKey === 'date' && orderSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
+                      <span :style="orderSortKey === 'date' && orderSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
+                    </span>
+                  </th>
+                  <th>Műveletek</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="order in paginatedOrders" :key="order.id">
+                  <td><strong>#{{ order.id }}</strong></td>
+                  <td>
                     <span
-                      v-for="color in (product.colors ?? []).slice(0, 6)"
-                      :key="color.id"
-                      :title="color.nev"
-                      style="width:20px; height:20px; border-radius:50%; display:inline-block; border:1.5px solid #e2e8f0; cursor:default;"
-                      :style="{ background: color.hex_kod }"
-                    ></span>
-                    <span
-                      v-if="(product.colors ?? []).length > 6"
-                      style="font-size:11px; color:#94a3b8; align-self:center;"
-                    >+{{ product.colors.length - 6 }}</span>
-                    <span v-if="!(product.colors ?? []).length" style="color:#94a3b8; font-size:13px;">—</span>
-                  </div>
-                </td>
-                <td>
-                  <div class="action-buttons">
-                    <button class="btn btn-sm btn-warning" @click="openProductModal(product)">
-                      <FontAwesomeIcon icon="fa-pen" />
-                    </button>
-                    <button class="btn btn-sm btn-danger" @click="deleteProduct(product.id)">
+                      v-if="order.customerId"
+                      @click="goToUser(order.customerId)"
+                      style="color:#f97316; cursor:pointer; font-weight:600; text-decoration:underline dotted;"
+                      :title="`Felhasználó megtekintése (ID: ${order.customerId})`"
+                    >
+                      {{ order.customer }}
+                    </span>
+                    <span v-else>{{ order.customer }}</span>
+                  </td>
+                  <td style="font-size:13px; color:#374151; min-width:180px;">
+                    <div v-if="order.szallitasiNev" style="display:flex; flex-direction:column; gap:2px;">
+                      <strong>{{ order.szallitasiNev }}</strong>
+                      <span style="color:#6b7280;">
+                        {{ order.szallitasiVaros }}, {{ order.szallitasiUtca }} {{ order.szallitasiHazszam }}
+                        <span v-if="order.szallitasiEmelet"> / {{ order.szallitasiEmelet }}</span>
+                      </span>
+                    </div>
+                    <span v-else style="color:#94a3b8;">—</span>
+                  </td>
+                  <td>{{ order.items }}</td>
+                  <td><strong>{{ formatCurrency(order.total) }}</strong></td>
+                  <td>
+                    <span class="badge" :class="getOrderBadgeClass(order.status)">
+                      {{ order.status }}
+                    </span>
+                  </td>
+                  <td>{{ order.date }}</td>
+                  <td><button
+                      class="btn btn-sm btn-danger"
+                      @click="deleteOrder(order)"
+                      :disabled="order.status === 'szállítás alatt'"
+                      :style="order.status === 'szállítás alatt' ? 'opacity:0.35; cursor:not-allowed;' : ''"
+                      :title="order.status === 'szállítás alatt' ? 'Szállítás alatt lévő rendelés nem törölhető' : 'Rendelés törlése'"
+                    >
                       <FontAwesomeIcon icon="fa-trash-alt" />
                     </button>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          <!-- Users pagináció -->
-          <div v-if="totalProductPages > 1" style="display:flex; justify-content:center; align-items:center; gap:8px; padding:16px; border-top:1px solid #e2e8f0;">
-            <button 
-              class="btn btn-sm" 
-              @click="currentProductPage--" 
-              :disabled="currentProductPage === 1"
-              style="background:#f1f5f9;"
-            >← Előző</button>
-            
-            <template v-for="page in totalProductPages" :key="page">
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div v-if="filteredOrders.length === 0" style="text-align:center; padding:40px; color:#94a3b8;">
+              Nincs találat a megadott feltételekre.
+            </div>
+
+            <div v-if="totalOrderPages > 1" style="display:flex; justify-content:center; align-items:center; gap:8px; padding:16px; border-top:1px solid #e2e8f0;">
               <button 
-                class="btn btn-sm"
-                @click="currentProductPage = page"
-                :style="currentProductPage === page ? 'background:#f97316; color:white;' : 'background:#f1f5f9;'"
-              >{{ page }}</button>
-            </template>
-            
-            <button 
-              class="btn btn-sm" 
-              @click="currentProductPage++" 
-              :disabled="currentProductPage === totalProductPages"
-              style="background:#f1f5f9;"
-            >Következő →</button>
-            
-            <span style="color:#64748b; font-size:13px; margin-left:8px;">
-              {{ filteredProducts.length }} felhasználó / {{ currentProductPage }}.oldal
-            </span>
+                class="btn btn-sm" 
+                @click="currentOrderPage--" 
+                :disabled="currentOrderPage === 1"
+                style="background:#f1f5f9;"
+              >← Előző</button>
+              
+              <template v-for="page in totalOrderPages" :key="page">
+                <button 
+                  class="btn btn-sm"
+                  @click="currentOrderPage = page"
+                  :style="currentOrderPage === page ? 'background:#f97316; color:white;' : 'background:#f1f5f9;'"
+                >{{ page }}</button>
+              </template>
+              
+              <button 
+                class="btn btn-sm" 
+                @click="currentOrderPage++" 
+                :disabled="currentOrderPage === totalOrderPages"
+                style="background:#f1f5f9;"
+              >Következő →</button>
+              
+              <span style="color:#64748b; font-size:13px; margin-left:8px;">
+                {{ filteredOrders.length }} rendelés / {{ currentOrderPage }}.oldal
+              </span>
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- Orders View -->
-      <div v-if="currentView === 'orders'">
-        <div class="header">
-          <h2>Rendelések</h2>
-        </div>
+        <!-- Users View -->
+        <div v-if="currentView === 'users'">
+          <div class="header">
+            <h2>Felhasználók</h2>
+            <div class="header-actions">
+              <button class="btn btn-primary" @click="openUserModal()">
+                <FontAwesomeIcon icon="fa-plus" /> Új felhasználó
+              </button>
+            </div>
+          </div>
 
-        <div class="table-container">
-          <div class="table-header">
-            <h3 class="table-title">Összes rendelés</h3>
-            <div class="filters-row">
-              <div class="search-box">
-                <input 
-                  type="text" 
-                  class="search-input" 
-                  placeholder="Keresés (név vagy ID alapján)..."
-                  v-model="orderSearch"
-                >
+          <div class="table-container">
+            <div class="table-header">
+              <h3 class="table-title">Összes felhasználó</h3>
+              <div class="filters-row">
+                <input type="text" class="search-input" placeholder="Keresés felhasználók között..." v-model="userSearch">
+                <select v-model="userRoleFilter" style="padding:8px 12px; font-size:14px; border:1px solid #e2e8f0; border-radius:8px; height:38px; background:white; cursor:pointer;">
+                  <option value="">Összes szerepkör</option>
+                  <option value="admin">Admin</option>
+                  <option value="moderator">Moderátor</option>
+                  <option value="sima">Felhasználó</option>
+                  <option value="felfuggesztett">Felfüggesztett</option>
+                </select>
+                <select v-model="userActiveFilter" style="padding:8px 12px; font-size:14px; border:1px solid #e2e8f0; border-radius:8px; height:38px; background:white; cursor:pointer;">
+                  <option value="">Összes státusz</option>
+                  <option value="true">✅ Aktív</option>
+                  <option value="false">🚫 Inaktív</option>
+                </select>
+                <select v-model="userOrderFilter" style="padding:8px 12px; font-size:14px; border:1px solid #e2e8f0; border-radius:8px; height:38px; background:white; cursor:pointer;">
+                  <option value="">Összes rendelés</option>
+                  <option value="van">📦 Van rendelése</option>
+                  <option value="aktiv">⚠️ Aktív rendelése van</option>
+                  <option value="nincs">— Nincs rendelése</option>
+                </select>
               </div>
-              <select 
-                v-model="orderStatusFilter" 
-                style="padding:8px 12px; font-size:14px; border:1px solid #e2e8f0; border-radius:8px; height:38px; min-width:160px; background:white; cursor:pointer;"
-              >
-                <option value="">Összes státusz</option>
-                <option value="teljesítve">✅ Teljesítve</option>
-                <option value="függőben">⏳ Függőben</option>
-                <option value="szállítás alatt">🚚 Szállítás alatt</option>
-                <option value="törölve">🚫 Törölve</option>
-              </select>
             </div>
-          </div>
-
-          <table>
-            <thead>
-              <tr>
-                <th @click="toggleOrderSort('id')" style="cursor:pointer; user-select:none; white-space:nowrap;">
-                  Rendelés ID
-                  <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
-                    <span :style="orderSortKey === 'id' && orderSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
-                    <span :style="orderSortKey === 'id' && orderSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
-                  </span>
-                </th>
-                <th @click="toggleOrderSort('customer')" style="cursor:pointer; user-select:none; white-space:nowrap;">
-                  Vásárló
-                  <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
-                    <span :style="orderSortKey === 'customer' && orderSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
-                    <span :style="orderSortKey === 'customer' && orderSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
-                  </span>
-                </th>
-                <th @click="toggleOrderSort('items')" style="cursor:pointer; user-select:none; white-space:nowrap;">
-                  Termékek
-                  <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
-                    <span :style="orderSortKey === 'items' && orderSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
-                    <span :style="orderSortKey === 'items' && orderSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
-                  </span>
-                </th>
-                <th @click="toggleOrderSort('total')" style="cursor:pointer; user-select:none; white-space:nowrap;">
-                  Összeg
-                  <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
-                    <span :style="orderSortKey === 'total' && orderSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
-                    <span :style="orderSortKey === 'total' && orderSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
-                  </span>
-                </th>
-                <th>Státusz</th>
-                <th @click="toggleOrderSort('date')" style="cursor:pointer; user-select:none; white-space:nowrap;">
-                  Dátum
-                  <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
-                    <span :style="orderSortKey === 'date' && orderSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
-                    <span :style="orderSortKey === 'date' && orderSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
-                  </span>
-                </th>
-                <th>Műveletek</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="order in paginatedOrders" :key="order.id">
-                <td><strong>#{{ order.id }}</strong></td>
-                <td>{{ order.customer }}</td>
-                <td>{{ order.items }}</td>
-                <td><strong>{{ formatCurrency(order.total) }}</strong></td>
-                <td>
-                  <span class="badge" :class="getOrderBadgeClass(order.status)">
-                    {{ order.status }}
-                  </span>
-                </td>
-                <td>{{ order.date }}</td>
-                <td><button
-                    class="btn btn-sm btn-danger"
-                    @click="deleteOrder(order)"
-                    :disabled="order.status === 'szállítás alatt'"
-                    :style="order.status === 'szállítás alatt' ? 'opacity:0.35; cursor:not-allowed;' : ''"
-                    :title="order.status === 'szállítás alatt' ? 'Szállítás alatt lévő rendelés nem törölhető' : 'Rendelés törlése'"
-                  >
-                    <FontAwesomeIcon icon="fa-trash-alt" />
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-
-          <div v-if="filteredOrders.length === 0" style="text-align:center; padding:40px; color:#94a3b8;">
-            Nincs találat a megadott feltételekre.
-          </div>
-
-          <div v-if="totalOrderPages > 1" style="display:flex; justify-content:center; align-items:center; gap:8px; padding:16px; border-top:1px solid #e2e8f0;">
-            <button 
-              class="btn btn-sm" 
-              @click="currentOrderPage--" 
-              :disabled="currentOrderPage === 1"
-              style="background:#f1f5f9;"
-            >← Előző</button>
-            
-            <template v-for="page in totalOrderPages" :key="page">
-              <button 
-                class="btn btn-sm"
-                @click="currentOrderPage = page"
-                :style="currentOrderPage === page ? 'background:#f97316; color:white;' : 'background:#f1f5f9;'"
-              >{{ page }}</button>
-            </template>
-            
-            <button 
-              class="btn btn-sm" 
-              @click="currentOrderPage++" 
-              :disabled="currentOrderPage === totalOrderPages"
-              style="background:#f1f5f9;"
-            >Következő →</button>
-            
-            <span style="color:#64748b; font-size:13px; margin-left:8px;">
-              {{ filteredOrders.length }} rendelés / {{ currentOrderPage }}.oldal
-            </span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Users View -->
-      <div v-if="currentView === 'users'">
-        <div class="header">
-          <h2>Felhasználók</h2>
-          <div class="header-actions">
-            <button class="btn btn-primary" @click="openUserModal()">
-              <FontAwesomeIcon icon="fa-plus" /> Új felhasználó
-            </button>
-          </div>
-        </div>
-
-        <div class="table-container">
-          <div class="table-header">
-            <h3 class="table-title">Összes felhasználó</h3>
-            <div class="filters-row">
-              <input type="text" class="search-input" placeholder="Keresés felhasználók között..." v-model="userSearch">
-              <select v-model="userRoleFilter" style="padding:8px 12px; font-size:14px; border:1px solid #e2e8f0; border-radius:8px; height:38px; background:white; cursor:pointer;">
-                <option value="">Összes szerepkör</option>
-                <option value="admin">Admin</option>
-                <option value="moderator">Moderátor</option>
-                <option value="sima">Felhasználó</option>
-                <option value="felfuggesztett">Felfüggesztett</option>
-              </select>
-              <select v-model="userActiveFilter" style="padding:8px 12px; font-size:14px; border:1px solid #e2e8f0; border-radius:8px; height:38px; background:white; cursor:pointer;">
-                <option value="">Összes státusz</option>
-                <option value="true">✅ Aktív</option>
-                <option value="false">🚫 Inaktív</option>
-              </select>
-              <select v-model="userOrderFilter" style="padding:8px 12px; font-size:14px; border:1px solid #e2e8f0; border-radius:8px; height:38px; background:white; cursor:pointer;">
-                <option value="">Összes rendelés</option>
-                <option value="van">📦 Van rendelése</option>
-                <option value="aktiv">⚠️ Aktív rendelése van</option>
-                <option value="nincs">— Nincs rendelése</option>
-              </select>
-            </div>
-          </div>
-          <table>
-            <thead>
-              <tr>
-                <th>Profilkép</th>
-                <th @click="toggleUserSort('name')" style="cursor:pointer; user-select:none; white-space:nowrap;">
-                  Név
-                  <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
-                    <span :style="userSortKey === 'name' && userSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
-                    <span :style="userSortKey === 'name' && userSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
-                  </span>
-                </th>
-                <th>Szerepkör</th>
-                <th @click="toggleUserSort('email')" style="cursor:pointer; user-select:none; white-space:nowrap;">
-                  Email
-                  <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
-                    <span :style="userSortKey === 'email' && userSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
-                    <span :style="userSortKey === 'email' && userSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
-                  </span>
-                </th>
-                <th>Aktív</th>
-                <th>Rendelések</th>
-                <th @click="toggleUserSort('registrationDate')" style="cursor:pointer; user-select:none; white-space:nowrap;">
-                  Regisztráció ideje
-                  <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
-                    <span :style="userSortKey === 'registrationDate' && userSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
-                    <span :style="userSortKey === 'registrationDate' && userSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
-                  </span>
-                </th>
-                <th @click="toggleUserSort('utolso_Belepes')" style="cursor:pointer; user-select:none; white-space:nowrap;">
-                  Utolsó bejelentkezés
-                  <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
-                    <span :style="userSortKey === 'utolso_Belepes' && userSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
-                    <span :style="userSortKey === 'utolso_Belepes' && userSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
-                  </span>
-                </th>
-                <th>Műveletek</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="user in paginatedUsers" :key="user.id">
-                <td>
-                  <img :src="user.profileImage" :alt="user.name" class="avatar">
-                </td>
-                <td><strong>{{ user.name }}</strong></td>
-                <td>
-                  <span class="badge" :class="user.role === 'admin' ? 'badge-blue' : user.role === 'moderator' ? 'badge-warning' : user.role === 'sima' ? 'badge-success' : 'badge-danger'">
-                    {{user.role}}
-                  </span>
-                </td>
-                <td>{{ user.email }}</td>
-                <td>
-                  <span class="badge" :class="user.active ? 'badge-success' : 'badge-danger'">
-                    {{ user.active ? 'Aktív' : 'Inaktív' }}
-                  </span>
-                </td>
-                <td>
+            <table>
+              <thead>
+                <tr>
+                  <th>Profilkép</th>
+                  <th @click="toggleUserSort('name')" style="cursor:pointer; user-select:none; white-space:nowrap;">
+                    Név
+                    <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
+                      <span :style="userSortKey === 'name' && userSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
+                      <span :style="userSortKey === 'name' && userSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
+                    </span>
+                  </th>
+                  <th>Szerepkör</th>
+                  <th @click="toggleUserSort('email')" style="cursor:pointer; user-select:none; white-space:nowrap;">
+                    Email
+                    <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
+                      <span :style="userSortKey === 'email' && userSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
+                      <span :style="userSortKey === 'email' && userSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
+                    </span>
+                  </th>
+                  <th>Aktív</th>
+                  <th>Rendelések</th>
+                  <th @click="toggleUserSort('registrationDate')" style="cursor:pointer; user-select:none; white-space:nowrap;">
+                    Regisztráció ideje
+                    <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
+                      <span :style="userSortKey === 'registrationDate' && userSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
+                      <span :style="userSortKey === 'registrationDate' && userSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
+                    </span>
+                  </th>
+                  <th @click="toggleUserSort('utolso_Belepes')" style="cursor:pointer; user-select:none; white-space:nowrap;">
+                    Utolsó bejelentkezés
+                    <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
+                      <span :style="userSortKey === 'utolso_Belepes' && userSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
+                      <span :style="userSortKey === 'utolso_Belepes' && userSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
+                    </span>
+                  </th>
+                  <th>Műveletek</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="user in paginatedUsers" :key="user.id">
+                  <td>
+                    <img :src="user.profileImage" :alt="user.name" class="avatar">
+                  </td>
+                  <td><strong>{{ user.name }}</strong></td>
+                  <td>
+                    <span class="badge" :class="user.role === 'admin' ? 'badge-blue' : user.role === 'moderator' ? 'badge-warning' : user.role === 'sima' ? 'badge-success' : 'badge-danger'">
+                      {{user.role}}
+                    </span>
+                  </td>
+                  <td>{{ user.email }}</td>
+                  <td>
+                    <span class="badge" :class="user.active ? 'badge-success' : 'badge-danger'">
+                      {{ user.active ? 'Aktív' : 'Inaktív' }}
+                    </span>
+                  </td>
+                  <td>
                   <div v-if="user.orderStats?.total > 0" style="display:flex; flex-direction:column; gap:4px;">
-                    <span class="badge" :class="user.orderStats.active > 0 ? 'badge-warning' : 'badge-success'">
+                    <span
+                      class="badge"
+                      :class="user.orderStats.active > 0 ? 'badge-warning' : 'badge-success'"
+                      @click="goToOrders(user.name)"
+                      style="cursor:pointer;"
+                      title="Rendelések megtekintése"
+                    >
                       {{ user.orderStats.active > 0 ? `⚠️ ${user.orderStats.active} aktív` : '✅ Mind teljesítve' }}
                     </span>
-                    <small style="color:#6b7280; font-size:11px;">
-                      Utolsó: <strong>{{ 
-                        user.orderStats.lastStatus === 'törölve' ? '🚫 Törölve' :
-                        user.orderStats.lastStatus === 'teljesítve' ? '✅ Teljesítve' :
-                        user.orderStats.lastStatus === 'függőben' ? '⏳ Függőben' :
-                        user.orderStats.lastStatus === 'szállítás alatt' ? '🚚 Szállítás alatt' :
-                        user.orderStats.lastStatus ?? '-'
-                      }}</strong>
-                    </small>
-                    <small style="color:#94a3b8; font-size:11px;">  
-                      Összesen: {{ user.orderStats.total }} db
-                    </small>
-                  </div>
-                  <span v-else style="color:#94a3b8; font-size:13px;">Nincs rendelés</span>
-                </td>
-                <td>{{ user.registrationDate ? formatDate(user.registrationDate) : '-' }}</td>
-                <td>{{ user.utolso_Belepes ? formatDate(user.utolso_Belepes) : '-' }}</td>
-                <td>
-                  <div class="action-buttons">
-                    <button class="btn btn-sm btn-warning" 
-                      @click="openUserModal(user)"       
-                      :disabled="user.id === currentUserId"
-                      :style="user.id === currentUserId ? 'opacity: 0.4; cursor: not-allowed;' : ''"
-                      :title="user.id === currentUserId ? 'Saját fiókod nem módosíthatod' : ''"
-                    >
-                      <FontAwesomeIcon icon="fa-pen" />
-                    </button>
-                    <button class="btn btn-sm btn-danger" 
-                      @click="deleteUser(user.id)"
-                      :disabled="user.id === currentUserId || user.orderStats.active > 0"
-                      :style="user.id === currentUserId || user.orderStats.active > 0 ? 'opacity: 0.4; cursor: not-allowed;' : ''"
-                      :title="user.id === currentUserId || user.orderStats.active > 0 ? 'Saját fiókod nem törölheted' : ''"
-                    >
-                      <FontAwesomeIcon icon="fa-trash-alt" />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          <!-- Users pagináció -->
-          <div v-if="totalPages > 1" style="display:flex; justify-content:center; align-items:center; gap:8px; padding:16px; border-top:1px solid #e2e8f0;">
-            <button 
-              class="btn btn-sm" 
-              @click="currentPage--" 
-              :disabled="currentPage === 1"
-              style="background:#f1f5f9;"
-            >← Előző</button>
-            
-            <template v-for="page in totalPages" :key="page">
+                      <small style="color:#6b7280; font-size:11px;">
+                        Utolsó: <strong>{{ 
+                          user.orderStats.lastStatus === 'törölve' ? '🚫 Törölve' :
+                          user.orderStats.lastStatus === 'teljesítve' ? '✅ Teljesítve' :
+                          user.orderStats.lastStatus === 'függőben' ? '⏳ Függőben' :
+                          user.orderStats.lastStatus === 'szállítás alatt' ? '🚚 Szállítás alatt' :
+                          user.orderStats.lastStatus ?? '-'
+                        }}</strong>
+                      </small>
+                      <small style="color:#94a3b8; font-size:11px;">  
+                        Összesen: {{ user.orderStats.total }} db
+                      </small>
+                    </div>
+                    <span v-else style="color:#94a3b8; font-size:13px;">Nincs rendelés</span>
+                  </td>
+                  <td>{{ user.registrationDate ? formatDate(user.registrationDate) : '-' }}</td>
+                  <td>{{ user.utolso_Belepes ? formatDate(user.utolso_Belepes) : '-' }}</td>
+                  <td>
+                    <div class="action-buttons">
+                      <button class="btn btn-sm btn-warning" 
+                        @click="openUserModal(user)"       
+                        :disabled="user.id === currentUserId"
+                        :style="user.id === currentUserId ? 'opacity: 0.4; cursor: not-allowed;' : ''"
+                        :title="user.id === currentUserId ? 'Saját fiókod nem módosíthatod' : ''"
+                      >
+                        <FontAwesomeIcon icon="fa-pen" />
+                      </button>
+                      <button class="btn btn-sm btn-danger" 
+                        @click="deleteUser(user.id)"
+                        :disabled="user.id === currentUserId || user.orderStats.active > 0"
+                        :style="user.id === currentUserId || user.orderStats.active > 0 ? 'opacity: 0.4; cursor: not-allowed;' : ''"
+                        :title="user.id === currentUserId || user.orderStats.active > 0 ? 'Saját fiókod nem törölheted' : ''"
+                      >
+                        <FontAwesomeIcon icon="fa-trash-alt" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <!-- Users pagináció -->
+            <div v-if="totalPages > 1" style="display:flex; justify-content:center; align-items:center; gap:8px; padding:16px; border-top:1px solid #e2e8f0;">
               <button 
-                class="btn btn-sm"
-                @click="currentPage = page"
-                :style="currentPage === page ? 'background:#f97316; color:white;' : 'background:#f1f5f9;'"
-              >{{ page }}</button>
-            </template>
-            
-            <button 
-              class="btn btn-sm" 
-              @click="currentPage++" 
-              :disabled="currentPage === totalPages"
-              style="background:#f1f5f9;"
-            >Következő →</button>
-            
-            <span style="color:#64748b; font-size:13px; margin-left:8px;">
-              {{ filteredUsers.length }} felhasználó / {{ currentPage }}.oldal
-            </span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Blog View -->
-      <div v-if="currentView === 'blog'">
-        <div class="header">
-          <h2>Blogbejegyzések</h2>
-          <div class="header-actions">
-            <button class="btn btn-primary" @click="openBlogModal()">
-              <FontAwesomeIcon icon="fa-plus" /> Új bejegyzés
-            </button>
-          </div>
-        </div>
-
-        <div class="table-container">
-          <div class="table-header">
-            <h3 class="table-title">Összes bejegyzés</h3>
-            <div class="filters-row">
-              <input 
-                type="text" 
-                class="search-input" 
-                placeholder="Keresés bejegyzések között..." 
-                v-model="blogSearch"
-              >
-              <MultiSelect
-                v-model="blogTagFilter"
-                :options="tagOptions"
-                optionLabel="name"
-                placeholder="Szűrés címke alapján"
-                display="chip"
-                filter
-                :maxSelectedLabels="2"
-                style="min-width:200px; max-width:200px; font-size:13px;"
-              />
-              <select 
-                v-model="blogPublishedFilter" 
-                style="padding:8px 10px; font-size:13px; border:1px solid #e2e8f0; border-radius:8px; height:38px; background:white; cursor:pointer;"
-              >
-                <option value="">Összes státusz</option>
-                <option value="true">✅ Publikálva</option>
-                <option value="false">🗑️ Törölt</option>
-              </select>
+                class="btn btn-sm" 
+                @click="currentPage--" 
+                :disabled="currentPage === 1"
+                style="background:#f1f5f9;"
+              >← Előző</button>
+              
+              <template v-for="page in totalPages" :key="page">
+                <button 
+                  class="btn btn-sm"
+                  @click="currentPage = page"
+                  :style="currentPage === page ? 'background:#f97316; color:white;' : 'background:#f1f5f9;'"
+                >{{ page }}</button>
+              </template>
+              
+              <button 
+                class="btn btn-sm" 
+                @click="currentPage++" 
+                :disabled="currentPage === totalPages"
+                style="background:#f1f5f9;"
+              >Következő →</button>
+              
+              <span style="color:#64748b; font-size:13px; margin-left:8px;">
+                {{ filteredUsers.length }} felhasználó / {{ currentPage }}.oldal
+              </span>
             </div>
           </div>
-          <table>
-            <thead>
-              <tr>
-                <th @click="toggleBlogSort('title')" style="cursor:pointer; user-select:none; white-space:nowrap;">
-                  Cím
-                  <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
-                    <span :style="blogSortKey === 'title' && blogSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
-                    <span :style="blogSortKey === 'title' && blogSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
-                  </span>
-                </th>
-                <th @click="toggleBlogSort('author')" style="cursor:pointer; user-select:none; white-space:nowrap;">
-                  Szerző
-                  <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
-                    <span :style="blogSortKey === 'author' && blogSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
-                    <span :style="blogSortKey === 'author' && blogSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
-                  </span>
-                </th>
-                <th>Címkék</th>
-                <th @click="toggleBlogSort('date')" style="cursor:pointer; user-select:none; white-space:nowrap;">
-                  Dátum
-                  <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
-                    <span :style="blogSortKey === 'date' && blogSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
-                    <span :style="blogSortKey === 'date' && blogSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
-                  </span>
-                </th>
-                <th>Státusz</th>
-                <th>Műveletek</th>
-              </tr>
-          </thead>
-            <tbody>
-              <tr v-for="post in paginatedBlogPosts" :key="post.id">
-                <td><strong>{{ post.title }}</strong></td>
-                <td>{{ post.author }}</td>
-                <td>
-                  <div style="display:flex; flex-wrap:wrap; gap:4px; align-items:center;">
-                    <span 
-                      v-for="tag in post.tags.slice(0, 2)" 
-                      :key="tag.id"
-                      class="badge badge-blue"
-                      style="font-size:11px; padding:2px 8px;"
-                    >
-                      {{ tag.nev }}
-                    </span>
-                    <span 
-                      v-if="post.tags.length > 2"
-                      class="badge"
-                      style="background:#e2e8f0; color:#475569; font-size:11px; padding:2px 8px; cursor:default;"
-                      :title="post.tags.slice(2).map(t => t.nev).join(', ')"
-                    >
-                      +{{ post.tags.length - 2 }}
-                    </span>
-                    <span v-if="post.tags.length === 0" style="color:#94a3b8; font-size:13px;">-</span>
-                  </div>
-                </td>
-                <td>{{ post.date }}</td>
-                <td style="text-align: center;">
-                  <span class="badge" :class="post.published ? 'badge-success' : 'badge-danger'">
-                    {{ post.published ? 'Publikálva' : 'törölt' }}
-                  </span>
-                </td>
-                <td>
-                  <div class="action-buttons">
-                    <button class="btn btn-sm btn-warning" @click="openBlogModal(post)">
-                      <FontAwesomeIcon icon="fa-pen" />
-                    </button>
-                    <button class="btn btn-sm btn-danger" @click="deleteBlogPost(post.id)">
-                      <FontAwesomeIcon icon="fa-trash-alt" />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          <!-- Users pagináció -->
-          <div v-if="totalBlogPages > 1" style="display:flex; justify-content:center; align-items:center; gap:8px; padding:16px; border-top:1px solid #e2e8f0;">
-            <button 
-              class="btn btn-sm" 
-              @click="currentBlogPage--" 
-              :disabled="currentBlogPage === 1"
-              style="background:#f1f5f9;"
-            >← Előző</button>
-            
-            <template v-for="page in totalBlogPages" :key="page">
-              <button 
-                class="btn btn-sm"
-                @click="currentBlogPage = page"
-                :style="currentBlogPage === page ? 'background:#f97316; color:white;' : 'background:#f1f5f9;'"
-              >{{ page }}</button>
-            </template>
-            
-            <button 
-              class="btn btn-sm" 
-              @click="currentBlogPage++" 
-              :disabled="currentBlogPage === totalBlogPages"
-              style="background:#f1f5f9;"
-            >Következő →</button>
-            
-            <span style="color:#64748b; font-size:13px; margin-left:8px;">
-              {{ filteredBlogPosts.length }} bejegyzés / {{ currentBlogPage }}.oldal
-            </span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Comments View -->
-      <div v-if="currentView === 'comments'">
-        <div class="header">
-          <h2>Kommentek</h2>
         </div>
 
-        <div class="table-container">
-          <div class="table-header">
-            <h3 class="table-title">Összes komment</h3>
-            <div class="filters-row">
-              <input
-                type="text"
-                class="search-input"
-                placeholder="Keresés (tartalom, szerző, poszt)..."
-                v-model="commentSearch"
-              >
-              <select
-                v-model="commentPostSortMode"
-                style="padding:8px 12px; font-size:14px; border:1px solid #e2e8f0; border-radius:8px; height:38px; background:white; cursor:pointer;"
-              >
-                <option value="abc">Poszt: A → Z</option>
-                <option value="id">Poszt: ID szerint</option>
-              </select>
+        <!-- Blog View -->
+        <div v-if="currentView === 'blog'">
+          <div class="header">
+            <h2>Blogbejegyzések</h2>
+            <div class="header-actions">
+              <button class="btn btn-primary" @click="openBlogModal()">
+                <FontAwesomeIcon icon="fa-plus" /> Új bejegyzés
+              </button>
             </div>
           </div>
 
-          <table>
-            <thead>
-              <tr>
-                <th
-                  @click="toggleCommentSort('id')"
-                  style="width:48px; cursor:pointer; user-select:none; white-space:nowrap;"
+          <div class="table-container">
+            <div class="table-header">
+              <h3 class="table-title">Összes bejegyzés</h3>
+              <div class="filters-row">
+                <input 
+                  type="text" 
+                  class="search-input" 
+                  placeholder="Keresés bejegyzések között..." 
+                  v-model="blogSearch"
                 >
-                  ID
-                  <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
-                    <span :style="commentSortKey === 'id' && commentSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
-                    <span :style="commentSortKey === 'id' && commentSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
-                  </span>
-                </th>
-                <th
-                  @click="toggleCommentSort('iro')"
-                  style="cursor:pointer; user-select:none; white-space:nowrap;"
+                <MultiSelect
+                  v-model="blogTagFilter"
+                  :options="tagOptions"
+                  optionLabel="name"
+                  placeholder="Szűrés címke alapján"
+                  display="chip"
+                  filter
+                  :maxSelectedLabels="2"
+                  style="min-width:200px; max-width:200px; font-size:13px;"
+                />
+                <select 
+                  v-model="blogPublishedFilter" 
+                  style="padding:8px 10px; font-size:13px; border:1px solid #e2e8f0; border-radius:8px; height:38px; background:white; cursor:pointer;"
                 >
-                  Szerző
-                  <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
-                    <span :style="commentSortKey === 'iro' && commentSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
-                    <span :style="commentSortKey === 'iro' && commentSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
-                  </span>
-                </th>
-                <th
-                  @click="toggleCommentSort('komment')"
-                  style="cursor:pointer; user-select:none;"
-                >
-                  Tartalom
-                  <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
-                    <span :style="commentSortKey === 'komment' && commentSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
-                    <span :style="commentSortKey === 'komment' && commentSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
-                  </span>
-                </th>
-                <th
-                  @click="toggleCommentSort('poszt_cim')"
-                  style="cursor:pointer; user-select:none; white-space:nowrap;"
-                >
-                  Poszt
-                  <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
-                    <span :style="commentSortKey === 'letrehozas_datuma' && commentSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
-                    <span :style="commentSortKey === 'letrehozas_datuma' && commentSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
-                  </span>
-                </th>
-                <th style="white-space:nowrap;">Típus</th>
-                <th
-                  @click="toggleCommentSort('valaszok_szama')"
-                  style="cursor:pointer; user-select:none; white-space:nowrap;"
-                >
-                  Válaszok
-                  <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
-                    <span :style="commentSortKey === 'valaszok_szama' && commentSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
-                    <span :style="commentSortKey === 'valaszok_szama' && commentSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
-                  </span>
-                </th>
-                <th
-                  @click="toggleCommentSort('letrehozas_datuma')"
-                  style="cursor:pointer; user-select:none; white-space:nowrap;"
-                >
-                  Dátum
-                  <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
-                    <span :style="commentSortKey === 'letrehozas_datuma' && commentSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
-                    <span :style="commentSortKey === 'letrehozas_datuma' && commentSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
-                  </span>
-                </th>
-                <th>Műveletek</th>
-              </tr>
+                  <option value="">Összes státusz</option>
+                  <option value="true">✅ Publikálva</option>
+                  <option value="false">🗑️ Törölt</option>
+                </select>
+              </div>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th @click="toggleBlogSort('title')" style="cursor:pointer; user-select:none; white-space:nowrap;">
+                    Cím
+                    <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
+                      <span :style="blogSortKey === 'title' && blogSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
+                      <span :style="blogSortKey === 'title' && blogSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
+                    </span>
+                  </th>
+                  <th @click="toggleBlogSort('author')" style="cursor:pointer; user-select:none; white-space:nowrap;">
+                    Szerző
+                    <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
+                      <span :style="blogSortKey === 'author' && blogSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
+                      <span :style="blogSortKey === 'author' && blogSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
+                    </span>
+                  </th>
+                  <th>Címkék</th>
+                  <th @click="toggleBlogSort('date')" style="cursor:pointer; user-select:none; white-space:nowrap;">
+                    Dátum
+                    <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
+                      <span :style="blogSortKey === 'date' && blogSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
+                      <span :style="blogSortKey === 'date' && blogSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
+                    </span>
+                  </th>
+                  <th>Státusz</th>
+                  <th>Műveletek</th>
+                </tr>
             </thead>
-            <tbody>
-              <tr v-for="comment in paginatedComments" :key="comment.id">
-                <td style="color:#94a3b8; font-size:12px;">#{{ comment.id }}</td>
-                <td><strong>{{ comment.iro }}</strong></td>
-                <td style="max-width:280px;">
-                  <span
-                    :title="comment.komment"
-                    style="display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;"
-                  >{{ comment.komment }}</span>
-                </td>
-                <td>
-                  <div style="display:flex; flex-direction:column; gap:2px;">
-                    <a 
-                      :href="`/blog/${comment.poszt_id}`" 
+              <tbody>
+                <tr v-for="post in paginatedBlogPosts" :key="post.id">
+                  <td>
+                    <a
+                      :href="`/blog/${post.id}`"
                       target="_blank"
-                      style="color:#f97316; font-size:13px; text-decoration:none; cursor:pointer;"
+                      style="color:#f97316; font-weight:600; text-decoration:none; cursor:pointer;"
                       @mouseover="$event.target.style.textDecoration='underline'"
                       @mouseleave="$event.target.style.textDecoration='none'"
-                    >{{ comment.poszt_cim }}</a>
-                    <span style="color:#94a3b8; font-size:11px;">#{{ comment.poszt_id }}</span>
-                  </div>
-                </td>
-                <td>
-                  <span
-                    class="badge"
-                    :class="comment.szulo_id ? 'badge-blue' : 'badge-success'"
-                  >
-                    {{ comment.szulo_id ? 'Válasz' : 'Főkomment' }}
-                  </span>
-                </td>
-                <td style="text-align:center;">
-                  <span v-if="comment.valaszok_szama > 0" class="badge badge-warning">
-                    {{ comment.valaszok_szama }} db
-                  </span>
-                  <span v-else style="color:#94a3b8; font-size:13px;">—</span>
-                </td>
-                <td style="white-space:nowrap;">{{ comment.letrehozas_datuma ? formatDate(comment.letrehozas_datuma) : '-' }}</td>
-                <td>
-                  <button class="btn btn-sm btn-danger" @click="deleteComment(comment.id)">
-                    <FontAwesomeIcon icon="fa-trash-alt" />
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+                    >
+                      {{ post.title }}
+                    </a>
+                  </td>
+                  <td>
+                    <span
+                      v-if="post.authorId"
+                      @click="goToUser(post.authorId)"
+                      style="color:#f97316; cursor:pointer; font-weight:600; text-decoration:underline dotted;"
+                      :title="`Felhasználó megtekintése (ID: ${post.authorId})`"
+                    >
+                      {{ post.author }}
+                    </span>
+                    <span v-else>{{ post.author }}</span>
+                  </td>
+                  <td>
+                    <div style="display:flex; flex-wrap:wrap; gap:4px; align-items:center;">
+                      <span 
+                        v-for="tag in post.tags.slice(0, 2)" 
+                        :key="tag.id"
+                        class="badge badge-blue"
+                        style="font-size:11px; padding:2px 8px;"
+                      >
+                        {{ tag.nev }}
+                      </span>
+                      <span 
+                        v-if="post.tags.length > 2"
+                        class="badge"
+                        style="background:#e2e8f0; color:#475569; font-size:11px; padding:2px 8px; cursor:default;"
+                        :title="post.tags.slice(2).map(t => t.nev).join(', ')"
+                      >
+                        +{{ post.tags.length - 2 }}
+                      </span>
+                      <span v-if="post.tags.length === 0" style="color:#94a3b8; font-size:13px;">-</span>
+                    </div>
+                  </td>
+                  <td>{{ post.date }}</td>
+                  <td style="text-align: center;">
+                    <span class="badge" :class="post.published ? 'badge-success' : 'badge-danger'">
+                      {{ post.published ? 'Publikálva' : 'törölt' }}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="action-buttons">
+                      <button class="btn btn-sm btn-warning" @click="openBlogModal(post)">
+                        <FontAwesomeIcon icon="fa-pen" />
+                      </button>
+                      <button class="btn btn-sm btn-danger" @click="deleteBlogPost(post.id)">
+                        <FontAwesomeIcon icon="fa-trash-alt" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <!-- Users pagináció -->
+            <div v-if="totalBlogPages > 1" style="display:flex; justify-content:center; align-items:center; gap:8px; padding:16px; border-top:1px solid #e2e8f0;">
+              <button 
+                class="btn btn-sm" 
+                @click="currentBlogPage--" 
+                :disabled="currentBlogPage === 1"
+                style="background:#f1f5f9;"
+              >← Előző</button>
+              
+              <template v-for="page in totalBlogPages" :key="page">
+                <button 
+                  class="btn btn-sm"
+                  @click="currentBlogPage = page"
+                  :style="currentBlogPage === page ? 'background:#f97316; color:white;' : 'background:#f1f5f9;'"
+                >{{ page }}</button>
+              </template>
+              
+              <button 
+                class="btn btn-sm" 
+                @click="currentBlogPage++" 
+                :disabled="currentBlogPage === totalBlogPages"
+                style="background:#f1f5f9;"
+              >Következő →</button>
+              
+              <span style="color:#64748b; font-size:13px; margin-left:8px;">
+                {{ filteredBlogPosts.length }} bejegyzés / {{ currentBlogPage }}.oldal
+              </span>
+            </div>
+          </div>
+        </div>
 
-          <div v-if="filteredComments.length === 0" style="text-align:center; padding:40px; color:#94a3b8;">
-            Nincs találat a megadott feltételekre.
+        <!-- Comments View -->
+        <div v-if="currentView === 'comments'">
+          <div class="header">
+            <h2>Kommentek</h2>
           </div>
 
-          <div v-if="totalCommentPages > 1" style="display:flex; justify-content:center; align-items:center; gap:8px; padding:16px; border-top:1px solid #e2e8f0;">
-            <button
-              class="btn btn-sm"
-              @click="currentCommentPage--"
-              :disabled="currentCommentPage === 1"
-              style="background:#f1f5f9;"
-            >← Előző</button>
+          <div class="table-container">
+            <div class="table-header">
+              <h3 class="table-title">Összes komment</h3>
+              <div class="filters-row">
+                <input
+                  type="text"
+                  class="search-input"
+                  placeholder="Keresés (tartalom, szerző, poszt)..."
+                  v-model="commentSearch"
+                >
+                <select
+                  v-model="commentPostSortMode"
+                  style="padding:8px 12px; font-size:14px; border:1px solid #e2e8f0; border-radius:8px; height:38px; background:white; cursor:pointer;"
+                >
+                  <option value="abc">Poszt: A → Z</option>
+                  <option value="id">Poszt: ID szerint</option>
+                </select>
+              </div>
+            </div>
 
-            <template v-for="page in totalCommentPages" :key="page">
+            <table>
+              <thead>
+                <tr>
+                  <th
+                    @click="toggleCommentSort('id')"
+                    style="width:48px; cursor:pointer; user-select:none; white-space:nowrap;"
+                  >
+                    ID
+                    <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
+                      <span :style="commentSortKey === 'id' && commentSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
+                      <span :style="commentSortKey === 'id' && commentSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
+                    </span>
+                  </th>
+                  <th
+                    @click="toggleCommentSort('iro')"
+                    style="cursor:pointer; user-select:none; white-space:nowrap;"
+                  >
+                    Szerző
+                    <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
+                      <span :style="commentSortKey === 'iro' && commentSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
+                      <span :style="commentSortKey === 'iro' && commentSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
+                    </span>
+                  </th>
+                  <th
+                    @click="toggleCommentSort('komment')"
+                    style="cursor:pointer; user-select:none;"
+                  >
+                    Tartalom
+                    <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
+                      <span :style="commentSortKey === 'komment' && commentSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
+                      <span :style="commentSortKey === 'komment' && commentSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
+                    </span>
+                  </th>
+                  <th
+                    @click="toggleCommentSort('poszt_cim')"
+                    style="cursor:pointer; user-select:none; white-space:nowrap;"
+                  >
+                    Poszt
+                    <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
+                      <span :style="commentSortKey === 'letrehozas_datuma' && commentSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
+                      <span :style="commentSortKey === 'letrehozas_datuma' && commentSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
+                    </span>
+                  </th>
+                  <th style="white-space:nowrap;">Típus</th>
+                  <th
+                    @click="toggleCommentSort('valaszok_szama')"
+                    style="cursor:pointer; user-select:none; white-space:nowrap;"
+                  >
+                    Válaszok
+                    <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
+                      <span :style="commentSortKey === 'valaszok_szama' && commentSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
+                      <span :style="commentSortKey === 'valaszok_szama' && commentSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
+                    </span>
+                  </th>
+                  <th
+                    @click="toggleCommentSort('letrehozas_datuma')"
+                    style="cursor:pointer; user-select:none; white-space:nowrap;"
+                  >
+                    Dátum
+                    <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
+                      <span :style="commentSortKey === 'letrehozas_datuma' && commentSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
+                      <span :style="commentSortKey === 'letrehozas_datuma' && commentSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
+                    </span>
+                  </th>
+                  <th>Műveletek</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="comment in paginatedComments" :key="comment.id">
+                  <td style="color:#94a3b8; font-size:12px;">#{{ comment.id }}</td>
+                  <td>
+                    <span
+                      v-if="comment.iro_id"
+                      @click="goToUser(comment.iro_id)"
+                      style="color:#f97316; cursor:pointer; font-weight:600; text-decoration:underline dotted;"
+                      :title="`Felhasználó megtekintése (ID: ${comment.iro_id})`"
+                    >
+                      {{ comment.iro }}
+                    </span>
+                    <span v-else><strong>{{ comment.iro }}</strong></span>
+                  </td>
+                  <td style="max-width:280px;">
+                    <span
+                      :title="comment.komment"
+                      style="display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;"
+                    >{{ comment.komment }}</span>
+                  </td>
+                  <td>
+                    <div style="display:flex; flex-direction:column; gap:2px;">
+                      <a 
+                        :href="`/blog/${comment.poszt_id}`" 
+                        target="_blank"
+                        style="color:#f97316; font-size:13px; text-decoration:none; cursor:pointer;"
+                        @mouseover="$event.target.style.textDecoration='underline'"
+                        @mouseleave="$event.target.style.textDecoration='none'"
+                      >{{ comment.poszt_cim }}</a>
+                      <span style="color:#94a3b8; font-size:11px;">#{{ comment.poszt_id }}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <span
+                      class="badge"
+                      :class="comment.szulo_id ? 'badge-blue' : 'badge-success'"
+                    >
+                      {{ comment.szulo_id ? 'Válasz' : 'Főkomment' }}
+                    </span>
+                  </td>
+                  <td style="text-align:center;">
+                    <span v-if="comment.valaszok_szama > 0" class="badge badge-warning">
+                      {{ comment.valaszok_szama }} db
+                    </span>
+                    <span v-else style="color:#94a3b8; font-size:13px;">—</span>
+                  </td>
+                  <td style="white-space:nowrap;">{{ comment.letrehozas_datuma ? formatDate(comment.letrehozas_datuma) : '-' }}</td>
+                  <td>
+                    <button class="btn btn-sm btn-danger" @click="deleteComment(comment.id)">
+                      <FontAwesomeIcon icon="fa-trash-alt" />
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div v-if="filteredComments.length === 0" style="text-align:center; padding:40px; color:#94a3b8;">
+              Nincs találat a megadott feltételekre.
+            </div>
+
+            <div v-if="totalCommentPages > 1" style="display:flex; justify-content:center; align-items:center; gap:8px; padding:16px; border-top:1px solid #e2e8f0;">
               <button
                 class="btn btn-sm"
-                @click="currentCommentPage = page"
-                :style="currentCommentPage === page ? 'background:#f97316; color:white;' : 'background:#f1f5f9;'"
-              >{{ page }}</button>
-            </template>
+                @click="currentCommentPage--"
+                :disabled="currentCommentPage === 1"
+                style="background:#f1f5f9;"
+              >← Előző</button>
 
-            <button
-              class="btn btn-sm"
-              @click="currentCommentPage++"
-              :disabled="currentCommentPage === totalCommentPages"
-              style="background:#f1f5f9;"
-            >Következő →</button>
+              <template v-for="page in totalCommentPages" :key="page">
+                <button
+                  class="btn btn-sm"
+                  @click="currentCommentPage = page"
+                  :style="currentCommentPage === page ? 'background:#f97316; color:white;' : 'background:#f1f5f9;'"
+                >{{ page }}</button>
+              </template>
 
-            <span style="color:#64748b; font-size:13px; margin-left:8px;">
-              {{ filteredComments.length }} komment / {{ currentCommentPage }}.oldal
-            </span>
+              <button
+                class="btn btn-sm"
+                @click="currentCommentPage++"
+                :disabled="currentCommentPage === totalCommentPages"
+                style="background:#f1f5f9;"
+              >Következő →</button>
+
+              <span style="color:#64748b; font-size:13px; margin-left:8px;">
+                {{ filteredComments.length }} komment / {{ currentCommentPage }}.oldal
+              </span>
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- Analytics View -->
-      <div v-if="currentView === 'analytics'">
-        <div class="header">
-          <h2>Analitika</h2>
-        </div>
-
-        <div class="charts-grid" style="grid-template-columns: 1fr;">
-          <div class="chart-card">
-            <div class="chart-header">
-              <h3 class="chart-title">Eladott termékek havi bontásban</h3>
+        <!-- Analytics View -->
+        <div v-if="currentView === 'analytics'">
+          <div class="header">
+            <h2>Analitika</h2>
+              <div class="header-actions">
+              <button class="btn btn-primary" @click="refreshAnalytics">
+                <FontAwesomeIcon icon="fa-refresh" /> Frissítés
+              </button>
             </div>
-            <canvas ref="productSalesChart"></canvas>
           </div>
 
-          <div class="chart-card">
-            <div class="chart-header">
-              <h3 class="chart-title">Bevétel havi megoszlása</h3>
+          <!-- Skeleton -->
+          <div v-if="analyticsLoading" class="charts-grid">
+            <div class="chart-card">
+              <div class="skeleton skeleton-title" style="width:40%; margin-bottom:20px;"></div>
+              <div class="skeleton skeleton-chart"></div>
             </div>
-            <canvas ref="revenueChart"></canvas>
+            <div class="chart-card">
+              <div class="skeleton skeleton-title" style="width:40%; margin-bottom:20px;"></div>
+              <div class="skeleton skeleton-chart"></div>
+            </div>
+          </div>
+          <div v-if="analyticsLoading" class="chart-card" style="margin-bottom:32px;">
+            <div class="skeleton skeleton-title" style="width:40%; margin-bottom:20px;"></div>
+            <div class="skeleton skeleton-chart"></div>
+          </div>
+
+          <!-- Valódi chartok -->
+          <div v-else>
+            <div class="charts-grid">
+              <div class="chart-card">
+                <div class="chart-header">
+                  <h3 class="chart-title">Eladott termékek havi bontásban</h3>
+                </div>
+                <canvas ref="productSalesChart"></canvas>
+              </div>
+              <div class="chart-card">
+                <div class="chart-header">
+                  <h3 class="chart-title">Bevétel havi megoszlása</h3>
+                </div>
+                <canvas ref="revenueChart"></canvas>
+              </div>
+            </div>
+
+            <div class="chart-card" style="margin-bottom: 32px;">
+              <div class="chart-header">
+                <h3 class="chart-title">Készlet állapota termékenkénti bontásban</h3>
+              </div>
+              <div style="overflow-x: auto;">
+                <div :style="{ width: Math.max(800, products.length * 60) + 'px', height: '400px' }">
+                  <canvas ref="stockChart"></canvas>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -1582,6 +1596,7 @@ import FileUpload from 'primevue/fileupload';
 import InputText from 'primevue/inputtext';
 import Checkbox from 'primevue/checkbox';
 import Dropdown from 'primevue/dropdown';
+import { useRouter } from 'vue-router';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import {
@@ -1599,11 +1614,13 @@ library.add(
   faFileLines, faPen, faTrashAlt,
   faHourglassHalf, faComment
 )
+const router = useRouter();
 
 const API = '/api/admin';
 
 // Reactive state
-const currentView = ref('dashboard');
+const savedView = sessionStorage.getItem('adminView');
+const currentView = ref(savedView ?? 'dashboard');
 const productSearch = ref('');
 const userSearch = ref('');
 const blogSearch = ref('');
@@ -1644,7 +1661,26 @@ const comments = ref([]);
 const commentSearch = ref('');
 const commentPostFilter = ref('');
 const currentCommentPage = ref(1);
-const { showToast, showErrorModal } = inject('toast')
+const { showToast, showErrorModal } = inject('toast');
+const statsLoading = ref(true);
+const chartsLoading = ref(true);
+const stockChart = ref(null);
+const analyticsLoading = ref(false);
+let stockChartInstance = null;
+
+const goToUser = (customerId) => {
+  if (!customerId) return;
+  currentView.value = 'users';
+  userSearch.value = String(customerId);
+  currentPage.value = 1;
+};
+
+const goToOrders = (customerName) => {
+  if (!customerName) return;
+  currentView.value = 'orders';
+  orderSearch.value = customerName;
+  currentOrderPage.value = 1;
+};
 
 // Confirm modal
 const confirmModal = ref({ visible: false, message: '', resolve: null })
@@ -1700,6 +1736,20 @@ const blogPosts = ref([]);
 const recentOrders = ref([]);
 const analyticsData = ref({ monthlySales: [], monthlyOrders: [], categories: [] });
 
+const calcChange = (current, previous) => {
+  current = Number(current);
+  previous = Number(previous);
+  
+  if (isNaN(current) || isNaN(previous)) return { pct: 0, dir: 'same' };
+  
+  if (previous === 0 && current === 0) return { pct: 0, dir: 'same' };
+  if (previous === 0) return { pct: 100, dir: 'up' };
+  
+  const pct = ((current - previous) / previous) * 100;
+  if (Math.abs(pct) < 0.5) return { pct: 0, dir: 'same' };
+  return { pct: Math.abs(pct).toFixed(1), dir: pct > 0 ? 'up' : 'down' };
+};
+
 // --- API hívások ---
 
 const fetchStats = async () => {
@@ -1713,10 +1763,16 @@ const fetchOrders = async () => {
     id: r.id,           
     rawId: parseInt(String(r.id).replace(/[^0-9]/g, ''), 10), 
     customer: r.felhasznalo?.nev ?? 'Vendég',
+    customerId: r.felhasznalo?.id ?? null,
     items: r.termekek_szama,
     total: r.osszeg,
     status: r.statusz,
     date: r.rendeles_datuma?.split('T')[0] ?? '',
+    szallitasiNev: r.szallitasi_nev ?? '',
+    szallitasiVaros: r.szallitasi_varos_nev ?? '',
+    szallitasiUtca: r.szallitasi_utca ?? '',
+    szallitasiHazszam: r.szallitasi_hazszam ?? '',
+    szallitasiEmelet: r.szallitasi_emeletAjto ?? '',
   }));
 };
 
@@ -1829,6 +1885,7 @@ const fetchBlogPosts = async () => {
     id: p.id,
     title: p.cim,
     author: p.szerző ?? '-',
+    authorId: p.szerzo_id ?? null,
     tags: p.cimkek || [],
     date: p.letrehozas_datuma ?? '',
     published: p.statusz === 'közzétett',
@@ -2112,7 +2169,7 @@ const deleteProduct = async (id) => {
   if (!confirmed) return;
   await axios.delete(`${API}/termekek/${id}`);
   await fetchProducts();
-  showToast('Termék törölve.', 'info')
+  showToast('Termék törölve.', 'error');
 };
 
 const deleteOrder = async (order) => {
@@ -2122,7 +2179,7 @@ const deleteOrder = async (order) => {
   try {
     await axios.delete(`${API}/rendelesek/${order.rawId}`);
     await fetchOrders();
-    showToast('Rendelés törölve.', 'info');
+    showToast('Rendelés törölve.', 'error');
   } catch (error) {
     showToast(
       'Nem sikerült törölni.',
@@ -2182,7 +2239,7 @@ const deleteUser = async (id) => {
     
     // If successful, refresh list and show success message
     await fetchUsers();
-    showToast(response.data.message || 'Sikeresen törölve!');
+    showToast(response.data.message || 'Sikeresen törölve!', 'error');
     
   } catch (error) {
     // If error (like 403 for active orders), show the backend error message
@@ -2252,7 +2309,7 @@ const deleteBlogPost = async (id) => {
   if (!confirmed) return;
   await axios.delete(`/api/posts/${id}`);
   await fetchBlogPosts();
-  showToast('Bejegyzés törölve.', 'info')
+  showToast('Bejegyzés törölve.', 'error');
 };
 
 const deleteComment = async (id) => {
@@ -2260,13 +2317,21 @@ const deleteComment = async (id) => {
   if (!confirmed) return;
   await axios.delete(`${API}/kommentek/${id}`);
   await fetchComments();
-  showToast('Komment törölve.', 'info');
+  showToast('Komment törölve.', 'error');
 };
 
 const refreshData = async () => {
-  loading.value = true;
-  await Promise.all([fetchStats(), fetchOrders(), fetchAnalytics()]);
-  loading.value = false;
+  statsLoading.value = true;
+  chartsLoading.value = true;
+  destroyDashboardCharts();
+
+  await Promise.all([fetchStats(), fetchAnalytics()]);
+
+  statsLoading.value = false;
+  chartsLoading.value = false;
+
+  await nextTick();
+  initCharts();
 };
 
 
@@ -2654,7 +2719,7 @@ const toggleUserSort = (key) => {
 const filteredUsers = computed(() => {
   let result = users.value.filter(u => {
     const s = userSearch.value.toLowerCase();
-    const matchesSearch = !s || u.name.toLowerCase().includes(s) || u.email.toLowerCase().includes(s) || u.role.toLowerCase().includes(s);
+    const matchesSearch = !s || u.name.toLowerCase().includes(s) || u.email.toLowerCase().includes(s) || u.role.toLowerCase().includes(s) || String(u.id).includes(s);
     const matchesRole = !userRoleFilter.value || u.role === userRoleFilter.value;
     const matchesActive = userActiveFilter.value === '' || u.active === (userActiveFilter.value === 'true');
     const matchesOrder = !userOrderFilter.value ||
@@ -2767,6 +2832,7 @@ watch(blogTagFilter, () => { currentBlogPage.value = 1; });
 watch(commentSearch, () => { currentCommentPage.value = 1; });
 watch(commentPostFilter, () => { currentCommentPage.value = 1; });
 watch(commentPostSortMode, () => { currentCommentPage.value = 1; });
+watch(currentView, (newView) => { sessionStorage.setItem('adminView', newView); });
 // --- Helpers ---
 
 const formatDate = (dateString) => {
@@ -2802,6 +2868,7 @@ const destroyDashboardCharts = () => {
 const destroyAnalyticsCharts = () => {
   if (productSalesChartInstance) { productSalesChartInstance.destroy(); productSalesChartInstance = null; }
   if (revenueChartInstance) { revenueChartInstance.destroy(); revenueChartInstance = null; }
+  if (stockChartInstance) { stockChartInstance.destroy(); stockChartInstance = null; }
 };
 
 const MONTHS = ['Jan', 'Feb', 'Már', 'Ápr', 'Máj', 'Jún', 'Júl', 'Aug', 'Sze', 'Okt', 'Nov', 'Dec'];
@@ -2967,28 +3034,109 @@ const initCharts = () => {
         }
       });
     }
+
+    if (stockChart.value && !stockChartInstance) {
+    const sortedProducts = [...products.value]
+      .sort((a, b) => b.stock - a.stock)
+
+    stockChartInstance = new Chart(stockChart.value, {
+      type: 'bar',
+      data: {
+        labels: sortedProducts.map(p => p.name.length > 20 ? p.name.slice(0, 20) + '…' : p.name),
+        datasets: [{
+          label: 'Készlet (db)',
+          data: sortedProducts.map(p => p.stock),
+          backgroundColor: sortedProducts.map(p =>
+            p.stock > 10 ? '#10b981' :
+            p.stock > 0  ? '#f59e0b' :
+                          '#ef4444'
+          ),
+          borderRadius: 6,
+          borderWidth: 0,
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              title: (items) => {
+                // Teljes név a tooltip-ben
+                return sortedProducts[items[0].dataIndex].name;
+              },
+              label: (ctx) => {
+                const p = sortedProducts[ctx.dataIndex];
+                const allapot = p.stock > 10 ? 'Raktáron' : p.stock > 0 ? 'Kevés' : 'Nincs készleten';
+                return ` ${ctx.parsed.y} db — ${allapot}`;
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            ticks: { font: { size: 11 }, maxRotation: 45 }
+          },
+          y: {
+            beginAtZero: true,
+            ticks: { callback: v => v + ' db' }
+          }
+        }
+      }
+    });
+  }
   });
+};
+
+const refreshAnalytics = async () => {
+  analyticsLoading.value = true;
+  destroyAnalyticsCharts();
+  await Promise.all([fetchAnalytics(), fetchProducts()]);
+  analyticsLoading.value = false;
+  await nextTick();
+  initCharts();
 };
 
 // --- Lifecycle ---
 
 onMounted(async () => {
+  router.beforeEach((to, from) => {
+    if (from.name === 'admin' && to.name !== 'admin') {
+      sessionStorage.removeItem('adminView');
+    }
+  });
+
+  loading.value = true;
+
   const { data } = await axios.get('/api/admin/user/id');
   currentUserId.value = data.id;
 
+  // Gyors adatok 
   await Promise.all([
-      fetchStats(), 
-      fetchOrders(), 
-      fetchAnalytics(), 
-      fetchProducts(),
-      fetchUsers(),
-      fetchBlogPosts(),
-      fetchTagsFromDatabase(),
-      fetchProductCategories(),
-      fetchColors(),
-      fetchComments(),
+    fetchUsers(),
+    fetchOrders(),
+    fetchProducts(),
+    fetchBlogPosts(),
+    fetchTagsFromDatabase(),
+    fetchProductCategories(),
+    fetchColors(),
+    fetchComments(),
   ]);
-  initCharts();
+
+  loading.value = false; // ← táblázatok megjelennek
+
+  // Analitika és chartok a háttérben betöltve, hogy gyors legyen a dashboard megjelenése
+  fetchStats().then(() => { statsLoading.value = false; });
+  fetchAnalytics().then(() => {
+    chartsLoading.value = false;
+    initCharts();
+  });
+});
+
+onUnmounted(() => {
+  document.body.style.overflow = '';
+  sessionStorage.removeItem('adminView');
 });
 
 watch(currentView, async (newView, oldView) => {
@@ -3162,6 +3310,14 @@ watch(currentView, async (newView, oldView) => {
 
 .stat-change.positive {
   color: #10b981;
+}
+
+.stat-change.negative {
+  color: #ef4444;
+}
+
+.stat-change.neutral {
+  color: #64748b;
 }
 
 /* Charts */
@@ -4074,4 +4230,34 @@ tbody tr:hover {
 .confirm-btn.cancel:hover { background: #d1d5db; }
 .confirm-btn.danger { background: #dc2626; color: white; }
 .confirm-btn.danger:hover { background: #b91c1c; }
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 5px solid #f0e9e2;
+  border-top-color: #f97316;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.skeleton {
+  background: linear-gradient(90deg, #f0e9e2 25%, #faf5f0 50%, #f0e9e2 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 8px;
+}
+
+.skeleton-title  { height: 14px; width: 60%; margin-bottom: 16px; }
+.skeleton-value  { height: 36px; width: 80%; margin-bottom: 8px; }
+.skeleton-text   { height: 12px; width: 50%; }
+.skeleton-chart  { height: 300px; width: 100%; }
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
 </style>
