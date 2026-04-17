@@ -714,6 +714,13 @@
             <table>
               <thead>
                 <tr>
+                  <th @click="toggleBlogSort('id')" style="cursor:pointer; user-select:none; white-space:nowrap; width:60px;">
+                    ID
+                    <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
+                      <span :style="blogSortKey === 'id' && blogSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
+                      <span :style="blogSortKey === 'id' && blogSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
+                    </span>
+                  </th>
                   <th @click="toggleBlogSort('title')" style="cursor:pointer; user-select:none; white-space:nowrap;">
                     Cím
                     <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
@@ -742,6 +749,7 @@
             </thead>
               <tbody>
                 <tr v-for="post in paginatedBlogPosts" :key="post.id">
+                  <td style="color:#94a3b8; font-size:12px;">#{{ post.id }}</td>
                   <td>
                     <a
                       :href="`/blog/${post.id}`"
@@ -1076,10 +1084,28 @@
                   <td>
                     <span class="badge" :class="reportOkBadge(r.ok)">{{ reportOkLabel(r.ok) }}</span>
                   </td>
-                  <td>{{ r.bejelento?.felhasz_nev ?? 'Vendég' }}</td>
+                  <td>
+                    <span
+                      v-if="r.bejelento"
+                      @click="goToUser(r.bejelento.id)"
+                      style="color:#f97316; cursor:pointer; font-weight:600; text-decoration:underline dotted;"
+                      :title="`Felhasználó megtekintése (ID: ${r.bejelento.id})`"
+                    >{{ r.bejelento.felhasz_nev }}</span>
+                    <span v-else style="color:#94a3b8;">Vendég</span>
+                  </td>
                   <td style="max-width:180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
-                    <a v-if="r.tipus==='post' && r.poszt_id" :href="`/blog/${r.poszt_id}`" target="_blank" style="color:#f97316;">{{ r.poszt?.cim ?? `#${r.poszt_id}` }}</a>
-                    <span v-else-if="r.tipus==='comment'" style="color:#94a3b8; font-size:12px">Komment #{{ r.komment_id }}</span>
+                    <span
+                      v-if="r.tipus==='post' && r.poszt_id"
+                      @click="goToBlogPost(r.poszt_id)"
+                      style="color:#f97316; cursor:pointer; font-weight:600;"
+                      :title="r.poszt?.cim ?? `#${r.poszt_id}`"
+                    >{{ r.poszt?.cim ?? `#${r.poszt_id}` }}</span>
+                    <span
+                      v-else-if="r.tipus==='comment' && r.komment"
+                      @click="goToComment(r.komment_id)"
+                      style="color:#f97316; cursor:pointer; font-weight:600;"
+                      :title="r.komment?.komment"
+                    >{{ r.komment?.komment ? r.komment.komment.slice(0, 40) + (r.komment.komment.length > 40 ? '…' : '') : `#${r.komment_id}` }}</span>
                   </td>
                   <td style="max-width:160px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:#64748b; font-size:12px" :title="r.leiras">{{ r.leiras || '—' }}</td>
                   <td>
@@ -1762,27 +1788,34 @@ watch(isAnyModalOpen, (open) => {
 onUnmounted(() => {
   document.body.style.overflow = '';
 });
+
 const editingProduct = ref({});
 const editingUser = ref({});
 const editingBlogPost = ref({});
 const editorKey = ref(0);
 const editorRef = ref(null);
+
 const loading = ref(false);
+
 const sidebarOpen = ref(false);
 const availableColors = ref([]);
+
 const selectedProductColors = ref([]);
 const selectedProductCategories = ref([]); 
-const selectedProductCategory = ref(null); 
+const selectedProductCategory = ref(null);
+
 const uploadedProductImages = ref([]);
 const productFileUploadRef = ref(null);
 const productEditorKey = ref(0);
 const productCategoryOptions = ref([]);
 const productMainImageIndex = ref(0); 
 const productSaving = ref(false);
+
 const comments = ref([]);
 const commentSearch = ref('');
 const commentPostFilter = ref('');
 const currentCommentPage = ref(1);
+
 const { showToast, showErrorModal } = inject('toast');
 const statsLoading = ref(true);
 const chartsLoading = ref(true);
@@ -1802,6 +1835,27 @@ const goToOrders = (customerName) => {
   currentView.value = 'orders';
   orderSearch.value = customerName;
   currentOrderPage.value = 1;
+};
+
+const goToBlogPost = (postId) => {
+  currentView.value = 'blog';
+  blogSearch.value = String(postId);
+  currentBlogPage.value = 1;
+};
+
+const goToComment = (commentId) => {
+  currentView.value = 'comments';
+  commentSearch.value = String(commentId);
+  currentCommentPage.value = 1;
+};
+
+const quickResolve = async (id) => {
+  await axios.patch(`${API}/jelentesek/${id}/statusz`, {
+    statusz: 'megoldva',
+    admin_megjegyzes: null,
+  });
+  await fetchReports();
+  showToast('Bejelentés megoldottként jelölve.');
 };
 
 // Confirm modal
@@ -2938,7 +2992,7 @@ const toggleBlogSort = (key) => {
 const filteredBlogPosts = computed(() => {
   let result = blogPosts.value.filter(p => {
     const s = blogSearch.value.toLowerCase();
-    const matchesSearch = !s || p.title.toLowerCase().includes(s) || p.author.toLowerCase().includes(s);
+    const matchesSearch = !s || p.title.toLowerCase().includes(s) || p.author.toLowerCase().includes(s) || String(p.id).includes(s);
     const matchesPublished = blogPublishedFilter.value === '' || p.published === (blogPublishedFilter.value === 'true');
     const matchesTag = blogTagFilter.value.length === 0 || 
       blogTagFilter.value.every(selectedTag => 
@@ -2951,7 +3005,9 @@ const filteredBlogPosts = computed(() => {
     result = [...result].sort((a, b) => {
       let aVal = a[blogSortKey.value];
       let bVal = b[blogSortKey.value];
-      if (blogSortKey.value === 'date') {
+      if (blogSortKey.value === 'id') {
+        aVal = Number(a.id); bVal = Number(b.id);
+      } else if (blogSortKey.value === 'date') {
         aVal = new Date(aVal || 0); bVal = new Date(bVal || 0);
       } else {
         aVal = String(aVal ?? '').toLowerCase(); bVal = String(bVal ?? '').toLowerCase();

@@ -33,8 +33,8 @@ class FelhasznaloAdatokSeeder extends Seeder
             [
                 'felhasznalo_id' => 2,
                 'szerepkor' => 'moderator',
-                'vezeteknev' => 'Tóthpál',
-                'keresztnev' => 'István',
+                'vezeteknev' => 'Kovács',
+                'keresztnev' => 'Edit',
                 'varos' => 2,
                 'utca' => 'Idk Street',
                 'hazszam' => 5,

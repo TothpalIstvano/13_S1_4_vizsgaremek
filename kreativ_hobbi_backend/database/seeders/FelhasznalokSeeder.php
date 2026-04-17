@@ -36,8 +36,8 @@ class FelhasznalokSeeder extends Seeder
         ]);
 
         Felhasznalok::factory()->create([
-            'felhasz_nev' => 'Tóthpál István',
-            'email' => 'tothpal.istvan@diak.szbi-pg.hu',
+            'felhasz_nev' => 'Kovács Edit',
+            'email' => 'kovacs.edit@diak.szbi-pg.hu',
             'jelszo'=> 'Alma12345678.',
             'profilKep_id'=> 2,
             'statusz' => true,

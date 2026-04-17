@@ -2,7 +2,7 @@
 
 namespace Database\Factories;
 
-use App\Models\Jelentes;
+use App\Models\Jelentesek;
 use App\Models\Felhasznalok;
 use App\Models\Posztok;
 use App\Models\Kommentek;
@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 
 class JelentesekFactory extends Factory
 {
-    protected $model = Jelentes::class;
+    protected $model = Jelentesek::class;
 
     public function definition(): array
     {
