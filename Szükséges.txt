@@ -1,4 +1,3 @@
-- belépés reszponzív animációval
 - dokumentáció: 
     - adatbázis javítások (ppt)
     - algoritmus javítások (ha kell)
@@ -7,4 +6,11 @@
     - források
     - fejlesztési lehetőségek
 - teszteket majd beletenni a fő mappába
+
+kivenni a szerverhez: 
+- vue: .env: localhost:8000 helyett ''
+- vite.config.js: host: '0.0.0.0', allowedHosts: true
+- auth.js: szintén localhostot kivenni
+- api.js: baseURL: ''
+
 (ha úgy gondolná h nem működik - blog képfeltöltés esetleg: https://stackoverflow.com/questions/50730143/laravel-storage-link-wont-work-on-production)
