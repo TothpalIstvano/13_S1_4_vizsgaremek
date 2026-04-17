@@ -37,6 +37,12 @@
           </a>
         </li>
         <li class="nav-item">
+          <a class="nav-link" :class="{active: currentView === 'reports'}" @click="currentView = 'reports'">
+            <span class="nav-icon"><FontAwesomeIcon icon="fa-flag" /></span>
+            Bejelentések
+          </a>
+        </li>
+        <li class="nav-item">
           <a class="nav-link" :class="{active: currentView === 'users'}" @click="currentView = 'users'">
             <span class="nav-icon"><FontAwesomeIcon icon="fa-user" /></span>
             Felhasználók
@@ -1012,6 +1018,94 @@
           </div>
         </div>
 
+        <!-- Reports View -->
+        <div v-if="currentView === 'reports'">
+          <div class="header">
+            <h2>Bejelentések</h2>
+          </div>
+          <div class="table-container">
+            <div class="table-header">
+              <h3 class="table-title">Összes bejelentés</h3>
+              <div class="filters-row">
+                <input type="text" class="search-input" placeholder="Keresés..." v-model="reportSearch">
+                <select v-model="reportTypeFilter" style="padding:8px 12px; font-size:14px; border:1px solid #e2e8f0; border-radius:8px; height:38px; background:white; cursor:pointer;">
+                  <option value="">Összes típus</option>
+                  <option value="post">Bejegyzés</option>
+                  <option value="comment">Komment</option>
+                </select>
+                <select v-model="reportOkFilter" style="padding:8px 12px; font-size:14px; border:1px solid #e2e8f0; border-radius:8px; height:38px; background:white; cursor:pointer;">
+                  <option value="">Összes ok</option>
+                  <option value="serto">Sértő</option>
+                  <option value="spam">Spam</option>
+                  <option value="18plus">18+</option>
+                  <option value="szemelyes">Személyes adat</option>
+                  <option value="jogsertes">Szerzői jog</option>
+                  <option value="egyeb">Egyéb</option>
+                </select>
+                <select v-model="reportStatuszFilter" style="padding:8px 12px; font-size:14px; border:1px solid #e2e8f0; border-radius:8px; height:38px; background:white; cursor:pointer;">
+                  <option value="">Összes státusz</option>
+                  <option value="fuggoben">Függőben</option>
+                  <option value="atnezte">Átnézve</option>
+                  <option value="megoldva">Megoldva</option>
+                  <option value="elvetve">Elvetve</option>
+                </select>
+              </div>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Típus</th>
+                  <th>Ok</th>
+                  <th>Bejelentő</th>
+                  <th>Tartalom</th>
+                  <th>Leírás</th>
+                  <th>Státusz</th>
+                  <th>Beérkezett</th>
+                  <th>Műveletek</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="r in paginatedReports" :key="r.id">
+                  <td style="color:#94a3b8; font-size:12px">#{{ r.id }}</td>
+                  <td>
+                    <span class="badge" :class="r.tipus === 'post' ? 'badge-warning' : 'badge-blue'">
+                      {{ r.tipus === 'post' ? 'Bejegyzés' : 'Komment' }}
+                    </span>
+                  </td>
+                  <td>
+                    <span class="badge" :class="reportOkBadge(r.ok)">{{ reportOkLabel(r.ok) }}</span>
+                  </td>
+                  <td>{{ r.bejelento?.felhasz_nev ?? 'Vendég' }}</td>
+                  <td style="max-width:180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                    <a v-if="r.tipus==='post' && r.poszt_id" :href="`/blog/${r.poszt_id}`" target="_blank" style="color:#f97316;">{{ r.poszt?.cim ?? `#${r.poszt_id}` }}</a>
+                    <span v-else-if="r.tipus==='comment'" style="color:#94a3b8; font-size:12px">Komment #{{ r.komment_id }}</span>
+                  </td>
+                  <td style="max-width:160px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:#64748b; font-size:12px" :title="r.leiras">{{ r.leiras || '—' }}</td>
+                  <td>
+                    <span class="badge" :class="reportStatuszBadge(r.statusz)">{{ reportStatuszLabel(r.statusz) }}</span>
+                  </td>
+                  <td style="white-space:nowrap; font-size:12px; color:#64748b">{{ r.created_at?.split('T')[0] ?? '' }}</td>
+                  <td>
+                    <div class="action-buttons">
+                      <button class="btn btn-sm btn-warning" @click="openReportModal(r)">Kezelés</button>
+                      <button class="btn btn-sm btn-danger" @click="deleteReport(r.id)">Törlés</button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <div v-if="filteredReports.length === 0" style="text-align:center; padding:40px; color:#94a3b8;">Nincs találat.</div>
+            <div v-if="totalReportPages > 1" style="display:flex; justify-content:center; align-items:center; gap:8px; padding:16px; border-top:1px solid #e2e8f0;">
+              <button class="btn btn-sm" @click="currentReportPage--" :disabled="currentReportPage===1" style="background:#f1f5f9;">← Előző</button>
+              <template v-for="page in totalReportPages" :key="page">
+                <button class="btn btn-sm" @click="currentReportPage=page" :style="currentReportPage===page ? 'background:#f97316;color:white;' : 'background:#f1f5f9;'">{{ page }}</button>
+              </template>
+              <button class="btn btn-sm" @click="currentReportPage++" :disabled="currentReportPage===totalReportPages" style="background:#f1f5f9;">Következő →</button>
+            </div>
+          </div>
+        </div>
+
         <!-- Analytics View -->
         <div v-if="currentView === 'analytics'">
           <div class="header">
@@ -1584,6 +1678,34 @@
       </div>
     </Teleport>
   </div>
+  <!-- Report Modal -->
+  <div v-if="showReportModal" class="modal-overlay" @click.self="showReportModal=false">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">Bejelentés kezelése</h3>
+        <button class="btn btn-icon" @click="showReportModal=false">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Státusz</label>
+          <select class="form-select" v-model="editingReport.statusz">
+            <option value="fuggoben">Függőben</option>
+            <option value="atnezte">Átnézve</option>
+            <option value="megoldva">Megoldva</option>
+            <option value="elvetve">Elvetve</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Admin megjegyzés</label>
+          <textarea class="form-textarea" v-model="editingReport.admin_megjegyzes" rows="3" placeholder="Opcionális megjegyzés..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" @click="showReportModal=false">Mégse</button>
+        <button class="btn btn-primary" @click="saveReport">Mentés</button>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup>
@@ -1604,7 +1726,7 @@ import {
   faTruck, faBagShopping, faUsers,
   faUser, faPoll, faChartLine,
   faFileLines, faPen, faTrashAlt,
-  faHourglassHalf, faComment
+  faHourglassHalf, faComment, faFlag
 } from '@fortawesome/free-solid-svg-icons'
 
 library.add(
@@ -1612,7 +1734,7 @@ library.add(
   faTruck, faBagShopping, faUsers,
   faUser, faPoll, faChartLine,
   faFileLines, faPen, faTrashAlt,
-  faHourglassHalf, faComment
+  faHourglassHalf, faComment, faFlag
 )
 const router = useRouter();
 
@@ -2318,6 +2440,58 @@ const deleteComment = async (id) => {
   await axios.delete(`${API}/kommentek/${id}`);
   await fetchComments();
   showToast('Komment törölve.', 'error');
+};
+
+const reports = ref([]);
+const reportSearch = ref('');
+const reportTypeFilter = ref('');
+const reportOkFilter = ref('');
+const reportStatuszFilter = ref('');
+const currentReportPage = ref(1);
+const showReportModal = ref(false);
+const editingReport = ref({});
+
+const OK_LABELS = { serto:'Sértő', spam:'Spam', '18plus':'18+', szemelyes:'Személyes adat', jogsertes:'Szerzői jog', egyeb:'Egyéb' };
+const reportOkLabel = (ok) => OK_LABELS[ok] ?? ok;
+const reportOkBadge = (ok) => ({ serto:'badge-danger', spam:'badge-warning', '18plus':'badge-blue', szemelyes:'badge-blue', jogsertes:'badge-warning', egyeb:'badge-success' }[ok] ?? 'badge-success');
+const reportStatuszLabel = (s) => ({ fuggoben:'Függőben', atnezte:'Átnézve', megoldva:'Megoldva', elvetve:'Elvetve' }[s] ?? s);
+const reportStatuszBadge = (s) => ({ fuggoben:'badge-warning', atnezte:'badge-blue', megoldva:'badge-success', elvetve:'badge-danger' }[s] ?? 'badge-success');
+
+const fetchReports = async () => {
+  const { data } = await axios.get(`${API}/jelentesek`);
+  reports.value = data.data ?? data;
+};
+
+const filteredReports = computed(() => reports.value.filter(r => {
+  const s = reportSearch.value.toLowerCase();
+  const ms = !s || (r.bejelento?.felhasz_nev ?? '').toLowerCase().includes(s) || (r.leiras ?? '').toLowerCase().includes(s) || reportOkLabel(r.ok).toLowerCase().includes(s);
+  return ms && (!reportTypeFilter.value || r.tipus === reportTypeFilter.value)
+            && (!reportOkFilter.value || r.ok === reportOkFilter.value)
+            && (!reportStatuszFilter.value || r.statusz === reportStatuszFilter.value);
+}));
+
+const totalReportPages = computed(() => Math.ceil(filteredReports.value.length / ITEMS_PER_PAGE));
+const paginatedReports = computed(() => {
+  const start = (currentReportPage.value - 1) * ITEMS_PER_PAGE;
+  return filteredReports.value.slice(start, start + ITEMS_PER_PAGE);
+});
+
+const openReportModal = (r) => { editingReport.value = { ...r }; showReportModal.value = true; };
+const saveReport = async () => {
+  await axios.patch(`${API}/jelentesek/${editingReport.value.id}/statusz`, {
+    statusz: editingReport.value.statusz,
+    admin_megjegyzes: editingReport.value.admin_megjegyzes,
+  });
+  showReportModal.value = false;
+  await fetchReports();
+  showToast('Bejelentés frissítve.');
+};
+const deleteReport = async (id) => {
+  const ok = await showConfirm('Biztosan törlöd ezt a bejelentést?');
+  if (!ok) return;
+  await axios.delete(`${API}/jelentesek/${id}`);
+  await fetchReports();
+  showToast('Bejelentés törölve.', 'error');
 };
 
 const refreshData = async () => {
@@ -3122,6 +3296,7 @@ onMounted(async () => {
     fetchProductCategories(),
     fetchColors(),
     fetchComments(),
+    fetchReports(),
   ]);
 
   loading.value = false; // ← táblázatok megjelennek
