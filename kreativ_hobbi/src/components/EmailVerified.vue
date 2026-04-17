@@ -67,7 +67,7 @@ onMounted(() => {
         )
         setTimeout(() => window.close(), 2000)
     } else {
-        setTimeout(() => router.push('/belepes'), 25000)
+        setTimeout(() => router.push('/profil'), 25000)
     }
 })
 </script>

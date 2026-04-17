@@ -2,14 +2,15 @@
 - \[ ] Az oldal tesztelése
 - \[ ] Az oldal dokumenálása
 - \[ ] Optimalizálás
+- \[ ] Email-verified ha be van loginelve akkor a profilra dobja
 - \[ ] Moderátor felület
 - \[ ] Az egész magyarosítása és a szövegek cseréje
 
-- \[ ] Sikertelen fizetések törlése egy idő után 
+- \[ ] Sikertelen fizetések törlése egy idő után
 - \[ ] ha felvan függesztve a user akkor ne tudjon feltölteni semmit se blogolni és a képe legyen def vagy i guess a basic-ekből tudjon választani
 - \[ ] Kommentek törlése - tehát, ha komenthez tartozik egy komment pl. 3 alkomment és kitöröljük akkor a komment azt jelenitse meg hogy a komment törölve és ha nincs komment alatta akkor csa k smá törölje a kommmentet
-- \[ ] blogok + kommentek bejelentése + táblázat az admin felületre vagy úgy hogy jelentetek vagy úgy, hogy be lehessen kapcsolni mint szűrés vagy külön tábla vagy mindkettő + migrációk és stb- hozzá ja és vagy egy lennyiló menű vagy egy modal
 
+- \[X] blogok + kommentek bejelentése + táblázat az admin felületre vagy úgy hogy jelentetek vagy úgy, hogy be lehessen kapcsolni mint szűrés vagy külön tábla vagy mindkettő + migrációk és stb- hozzá ja és vagy egy lennyiló menű vagy egy modal✅
 - \[X] zöld/prios text a növekedés a dashboardon✅
 - \[X] Webshop✅
 - \[X] Rendelés törlése✅
