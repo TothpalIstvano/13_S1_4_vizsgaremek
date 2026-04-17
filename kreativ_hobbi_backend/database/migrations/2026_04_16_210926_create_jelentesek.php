@@ -60,9 +60,10 @@ return new class extends Migration
 
             $table->timestamps();
 
-            // Egy felhasználó ugyanazt a tartalmat csak egyszer jelentheti be
+            /* Egy felhasználó ugyanazt a tartalmat csak egyszer jelentheti be
             $table->unique(['bejelento_id', 'tipus', 'poszt_id'],    'egyedi_poszt_jelentes');
             $table->unique(['bejelento_id', 'tipus', 'komment_id'],  'egyedi_komment_jelentes');
+            */
 
             // Gyors keresés 
             $table->index(['statusz', 'created_at']);
