@@ -1788,27 +1788,34 @@ watch(isAnyModalOpen, (open) => {
 onUnmounted(() => {
   document.body.style.overflow = '';
 });
+
 const editingProduct = ref({});
 const editingUser = ref({});
 const editingBlogPost = ref({});
 const editorKey = ref(0);
 const editorRef = ref(null);
+
 const loading = ref(false);
+
 const sidebarOpen = ref(false);
 const availableColors = ref([]);
+
 const selectedProductColors = ref([]);
 const selectedProductCategories = ref([]); 
-const selectedProductCategory = ref(null); 
+const selectedProductCategory = ref(null);
+
 const uploadedProductImages = ref([]);
 const productFileUploadRef = ref(null);
 const productEditorKey = ref(0);
 const productCategoryOptions = ref([]);
 const productMainImageIndex = ref(0); 
 const productSaving = ref(false);
+
 const comments = ref([]);
 const commentSearch = ref('');
 const commentPostFilter = ref('');
 const currentCommentPage = ref(1);
+
 const { showToast, showErrorModal } = inject('toast');
 const statsLoading = ref(true);
 const chartsLoading = ref(true);
