@@ -406,18 +406,14 @@
   }
 
   async function termekRendezes() {
-    if (selected.value.value === 'price-asc') {
-      items.value.sort((a, b) => a.ar - b.ar);
+    const sorter = {
+      'price-asc':  (a, b) => a.ar - b.ar,
+      'price-desc': (a, b) => b.ar - a.ar,
+      'name-asc':   (a, b) => a.nev.localeCompare(b.nev),
+      'name-desc':  (a, b) => b.nev.localeCompare(a.nev),
     }
-    if (selected.value.value === 'price-desc') {
-      items.value.sort((a, b) => b.ar - a.ar);
-    }
-    if (selected.value.value === 'name-asc') {
-      items.value.sort((a, b) => a.nev.localeCompare(b.nev));
-    }
-    if (selected.value.value === 'name-desc') {
-      items.value.sort((a, b) => b.nev.localeCompare(a.nev));
-    }
+    const fn = sorter[selected.value.value]
+    if (fn) originalItems.value = [...originalItems.value].sort(fn)
   }
 
 
@@ -449,35 +445,99 @@
   const openCategories = ref([])
 
   function togglekategoria(id) {
-    const index = selectedkategoriak.value.indexOf(id);
-    if (index === -1) {
-      selectedkategoriak.value.push(id);
+    const index = selectedkategoriak.value.indexOf(id)
+    const kategoria = kategoriak.value.find(k => k.id === id)
+
+    // Ha főkategória (nincs szülője)
+    if (kategoria && !kategoria.fo_kategoria_id) {
+      const gyerekek = kategoriak.value
+        .filter(k => k.fo_kategoria_id === id)
+        .map(k => k.id)
+
+      if (index === -1) {
+        // Bejelölés — főkategória + összes gyerek hozzáadása
+        selectedkategoriak.value.push(id)
+        gyerekek.forEach(gyerekId => {
+          if (!selectedkategoriak.value.includes(gyerekId)) {
+            selectedkategoriak.value.push(gyerekId)
+          }
+        })
+      } else {
+        // Törlés — főkategória + összes gyerek törlése
+        selectedkategoriak.value = selectedkategoriak.value.filter(
+          v => v !== id && !gyerekek.includes(v)
+        )
+      }
+
     } else {
-      selectedkategoriak.value.splice(index, 1);
+      // Alkategória — csak saját maga
+      if (index === -1) {
+        selectedkategoriak.value.push(id)
+      } else {
+        selectedkategoriak.value.splice(index, 1)
+      }
     }
   }
 
   const filteredItems = computed(() => {
-  return originalItems.value.filter(item => {
+    return originalItems.value.filter(item => {
 
-    // SEARCH
-    const matchesSearch =
-      item.nev.toLowerCase().includes(searchTerm.value.toLowerCase())
+      // SEARCH
+      const matchesSearch =
+        item.nev.toLowerCase().includes(searchTerm.value.toLowerCase())
 
-    // PRICE
-    const matchesPrice =
-      item.ar >= appliedMin.value && item.ar <= appliedMax.value
+      // PRICE
+      const matchesPrice =
+        item.ar >= appliedMin.value && item.ar <= appliedMax.value
 
-    // TAGS
-    const matchesTags =
-      selectedkategoriak.value.length === 0 ||
-      selectedkategoriak.value.every(tagId =>
-        item.termek_kategoriak.some(t => t.id === tagId)
-      )
+      // TAGS
+      const matchesTags = (() => {
+        if (selectedkategoriak.value.length === 0) return true
 
-    return matchesSearch && matchesPrice && matchesTags
+        // Kijelölt főkategóriák és alkategóriák szétválasztása
+        const kivalasztottFok = kategoriakTree.value.filter(fo =>
+          selectedkategoriak.value.includes(fo.id)
+        )
+
+        const kivalasztottMaganyosAlkategoriak = selectedkategoriak.value.filter(id => {
+          const kat = kategoriak.value.find(k => k.id === id)
+          if (!kat || !kat.fo_kategoria_id) return false
+          // Csak akkor "magányos", ha a szülője NINCS kijelölve
+          return !selectedkategoriak.value.includes(kat.fo_kategoria_id)
+        })
+
+        // Ha van kijelölt főkategória — elég ha a termék bármelyik
+        // kijelölt alkategóriájában (vagy magában a főkategóriában) benne van
+        const foKategoriaEgyezik = kivalasztottFok.length === 0 ||
+          kivalasztottFok.some(fo => {
+            const kijeloltGyerekek = fo.children
+              .filter(c => selectedkategoriak.value.includes(c.id))
+              .map(c => c.id)
+
+            // Ha nincs kijelölt gyerek, maga a főkategória elég
+            if (kijeloltGyerekek.length === 0) {
+              return item.termek_kategoriak.some(t => t.id === fo.id)
+            }
+
+            // Ha vannak kijelölt gyerekek, bármelyik elég
+            return kijeloltGyerekek.some(gyerekId =>
+              item.termek_kategoriak.some(t => t.id === gyerekId)
+            )
+          })
+
+        // Magányos alkategóriák (szülőjük nincs kijelölve) — bármelyik elég
+        const alkategoriaEgyezik = kivalasztottMaganyosAlkategoriak.length === 0 ||
+          kivalasztottMaganyosAlkategoriak.some(id =>
+            item.termek_kategoriak.some(t => t.id === id)
+          )
+
+        return foKategoriaEgyezik && alkategoriaEgyezik
+      })()
+
+      return matchesSearch && matchesPrice && matchesTags
   })
 })
+
 
   function addToCart(item) {
     const result = cartStore.addToCart(item, 1)
@@ -495,32 +555,74 @@
 //#endregion
 
 //#region mountok, unmountok, watchok, stb.
-onMounted(() => {
+
+onMounted(async () => {
   document.addEventListener('click', handleClickOutside)
 
-  fetchTermek().then(data => {
-    items.value = data
-    min.value = items.value.reduce((acc, item) => Math.min(acc, item.ar), Infinity)
-    max.value = items.value.reduce((acc, item) => Math.max(acc, item.ar), 0)
-  })
+  loading.value = true
 
-  fetchkategoriak().then(data => {
-    kategoriak.value = data.sort((a, b) => a.nev.localeCompare(b.nev))
-  })
+  const [termekData, kategoriakData] = await Promise.all([
+    fetchTermek(),
+    fetchkategoriak()
+  ])
+
+  originalItems.value = termekData
+  items.value = termekData
+
+  kategoriak.value = kategoriakData.sort((a, b) => a.nev.localeCompare(b.nev))
+
+  absMin.value = Math.min(...termekData.map(i => i.ar))
+  absMax.value = Math.max(...termekData.map(i => i.ar))
+  tempMin.value = absMin.value
+  tempMax.value = absMax.value
+  appliedMin.value = absMin.value
+  appliedMax.value = absMax.value
+
+  loading.value = false
+
+  try {
+    const res = await axios.get('/api/user/check')
+    isLoggedIn.value = res.data.loggedIn
+  } catch {}
+
+  try {
+    const res = await axios.get('/api/user/kedvencek')
+    likedIds.value = new Set(res.data)
+  } catch {}
 })
 
 onUnmounted(() => {
   document.removeEventListener('click', handleClickOutside)
 })
 
+// ✅ JAVÍTOTT — flag-gel védjük
+let isUpdating = false
+
 watch(selectedkategoriak, (val) => {
   sessionStorage.setItem('shop_selected_kategoriak', JSON.stringify(val))
+
+  if (isUpdating) return
+  isUpdating = true
+
+  kategoriakTree.value.forEach(fo => {
+    const gyerekIds = fo.children.map(c => c.id)
+    if (gyerekIds.length === 0) return
+
+    const mindKijelolt = gyerekIds.every(id => val.includes(id))
+    const foKijelolt = val.includes(fo.id)
+
+    if (mindKijelolt && !foKijelolt) {
+      selectedkategoriak.value.push(fo.id)
+    } else if (!mindKijelolt && foKijelolt) {
+      selectedkategoriak.value = selectedkategoriak.value.filter(v => v !== fo.id)
+    }
+  })
+
+  isUpdating = false
 }, { deep: true })
 
 watch(selected, () => {
-  setTimeout(() => {
-    termekRendezes()
-  },1000)
+  termekRendezes()
 })
 
 watch(items, () => {

@@ -9,7 +9,7 @@ class TermekSzinek extends Model
 {
     use HasFactory;
     protected $table = "termekSzinek";
-    protected $PrimaryKey = ["termek_id", "szin_id"];
+    protected $primaryKey = ["termek_id", "szin_id"];
     public $incrementing = false;
     protected $fillables = ["termek_id", "szin_id"];
 

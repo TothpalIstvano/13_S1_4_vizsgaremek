@@ -9,7 +9,7 @@ class Termekek extends Model
 {
     use HasFactory;
     protected $table = "termekek";
-    protected $PrimaryKey = "id";
+    protected $primaryKey = "id";
     public $timestamps = true;
     protected $fillable = ['nev', 'leiras', 'ar', 'darab', 'meter', 'kategoria_id', 'fo_kep_id'];
 

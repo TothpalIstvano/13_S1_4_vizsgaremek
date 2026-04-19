@@ -235,6 +235,13 @@
             <table>
               <thead>
                 <tr>
+                  <th @click="toggleProductSort('id')" style="cursor:pointer; user-select:none; white-space:nowrap; width:70px;">
+                      ID
+                      <span style="margin-left:4px; font-size:11px; color:#94a3b8;">
+                          <span :style="productSortKey === 'id' && productSortDir === 'asc' ? 'color:#f97316;' : ''">▲</span>
+                          <span :style="productSortKey === 'id' && productSortDir === 'desc' ? 'color:#f97316;' : ''">▼</span>
+                      </span>
+                  </th>
                   <th>Kép</th>
                   <th @click="toggleProductSort('name')" style="cursor:pointer; user-select:none; white-space:nowrap;">
                     Név
@@ -271,6 +278,7 @@
               </thead>
               <tbody>
                 <tr v-for="product in paginatedProducts" :key="product.id">
+                  <td style="color:#94a3b8; font-size:12px; font-weight:600;">#{{ product.id }}</td>
                   <td>
                     <img :src="product.image" :alt="product.name" class="product-img">
                   </td>
@@ -441,7 +449,69 @@
                     </div>
                     <span v-else style="color:#94a3b8;">—</span>
                   </td>
-                  <td>{{ order.items }}</td>
+                  <td>
+                      <div style="position:relative;">
+                          <!-- Badge -->
+                          <span
+                              class="badge badge-warning"
+                              style="cursor:pointer; user-select:none; white-space:nowrap;"
+                              @click.stop="toggleOrderItems(order.id)"
+                          >
+                              {{ order.items }} termék
+                              {{ nyitottRendelesek.has(order.id) ? '▲' : '▼' }}
+                          </span>
+
+                          <!-- Popover — nem nyújtja a táblát -->
+                          <div
+                              v-if="nyitottRendelesek.has(order.id)"
+                              style="
+                                  position:absolute;
+                                  top:calc(100% + 6px);
+                                  left:0;
+                                  z-index:50;
+                                  background:white;
+                                  border:1px solid #e2e8f0;
+                                  border-radius:10px;
+                                  box-shadow:0 8px 24px rgba(0,0,0,0.12);
+                                  padding:8px;
+                                  min-width:280px;
+                                  max-width:340px;
+                              "
+                          >
+                              <div
+                                  v-for="(t, i) in order.termekek"
+                                  :key="i"
+                                  @click.stop="goToProduct(t.id)"
+                                  style="
+                                      font-size:12px;
+                                      color:#374151;
+                                      display:flex;
+                                      align-items:center;
+                                      gap:8px;
+                                      padding:6px 8px;
+                                      border-radius:6px;
+                                      cursor:pointer;
+                                      transition:background 0.15s;
+                                  "
+                                  @mouseover="$event.currentTarget.style.background='#fff7ed'"
+                                  @mouseleave="$event.currentTarget.style.background='transparent'"
+                                  :title="`Termék megtekintése: ${t.nev}`"
+                              >
+                                  <!-- Szín jelző -->
+                                  <span
+                                      v-if="t.hex"
+                                      :style="{ background: t.hex }"
+                                      style="width:10px; height:10px; border-radius:50%; border:1px solid #d1d5db; flex-shrink:0;"
+                                  ></span>
+                                  <span style="flex:1; font-weight:500;">{{ t.nev }}</span>
+                                  <span style="color:#6b7280; white-space:nowrap; font-size:11px;">
+                                      {{ t.mennyiseg }} × {{ formatCurrency(t.egysegar) }}
+                                  </span>
+                                  <span style="color:#f97316; font-size:11px;">→</span>
+                              </div>
+                          </div>
+                      </div>
+                  </td>
                   <td><strong>{{ formatCurrency(order.total) }}</strong></td>
                   <td>
                     <span class="badge" :class="getOrderBadgeClass(order.status)">
@@ -1837,6 +1907,14 @@ const goToOrders = (customerName) => {
   currentOrderPage.value = 1;
 };
 
+function goToProduct(termekId) {
+    if (!termekId) return
+    currentView.value = 'products'
+    productSearch.value = String(termekId)
+    currentProductPage.value = 1
+    nyitottRendelesek.value = new Set() // bezárja a popover-t
+}
+
 const goToBlogPost = (postId) => {
   currentView.value = 'blog';
   blogSearch.value = String(postId);
@@ -1941,6 +2019,7 @@ const fetchOrders = async () => {
     customer: r.felhasznalo?.nev ?? 'Vendég',
     customerId: r.felhasznalo?.id ?? null,
     items: r.termekek_szama,
+    termekek: r.termekek ?? [], 
     total: r.osszeg,
     status: r.statusz,
     date: r.rendeles_datuma?.split('T')[0] ?? '',
@@ -2842,6 +2921,18 @@ const toggleOrderSort = (key) => {
   currentOrderPage.value = 1;
 };
 
+const nyitottRendelesek = ref(new Set())
+
+function toggleOrderItems(id) {
+    if (nyitottRendelesek.value.has(id)) {
+        nyitottRendelesek.value.delete(id)
+    } else {
+        nyitottRendelesek.value.add(id)
+    }
+    // Set-nél Vue nem detektálja automatikusan a változást
+    nyitottRendelesek.value = new Set(nyitottRendelesek.value)
+}
+
 const filteredOrders = computed(() => {
   let result = recentOrders.value.filter(order => {
     const s = orderSearch.value.toLowerCase();
@@ -2900,32 +2991,35 @@ const toggleProductSort = (key) => {
 
 const filteredProducts = computed(() => {
   let result = products.value.filter(p => {
-    const s = productSearch.value.toLowerCase();
-    const matchesSearch = !s || p.name.toLowerCase().includes(s) || p.category.toLowerCase().includes(s);
-    const matchesCategory = !productCategoryFilter.value || p.category === productCategoryFilter.value;
+    const s = productSearch.value.toLowerCase()
+    const matchesSearch = !s || 
+      p.name.toLowerCase().includes(s) || 
+      p.category.toLowerCase().includes(s) ||
+      String(p.id).includes(s)  
+    const matchesCategory = !productCategoryFilter.value || p.category === productCategoryFilter.value
     const matchesStock = !productStockFilter.value ||
       (productStockFilter.value === 'raktaron' && p.stock > 10) ||
       (productStockFilter.value === 'keves' && p.stock > 0 && p.stock <= 10) ||
-      (productStockFilter.value === 'nincs' && p.stock === 0);
-    return matchesSearch && matchesCategory && matchesStock;
-  });
+      (productStockFilter.value === 'nincs' && p.stock === 0)
+    return matchesSearch && matchesCategory && matchesStock
+  })
 
   if (productSortKey.value) {
     result = [...result].sort((a, b) => {
-      let aVal = a[productSortKey.value];
-      let bVal = b[productSortKey.value];
-      if (['price', 'stock'].includes(productSortKey.value)) {
-        aVal = Number(aVal); bVal = Number(bVal);
+      let aVal = a[productSortKey.value]
+      let bVal = b[productSortKey.value]
+      if (['price', 'stock', 'id'].includes(productSortKey.value)) {  
+        aVal = Number(aVal); bVal = Number(bVal)
       } else {
-        aVal = String(aVal).toLowerCase(); bVal = String(bVal).toLowerCase();
+        aVal = String(aVal).toLowerCase(); bVal = String(bVal).toLowerCase()
       }
-      if (aVal < bVal) return productSortDir.value === 'asc' ? -1 : 1;
-      if (aVal > bVal) return productSortDir.value === 'asc' ? 1 : -1;
-      return 0;
-    });
+      if (aVal < bVal) return productSortDir.value === 'asc' ? -1 : 1
+      if (aVal > bVal) return productSortDir.value === 'asc' ? 1 : -1
+      return 0
+    })
   }
-  return result;
-});
+  return result
+})
 
 // --- Felhasználó rendezés + szűrés ---
 const userSortKey = ref('');
@@ -3362,6 +3456,12 @@ onMounted(async () => {
   fetchAnalytics().then(() => {
     chartsLoading.value = false;
     initCharts();
+  });
+  // Popover bezárása ha máshol kattint
+  document.addEventListener('click', () => {
+      if (nyitottRendelesek.value.size > 0) {
+          nyitottRendelesek.value = new Set()
+      }
   });
 });
 

@@ -38,7 +38,7 @@
                 Ez az ablak hamarosan automatikusan bezárul…
             </div>
 
-            <router-link v-else to="/belepes" class="cta-btn">
+            <router-link v-else to="/profil" class="cta-btn">
                 <span>Tovább a bejelentkezéshez</span>
                 <svg class="cta-btn__arrow" viewBox="0 0 20 20" fill="none">
                     <path d="M4 10h12M12 6l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
