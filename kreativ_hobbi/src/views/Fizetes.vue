@@ -31,7 +31,7 @@
 
               <div class="card-item__content">
                 <label class="card-item__info">
-                  <div class="card-item__holder">Card Holder</div>
+                  <div class="card-item__holder">Kártya tulajdonos</div>
                   <div class="card-item__name">
                     <span
                       class="card-item__nameItem"
@@ -44,7 +44,7 @@
                 </label>
 
                 <div class="card-item__date">
-                  <label class="card-item__dateTitle">Expires</label>
+                  <label class="card-item__dateTitle">Lejárati dátum</label>
                   <span class="card-item__dateItem">{{ cardMonth || 'MM' }}</span>
                   /
                   <span class="card-item__dateItem">{{
@@ -75,7 +75,7 @@
 
       <div class="card-form__inner">
         <div class="card-input">
-          <label class="card-input__label">Card Number
+          <label class="card-input__label">Kártyaszám
             <span v-if="cardNumberError" class="error-indicator">⚠</span>
             <span v-else-if="cardNumberValid" class="success-indicator">✓</span>
             <span v-if="kartyaLejart && !kartyaszamModositva" class="expired-badge">⚠ Lejárt kártya</span>
@@ -99,7 +99,7 @@
         </div>
 
         <div class="card-input">
-          <label class="card-input__label">Card Holder
+          <label class="card-input__label">Kártya tulajdonos
             <span v-if="cardNameError" class="error-indicator">⚠</span>
             <span v-else-if="cardNameValid" class="success-indicator">✓</span>
           </label>
@@ -124,7 +124,7 @@
 
         <div class="card-form__row">
           <div class="card-form__col">
-            <label class="card-input__label">Expiration Date
+            <label class="card-input__label">Lejárati dátum
                 <span v-if="expiryError" class="error-indicator">⚠</span>
                 <span v-else-if="expiryValid" class="success-indicator">✓</span>
             </label>
@@ -134,7 +134,7 @@
                   'input-error': expiryError,
                   'input-success': expiryValid
                 }">
-                <option value="" disabled>Month</option>
+                <option value="" disabled>Hónap</option>
                 <option v-for="month in availableMonths" :key="month" :value="month">
                   {{ month }}
                 </option>
@@ -144,7 +144,7 @@
                   'input-error': expiryError,
                   'input-success': expiryValid
                 }">
-                <option value="" disabled>Year</option>
+                <option value="" disabled>Év</option>
                 <option
                   v-for="n in 7"
                   :key="n"

@@ -1,8 +1,5 @@
-- dokumentáció: 
-    - adatbázis javítások (ppt)
-    - algoritmus javítások (ha kell)
-    - hiányzó kis részek
-    - maybe keret a képekre?
+- dokumentáció:
+    - backend tesztek dokumentálása befejezés
     - források
     - fejlesztési lehetőségek
 - teszteket majd beletenni a fő mappába
@@ -12,5 +9,6 @@ kivenni a szerverhez:
 - vite.config.js: host: '0.0.0.0', allowedHosts: true
 - auth.js: szintén localhostot kivenni
 - api.js: baseURL: ''
+- laravel .env file: session domain, app_url
 
 (ha úgy gondolná h nem működik - blog képfeltöltés esetleg: https://stackoverflow.com/questions/50730143/laravel-storage-link-wont-work-on-production)

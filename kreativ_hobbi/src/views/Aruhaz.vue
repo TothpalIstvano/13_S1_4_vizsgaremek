@@ -151,8 +151,8 @@
                 :id="`cbx-${fo.id}`"
                 class="inp-cbx"
                 :value="fo.id"
+                :checked="selectedkategoriak.includes(fo.id)"
                 @change="togglekategoria(fo.id)"
-                v-model="selectedkategoriak"
               />
               <label :for="`cbx-${fo.id}`" class="cbx">
                 <span>
@@ -179,7 +179,6 @@
                 :key="child.id"
                 class="item-tag"
                 :class="{ active: selectedkategoriak.includes(child.id) }"
-                @click="togglekategoria(child.id)"
               >
                 <div class="checkbox-wrapper-46">
                   <input
@@ -187,8 +186,8 @@
                     :id="`cbx-${child.id}`"
                     class="inp-cbx"
                     :value="child.id"
+                    :checked="selectedkategoriak.includes(child.id)"
                     @change="togglekategoria(child.id)"
-                    v-model="selectedkategoriak"
                     @click.stop
                   />
                   <label :for="`cbx-${child.id}`" class="cbx">
@@ -449,11 +448,26 @@
   const openCategories = ref([])
 
   function togglekategoria(id) {
-    const index = selectedkategoriak.value.indexOf(id);
-    if (index === -1) {
-      selectedkategoriak.value.push(id);
+    const index = selectedkategoriak.value.indexOf(id)
+    const isSelecting = index === -1
+
+    if (isSelecting) {
+      selectedkategoriak.value.push(id)
     } else {
-      selectedkategoriak.value.splice(index, 1);
+      selectedkategoriak.value.splice(index, 1)
+    }
+
+    // If this is a main category, sync all its children too
+    const mainCat = kategoriakTree.value.find(fo => fo.id === id)
+    if (mainCat) {
+      mainCat.children.forEach(child => {
+        const childIndex = selectedkategoriak.value.indexOf(child.id)
+        if (isSelecting && childIndex === -1) {
+          selectedkategoriak.value.push(child.id)
+        } else if (!isSelecting && childIndex !== -1) {
+          selectedkategoriak.value.splice(childIndex, 1)
+        }
+      })
     }
   }
 
@@ -471,7 +485,7 @@
     // TAGS
     const matchesTags =
       selectedkategoriak.value.length === 0 ||
-      selectedkategoriak.value.every(tagId =>
+      selectedkategoriak.value.some(tagId =>
         item.termek_kategoriak.some(t => t.id === tagId)
       )
 
