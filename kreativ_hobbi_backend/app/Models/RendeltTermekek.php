@@ -16,7 +16,7 @@ class RendeltTermekek extends Model
         "egysegar",
         "szin_id"
     ];
-    protected $PrimaryKey = "id";
+    protected $primaryKey = "id";
     
     public function rendeles(){
         return $this->belongsTo(Rendelesek::class, 'rendelesek_id', 'id');

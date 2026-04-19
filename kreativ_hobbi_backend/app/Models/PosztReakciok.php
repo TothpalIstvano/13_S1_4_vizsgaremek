@@ -12,7 +12,7 @@ class PosztReakciok extends Model
     protected $table = "posztReakciok";
     protected $fillable = ["poszt_id", "felhasznalo_id", "reakcio"];
 
-    protected $PrimaryKey = ["poszt_id", "felhasznalo_id"];
+    protected $primaryKey = ["poszt_id", "felhasznalo_id"];
     public $incrementing = false;
     public function poszt(){
         return $this->belongsTo(Posztok::class,"poszt_id", "id");

@@ -709,7 +709,7 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
 
     // Rendelések lista
     Route::get('/rendelesek', function () {
-        $rendelesek = Rendelesek::with('felhasznalo:id,felhasz_nev')
+        $rendelesek = Rendelesek::with('felhasznalo:id,felhasz_nev','rendeltTermekek.termekek:id,nev,ar','rendeltTermekek.szin:id,nev,hex_kod',)
             ->withCount('rendeltTermekek')
             ->orderBy('rendeles_datuma', 'desc')
             ->get()
@@ -720,6 +720,14 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
                     'nev' => $r->felhasznalo?->felhasz_nev ?? 'Vendég'
                     ],
                 'termekek_szama' => $r->rendelt_termekek_count,
+                'termekek' => $r->rendeltTermekek->map(fn($t) => [
+                    'id'       => $t->termekek?->id ?? null,  
+                    'nev'      => $t->termekek?->nev ?? '-',
+                    'mennyiseg'=> $t->mennyiseg,
+                    'egysegar' => $t->egysegar,
+                    'szin'     => $t->szin?->nev ?? null,
+                    'hex'      => $t->szin?->hex_kod ?? null,
+                ]),
                 'osszeg' => $r->osszeg,
                 'statusz' => $r->statusz,
                 'rendeles_datuma' => $r->rendeles_datuma,

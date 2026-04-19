@@ -23,8 +23,9 @@ class RendelesekFactory extends Factory
         return [
             "felhasznalo_id"=> Felhasznalok::pluck("id")->random(),
             "statusz"=>$this->faker->randomElement(["függőben","szállítás alatt","teljesítve","törölve"]),
+            'fizetes_statusz' => $this->faker->randomElement(['függőben', 'fizetve', 'sikertelen']),
             "osszeg"=>rand(1000, 5000),
-            "rendeles_datuma"=>$this->faker->dateTime(),
+            "rendeles_datuma"=>$this->faker->dateTimeBetween('-5 years', 'now'),
             'szallitasi_nev'=>$this->faker->name(),
             'szallitasi_email'=>$this->faker->email(),
             'szallitasi_telefon'=>$this->faker->phoneNumber(),
