@@ -151,8 +151,8 @@
                 :id="`cbx-${fo.id}`"
                 class="inp-cbx"
                 :value="fo.id"
+                :checked="selectedkategoriak.includes(fo.id)"
                 @change="togglekategoria(fo.id)"
-                v-model="selectedkategoriak"
               />
               <label :for="`cbx-${fo.id}`" class="cbx">
                 <span>
@@ -179,7 +179,6 @@
                 :key="child.id"
                 class="item-tag"
                 :class="{ active: selectedkategoriak.includes(child.id) }"
-                @click="togglekategoria(child.id)"
               >
                 <div class="checkbox-wrapper-46">
                   <input
@@ -187,8 +186,8 @@
                     :id="`cbx-${child.id}`"
                     class="inp-cbx"
                     :value="child.id"
+                    :checked="selectedkategoriak.includes(child.id)"
                     @change="togglekategoria(child.id)"
-                    v-model="selectedkategoriak"
                     @click.stop
                   />
                   <label :for="`cbx-${child.id}`" class="cbx">
@@ -535,6 +534,7 @@
       })()
 
       return matchesSearch && matchesPrice && matchesTags
+
   })
 })
 
