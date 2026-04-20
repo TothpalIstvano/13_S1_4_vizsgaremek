@@ -1021,10 +1021,12 @@
                     <span v-else><strong>{{ comment.iro }}</strong></span>
                   </td>
                   <td style="max-width:280px;">
-                    <span
-                      :title="comment.komment"
-                      style="display:-webkit-box; -webkit-box-orient:vertical; overflow:hidden;"
-                    >{{ comment.komment }}</span>
+                    <span v-if="comment.komment === ''" style="color:#94a3b8; font-style:italic;">
+                      [ Törölt komment ]
+                    </span>
+                    <span v-else :title="comment.komment" style="display:-webkit-box; -webkit-box-orient:vertical; overflow:hidden;">
+                      {{ comment.komment }}
+                    </span>
                   </td>
                   <td>
                     <div style="display:flex; flex-direction:column; gap:2px;">
@@ -1054,9 +1056,21 @@
                   </td>
                   <td style="white-space:nowrap;">{{ comment.letrehozas_datuma ? formatDate(comment.letrehozas_datuma) : '-' }}</td>
                   <td>
-                    <button class="btn btn-sm btn-danger" @click="deleteComment(comment.id)">
-                      <FontAwesomeIcon icon="fa-trash-alt" />
-                    </button>
+                    <div class="action-buttons">
+                      <button class="btn btn-sm btn-danger" @click="deleteComment(comment.id)" title="Komment törlése">
+                        <FontAwesomeIcon icon="fa-trash-alt" />
+                      </button>
+                      <!-- ÚJ: lánctörlés gomb — csak ha van gyereke -->
+                      <button
+                        v-if="comment.valaszok_szama > 0"
+                        class="btn btn-sm"
+                        style="background:#7c3aed; color:white;"
+                        @click="deleteCommentChain(comment.id)"
+                        title="Teljes lánc törlése (minden válasszal együtt)"
+                      >
+                        <FontAwesomeIcon icon="fa-trash-alt" />🔗
+                      </button>
+                    </div>
                   </td>
                 </tr>
               </tbody>
@@ -2573,6 +2587,25 @@ const deleteComment = async (id) => {
   await axios.delete(`${API}/kommentek/${id}`);
   await fetchComments();
   showToast('Komment törölve.', 'error');
+};
+
+const deleteCommentChain = async (id) => {
+  const confirmed = await showConfirm(
+    'Biztosan törölni szeretnéd a TELJES kommentláncot (minden választ is)?'
+  );
+  if (!confirmed) return;
+
+  try {
+    await axios.delete(`${API}/kommentek/${id}/chain`);
+    await fetchComments();
+    showToast('Kommentlánc törölve.', 'error');
+  } catch (error) {
+    showToast(
+      'Nem sikerült törölni.',
+      'error',
+      error.response?.data?.message || 'Ismeretlen hiba.'
+    );
+  }
 };
 
 const reports = ref([]);

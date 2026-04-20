@@ -12,7 +12,7 @@ return new class extends Migration {
     {
         Schema::create('kommentek', function (Blueprint $table) {
             $table->unsignedInteger('id')->primary()->autoIncrement();
-            $table->text('komment');
+            $table->text('komment')->nullable();
             $table->unsignedInteger('poszt_id');
             $table->unsignedInteger('kommentelo')->nullable();
             $table->unsignedInteger('elozetes_komment_id')->nullable();
