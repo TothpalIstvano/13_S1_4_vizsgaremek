@@ -195,9 +195,12 @@
                 :comment="comment"
                 :currentUserId="currentUser?.id"
                 :currentUser="currentUser"
+                :isAdminOrMod="currentUser?.adatok?.szerepkor === 'admin' || currentUser?.adatok?.szerepkor === 'moderator'"
+                :loadingComments="loadingComments"
                 @reply="handleReply"
                 @delete="handleDelete"
                 @report="handleCommentReport"
+                @deleteChain="handleDeleteChain"
                 class="comment-item-animate"
               />
             </div>
@@ -276,6 +279,19 @@ const openPostReport = () => {
 
 const handleCommentReport = (commentId) => {
   reportModal.value = { visible: true, type: 'comment', targetId: commentId }
+}
+
+const handleDeleteChain = async (commentId) => {
+  const confirmed = await showConfirm('Biztosan törölni szeretnéd a TELJES kommentláncot?')
+  if (!confirmed) return
+
+  try {
+    await api.delete(`/api/admin/kommentek/${commentId}/chain`)
+    await fetchComments()
+    showToast('Kommentlánc törölve.', 'error')
+  } catch (err) {
+    showToast('Hiba történt a lánc törlésekor.', 'error')
+  }
 }
 
 const postId = computed(() => route.params.id)
@@ -433,9 +449,16 @@ const handleDelete = async (commentId) => {
   
   try {
     await ensureCsrfToken()
+    const response = await api.delete(`/api/comments/${commentId}`)
     
-    await api.delete(`/api/comments/${commentId}`)
-    removeComment(commentId)
+    if (response.data.deleted === false) {
+      // Placeholder lett — csak frissítjük a listát
+      await fetchComments()
+    } else {
+      // Valódi törlés — frontenden is eltávolítjuk
+      removeComment(commentId)
+    }
+    
     showToast('Hozzászólás törölve.', 'info')
   } catch (err) {
     if (err.response?.status === 419) {

@@ -3,10 +3,13 @@
 - \[ ] Az oldal dokumenálása
 - \[ ] Optimalizálás
 - \[ ] Moderátor felület
+- \[ ] Térkép javítása
+- \[ ] Termék szövege forduljonbe normálba változtatás után hogy ne legyenek ott a html taggek + kattintható legyen a termék neve hogy oda dobjon a termékre
 
 - \[ ] ha felvan függesztve a user akkor ne tudjon feltölteni semmit se blogolni és a képe legyen def vagy i guess a basic-ekből tudjon választani
-- \[ ] Kommentek törlése - tehát, ha komenthez tartozik egy komment pl. 3 alkomment és kitöröljük akkor a komment azt jelenitse meg hogy a komment törölve és ha nincs komment alatta akkor csa k smá törölje a kommmentet
 
+- \[X] Bug ha adminként a saját kommentem törlöm akkor azt írja hogy törölt felhasználó✅
+- \[X] Kommentek törlése - tehát, ha komenthez tartozik egy komment pl. 3 alkomment és kitöröljük akkor a komment azt jelenitse meg hogy a komment törölve és ha nincs komment alatta akkor csa k smá törölje a kommmentet✅
 - \[X] Admin felületen rendeléseknél a termék számot írja csak viszont az lenyitható legyen és látható hogy miből mennyit vett✅
 - \[X] Ja ha kijelől egy ffő kategoriát a termékeknél a shopba akkor az alkategoriáit is jelőlje ki✅
 - \[X] Email-verified ha be van loginelve akkor a profilra dobja✅

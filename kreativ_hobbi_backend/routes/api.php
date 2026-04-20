@@ -956,7 +956,7 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
                 return [
                     'id' => $k->id,
                     'komment' => $k->komment,
-                    'iro' => $k->iro ?? 'Vendég',
+                    'iro' => $k->iro ?? 'Törölt felhasználó',
                     'iro_id' => $k->iro_id,
                     'poszt_cim' => $k->poszt_cim ?? '-',
                     'poszt_id' => $k->poszt_id,
@@ -969,13 +969,8 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
         return response()->json($kommentek);
     });
 
-    Route::delete('/kommentek/{id}', function ($id) {
-        \DB::table('kommentek')
-            ->where('elozetes_komment_id', $id)
-            ->update(['elozetes_komment_id' => null]);
-        \DB::table('kommentek')->where('id', $id)->delete();
-        return response()->json(['message' => 'Komment törölve']);
-    });
+    Route::delete('/kommentek/{id}', [KommentController::class, 'destroy']);
+    Route::delete('/kommentek/{id}/chain', [KommentController::class, 'destroyChain']);
 
     Route::delete('/rendelesek/{id}', function ($id) {
         $rendeles = Rendelesek::findOrFail($id);

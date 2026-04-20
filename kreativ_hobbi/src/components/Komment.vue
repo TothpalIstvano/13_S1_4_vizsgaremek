@@ -21,9 +21,17 @@ const props = defineProps({
     type: Object,
     default: null
   },
+  isAdminOrMod: { 
+    type: Boolean,
+    default: false 
+  },
+  loadingComments: {
+    type: Boolean,
+    default: false 
+  },
 })
 
-const emit = defineEmits(['reply', 'delete', 'report'])
+const emit = defineEmits(['reply', 'delete', 'report', 'deleteChain'])
 
 const formatDate = (dateString) => {
   if (!dateString) return ''
@@ -85,11 +93,25 @@ const formatDate = (dateString) => {
             <font-awesome-icon icon="fa-solid fa-trash" />
           </div>
         </button>
+        <button
+          v-if="isAdminOrMod && comment.gyermekKommentek?.length > 0"
+          @click="$emit('deleteChain', comment.id)"
+          class="chain-delete-btn"
+          title="Teljes lánc törlése"
+        >
+          <div class="delete-icon">
+            <font-awesome-icon icon="fa-solid fa-trash" />
+            <span style="font-size:10px; margin-left:2px;">🔗</span>
+          </div>
+        </button>
       </div>
     </div>
     
     <div class="comment-content">
-      <div class="content-text">
+      <div v-if="comment.komment === null || comment.komment === ''" class="deleted-comment">
+        <em>[ Ez a komment törölve lett ]</em>
+      </div>
+      <div v-else class="content-text">
         {{ comment.komment }}
       </div>
     </div>
@@ -115,9 +137,12 @@ const formatDate = (dateString) => {
         :isReply="true"
         :currentUserId="currentUserId"
         :currentUser="currentUser"
+        :isAdminOrMod="isAdminOrMod"
+        :loadingComments="loadingComments"
         @reply="$emit('reply', $event)"
         @delete="$emit('delete', $event)"
         @report="$emit('report', $event)"
+        @deleteChain="$emit('deleteChain', $event)"
       />
     </div>
   </div>
@@ -160,6 +185,31 @@ const formatDate = (dateString) => {
 
 .comment-author {
   flex: 1;
+}
+
+.deleted-comment {
+  padding: 12px;
+  background: #f1f5f9;
+  border-radius: 12px;
+  border-left: 3px solid #cbd5e1;
+  color: #94a3b8;
+  font-size: 14px;
+}
+
+.chain-delete-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  color: rgb(109, 40, 217);
+  background-color: #ede9fe;
+}
+
+.chain-delete-btn:hover {
+  background: #ddd6fe;
+  color: #6d28d9;
 }
 
 .avatar-container {
