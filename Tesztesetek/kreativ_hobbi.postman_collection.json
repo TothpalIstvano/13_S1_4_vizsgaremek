@@ -808,6 +808,45 @@
           "response": []
         },
         {
+          "name": "Címkék",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));\r",
+                  "pm.test(\"Response is an array\", () => {\r",
+                  "    pm.expect(pm.response.json()).to.be.an(\"array\");\r",
+                  "});\r",
+                  "pm.test(\"Tag has id and nev\", () => {\r",
+                  "    const tags = pm.response.json();\r",
+                  "    if (tags.length > 0) {\r",
+                  "        pm.expect(tags[0]).to.have.all.keys(\"id\", \"nev\");\r",
+                  "    }\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/cimkek",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "cimkek"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
           "name": "Kommentek",
           "event": [
             {
@@ -1653,45 +1692,6 @@
           "response": []
         },
         {
-          "name": "Címkék",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));\r",
-                  "pm.test(\"Response is an array\", () => {\r",
-                  "    pm.expect(pm.response.json()).to.be.an(\"array\");\r",
-                  "});\r",
-                  "pm.test(\"Tag has id and nev\", () => {\r",
-                  "    const tags = pm.response.json();\r",
-                  "    if (tags.length > 0) {\r",
-                  "        pm.expect(tags[0]).to.have.all.keys(\"id\", \"nev\");\r",
-                  "    }\r",
-                  "});"
-                ],
-                "type": "text/javascript",
-                "packages": {},
-                "requests": {}
-              }
-            }
-          ],
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/cimkek",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "cimkek"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
           "name": "Rendelés (vendég)",
           "event": [
             {
@@ -2466,7 +2466,7 @@
           "response": []
         },
         {
-          "name": "Navbar",
+          "name": "Profilkép a navbar-ban",
           "event": [
             {
               "listen": "test",
@@ -3098,7 +3098,7 @@
           "response": []
         },
         {
-          "name": "Rendelés státusz",
+          "name": "Rendelés státusz módosítása",
           "event": [
             {
               "listen": "test",
@@ -3607,7 +3607,7 @@
           "response": []
         },
         {
-          "name": "Admin felhasználók",
+          "name": "Összes felhasználó",
           "event": [
             {
               "listen": "test",
@@ -3651,7 +3651,7 @@
           "response": []
         },
         {
-          "name": "Admin felhasználó",
+          "name": "Admin felhasználók",
           "event": [
             {
               "listen": "test",
@@ -3660,7 +3660,9 @@
                   "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
                   "pm.test(\"Has id\", () => pm.expect(pm.response.json()).to.have.property(\"id\"));"
                 ],
-                "type": "text/javascript"
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
               }
             }
           ],
@@ -3692,7 +3694,7 @@
           "response": []
         },
         {
-          "name": "Admin felhasználó törlés",
+          "name": "Felhasználó törlése",
           "event": [
             {
               "listen": "test",

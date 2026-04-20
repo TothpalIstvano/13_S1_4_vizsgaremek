@@ -219,7 +219,7 @@ const post = ref({
   kivonat: ''
 })
 const selectedTags = ref([])
-const uploadedImages = ref([])   // each item: { id: null|number, file: File|null, preview: string, alt: string, description: string }
+const uploadedImages = ref([])
 
 const formTouched = ref(false);
 const editorKey = ref(0);
@@ -574,7 +574,6 @@ const resetForm = () => {
   font-style: italic;
 }
 
-/* Make inputs full width on all screens */
 #postTitle,
 #postSubtext,
 :deep(.p-multiselect) {
@@ -650,7 +649,6 @@ const resetForm = () => {
   background-color: #667eea;
 }
 
-/* PrimeVue overrides for responsiveness */
 :deep(.p-fileupload) {
   border: 2px solid #e2e8f0;
   border-radius: 10px;
@@ -774,7 +772,6 @@ const resetForm = () => {
   margin: 0;
 }
 
-/* Notification */
 .notification {
   position: fixed;
   top: 20px;
@@ -830,7 +827,6 @@ const resetForm = () => {
   }
 }
 
-/* Responsive */
 @media (min-width: 768px) {
   .container {
     /*max-width: 90%;*/

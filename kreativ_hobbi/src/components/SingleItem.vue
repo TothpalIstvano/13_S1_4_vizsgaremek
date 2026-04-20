@@ -25,7 +25,6 @@
             />
           </transition>
 
-          <!-- Nav arrows — only show if more than 1 image -->
           <template v-if="allImages.length > 1">
             <button class="gallery-arrow left" @click="prevImage">&#8249;</button>
             <button class="gallery-arrow right" @click="nextImage">&#8250;</button>
@@ -150,7 +149,6 @@ const qty = ref(1)
 const selectedColor = ref(null)
 const activeIndex = ref(0)
 
-// Build a deduplicated list of all images (fo_kep + termek_kepek)
 const allImages = computed(() => {
   if (!product.value) return []
   const seen = new Set()
@@ -163,10 +161,8 @@ const allImages = computed(() => {
     }
   }
 
-  // Main image first
   add(product.value.termek_fo_kep?.url_Link)
 
-  // Extra images
   if (product.value.termek_kepek?.length) {
     product.value.termek_kepek.forEach(k => add(k.url_Link))
   }
@@ -323,7 +319,6 @@ onMounted(() => {
   display: block;
 }
 
-/* Fade transition */
 .fade-enter-active, .fade-leave-active { transition: opacity 0.25s ease; }
 .fade-enter-from, .fade-leave-to { opacity: 0; }
 
@@ -468,6 +463,7 @@ onMounted(() => {
 .colors {
   margin-bottom: 28px;
 }
+
 .colors label {
   display: flex;
   align-items: center;
@@ -477,11 +473,13 @@ onMounted(() => {
   color: #333;
   margin-bottom: 10px;
 }
+
 .selected-color-name {
   font-weight: 400;
   color: #888;
   font-size: 13px;
 }
+
 .color-options { display: flex; gap: 8px; flex-wrap: wrap; }
 .color-btn {
   width: 34px; height: 34px;
@@ -491,6 +489,7 @@ onMounted(() => {
   cursor: pointer;
   transition: all 0.18s;
 }
+
 .color-btn:hover { transform: scale(1.12); outline-color: #ccc; }
 .color-btn.active {
   outline: 2.5px solid #2c3e50;
@@ -507,12 +506,14 @@ onMounted(() => {
   color: #333;
   margin-bottom: 10px;
 }
+
 .qty-row {
   display: flex;
   align-items: center;
   gap: 20px;
   flex-wrap: wrap;
 }
+
 .qty-control {
   display: flex;
   align-items: center;
@@ -520,6 +521,7 @@ onMounted(() => {
   border-radius: 10px;
   overflow: hidden;
 }
+
 .qty-btn {
   width: 40px; height: 40px;
   background: #f8f8f8;
@@ -531,6 +533,7 @@ onMounted(() => {
   transition: background 0.15s;
   font-family: inherit;
 }
+
 .qty-btn:hover { background: #eee; }
 .qty-input {
   width: 52px;
@@ -555,8 +558,11 @@ onMounted(() => {
   font-weight: 500;
   margin: 0;
 }
+
 .stock-info.low { color: #b45309; }
+
 .stock-info.out { color: #c0392b; }
+
 .stock-dot {
   width: 7px; height: 7px;
   border-radius: 50%;
@@ -578,11 +584,13 @@ onMounted(() => {
   transition: all 0.22s;
   letter-spacing: 0.02em;
 }
+
 .add-to-cart-btn:hover:not(:disabled) {
   background: #81442f;
   transform: translateY(-2px);
   box-shadow: 0 8px 24px rgba(26, 26, 46, 0.28);
 }
+
 .add-to-cart-btn:disabled {
   opacity: 0.4;
   cursor: not-allowed;

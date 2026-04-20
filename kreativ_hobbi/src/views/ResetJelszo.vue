@@ -167,18 +167,46 @@ const resetPassword = async () => {
 }
 
 .eye-btn:hover { background: rgba(139,4,4,0.08); }
-.eye-icon { width: 20px; height: 20px; overflow: visible; }
-.eye-outer, .eye-pupil, .eye-slash { transition: opacity 0.3s ease, transform 0.35s ease; transform-origin: 12px 12px; }
+
+.eye-icon { 
+  width: 20px; 
+  height: 20px; 
+  overflow: visible; 
+}
+
+.eye-outer, .eye-pupil, .eye-slash { 
+  transition: opacity 0.3s ease, 
+  transform 0.35s ease; 
+  transform-origin: 12px 12px; 
+}
+
 .eye-open .eye-slash { opacity: 0; transform: scaleX(0); }
+
 .eye-open .eye-outer { opacity: 1; }
+
 .eye-open .eye-pupil { opacity: 1; transform: scale(1); }
+
 .eye-closed .eye-slash { opacity: 1; }
+
 .eye-closed .eye-outer { opacity: 0.35; }
+
 .eye-closed .eye-pupil { opacity: 0; transform: scale(0); }
+
 .eye-open { animation: eyeOpen 0.35s ease forwards; }
+
 .eye-closed { animation: eyeClose 0.35s ease forwards; }
-@keyframes eyeOpen { 0% { transform: scaleY(0.1); } 60% { transform: scaleY(1.15); } 100% { transform: scaleY(1); } }
-@keyframes eyeClose { 0% { transform: scaleY(0.1); } 40% { transform: scaleY(1.1); } 100% { transform: scaleY(1); } }
+
+@keyframes eyeOpen { 
+  0% { transform: scaleY(0.1); } 
+  60% { transform: scaleY(1.15); } 
+  100% { transform: scaleY(1); } 
+}
+
+@keyframes eyeClose { 
+  0% { transform: scaleY(0.1); } 
+  40% { transform: scaleY(1.1); } 
+  100% { transform: scaleY(1); } 
+}
 
 .button {
   width: 180px;

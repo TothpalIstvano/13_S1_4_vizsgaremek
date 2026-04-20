@@ -39,8 +39,8 @@ class FelhasznaloController
         $data['telefonszam'] = $request->filled('telefonszam') ? $request->telefonszam : '';
         $data['utca'] = $request->filled('utca') ? $request->utca : '';
         $data['emeletAjto'] = $request->filled('emeletAjto') ? $request->emeletAjto : '';
-        $data['hazszam'] = $request->filled('hazszam') ? (int) $request->hazszam : 0;   // integer, 0 if empty
-        $data['varos'] = $request->filled('varos') ? (int) $request->varos : null; // nullable foreign key
+        $data['hazszam'] = $request->filled('hazszam') ? (int) $request->hazszam : 0;
+        $data['varos'] = $request->filled('varos') ? (int) $request->varos : null;
 
         $userData = FelhasznaloAdatok::updateOrCreate(
             ['felhasznalo_id' => $request->user()->id],
@@ -69,47 +69,48 @@ class FelhasznaloController
         ]);
     }
 
-public function index(){
-    $users = Felhasznalok::with('profilKep:id,url_Link,alt_szoveg', 'adatok')
-        ->get()
-        ->map(function ($user) {
-            $lastOrder = \DB::table('rendelesek')
-                ->where('felhasznalo_id', $user->id)
-                ->orderBy('rendeles_datuma', 'desc')
-                ->first();
+    public function index()
+    {
+        $users = Felhasznalok::with('profilKep:id,url_Link,alt_szoveg', 'adatok')
+            ->get()
+            ->map(function ($user) {
+                $lastOrder = \DB::table('rendelesek')
+                    ->where('felhasznalo_id', $user->id)
+                    ->orderBy('rendeles_datuma', 'desc')
+                    ->first();
 
-            $completedOrders = \DB::table('rendelesek')
-                ->where('felhasznalo_id', $user->id)
-                ->where('statusz', 'teljesítve')
-                ->count();
+                $completedOrders = \DB::table('rendelesek')
+                    ->where('felhasznalo_id', $user->id)
+                    ->where('statusz', 'teljesítve')
+                    ->count();
 
-            $activeOrders = \DB::table('rendelesek')
-                ->where('felhasznalo_id', $user->id)
-                ->whereNotIn('statusz', ['teljesítve', 'törölve'])
-                ->count();
+                $activeOrders = \DB::table('rendelesek')
+                    ->where('felhasznalo_id', $user->id)
+                    ->whereNotIn('statusz', ['teljesítve', 'törölve'])
+                    ->count();
 
-            return [
-                'id' => $user->id,
-                'name' => $user->felhasz_nev,
-                'email' => $user->email,
-                'role' => $user->adatok->szerepkor ?? 'sima',
-                'statusz' => (bool) $user->statusz,
-                'profileImage' => $user->profilKep 
-                    ? $user->profilKep->url_Link 
-                    : 'localhost:8000/storage/profilkepek/default.jpg',
-                'created_at' => $user->created_at,
-                'utolso_Belepes' => $user->utolso_Belepes,
-                'orderStats' => [
-                    'completed' => $completedOrders,
-                    'active' => $activeOrders,
-                    'total' => $completedOrders + $activeOrders,
-                    'lastStatus' => $lastOrder?->statusz ?? null,
-                ],
-            ];
-        });
+                return [
+                    'id' => $user->id,
+                    'name' => $user->felhasz_nev,
+                    'email' => $user->email,
+                    'role' => $user->adatok->szerepkor ?? 'sima',
+                    'statusz' => (bool) $user->statusz,
+                    'profileImage' => $user->profilKep
+                        ? $user->profilKep->url_Link
+                        : 'localhost:8000/storage/profilkepek/default.jpg',
+                    'created_at' => $user->created_at,
+                    'utolso_Belepes' => $user->utolso_Belepes,
+                    'orderStats' => [
+                        'completed' => $completedOrders,
+                        'active' => $activeOrders,
+                        'total' => $completedOrders + $activeOrders,
+                        'lastStatus' => $lastOrder?->statusz ?? null,
+                    ],
+                ];
+            });
 
-    return response()->json($users);
-}
+        return response()->json($users);
+    }
     /**
      * Store a newly created user in storage.
      */
@@ -130,15 +131,13 @@ public function index(){
         try {
             \DB::beginTransaction();
 
-            // Create User
             $user = Felhasznalok::create([
                 'email' => $request->email,
-                'jelszo' => Hash::make($request->password), // Assuming 'jelszo' is the password column
+                'jelszo' => Hash::make($request->password),
                 'felhasz_nev' => $request->felhasz_nev,
-                'statusz' => $request-> boolean('statusz') ? 1 : 0,
+                'statusz' => $request->boolean('statusz') ? 1 : 0,
             ]);
 
-            // Create User Details (FelhasznaloAdatok)
             FelhasznaloAdatok::create([
                 'felhasznalo_id' => $user->id,
                 'szerepkor' => $request->szerepkor,
@@ -146,7 +145,6 @@ public function index(){
 
             \DB::commit();
 
-            // Return the same format as index for the frontend
             return response()->json([
                 'id' => $user->id,
                 'name' => $user->felhasz_nev,
@@ -212,23 +210,20 @@ public function index(){
         try {
             \DB::beginTransaction();
 
-            // Update Felhasznalok
             $userData = [
                 'email' => $request->email ?? $user->email,
                 'felhasz_nev' => $request->felhasz_nev ?? $user->felhasz_nev,
                 'statusz' => $request->boolean('statusz') ? 1 : 0,
             ];
 
-            // Handle Profile Picture Reset
-            if ($request->has('resetProfilePic') && $request->resetProfilePic ) {
-                $userData['profilKep_id'] = 1; 
+            if ($request->has('resetProfilePic') && $request->resetProfilePic) {
+                $userData['profilKep_id'] = 1;
             }
 
             $user->update($userData);
 
             $user = $user->fresh('profilKep', 'adatok');
 
-            // Update FelhasznaloAdatok
             FelhasznaloAdatok::updateOrCreate(
                 ['felhasznalo_id' => $user->id],
                 [
@@ -255,7 +250,7 @@ public function index(){
         }
     }
 
-        /**
+    /**
      * Remove the specified user from storage.
      */
     public function destroy($id)
@@ -266,7 +261,6 @@ public function index(){
             return response()->json(['error' => 'Felhasználó nem található'], 404);
         }
 
-        // Prevent deleting yourself
         if (auth()->check() && auth()->id() == $id) {
             return response()->json(['error' => 'Nem törölheted a saját fiókodat'], 403);
         }
@@ -274,7 +268,6 @@ public function index(){
         try {
             \DB::beginTransaction();
 
-            // --- CHECK: Only delete if ALL orders are completed ---
             $hasActiveOrders = \DB::table('rendelesek')
                 ->where('felhasznalo_id', $id)
                 ->whereNotIn('statusz', ['teljesítve', 'törölve'])
@@ -289,10 +282,8 @@ public function index(){
 
             \DB::table('rendelesek')->where('felhasznalo_id', $id)->delete();
 
-            // --- DELETE: Posts ---
             \DB::table('posztok')->where('szerzo_id', $id)->delete();
 
-            // --- DELETE: Favorites ---
             \DB::table('kedvencek')->where('felhasznalo_id', $id)->delete();
 
             $user->delete();

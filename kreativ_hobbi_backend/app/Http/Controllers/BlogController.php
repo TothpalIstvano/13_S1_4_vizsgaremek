@@ -167,20 +167,18 @@ class BlogController extends Controller
         $userId = auth()->id();
         $post = Posztok::findOrFail($id);
 
-        $existing = \DB::table('posztreakciok') // use your actual table name
+        $existing = \DB::table('posztreakciok')
             ->where('poszt_id', $post->id)
             ->where('felhasznalo_id', $userId)
             ->first();
 
         if ($existing) {
             if ($existing->reakcio === $request->reaction) {
-                // Same button clicked again → toggle off
                 \DB::table('posztreakciok')
                     ->where('poszt_id', $post->id)
                     ->where('felhasznalo_id', $userId)
                     ->delete();
             } else {
-                // Switching like ↔ dislike
                 \DB::table('posztreakciok')
                     ->where('poszt_id', $post->id)
                     ->where('felhasznalo_id', $userId)

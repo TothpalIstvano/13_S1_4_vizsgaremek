@@ -92,10 +92,13 @@ defineExpose({ showToast, showErrorModal })
 }
 
 .toast.success { background: #EAF3DE; border-color: #97C459; color: #3B6D11; }
+
 .toast.error   { background: #FCEBEB; border-color: #F09595; color: #A32D2D; }
+
 .toast.info    { background: #E6F1FB; border-color: #85B7EB; color: #185FA5; }
 
 .toast-body strong { display: block; font-size: 14px; font-weight: 600; }
+
 .toast-body span   { font-size: 13px; opacity: .8; margin-top: 2px; display: block; }
 
 .toast-close {
@@ -180,5 +183,6 @@ defineExpose({ showToast, showErrorModal })
   cursor: pointer;
   font-weight: 600;
 }
+
 .btn.confirm { background: #dc2626; color: #fff; }
 </style>

@@ -118,7 +118,7 @@ const adatfelhasznalasFile = async () => {
 .footer-links {
   /*display: flex;
   flex-direction: column;*/
-  gap: 1rem; /* Adjust this value for bigger/smaller gaps */
+  gap: 1rem;
   text-decoration: underline;
 }
 

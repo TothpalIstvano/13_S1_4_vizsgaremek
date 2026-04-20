@@ -233,7 +233,7 @@ const handleSignIn = async () => {
     }
     
     // API call to login
-    await axios.get('/sanctum/csrf-cookie') // Get CSRF cookie if needed
+    await axios.get('/sanctum/csrf-cookie')
 
     const response = await axios.post('/login', {
       email: signInForm.value.email,
@@ -252,7 +252,6 @@ const handleSignIn = async () => {
     else {
       throw new Error('Login failed. Please check your credentials.')
     }
-    // Redirect to dashboard or home
     
   } catch (error) {
     loginError.value = error.response?.data?.message || error.message || 'Login failed. Please try again.'
@@ -281,7 +280,7 @@ const handleSignUp = async () => {
     }
 
     // API call to register
-    await axios.get('/sanctum/csrf-cookie') // Get CSRF cookie if needed
+    await axios.get('/sanctum/csrf-cookie')
 
     const response = await axios.post('/register', {
       felhasz_nev: signUpForm.value.name,
@@ -294,7 +293,7 @@ const handleSignUp = async () => {
 
     // backend returns noContent() (204) after registering and logging in the user
     if (response.status === 204 || response.status === 201) {
-      await authStore.checkAuth()  // ← ez is kell!
+      await authStore.checkAuth()
       
       const redirect = router.currentRoute.value.query.redirect || '/profil'
       router.push(redirect)
@@ -328,7 +327,6 @@ const handleSignUp = async () => {
     user-select: none;
 }
 
-/* Generic */
 .error-message {
   color:#e74c3c;
   font-size: 12px;
@@ -345,12 +343,10 @@ const handleSignUp = async () => {
   animation: alertPopup 0.5s ease-out forwards;
 }
 
-/* LEAVE */
 .error-leave-active {
   animation: alertFadeOut 0.6s ease-in-out forwards;
 }
 
-/* Prevent jump when leaving */
 .error-leave-to {
   opacity: 0;
 }
@@ -360,140 +356,138 @@ const handleSignUp = async () => {
 }
 */
 @keyframes alertPopup {
-    0% {
-        opacity: 0;
-    }
-    100% {
-        opacity: 1;
-    }
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 @keyframes alertFadeOut {
-    0% {
-        opacity: 1;
-    }
-    60% {
-       color: var(--errorColor);
-    }
-    100% {
-        opacity: 0;
-    }
+  0% {
+    opacity: 1;
+  }
+  60% {
+    color: var(--errorColor);
+  }
+  100% {
+    opacity: 0;
+  }
 }
 
-/**/
 .main {
-    margin: 6.5% auto 0; 
-    position: relative;
-    width: 1000px;
-    min-width: 1000px;
-    min-height: 650px;
-    height: 650px;
-    padding: 25px;
-    background-color: #ecf0f3;
-    box-shadow:
-        10px 10px 10px #d1d9e6,
-        -10px -10px 10px #f9f9f9;
-    border-radius: 12px;
-    overflow: hidden;
+  margin: 6.5% auto 0; 
+  position: relative;
+  width: 1000px;
+  min-width: 1000px;
+  min-height: 650px;
+  height: 650px;
+  padding: 25px;
+  background-color: #ecf0f3;
+  box-shadow:
+    10px 10px 10px #d1d9e6,
+    -10px -10px 10px #f9f9f9;
+  border-radius: 12px;
+  overflow: hidden;
 }
 
 .container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: absolute;
-    top: 0;
-    width: 600px;
-    height: 100%;
-    padding: 25px;
-    background-color: #ecf0f3;
-    transition: 1.25s;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 0;
+  width: 600px;
+  height: 100%;
+  padding: 25px;
+  background-color: #ecf0f3;
+  transition: 1.25s;
 }
 
 .form {
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    width: 100%;
-    height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
 }
 
 .form__icon {
-    object-fit: contain;
-    width: 30px;
-    margin: 0 5px;
-    opacity: .5;
-    transition: .15s;
+  object-fit: contain;
+  width: 30px;
+  margin: 0 5px;
+  opacity: .5;
+  transition: .15s;
 }
 
 .form__icon:hover {
-    opacity: 1;
-    transition: .15s;
-    cursor: pointer;
+  opacity: 1;
+  transition: .15s;
+  cursor: pointer;
 }
 
 .form__input {
-    width: 350px;
-    height: 40px;
-    margin: 4px 0;
-    padding-left: 25px;
-    font-size: 13px;
-    letter-spacing: .15px;
-    border: none;
-    outline: none;
-    font-family: 'Montserrat', sans-serif;
-    background-color: #ecf0f3;
-    transition: .25s ease;
-    border-radius: 8px;
-    box-shadow:
-        inset 2px 2px 4px #d1d9e6,
-        inset -2px -2px 4px #f9f9f9;
+  width: 350px;
+  height: 40px;
+  margin: 4px 0;
+  padding-left: 25px;
+  font-size: 13px;
+  letter-spacing: .15px;
+  border: none;
+  outline: none;
+  font-family: 'Montserrat', sans-serif;
+  background-color: #ecf0f3;
+  transition: .25s ease;
+  border-radius: 8px;
+  box-shadow:
+    inset 2px 2px 4px #d1d9e6,
+    inset -2px -2px 4px #f9f9f9;
 }
 
 .form__input::placeholder {
-    color: #8b0404a1;
+  color: #8b0404a1;
 }
 
 .form__input:focus {
-    box-shadow:
-        inset 4px 4px 4px #d1d9e6,
-        inset -4px -4px 4px #f9f9f9;
+  box-shadow:
+    inset 4px 4px 4px #d1d9e6,
+    inset -4px -4px 4px #f9f9f9;
 }
 
 .form__checkbox {
-    display: flex;
-    align-items: center;
-    font-size: 16   px;
-    margin-top: 15px;
-    color: #181818;
-    cursor: pointer;
+  display: flex;
+  align-items: center;
+  font-size: 16   px;
+  margin-top: 15px;
+  color: #181818;
+  cursor: pointer;
 }
 
 .form__checkbox input {
-    width: 15px;
-    height: 15px;
-    margin-right: 10px;
-    cursor: pointer;
+  width: 15px;
+  height: 15px;
+  margin-right: 10px;
+  cursor: pointer;
 }
 
 .form__checkbox input:checked {
-    accent-color: #8b0404;
+  accent-color: #8b0404;
 }
 
 .form__span {
-    margin-top: 30px;
-    margin-bottom: 12px;
+  margin-top: 30px;
+  margin-bottom: 12px;
 }
 
 .form__link {
-    color: #181818;
-    font-size: 15px;
-    margin-top: 25px;
-    border-bottom: 1px solid #8b0404;
-    line-height: 2;
-    text-decoration: none;
+  color: #181818;
+  font-size: 15px;
+  margin-top: 25px;
+  border-bottom: 1px solid #8b0404;
+  line-height: 2;
+  text-decoration: none;
 }
 
 .input-wrapper { 
@@ -559,161 +553,158 @@ const handleSignUp = async () => {
 }
 
 .title {
-    font-size: 34px;
-    font-weight: 700;
-    line-height: 3;
-    color: #181818;
+  font-size: 34px;
+  font-weight: 700;
+  line-height: 3;
+  color: #181818;
 }
 
 .description {
-    font-size: 14px;
-    letter-spacing: .25px;
-    text-align: center;
-    line-height: 1.6;
+  font-size: 14px;
+  letter-spacing: .25px;
+  text-align: center;
+  line-height: 1.6;
 }
 
 .button {
-    width: 180px;
-    height: 50px;
-    border-radius: 25px;
-    margin-top: 50px;
-    font-weight: 700;
-    font-size: 14px;
-    letter-spacing: 1.15px;
-    background-color: #8b0404;
-    color: #f9f9f9;
-    box-shadow:
-        8px 8px 16px #d1d9e6,
-        -8px -8px 16px #f9f9f9;
-    border: none;
-    outline: none;
-    cursor: pointer;
+  width: 180px;
+  height: 50px;
+  border-radius: 25px;
+  margin-top: 50px;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 1.15px;
+  background-color: #8b0404;
+  color: #f9f9f9;
+  box-shadow:
+    8px 8px 16px #d1d9e6,
+    -8px -8px 16px #f9f9f9;
+  border: none;
+  outline: none;
+  cursor: pointer;
 }
 
-/**/
 .a-container {
-    z-index: 1;
-    left: calc(100% - 600px);
+  z-index: 1;
+  left: calc(100% - 600px);
 }
 
 .b-container {
-    left: calc(100% - 600px);
-    z-index: 0;
+  left: calc(100% - 600px);
+  z-index: 0;
 }
 
 .switch {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100%;
-    width: 400px;
-    padding: 50px;
-    z-index: 2;
-    transition: 2s;
-    background-color: #ecf0f3;
-    overflow: hidden;
-    box-shadow:
-        4px 4px 10px #d1d9e6,
-        -4px -4px 10px #f9f9f9;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 400px;
+  padding: 50px;
+  z-index: 2;
+  transition: 2s;
+  background-color: #ecf0f3;
+  overflow: hidden;
+  box-shadow:
+    4px 4px 10px #d1d9e6,
+    -4px -4px 10px #f9f9f9;
 }
 
 .switch__circle {
-    position: absolute;
-    width: 500px;
-    height: 500px;
-    border-radius: 50%;
-    background-color: #ecf0f3;
-    box-shadow:
-        inset 8px 8px 12px #8b040442,
-        inset -8px -8px 12px #8b040442;
-    bottom: -60%;
-    left: -60%;
-    transition: 1.25s;
-    transform: translateX(60%);
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  border-radius: 50%;
+  background-color: #ecf0f3;
+  box-shadow:
+    inset 8px 8px 12px #8b040442,
+    inset -8px -8px 12px #8b040442;
+  bottom: -60%;
+  left: -60%;
+  transition: 1.25s;
+  transform: translateX(60%);
 }
 
 .switch__circle--t {
-    top: -30%;
-    left: 60%;
-    width: 300px;
-    height: 300px;
-    transition: 1.25s;
+  top: -30%;
+  left: 60%;
+  width: 300px;
+  height: 300px;
+  transition: 1.25s;
 }
 
 .switch__container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    position: absolute;
-    width: 400px;
-    padding: 50px 55px;
-    transition: 1.25s;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  position: absolute;
+  width: 400px;
+  padding: 50px 55px;
+  transition: 1.25s;
 }
 
 .switch__button {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 .switch__button:hover {
-    box-shadow:
-        6px 6px 10px #d1d9e6,
-        -6px -6px 10px #f9f9f9;
-    transform: scale(.985);
-    transition: .25s;
+  box-shadow:
+    6px 6px 10px #d1d9e6,
+    -6px -6px 10px #f9f9f9;
+  transform: scale(.985);
+  transition: .25s;
 }
 
 .switch__button:active,
 .switch__button:focus,
 .button:active,
 .button:focus {
-    box-shadow:
-        2px 2px 6px #d1d9e6,
-        -2px -2px 6px #f9f9f9;
-    transform: scale(.97);
-    transition: .25s;
+  box-shadow:
+    2px 2px 6px #d1d9e6,
+    -2px -2px 6px #f9f9f9;
+  transform: scale(.97);
+  transition: .25s;
 }
 
-/**/
 .is-txr {
-    left: calc(100% - 400px);
-    transition: 1.25s;
-    transform-origin: left;
+  left: calc(100% - 400px);
+  transition: 1.25s;
+  transform-origin: left;
 }
 
 .is-txl {
-    left: 0;
-    transition: 2s;
-    transform-origin: right;
+  left: 0;
+  transition: 2s;
+  transform-origin: right;
 }
 
 .is-z200 {
-    z-index: 2;
-    transition: 2s;
+  z-index: 2;
+  transition: 2s;
 }
 
 .is-hidden {
-    visibility: hidden;
-    opacity: 0;
-    position: absolute;
-    transition: 1.25s;
+  visibility: hidden;
+  opacity: 0;
+  position: absolute;
+  transition: 1.25s;
 }
 
 .is-gx {
-    animation: is-gx 1.25s ease-in-out forwards;
+  animation: is-gx 1.25s ease-in-out forwards;
 }
 
 @keyframes is-gx {
-    0%, 10%, 100% {
-        width: 400px;
-    }
-    30%, 50% {
-        width: 500px;
-    }
-
+  0%, 10%, 100% {
+    width: 400px;
+  }
+  30%, 50% {
+    width: 500px;
+  }
 }
 
 .modal-overlay {
@@ -784,12 +775,11 @@ const handleSignUp = async () => {
     padding: 0;
     display: flex;
     flex-direction: column;
-    overflow: hidden;                /* keep the switch inside rounded corners */
+    overflow: hidden;
     border-radius: 12px;
-    position: relative;              /* for absolute positioning of the switch */
+    position: relative;
   }
 
-  /* Both form containers – stacked normally, hidden with display:none when inactive */
   .container {
     position: relative !important;
     width: 100% !important;
@@ -797,7 +787,7 @@ const handleSignUp = async () => {
     left: 0 !important;
     top: 0 !important;
     padding: 32px 24px 40px;
-    transition: none;                /* we’ll control visibility with display */
+    transition: none;
   }
 
   .a-container {
@@ -808,7 +798,6 @@ const handleSignUp = async () => {
     display: none;
   }
 
-  /* When sign‑in mode is active, show the sign‑in form */
   .main.is-signin .a-container {
     display: none;
   }
@@ -817,14 +806,13 @@ const handleSignUp = async () => {
     display: block;
   }
 
-  /* The switch panel – now absolutely positioned and slides vertically */
   .switch {
     position: absolute !important;
     top: 0;
     left: 0;
     width: 100% !important;
-    min-height: 280px;               /* use min-height instead of fixed height */
-    height: auto;                    /* let it grow if needed */
+    min-height: 280px;
+    height: auto;
     padding: 32px 24px;
     background-color: #ecf0f3;
     box-shadow: 4px 4px 10px #d1d9e6, -4px -4px 10px #f9f9f9;
@@ -838,15 +826,13 @@ const handleSignUp = async () => {
     box-sizing: border-box;
   }
 
-  /* When sign‑in is active, slide the switch to the bottom */
   .main.is-signin .switch {
-    transform: translateY(calc(100% + 40px)); /* slides down below the form */
+    transform: translateY(calc(100% + 40px));
     border-radius: 0 0 12px 12px;
   }
 
-  /* Switch content containers – cross‑fade inside the sliding panel */
   .switch__container {
-    position: relative !important;    /* changed from absolute */
+    position: relative !important;
     width: 100%;
     padding: 0;
     text-align: center;
@@ -874,33 +860,28 @@ const handleSignUp = async () => {
     width: 160px;
   }
 
-  /* Remove desktop circles */
   .switch__circle,
   .switch__circle--t {
     display: none;
   }
 
-  /* Push the form down to make room for the switch when it's at the top */
   .container {
-    margin-top: 280px;               /* same as switch height */
+    margin-top: 280px;
   }
 
-  /* When switch slides to bottom, remove top margin so form sits at top */
   .main.is-signin .container {
     margin-top: 0;
   }
 
   .main.is-signin .switch {
-    transform: translateY(380px); /* adjust to slide below form */
+    transform: translateY(380px);
     border-radius: 0 0 12px 12px;
   }
 
-  /* Ensure the main container has enough height to show everything */
   .main {
-    min-height: 600px;               /* prevent collapsing */
+    min-height: 600px;
   }
 
-  /* Form elements full width */
   .form__input,
   .input-wrapper,
   .error-message {
@@ -913,7 +894,6 @@ const handleSignUp = async () => {
     margin-top: 24px;
   }
 
-  /* Remove old left/right classes effects */
   .is-txr, .is-txl, .is-z200 {
     left: 0 !important;
     transition: none !important;
