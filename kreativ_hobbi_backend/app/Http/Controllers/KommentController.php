@@ -119,7 +119,7 @@ class KommentController extends Controller
                 return response()->json(['error' => 'You can only delete your own comments'], 403);
             }
 
-            $comment->delete(); // children's elozetes_komment_id becomes null automatically
+            $comment->delete();
 
             return response()->json(['message' => 'Comment deleted!']);
         } catch (\Exception $e) {

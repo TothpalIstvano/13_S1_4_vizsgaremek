@@ -1023,7 +1023,7 @@
                   <td style="max-width:280px;">
                     <span
                       :title="comment.komment"
-                      style="display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;"
+                      style="display:-webkit-box; -webkit-box-orient:vertical; overflow:hidden;"
                     >{{ comment.komment }}</span>
                   </td>
                   <td>

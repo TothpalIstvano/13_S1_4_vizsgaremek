@@ -417,7 +417,7 @@
 
 
   const items = ref([])
-  const kategoriak = ref([]) // Holds the list of tags for the sidebar
+  const kategoriak = ref([])
   const selectedkategoriak = ref(
     JSON.parse(sessionStorage.getItem('shop_selected_kategoriak') || '[]')
   )
@@ -595,7 +595,6 @@ onUnmounted(() => {
   document.removeEventListener('click', handleClickOutside)
 })
 
-// ✅ JAVÍTOTT — flag-gel védjük
 let isUpdating = false
 
 watch(selectedkategoriak, (val) => {
@@ -808,6 +807,7 @@ onBeforeUnmount(() => {
 }
 
 .heart-wrapper { position: relative; }
+
 .heart-btn {
   position: absolute; top: 8px; right: 8px;
   background: rgba(255,255,255,0.85);
@@ -818,6 +818,7 @@ onBeforeUnmount(() => {
   z-index: 1;
 }
 .heart-btn.liked { color: #e03e3e; }
+
 .heart-btn:hover { transform: scale(1.15); }
 
 #shop {
@@ -839,7 +840,6 @@ onBeforeUnmount(() => {
   padding: 12px 24px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.151);
 }
-
 
 /*#endregion*/
 
@@ -896,11 +896,10 @@ onBeforeUnmount(() => {
 .filter-chip:hover {
   background-color: #ffecdb;
   border-color: #cc6c34;
-  transform: translateY(-1px); /* Slight lift effect */
+  transform: translateY(-1px);
   box-shadow: 0 2px 5px rgba(43, 62, 168, 0.15);
 }
 
-/* The 'X' remove button styling */
 .filter-chip .remove {
   display: flex;
   align-items: center;
@@ -917,11 +916,10 @@ onBeforeUnmount(() => {
 }
 
 .filter-chip .remove:hover {
-  background-color: #b55b3f; /* Fills with color on hover */
+  background-color: #b55b3f;
   color: white;
 }
 
-/* Specific style for the "+X" counter chip */
 .filter-chip.more-chip {
   background-color: #f8f9fa;
   color: #666;
@@ -931,13 +929,12 @@ onBeforeUnmount(() => {
 }
 
 .filter-chip.more-chip:hover {
-  transform: none; /* No lift effect for the counter */
+  transform: none;
   background-color: #f8f9fa;
   box-shadow: none;
   border-color: #d0d0d0;
 }
 
-/* Style for the Clear Button */
 #clear-filters {
   padding: 6px 14px;
   font-size: 13px;
@@ -958,7 +955,6 @@ onBeforeUnmount(() => {
 }
 
 /*#endregion*/
-
 
 /*#region ===== DROPDOWN ===== */
 .dropdown {
@@ -1017,9 +1013,9 @@ onBeforeUnmount(() => {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 8px 14px 8px 14px; /* Adjusted padding for better look */
+  padding: 8px 14px 8px 14px;
   border: 1px solid #d0d0d0;
-  border-radius: 50px; /* Pill shape */
+  border-radius: 50px;
   background: white;
   width: 300px;
   height: 40px;
@@ -1060,7 +1056,7 @@ onBeforeUnmount(() => {
 /*#region ===== SIDEBAR ===== */
 .side-bar {
   width: 250px;
-  flex-shrink: 0; /* Prevent shrinking */
+  flex-shrink: 0;
   background: white;
   border-radius: 14px;
   padding: 20px;

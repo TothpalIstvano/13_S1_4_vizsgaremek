@@ -83,9 +83,7 @@
                 })"
               >
                 <span>Termék megtekintése</span>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                  <path d="M5 12h14M12 5l7 7-7 7"/>
-                </svg>
+                <FontAwesomeIcon icon="fa-arrow-right" />
               </button>
             </div>
           </div>
@@ -94,14 +92,10 @@
 
       <!-- Nav buttons -->
       <button class="nav-btn nav-prev" @click="prevSlide" aria-label="Előző">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-          <path d="M19 12H5M12 19l-7-7 7-7"/>
-        </svg>
+        <FontAwesomeIcon icon="fa-arrow-left" />
       </button>
       <button class="nav-btn nav-next" @click="nextSlide" aria-label="Következő">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-          <path d="M5 12h14M12 5l7 7-7 7"/>
-        </svg>
+        <FontAwesomeIcon icon="fa-arrow-right" />
       </button>
     </div>
 
@@ -128,6 +122,11 @@
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { library } from '@fortawesome/fontawesome-svg-core'
+import {faArrowLeft, faArrowRight} from '@fortawesome/free-solid-svg-icons'
+
+library.add(faArrowLeft, faArrowRight)
 
 const router = useRouter();
 
@@ -230,14 +229,12 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-/* ── Outer wrapper ── */
 .carousel-outer {
   width: 97%;
   margin: 5px auto 0;
   font-family: 'Rubik', sans-serif;
 }
 
-/* ── Main wrapper: warm gradient matching the site ── */
 .carousel-wrapper {
   position: relative;
   border-radius: 28px;
@@ -246,7 +243,6 @@ onUnmounted(() => {
   box-shadow: 0 24px 60px rgba(100, 30, 5, 0.35);
 }
 
-/* Subtle fabric texture overlay */
 .carousel-wrapper::before {
   content: '';
   position: absolute;
@@ -258,7 +254,6 @@ onUnmounted(() => {
   pointer-events: none;
 }
 
-/* Decorative top-right glow */
 .carousel-wrapper::after {
   content: '';
   position: absolute;
@@ -272,7 +267,6 @@ onUnmounted(() => {
   z-index: 0;
 }
 
-/* ── Slide ── */
 .carousel-track {
   position: relative;
   z-index: 1;
@@ -294,7 +288,6 @@ onUnmounted(() => {
   box-sizing: border-box;
 }
 
-/* ── Slide transitions ── */
 .slide-left-enter-active,
 .slide-left-leave-active,
 .slide-right-enter-active,
@@ -308,7 +301,6 @@ onUnmounted(() => {
 .slide-right-enter-from { transform: translateX(-60px); opacity: 0; }
 .slide-right-leave-to   { transform: translateX(60px); opacity: 0; }
 
-/* ── Image column ── */
 .slide-image-col {
   display: flex;
   align-items: center;
@@ -323,7 +315,6 @@ onUnmounted(() => {
   aspect-ratio: 1 / 1;
 }
 
-/* Decorative corner brackets */
 .frame-deco {
   position: absolute;
   width: 28px;
@@ -337,6 +328,7 @@ onUnmounted(() => {
   border-width: 2px 0 0 2px;
   border-radius: 4px 0 0 0;
 }
+
 .frame-deco.bottom-right {
   bottom: -6px; right: -6px;
   border-width: 0 2px 2px 0;
@@ -356,7 +348,6 @@ onUnmounted(() => {
   transform: scale(1.03) translateY(-4px);
 }
 
-/* Price in info column */
 .slide-price {
   font-size: clamp(1.1rem, 2vw, 1.5rem);
   font-weight: 800;
@@ -365,7 +356,6 @@ onUnmounted(() => {
   letter-spacing: -0.01em;
 }
 
-/* ── Info column ── */
 .slide-info-col {
   display: flex;
   flex-direction: column;
@@ -381,6 +371,7 @@ onUnmounted(() => {
   gap: 4px;
   margin-bottom: 4px;
 }
+
 .slide-index-current {
   font-size: clamp(28px, 4vw, 44px);
   font-weight: 800;
@@ -388,11 +379,13 @@ onUnmounted(() => {
   line-height: 1;
   letter-spacing: -0.03em;
 }
+
 .slide-index-sep {
   font-size: 18px;
   color: rgba(255,255,255,0.35);
   margin: 0 2px;
 }
+
 .slide-index-total {
   font-size: 14px;
   color: rgba(255,255,255,0.45);
@@ -414,12 +407,10 @@ onUnmounted(() => {
   color: rgba(255,255,255,0.72);
   margin: 0;
   display: -webkit-box;
-  -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
-/* ── Colors ── */
 .slide-colors {
   display: flex;
   flex-direction: column;
@@ -470,7 +461,6 @@ onUnmounted(() => {
   transform: scale(1.15);
 }
 
-/* Tooltip */
 .swatch-tooltip {
   position: absolute;
   bottom: calc(100% + 8px);
@@ -488,6 +478,7 @@ onUnmounted(() => {
   transition: opacity 0.2s ease;
   z-index: 10;
 }
+
 .color-swatch:hover .swatch-tooltip {
   opacity: 1;
 }
@@ -500,7 +491,6 @@ onUnmounted(() => {
   min-height: 16px;
 }
 
-/* ── CTA button ── */
 .slide-cta {
   display: inline-flex;
   align-items: center;
@@ -528,14 +518,6 @@ onUnmounted(() => {
   gap: 14px;
 }
 
-.slide-cta svg {
-  transition: transform 0.3s ease;
-}
-.slide-cta:hover svg {
-  transform: translateX(4px);
-}
-
-/* ── Nav buttons ── */
 .nav-btn {
   position: absolute;
   top: 50%;
@@ -564,7 +546,6 @@ onUnmounted(() => {
 .nav-prev { left: 16px; }
 .nav-next { right: 16px; }
 
-/* ── Dots ── */
 .carousel-dots {
   display: flex;
   justify-content: center;
@@ -589,7 +570,6 @@ onUnmounted(() => {
   border-radius: 4px;
 }
 
-/* ── Progress bar ── */
 .progress-bar {
   height: 3px;
   background: rgba(122, 52, 16, 0.15);
@@ -605,7 +585,6 @@ onUnmounted(() => {
   transition: width 0.1s linear;
 }
 
-/* ── Responsive ── */
 @media (max-width: 820px) {
   .carousel-slide {
     grid-template-columns: 1fr;
@@ -644,10 +623,6 @@ onUnmounted(() => {
 
   .slide-title {
     font-size: 1.2rem;
-  }
-
-  .slide-desc {
-    -webkit-line-clamp: 2;
   }
 
   .color-swatch {

@@ -59,7 +59,6 @@ onMounted(() => {
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap');
 
-/* ── Root Variables ── */
 :root {
     --gold: #e8c87a;
     --gold-dim: #c9a84c;
@@ -70,7 +69,6 @@ onMounted(() => {
     --text-sub: #7a6b52;
 }
 
-/* ── Page ── */
 .page-wrapper {
     min-height: 100vh;
     display: flex;
@@ -92,7 +90,6 @@ onMounted(() => {
     opacity: 0.6;
 }
 
-/* ── Card ── */
 .card {
     position: relative;
     background: #ffffff75;
@@ -127,7 +124,6 @@ onMounted(() => {
     background: linear-gradient(90deg, transparent, var(--gold), transparent);
 }
 
-/* ── Status Badge ── */
 .status-badge {
     display: inline-flex;
     align-items: center;
@@ -157,7 +153,6 @@ onMounted(() => {
     50% { opacity: 0.5; transform: scale(0.75); }
 }
 
-/* ── Icon ── */
 .icon-wrap {
     margin-bottom: 28px;
 }
@@ -186,7 +181,6 @@ onMounted(() => {
     to { stroke-dashoffset: 0; }
 }
 
-/* ── Typography ── */
 .title {
     font-family: 'Cormorant Garamond', serif;
     font-size: 2rem;
@@ -212,7 +206,6 @@ onMounted(() => {
     font-weight: 300;
 }
 
-/* ── Divider ── */
 .divider {
     display: flex;
     align-items: center;
@@ -238,7 +231,6 @@ onMounted(() => {
     opacity: 0.6;
 }
 
-/* ── CTA Button ── */
 .cta-btn {
     display: inline-flex;
     align-items: center;
@@ -274,7 +266,6 @@ onMounted(() => {
     transform: translateX(3px);
 }
 
-/* ── Hint ── */
 .hint {
     font-size: 13px;
     color: var(--text-sub);
@@ -292,7 +283,6 @@ onMounted(() => {
     border-color: var(--gold-dim);
 }
 
-/* ── Responsive ── */
 @media (max-width: 520px) {
     .card {
         padding: 40px 28px 36px;

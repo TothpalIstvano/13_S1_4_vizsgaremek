@@ -1143,10 +1143,10 @@ function formatDate(d) { return new Date(d).toLocaleDateString(); }
   inset: 0;
   background: rgba(0, 0, 0, 0.5);
   display: flex;
-  align-items: flex-start;        /* was: center */
+  align-items: flex-start;
   justify-content: center;
   z-index: 100;
-  padding: 80px 16px 16px;        /* was: 16px — top value moves it down */
+  padding: 80px 16px 16px;
 }
 
 .szerk-modal {
@@ -1660,7 +1660,7 @@ function formatDate(d) { return new Date(d).toLocaleDateString(); }
   inset: 0;
   background: rgba(0, 0, 0, 0.5);
   display: flex;
-  align-items: flex-start;        /* was: center */
+  align-items: flex-start;
   justify-content: center;
   z-index: 100;
 }

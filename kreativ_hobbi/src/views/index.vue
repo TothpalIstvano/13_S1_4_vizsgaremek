@@ -217,7 +217,6 @@ watch(isAuthenticated, (newVal) => {
 
     <carousel></carousel>
 
-    <!-- add ref, tabindex so it can receive keyboard focus, and class binding -->
     <section class="features-wrapper">
       <div class="features-header">
         <p class="features-subtitle">Előnyeink</p>
@@ -807,7 +806,7 @@ watch(isAuthenticated, (newVal) => {
   position: absolute;
   height: 3px;
   background: var(--navbar-bg);
-  top: -1.6rem;   /* slightly above the container::before */
+  top: -1.6rem;
   left: 25%;
   width: 75%;
   border-radius: 2px;
@@ -820,28 +819,11 @@ watch(isAuthenticated, (newVal) => {
   position: absolute;
   height: 3px;
   background: var(--navbar-bg);
-  bottom: -1.6rem; /* slightly below the container::after */
+  bottom: -1.6rem;
   left: 0;
   width: 75%;
   border-radius: 2px;
   z-index: 0;
-}
-
-/* responsive: on small screens make lines full width and reduce gap */
-@media (max-width: 800px) {
-  #mottoContainer { width: 90%; padding: 1.2rem 0.8rem; }
-  #mottoContainer::before,
-  #mottoContainer::after,
-  .mottoInner::before,
-  .mottoInner::after {
-    left: 0;
-    width: 100%;
-    height: 2px;
-  }
-  #mottoContainer::before { top: -0.8rem; }
-  #mottoContainer::after  { bottom: -0.8rem; }
-  .mottoInner::before { top: -1.2rem; }
-  .mottoInner::after  { bottom: -1.2rem; }
 }
 /*#endregion*/
 
@@ -885,11 +867,11 @@ watch(isAuthenticated, (newVal) => {
   font-weight: 800;
   margin: 0;
   line-height: 1.1;
-  color: transparent;          /* animáció állítja be */
+  color: transparent;
   letter-spacing: -0.02em;
-  border-bottom: none;         /* az első doc nem használ border-bottom-ot */
+  border-bottom: none;
   opacity: 0;
-  animation: none;             /* .in-view váltja ki */
+  animation: none;
 }
 
 #featureTitle span {
@@ -1093,22 +1075,6 @@ watch(isAuthenticated, (newVal) => {
   transform: translateX(8px);
   box-shadow: 0 8px 20px rgba(102, 126, 234, 0.35);
 }
-
-/* ── Responsive ── */
-@media (max-width: 800px) {
-  .features-wrapper  { padding: 60px 0; }
-  .features-header   { margin-bottom: 48px; }
-  .feature-grid      { grid-template-columns: 1fr; gap: 20px; }
-  #featureTitle      { font-size: clamp(1.7rem, 6vw, 2.4rem); }
-}
-
-@media (max-width: 480px) {
-  .feature-card          { padding: 28px 20px 24px; }
-  .feature-icon-wrapper  { width: 64px; height: 64px; }
-  .feature-icon          { font-size: 26px; }
-  .feature-number        { font-size: 36px; }
-}
-/*#endregion*/
 
 /*#region Blog cards*/
 .blog-main-title-container {
@@ -1462,6 +1428,35 @@ watch(isAuthenticated, (newVal) => {
   .card-2 {right: 200px;}  
 }
 
+@media (max-width: 800px) {
+  .features-wrapper  { padding: 60px 0; }
+
+  .features-header   { margin-bottom: 48px; }
+
+  .feature-grid      { grid-template-columns: 1fr; gap: 20px; }
+
+  #featureTitle      { font-size: clamp(1.7rem, 6vw, 2.4rem); }
+
+  #mottoContainer { width: 90%; padding: 1.2rem 0.8rem; }
+
+  #mottoContainer::before,
+  #mottoContainer::after,
+  .mottoInner::before,
+  .mottoInner::after {
+    left: 0;
+    width: 100%;
+    height: 2px;
+  }
+
+  #mottoContainer::before { top: -0.8rem; }
+
+  #mottoContainer::after  { bottom: -0.8rem; }
+
+  .mottoInner::before { top: -1.2rem; }
+
+  .mottoInner::after  { bottom: -1.2rem; }
+}
+
 @media screen and (max-width: 756px) {
   .blog-main-title {
     margin-top: 3rem;
@@ -1575,6 +1570,14 @@ watch(isAuthenticated, (newVal) => {
   .reakcio-kontener {
     justify-content: flex-start;
   }
+
+  .feature-card          { padding: 28px 20px 24px; }
+
+  .feature-icon-wrapper  { width: 64px; height: 64px; }
+
+  .feature-icon          { font-size: 26px; }
+  
+  .feature-number        { font-size: 36px; }
 }
 
 @media (max-width: 420px) {

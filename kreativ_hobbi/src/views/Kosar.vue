@@ -1385,7 +1385,7 @@ async function checkout() {
 
   .cart-item-details {
     grid-area: details;
-    padding-right: 36px; /* space for remove button */
+    padding-right: 36px;
     align-self: end;
   }
 
@@ -1552,7 +1552,10 @@ async function checkout() {
 }
 
 .confirm-btn.cancel { background: #e5e7eb; color: #374151; }
+
 .confirm-btn.cancel:hover { background: #d1d5db; }
+
 .confirm-btn.danger { background: #dc2626; color: white; }
+
 .confirm-btn.danger:hover { background: #b91c1c; }
 </style>

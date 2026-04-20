@@ -28,13 +28,14 @@ function open() {
     xbeValtas.value = !xbeValtas.value;
   }
 }
+
 function handleResize() {
   if (window.innerWidth > 1150 && latszik.value) {
     latszik.value = false;
     xbeValtas.value = false;
   }
 }
-// --- Add this function ---
+
 function handleClickOutside(event) {
   if (
     latszik.value &&
@@ -144,7 +145,7 @@ onUnmounted(() => {
           <RouterLink to="/" id="nev">
             <h1>Hobbitár</h1>
           </RouterLink>
-          <div id="mobilIkonok"> <!--na így nem tetszik akkor ezt a divet kell kivenni-->
+          <div id="mobilIkonok">
             <RouterLink to="/kosar" id="mobilKosar">
               <div class="cart-icon-wrapper">
                 <img

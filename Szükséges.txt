@@ -1,5 +1,4 @@
 - dokumentáció:
-    - backend tesztek dokumentálása befejezés
     - források
     - fejlesztési lehetőségek
 - teszteket majd beletenni a fő mappába

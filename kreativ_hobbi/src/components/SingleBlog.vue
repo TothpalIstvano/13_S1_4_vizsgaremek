@@ -364,7 +364,6 @@ const fetchCurrentUser = async () => {
   }
 }
 
-//még azért javítani kéne
 const addComment = async () => {
   if (!newComment.value.trim()) return
   
