@@ -10,5 +10,7 @@ Artisan::command('inspire', function () {
 
 Schedule::command('rendelesek:cleanup --days=30')
     ->daily()
-    ->at('03:00')
+    ->at('02:34')
     ->withoutOverlapping();
+
+Schedule::command('felhasznalok:inaktival')->daily();

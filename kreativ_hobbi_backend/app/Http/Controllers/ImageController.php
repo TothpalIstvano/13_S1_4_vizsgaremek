@@ -4,12 +4,23 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Http\JsonResponse;
 use App\Models\Kepek;
 
 class ImageController extends Controller
 {
+    private function checkNotSuspended(Request $request): ?JsonResponse
+    {
+        $adatok = $request->user()->adatok;
+        if ($adatok && $adatok->szerepkor === 'felfuggesztett') {
+            return response()->json(['message' => 'Felfüggesztett fiók nem tölthet fel képet.'], 403);
+        }
+        return null;
+    }
+
     public function uploadBlogPictures(Request $request)
     {
+
         try {
             $validator = Validator::make($request->all(), [
                 'images.*' => 'required|max:5120',
@@ -66,6 +77,8 @@ class ImageController extends Controller
 
     public function uploadProfilePicture(Request $request)
     {
+        if ($err = $this->checkNotSuspended($request)) return $err;
+
         try {
             $validator = Validator::make($request->all(), [
                 'image' => 'required|file|max:5120',
@@ -115,6 +128,8 @@ class ImageController extends Controller
     }
     public function uploadCoverPicture(Request $request)
     {
+        if ($err = $this->checkNotSuspended($request)) return $err;
+
         try {
             $validator = Validator::make($request->all(), [
                 'image' => 'required|file|max:10240',

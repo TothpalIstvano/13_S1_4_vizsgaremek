@@ -28,6 +28,7 @@ class Felhasznalok extends Authenticatable implements MustVerifyEmail
         'email',
         'jelszo',
         'profilKep_id',
+        'hatterKep_id',
         'statusz',
         'letrehozas_Datuma',
         'utolso_Belepes',

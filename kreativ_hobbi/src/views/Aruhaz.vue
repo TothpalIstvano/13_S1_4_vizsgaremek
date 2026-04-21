@@ -6,7 +6,7 @@
       <CartModal ref="cartModal" />
 
       <!-- TOP FILTER BAR -->
-      <div id="toolbar">
+      <div id="toolbar">  
         <div class="filter-group">
           <span class="filter-label">Aktív kategóriák:</span>
           <div class="active-filters" v-if="activekategoriak.length">
@@ -428,6 +428,12 @@
   const maxLathatoFilter = 4 //max látható szűrők száma a chipben
   const originalItems = ref([])
   const likedIds = ref(new Set())
+  const stripHtml = (html) => {
+    if (!html) return '';
+    const tmp = document.createElement('div');
+    tmp.innerHTML = html;
+    return tmp.textContent || tmp.innerText || '';
+  };
 
   // absolute bounds (from backend)
   const absMin = ref(0)
@@ -566,8 +572,12 @@ onMounted(async () => {
     fetchkategoriak()
   ])
 
-  originalItems.value = termekData
-  items.value = termekData
+  const mappedTermekData = termekData.map(item => ({
+    ...item,
+    leiras: stripHtml(item.leiras)
+  }));
+  originalItems.value = mappedTermekData
+  items.value = mappedTermekData
 
   kategoriak.value = kategoriakData.sort((a, b) => a.nev.localeCompare(b.nev))
 
@@ -732,8 +742,12 @@ onMounted(async () => {
   loading.value = true
   const data = await fetchTermek()
 
-  originalItems.value = data
-  items.value = data
+  const mappedData = data.map(item => ({
+    ...item,
+    leiras: stripHtml(item.leiras)
+  }));
+  originalItems.value = mappedData
+  items.value = mappedData
 
   absMin.value = Math.min(...data.map(i => i.ar))
   absMax.value = Math.max(...data.map(i => i.ar))
