@@ -39,6 +39,7 @@ const editForm = reactive({
 const saving = ref(false);
 const cities = ref([]);
 const loadingCities = ref(false);
+const mousedownTarget = ref(null);
 
 const showCamera = ref(false);
 const videoRef = ref(null);
@@ -611,7 +612,9 @@ function formatDate(d) { return new Date(d).toLocaleDateString(); }
       </div>
     </section>
     <div class="profile-actions">
-      <div v-if="showLogout" class="modal-backdrop" @click.self="cancelLogout">
+      <div v-if="showLogout" class="modal-backdrop"
+        @mousedown="mousedownTarget = $event.target"
+        @click.self="mousedownTarget === $event.currentTarget && cancelLogout()">
         <div class="modal">
           <h3>Kijelentkezés</h3>
           <p>Biztos ki szeretnél jelentkezni?</p>
@@ -621,7 +624,9 @@ function formatDate(d) { return new Date(d).toLocaleDateString(); }
           </div>
         </div>
       </div>
-      <div v-else-if="showSzerkesztes" class="szerk-modal-backdrop" @click.self="cancelSzerkesztes">
+      <div v-else-if="showSzerkesztes" class="szerk-modal-backdrop"
+        @mousedown="mousedownTarget = $event.target"
+        @click.self="mousedownTarget === $event.currentTarget && cancelSzerkesztes()">
         <div class="szerk-modal">
           <div class="szerk-modal-header">
             <h3>Profil szerkesztése</h3>

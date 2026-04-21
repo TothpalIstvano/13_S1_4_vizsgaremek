@@ -22,7 +22,7 @@ class FelhasznaloAdatokSeeder extends Seeder
                 'utca' => 'Admin Street',
                 'hazszam' => 1,
                 'emeletAjto' => '1/A',
-                'telefonszam' => '1234567890',
+                'telefonszam' => '+36304627699',
                 'kartyaszam' => encrypt('1111222233334444'),
                 'kartya_nev' => 'Test Felhasznalo',
                 'kartya_honap' => 1,
@@ -39,7 +39,7 @@ class FelhasznaloAdatokSeeder extends Seeder
                 'utca' => 'Idk Street',
                 'hazszam' => 5,
                 'emeletAjto' => '1/A',
-                'telefonszam' => '9876543210',
+                'telefonszam' => '+36201578456',
                 'kartyaszam' => encrypt('1111222253334444'),
             ]
         );
@@ -53,7 +53,7 @@ class FelhasznaloAdatokSeeder extends Seeder
                 'utca' => 'Idk Street',
                 'hazszam' => 5,
                 'emeletAjto' => '1/A',
-                'telefonszam' => '9876543210',
+                'telefonszam' => '+36709512357',
                 'kartyaszam' => encrypt('1111222253334444'),
             ]
         );

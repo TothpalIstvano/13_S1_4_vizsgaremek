@@ -15,7 +15,6 @@ class PosztKepekSeeder extends Seeder
      */
     public function run(): void
     {
-        // 2. Szerezzük be a szükséges ID-ket
         $posztIds = Posztok::pluck('id');
         $kepIds = Kepek::where('url_Link', 'like', '%/blog/placeholder%')->pluck('id');
 
@@ -24,7 +23,6 @@ class PosztKepekSeeder extends Seeder
             return;
         }
 
-        // 3. Hozzuk létre az egyedi párosításokat
         $numberOfConnections = 30;
         $maxPossibleConnections = $posztIds->count() * $kepIds->count();
 
@@ -37,7 +35,6 @@ class PosztKepekSeeder extends Seeder
         // A random() kiválaszt belőle a kívánt mennyiséget.
         $uniquePairs = $posztIds->crossJoin($kepIds)->random($numberOfConnections);
 
-        // 4. Hozzuk létre a kapcsolatokat az egyedi párokkal
         foreach ($uniquePairs as $pair) {
             PosztKepek::create([
                 'poszt_id' => $pair[0], // A crossJoin tömböt ad vissza: [poszt_id, kep_id]

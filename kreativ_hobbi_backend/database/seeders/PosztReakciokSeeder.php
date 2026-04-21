@@ -16,7 +16,6 @@ class PosztReakciokSeeder extends Seeder
     public function run(): void
     {
 
-        // 2. Szerezzük be a szükséges ID-ket
         $posztIds = Posztok::pluck('id');
         $felhasznaloIds = Felhasznalok::pluck('id');
 
@@ -39,7 +38,6 @@ class PosztReakciokSeeder extends Seeder
         // A random() kiválaszt belőle a kívánt mennyiséget.
         $uniquePairs = $posztIds->crossJoin($felhasznaloIds)->random($numberOfReactions);
 
-        // 4. Hozzuk létre a reakciókat az egyedi párokkal
         foreach ($uniquePairs as $pair) {
             PosztReakciok::factory()->create([
                 'poszt_id' => $pair[0], // A crossJoin tömböt ad vissza: [poszt_id, felhasznalo_id]

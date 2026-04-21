@@ -15,7 +15,6 @@ class KedvencekSeeder extends Seeder
     public function run(): void
     {
 
-        // 2. Szerezzük be a szükséges ID-ket
         $felhasznaloIds = Felhasznalok::pluck('id');
         $termekIds = Termekek::pluck('id');
 
@@ -24,7 +23,6 @@ class KedvencekSeeder extends Seeder
             return;
         }
 
-        // 3. Hozzuk létre az egyedi párosításokat
         // Tegyük fel, hogy átlagosan minden felhasználónak 2 kedvence van
         $numberOfFavorites = $felhasznaloIds->count() * 2;
         $maxPossibleFavorites = $felhasznaloIds->count() * $termekIds->count();
