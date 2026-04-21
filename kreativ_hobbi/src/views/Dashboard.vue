@@ -19,6 +19,12 @@
           </a>
         </li>
         <li class="nav-item">
+          <a class="nav-link" :class="{active: currentView === 'kategoriak'}" @click="currentView = 'kategoriak'">
+            <span class="nav-icon"><FontAwesomeIcon icon="fa-tags" /></span>
+            Kategóriák
+          </a>
+        </li>
+        <li class="nav-item">
           <a class="nav-link" :class="{active: currentView === 'orders'}" @click="currentView = 'orders'">
             <span class="nav-icon"><FontAwesomeIcon icon="fa-truck" /></span>
             Rendelések
@@ -355,6 +361,171 @@
               <span style="color:#64748b; font-size:13px; margin-left:8px;">
                 {{ filteredProducts.length }} felhasználó / {{ currentProductPage }}.oldal
               </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Kategóriák View -->
+        <div v-if="currentView === 'kategoriak'">
+          <div class="header">
+            <h2>Kategóriák</h2>
+            <div class="header-actions">
+              <button class="btn btn-primary" @click="openKategoriaModal()">
+                <FontAwesomeIcon icon="fa-plus" /> Új kategória
+              </button>
+            </div>
+          </div>
+
+          <div class="table-container">
+            <div class="table-header">
+              <h3 class="table-title">Összes kategória</h3>
+              <div class="filters-row">
+                <input
+                  type="text"
+                  class="search-input"
+                  placeholder="Keresés kategóriák között..."
+                  v-model="kategoriaSearch"
+                >
+                <select
+                  v-model="katTipusFilter"
+                  style="padding:8px 12px; font-size:14px; border:1px solid #e2e8f0; border-radius:8px; height:38px; background:white; cursor:pointer;"
+                >
+                  <option value="">Összes típus</option>
+                  <option value="termek" v-if="isAdmin">🛍️ Termék kategória</option>
+                  <option value="blog">📝 Blog kategória (Cimke)</option>
+                </select>
+              </div>
+            </div>
+
+            <table>
+              <thead>
+                <tr>
+                  <th style="width:60px;">ID</th>
+                  <th>Név</th>
+                  <th>Típus</th>
+                  <th>Szülő kategória</th>
+                  <th style="cursor:pointer;" @click="toggleKategoriaSort('elemek_szama')">
+                    Elemek száma
+                    <span style="font-size:11px; color:#94a3b8; margin-left:4px;">
+                      <span :style="katSortKey==='elemek_szama'&&katSortDir==='asc'?'color:#f97316':''">▲</span>
+                      <span :style="katSortKey==='elemek_szama'&&katSortDir==='desc'?'color:#f97316':''">▼</span>
+                    </span>
+                  </th>
+                  <th>Műveletek</th>
+                </tr>
+              </thead>
+              <tbody>
+                <template v-for="kat in paginatedKategoriak" :key="kat.id + '-' + kat.tipus">
+                  <!-- Fő sor -->
+                  <tr>
+                    <td style="color:#94a3b8; font-size:12px;">#{{ kat.id }}</td>
+                    <td>
+                      <strong
+                        style="color:#f97316; cursor:pointer;"
+                        @click="kat.tipus === 'termek'
+                          ? navigateToTermekKat(kat.nev)
+                          : navigateToBlogKat(kat)"
+                        :title="kat.tipus === 'termek' ? 'Termékek szűrése' : 'Blog szűrése'"
+                      >
+                        {{ kat.nev }}
+                      </strong>
+                    </td>
+                    <td>
+                      <span class="badge" :class="kat.tipus === 'termek' ? 'badge-warning' : 'badge-blue'">
+                        {{ kat.tipus === 'termek' ? '🛍️ Termék' : '📝 Blog' }}
+                      </span>
+                    </td>
+                    <td>
+                      <span v-if="kat.fo_kategoria_id" style="color:#64748b; font-size:13px;">
+                        {{ kategoriak.find(k => k.id === kat.fo_kategoria_id && k.tipus === 'termek')?.nev ?? '-' }}
+                      </span>
+                      <span v-else style="color:#94a3b8;">—</span>
+                    </td>
+                    <td>
+                      <span
+                        class="badge badge-success"
+                        style="cursor:pointer;"
+                        @click="toggleKategoriaElemek(kat.id + '-' + kat.tipus)"
+                        title="Elemek megtekintése"
+                      >
+                        {{ kat.elemek_szama }} db
+                        {{ nyitottKategoriak.has(kat.id + '-' + kat.tipus) ? '▲' : '▼' }}
+                      </span>
+                    </td>
+                    <td>
+                      <div class="action-buttons">
+                        <button
+                          v-if="kat.tipus === 'termek' && isAdmin"
+                          class="btn btn-sm btn-danger"
+                          @click="deleteKategoria(kat.id, 'termek')"
+                          title="Törlés"
+                        >
+                          <FontAwesomeIcon icon="fa-trash-alt" />
+                        </button>
+                        <button
+                          v-if="kat.tipus === 'blog'"
+                          class="btn btn-sm btn-danger"
+                          @click="deleteKategoria(kat.id, 'blog')"
+                          title="Törlés"
+                        >
+                          <FontAwesomeIcon icon="fa-trash-alt" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+
+                  <!-- Expandált elem lista -->
+                  <tr v-if="nyitottKategoriak.has(kat.id + '-' + kat.tipus)">
+                    <td colspan="6" style="background:#f8fafc; padding:12px 24px;">
+                      <div style="margin-bottom:8px; display:flex; gap:8px; align-items:center;">
+                        <strong style="font-size:13px;">{{ kat.nev }} elemei:</strong>
+                        <input
+                          type="text"
+                          v-model="kategoriaElemSearch[kat.id + '-' + kat.tipus]"
+                          placeholder="Keresés..."
+                          style="padding:4px 10px; border:1px solid #e2e8f0; border-radius:6px; font-size:13px; width:200px;"
+                        />
+                      </div>
+                      <div v-if="kategoriaElemek[kat.id + '-' + kat.tipus]?.length">
+                        <div
+                          v-for="elem in filteredKategoriaElemek(kat)"
+                          :key="elem.id"
+                          style="display:inline-flex; align-items:center; gap:6px; margin:4px; padding:4px 12px;
+                                background:white; border:1px solid #e2e8f0; border-radius:20px; font-size:13px;
+                                cursor:pointer; transition:all 0.15s;"
+                          @click="kat.tipus==='termek' ? goToProductFromKat(elem.id) : goToBlogPost(elem.id)"
+                          @mouseover="$event.currentTarget.style.background='#fff7ed'"
+                          @mouseleave="$event.currentTarget.style.background='white'"
+                        >
+                          <span style="color:#f97316; font-weight:600;">{{ elem.nev ?? elem.cim }}</span>
+                          <span style="color:#94a3b8; font-size:11px;">→</span>
+                        </div>
+                      </div>
+                      <div v-else-if="kategoriaElemek[kat.id + '-' + kat.tipus] === undefined">
+                        <span style="color:#94a3b8; font-size:13px;">Betöltés...</span>
+                      </div>
+                      <div v-else>
+                        <span style="color:#94a3b8; font-size:13px;">Nincs elem ebben a kategóriában.</span>
+                      </div>
+                    </td>
+                  </tr>
+                </template>
+              </tbody>
+            </table>
+
+            <div v-if="filteredKategoriak.length === 0" style="text-align:center; padding:40px; color:#94a3b8;">
+              Nincs találat.
+            </div>
+
+            <!-- Pagináció -->
+            <div v-if="totalKategoriaPages > 1" style="display:flex; justify-content:center; align-items:center; gap:8px; padding:16px; border-top:1px solid #e2e8f0;">
+              <button class="btn btn-sm" @click="currentKategoriaPage--" :disabled="currentKategoriaPage===1" style="background:#f1f5f9;">← Előző</button>
+              <template v-for="page in totalKategoriaPages" :key="page">
+                <button class="btn btn-sm" @click="currentKategoriaPage=page"
+                  :style="currentKategoriaPage===page?'background:#f97316;color:white;':'background:#f1f5f9;'"
+                >{{ page }}</button>
+              </template>
+              <button class="btn btn-sm" @click="currentKategoriaPage++" :disabled="currentKategoriaPage===totalKategoriaPages" style="background:#f1f5f9;">Következő →</button>
             </div>
           </div>
         </div>
@@ -1817,6 +1988,42 @@
       </div>
     </div>
   </div>
+
+  <!-- Kategória Modal -->
+  <div v-if="showKategoriaModal" class="modal-overlay" @click.self="showKategoriaModal=false">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">Új kategória létrehozása</h3>
+        <button class="btn btn-icon" @click="showKategoriaModal=false">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Típus</label>
+          <select class="form-select" v-model="ujKategoria.tipus">
+            <option value="blog">📝 Blog kategória (Cimke)</option>
+            <option value="termek" v-if="isAdmin">🛍️ Termék kategória</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Név <span style="color:#f87171;">*</span></label>
+          <input type="text" class="form-input" v-model="ujKategoria.nev" placeholder="Kategória neve...">
+        </div>
+        <div class="form-group" v-if="ujKategoria.tipus === 'termek' && isAdmin">
+          <label class="form-label">Szülő kategória (opcionális)</label>
+          <select class="form-select" v-model="ujKategoria.fo_kategoria_id">
+            <option :value="null">— Főkategória</option>
+            <option v-for="k in kategoriak.filter(k => k.tipus==='termek' && !k.fo_kategoria_id)" :key="k.id" :value="k.id">
+              {{ k.nev }}
+            </option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" @click="showKategoriaModal=false">Mégse</button>
+        <button class="btn btn-primary" @click="saveKategoria" :disabled="!ujKategoria.nev.trim()">Létrehozás</button>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup>
@@ -1837,7 +2044,7 @@ import {
   faTruck, faBagShopping, faUsers,
   faUser, faPoll, faChartLine,
   faFileLines, faPen, faTrashAlt,
-  faHourglassHalf, faComment, faFlag
+  faHourglassHalf, faComment, faFlag, faTags
 } from '@fortawesome/free-solid-svg-icons'
 
 library.add(
@@ -1845,7 +2052,7 @@ library.add(
   faTruck, faBagShopping, faUsers,
   faUser, faPoll, faChartLine,
   faFileLines, faPen, faTrashAlt,
-  faHourglassHalf, faComment, faFlag
+  faHourglassHalf, faComment, faFlag, faTags
 )
 const router = useRouter();
 
@@ -1863,7 +2070,7 @@ const showBlogModal = ref(false);
 
 // Scroll lock — prevents background scroll whenever any modal is open
 const isAnyModalOpen = computed(
-  () => showProductModal.value || showUserModal.value || showBlogModal.value
+  () => showProductModal.value || showUserModal.value || showBlogModal.value || showKategoriaModal.value
 );
 
 watch(isAnyModalOpen, (open) => {
@@ -2607,6 +2814,160 @@ const deleteCommentChain = async (id) => {
     );
   }
 };
+
+// ── Kategóriák ──────────────────────────────────
+const kategoriak = ref([])
+const kategoriaSearch = ref('')
+const katTipusFilter = ref('')
+const katSortKey = ref('')
+const katSortDir = ref('asc')
+const currentKategoriaPage = ref(1)
+const nyitottKategoriak = ref(new Set())
+const kategoriaElemek = ref({})        // { 'id-tipus': [...] }
+const kategoriaElemSearch = ref({})    // { 'id-tipus': '' }
+const showKategoriaModal = ref(false)
+const ujKategoria = ref({ nev: '', tipus: 'blog', fo_kategoria_id: null })
+
+// Aktuális user szerepköre
+const isAdmin = computed(() => {
+  const me = users.value.find(u => u.id === currentUserId.value)
+  return me?.role === 'admin'
+})
+
+const toggleKategoriaSort = (key) => {
+  if (katSortKey.value === key) katSortDir.value = katSortDir.value === 'asc' ? 'desc' : 'asc'
+  else { katSortKey.value = key; katSortDir.value = 'asc' }
+  currentKategoriaPage.value = 1
+}
+
+const filteredKategoriak = computed(() => {
+  let result = kategoriak.value.filter(k => {
+    const s = kategoriaSearch.value.toLowerCase()
+    const matchSearch = !s || k.nev.toLowerCase().includes(s) || String(k.id).includes(s)
+    const matchTipus = !katTipusFilter.value || k.tipus === katTipusFilter.value
+    return matchSearch && matchTipus
+  })
+  if (katSortKey.value) {
+    result = [...result].sort((a, b) => {
+      let aV = a[katSortKey.value], bV = b[katSortKey.value]
+      if (typeof aV === 'number') return katSortDir.value === 'asc' ? aV - bV : bV - aV
+      aV = String(aV ?? '').toLowerCase(); bV = String(bV ?? '').toLowerCase()
+      return katSortDir.value === 'asc' ? aV.localeCompare(bV) : bV.localeCompare(aV)
+    })
+  }
+  return result
+})
+
+const totalKategoriaPages = computed(() => Math.ceil(filteredKategoriak.value.length / ITEMS_PER_PAGE))
+const paginatedKategoriak = computed(() => {
+  const start = (currentKategoriaPage.value - 1) * ITEMS_PER_PAGE
+  return filteredKategoriak.value.slice(start, start + ITEMS_PER_PAGE)
+})
+
+const fetchKategoriak = async () => {
+  try {
+    const { data } = await axios.get(`${API}/kategoriak`)
+    kategoriak.value = data
+  } catch (e) {
+    console.error('Kategóriák betöltése sikertelen:', e)
+  }
+}
+
+const toggleKategoriaElemek = async (key) => {
+  const newSet = new Set(nyitottKategoriak.value)
+  if (newSet.has(key)) {
+    newSet.delete(key)
+  } else {
+    newSet.add(key)
+    // Betöltés ha még nincs
+    if (kategoriaElemek.value[key] === undefined) {
+      const [id, tipus] = key.split('-')
+      try {
+        if (tipus === 'termek') {
+          const { data } = await axios.get(`/api/termekek`)
+          kategoriaElemek.value[key] = data
+            .filter(t => t.kategoria_id === Number(id))
+            .map(t => ({ id: t.id, nev: t.nev }))
+        } else {
+          const { data } = await axios.get(`/api/blog`)
+          kategoriaElemek.value[key] = data
+            .filter(p => p.cimkek?.some(c => String(c.id ?? c) === id))
+            .map(p => ({ id: p.id, cim: p.cim }))
+        }
+      } catch (e) {
+        kategoriaElemek.value[key] = []
+      }
+    }
+  }
+  nyitottKategoriak.value = newSet
+}
+
+const filteredKategoriaElemek = (kat) => {
+  const key = kat.id + '-' + kat.tipus
+  const elemek = kategoriaElemek.value[key] ?? []
+  const s = (kategoriaElemSearch.value[key] ?? '').toLowerCase()
+  if (!s) return elemek
+  return elemek.filter(e => (e.nev ?? e.cim ?? '').toLowerCase().includes(s))
+}
+
+const openKategoriaModal = () => {
+  ujKategoria.value = { nev: '', tipus: isAdmin.value ? 'termek' : 'blog', fo_kategoria_id: null }
+  showKategoriaModal.value = true
+}
+
+const saveKategoria = async () => {
+  if (!ujKategoria.value.nev.trim()) return
+  try {
+    if (ujKategoria.value.tipus === 'blog') {
+      await axios.post(`${API}/kategoriak/blog`, { nev: ujKategoria.value.nev.trim() })
+    } else {
+      await axios.post(`${API}/kategoriak`, {
+        nev: ujKategoria.value.nev.trim(),
+        fo_kategoria_id: ujKategoria.value.fo_kategoria_id ?? null
+      })
+    }
+    showKategoriaModal.value = false
+    await fetchKategoriak()
+    showToast('Kategória létrehozva.')
+  } catch (e) {
+    showToast('Hiba a létrehozáskor.', 'error', e.response?.data?.message ?? e.message)
+  }
+}
+
+const deleteKategoria = async (id, tipus) => {
+  const ok = await showConfirm('Biztosan törlöd ezt a kategóriát?')
+  if (!ok) return
+  try {
+    if (tipus === 'termek') {
+      await axios.delete(`${API}/kategoriak/${id}`)
+    } else {
+      await axios.delete(`${API}/kategoriak/blog/${id}`)
+    }
+    await fetchKategoriak()
+    showToast('Kategória törölve.', 'error')
+  } catch (e) {
+    showToast('Nem sikerült törölni.', 'error', e.response?.data?.message ?? e.message)
+  }
+}
+
+// Navigálás a többi nézetbe kategória alapján
+const navigateToTermekKat = (nev) => {
+  currentView.value = 'products'
+  productCategoryFilter.value = nev
+  currentProductPage.value = 1
+}
+
+const navigateToBlogKat = (kat) => {
+  currentView.value = 'blog'
+  blogTagFilter.value = [{ id: kat.id, name: kat.nev }]
+  currentBlogPage.value = 1
+}
+
+const goToProductFromKat = (id) => {
+  currentView.value = 'products'
+  productSearch.value = String(id)
+  currentProductPage.value = 1
+}
 
 const reports = ref([]);
 const reportSearch = ref('');
@@ -3487,6 +3848,7 @@ onMounted(async () => {
     fetchColors(),
     fetchComments(),
     fetchReports(),
+    fetchKategoriak(),
   ]);
 
   loading.value = false; // ← táblázatok megjelennek
@@ -3514,6 +3876,7 @@ watch(currentView, async (newView, oldView) => {
   if (newView === 'blog' && tagOptions.value.length === 0) {
     await fetchTagsFromDatabase();
   }
+  if (newView === 'kategoriak') await fetchKategoriak();
   if (newView === 'comments' && comments.value.length === 0) {
     await fetchComments(); 
   }
