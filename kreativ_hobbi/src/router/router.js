@@ -165,6 +165,10 @@ router.beforeEach((to, from, next) => {
     return next({ name: 'NotFound' })
   }
 
+  if ((to.name === 'NewPost' || to.name === 'EditPost') && userRole === 'felfuggesztett') {
+    return next({ name: 'Index' })
+  }
+
   next()
 })
 export default router

@@ -12,6 +12,11 @@ class PosztController extends Controller
 {
     public function store(Request $request)
     {
+        $adatok = $request->user()->adatok;
+        if ($adatok && $adatok->szerepkor === 'felfuggesztett') {
+            return response()->json(['message' => 'Felfüggesztett fiók nem hozhat létre bejegyzést.'], 403);
+        }   
+
         if (!Auth::check()) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
