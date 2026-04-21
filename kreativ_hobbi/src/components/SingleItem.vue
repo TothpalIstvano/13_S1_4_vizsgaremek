@@ -77,7 +77,7 @@
           </span>
         </div>
 
-        <p class="description">{{ product.leiras }}</p>
+        <div class="description" v-html="product.leiras"></div>
 
         <!-- Colors -->
         <div v-if="product.termek_szinek?.length" class="colors">

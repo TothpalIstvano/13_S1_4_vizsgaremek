@@ -1,6 +1,6 @@
 <script setup>
 import axios from 'axios';
-import { ref, reactive, onMounted, watch, onUnmounted, nextTick, inject } from 'vue';
+import { ref, reactive, onMounted, watch, onUnmounted, nextTick, inject, computed } from 'vue';
 import { RouterLink } from 'vue-router';
 import Dropdown from 'primevue/dropdown';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
@@ -72,6 +72,9 @@ const showLogout = ref(false);
 const showSzerkesztes = ref(false);
 const showKedvencekModal = ref(false);
 
+const isFelfuggesztett = computed(() =>
+  userData.value?.adatok?.szerepkor === 'felfuggesztett'
+)
 // Fetch user data
 async function fetchUserData() {
   try {
@@ -766,6 +769,10 @@ function formatDate(d) { return new Date(d).toLocaleDateString(); }
             <!-- Profilkép -->
             <div class="form-section">
               <h4>Profilkép</h4>
+              <div v-if="isFelfuggesztett" class="felfugg-banner">
+                ⛔ A fiókod fel van függesztve. Profilképet nem tölthetsz fel.
+              </div>
+              <template v-else>
                 <div class="form-group">
                   <label>Feltöltés számítógépről</label>
                   <label for="avatar" class="file-upload-btn" :class="{ 'file-selected': selectedFileName }">
@@ -783,35 +790,38 @@ function formatDate(d) { return new Date(d).toLocaleDateString(); }
                     />
                   </label>
                 </div>
-              <div v-if="!showCamera" class="camera-toggle">
-                <button type="button" class="btn camera-btn" @click="startCamera">📷 Kamera használata</button>
-              </div>
-              <div v-if="showCamera" class="camera-preview">
-                <video ref="videoRef" autoplay playsinline></video>
-                <canvas ref="canvasRef" style="display: none;"></canvas>
-                <div class="camera-controls">
-                  <button type="button" class="btn capture" @click="capturePhoto">Fotózás</button>
-                  <button type="button" class="btn cancel" @click="stopCamera">Mégse</button>
+                <div v-if="!showCamera" class="camera-toggle">
+                  <button type="button" class="btn camera-btn" @click="startCamera">📷 Kamera használata</button>
                 </div>
-                <div v-if="capturedBlob" class="captured-preview">
-                  <p>Előkép:</p>
-                  <img :src="objectUrl" alt="preview" />
-                  <button type="button" class="btn upload" @click="uploadProfilePhoto" :disabled="uploading">
-                    {{ uploading ? 'Feltöltés...' : 'Profilkép beállítása' }}
-                  </button>
+                <div v-if="showCamera" class="camera-preview">
+                  <video ref="videoRef" autoplay playsinline></video>
+                  <canvas ref="canvasRef" style="display: none;"></canvas>
+                  <div class="camera-controls">
+                    <button type="button" class="btn capture" @click="capturePhoto">Fotózás</button>
+                    <button type="button" class="btn cancel" @click="stopCamera">Mégse</button>
+                  </div>
+                  <div v-if="capturedBlob" class="captured-preview">
+                    <p>Előkép:</p>
+                    <img :src="objectUrl" alt="preview" />
+                    <button type="button" class="btn upload" @click="uploadProfilePhoto" :disabled="uploading">
+                      {{ uploading ? 'Feltöltés...' : 'Profilkép beállítása' }}
+                    </button>
+                  </div>
                 </div>
-              </div>
+              </template>
             </div>
 
-            <!-- Háttérkép választása-->
+            <!-- Háttérkép választása -->
             <div class="form-section">
               <h4>Háttérkép</h4>
-
+              <div v-if="isFelfuggesztett" class="felfugg-banner">
+                ⚠️ Felfüggesztett fióknál csak az alap háttérképek közül választhatsz.
+              </div>
               <div class="camera-toggle" style="display:flex; gap:10px; flex-wrap:wrap;">
                 <button type="button" class="btn camera-btn" @click="loadAvailableCovers">
                   🖼️ Választás a galériából
                 </button>
-                <label class="btn camera-btn" style="cursor:pointer;">
+                <label v-if="!isFelfuggesztett" class="btn camera-btn" style="cursor:pointer;">
                   {{ coverUploading ? 'Feltöltés...' : '⬆️ Saját kép feltöltése' }}
                   <input
                     id="coverUpload"
@@ -823,7 +833,6 @@ function formatDate(d) { return new Date(d).toLocaleDateString(); }
                   />
                 </label>
               </div>
-
               <!-- Gallery picker -->
               <div v-if="showCoverPicker" style="margin-top:12px;">
                 <p style="font-size:13px; color:#666; margin-bottom:8px;">Válassz egy háttérképet:</p>
@@ -2436,5 +2445,16 @@ color: #6b7280;
 
 .file-upload-icon {
   font-size: 18px;
+}
+
+.felfugg-banner {
+  background: #fef2f2;
+  border: 1.5px solid #fca5a5;
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #991b1b;
+  margin-bottom: 12px;
 }
 </style>

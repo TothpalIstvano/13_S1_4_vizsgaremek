@@ -102,7 +102,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/posts/{id}', [PosztController::class, 'update']);
     Route::put('/user/cover-picture', [FelhasznaloController::class, 'updateCoverPicture']);
 
-    Route::get('/hatterkepek', function () {
+    Route::get('/hatterkepek', function (Request $request) {
         $kepek = Kepek::where('url_Link', 'like', '%hatterKepek%')
             ->orWhere('url_Link', 'like', '%hatterkepek%')
             ->get(['id', 'url_Link', 'alt_Szoveg']);

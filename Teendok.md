@@ -2,12 +2,12 @@
 - \[ ] Az oldal tesztelése
 - \[ ] Az oldal dokumenálása
 - \[ ] Optimalizálás
+
 - \[ ] Moderátor felület
-- \[ ] Térkép javítása
-- \[ ] Termék szövege forduljonbe normálba változtatás után hogy ne legyenek ott a html taggek + kattintható legyen a termék neve hogy oda dobjon a termékre
+- \[ ] Kategoriak tábla-> termék kat. ->csak admin hozzá férés, blog kat. -> admin és mod hozzá férés -> az egész egy táblába jelenjen meg és legyen egy szűrő, hogy blog, termék, mind -> mod ->locked to blog, legyen egy kategoria létrhozás gomb. A táblázat írja ki hogy hány elem tartozik ahhoz a kategoriához. Többi táblába kategoria alap szűrés vhogy jó lenne továbbá hogy a kategoriák is katinthatóak legyenek úgy mint minden más. Továbbá ha a kiírásra katint hogy hány elem tartozik ahhoz a kategoriához akkor letudja nyitni tudjon keresniben és ja akár primeVue dropdown is megteszi
 
-- \[ ] ha felvan függesztve a user akkor ne tudjon feltölteni semmit se blogolni és a képe legyen def vagy i guess a basic-ekből tudjon választani
-
+- \[X] ha felvan függesztve a user akkor ne tudjon feltölteni semmit se blogolni és a képe legyen def vagy i guess a basic-ekből tudjon választani✅
+- \[X] Termék szövege forduljonbe normálba változtatás után hogy ne legyenek ott a html taggek + kattintható legyen a termék neve hogy oda dobjon a termékre->Dashboardon✅
 - \[X] Bug ha adminként a saját kommentem törlöm akkor azt írja hogy törölt felhasználó✅
 - \[X] Kommentek törlése - tehát, ha komenthez tartozik egy komment pl. 3 alkomment és kitöröljük akkor a komment azt jelenitse meg hogy a komment törölve és ha nincs komment alatta akkor csa k smá törölje a kommmentet✅
 - \[X] Admin felületen rendeléseknél a termék számot írja csak viszont az lenyitható legyen és látható hogy miből mennyit vett✅

@@ -282,7 +282,15 @@
                   <td>
                     <img :src="product.image" :alt="product.name" class="product-img">
                   </td>
-                  <td><strong>{{ product.name }}</strong></td>
+                  <td>
+                    <span
+                      @click="router.push(`/aruhaz/${product.id}`)"
+                      style="color:#f97316; font-weight:600; cursor:pointer; text-decoration:underline dotted;"
+                      title="Termék megtekintése"
+                    >
+                      {{ product.name }}
+                    </span>
+                  </td>
                   <td>{{ product.category }}</td>
                   <td><strong>{{ formatCurrency(product.price) }}</strong></td>
                   <td>{{ product.stock }} db</td>
@@ -1757,13 +1765,6 @@
               Jelöld be, ha törölni akarod a jelenlegi profilképet.
             </small>
           </div>
-          <div class="form-group">
-            <label class="form-label">Státusz</label>
-            <select class="form-select" v-model="editingUser.active">
-              <option :value="true" >Aktív</option>
-              <option :value="false">Inaktív</option>
-            </select>
-          </div>
         </div>
         <div class="modal-footer">
           <button class="btn" @click="showUserModal = false">Mégse</button>
@@ -2064,7 +2065,7 @@ const fetchProducts = async () => {
     fo_kep_id:      p.fo_kep_id,
     price:          p.ar,
     stock:          p.darab,
-    description:    p.leiras ?? '',
+    description:    stripHtml(p.leiras ?? '') ?? '',
     image:          p.termek_fo_kep?.url_Link ?? 'https://placehold.co/100x100',
     imagesData:     (p.termek_kepek ?? []).map(k => ({
       id:        k.id,
@@ -2471,7 +2472,6 @@ const saveUser = async () => {
     felhasz_nev: editingUser.value.name,
     email: editingUser.value.email,
     szerepkor: editingUser.value.role,
-    statusz: editingUser.value.active,
     password: editingUser.value.password,
   };
 
@@ -3208,6 +3208,13 @@ const formatDate = (dateString) => {
 
 const formatCurrency = (value) =>
   new Intl.NumberFormat('hu-HU', { style: 'currency', currency: 'HUF', minimumFractionDigits: 0 }).format(value);
+
+const stripHtml = (html) => {
+  if (!html) return '';
+  const tmp = document.createElement('div');
+  tmp.innerHTML = html;
+  return tmp.textContent || tmp.innerText || '';
+};
 
 const getOrderBadgeClass = (status) => {
   if (status === 'teljesítve') return 'badge-success';

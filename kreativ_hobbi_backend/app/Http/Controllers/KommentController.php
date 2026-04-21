@@ -83,6 +83,10 @@ class KommentController extends Controller
 
     public function store(Request $request, $postId)
     {
+        $adatok = $request->user()->adatok;
+        if ($adatok && $adatok->szerepkor === 'felfuggesztett') {
+            return response()->json(['message' => 'Felfüggesztett fiók nem kommentelhet.'], 403);
+        }
         try {
             if (!Auth::check()) {
                 return response()->json(['error' => 'Unauthorized'], 401);

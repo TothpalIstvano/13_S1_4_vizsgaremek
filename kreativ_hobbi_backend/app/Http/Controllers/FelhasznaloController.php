@@ -213,7 +213,6 @@ class FelhasznaloController
             $userData = [
                 'email' => $request->email ?? $user->email,
                 'felhasz_nev' => $request->felhasz_nev ?? $user->felhasz_nev,
-                'statusz' => $request->boolean('statusz') ? 1 : 0,
             ];
 
             if ($request->has('resetProfilePic') && $request->resetProfilePic) {
@@ -296,5 +295,21 @@ class FelhasznaloController
             \Log::error('User deletion failed: ' . $e->getMessage());
             return response()->json(['error' => 'Hiba történt a törlés során: ' . $e->getMessage()], 500);
         }
+    }
+
+    public function updateCoverPicture(Request $request)
+    {
+        $request->validate([
+            'hatterKep_id' => 'required|integer|exists:kepek,id'
+        ]);
+
+        $user = $request->user();
+        $user->hatterKep_id = $request->hatterKep_id;
+        $user->save();
+
+        return response()->json([
+            'message' => 'Cover picture updated',
+            'user' => $user->load('profilKep', 'hatterKep', 'adatok')
+        ]);
     }
 }
