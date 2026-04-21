@@ -15,7 +15,6 @@ class TermekSzinekSeeder extends Seeder
      */
     public function run(): void
     {
-        // 2. Szerezzük be a szükséges ID-ket
         $termekIds = Termekek::pluck('id')->toArray();
         $szinIds = Szinek::pluck('id')->toArray();
 
@@ -24,7 +23,6 @@ class TermekSzinekSeeder extends Seeder
             return;
         }
 
-        // 3. Biztosítsd, hogy minden termék legalább egy színnel rendelkezik
         foreach ($termekIds as $termekId) {
             $randomSzinId = $szinIds[array_rand($szinIds)];
             TermekSzinek::create([
@@ -33,16 +31,16 @@ class TermekSzinekSeeder extends Seeder
             ]);
         }
 
-        // 4. Opcionálisan további véletlen párosítások hozzáadása
-        $additionalConnections = 20; // Még ennyi további véletlen párosítás
+        $additionalConnections = 20;
         for ($i = 0; $i < $additionalConnections; $i++) {
             $randomTermekId = $termekIds[array_rand($termekIds)];
             $randomSzinId = $szinIds[array_rand($szinIds)];
-            
-            // Ellenőrzés: ha már létezik, ne adjunk hozzá duplikátumot
-            if (!TermekSzinek::where('termek_id', $randomTermekId)
-                                ->where('szin_id', $randomSzinId)
-                                ->exists()) {
+
+            if (
+                !TermekSzinek::where('termek_id', $randomTermekId)
+                    ->where('szin_id', $randomSzinId)
+                    ->exists()
+            ) {
                 TermekSzinek::create([
                     'termek_id' => $randomTermekId,
                     'szin_id' => $randomSzinId,

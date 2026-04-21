@@ -15,18 +15,16 @@ class TermekKepekSeeder extends Seeder
      */
     public function run(): void
     {
-        
-        // 2. Szerezzük be a szükséges ID-ket
+
         $termekIds = Termekek::pluck('id');
-        $kepIds = Kepek::get('id')->whereBetween('id', [14,31])->pluck('id');
+        $kepIds = Kepek::get('id')->whereBetween('id', [14, 31])->pluck('id');
 
         if ($termekIds->isEmpty() || $kepIds->isEmpty()) {
             $this->command->error('A termék-kép kapcsolatok seederhez először futtasd a TermekekSeeder-t és a KepekSeeder-t!');
             return;
         }
 
-        // 3. Hozzuk létre az egyedi párosításokat
-        $numberOfConnections = 30; // Vagy amennyit szeretnél
+        $numberOfConnections = 30;
         $maxPossibleConnections = $termekIds->count() * $kepIds->count();
 
         if ($numberOfConnections > $maxPossibleConnections) {
@@ -38,12 +36,11 @@ class TermekKepekSeeder extends Seeder
         // A random() kiválaszt belőle a kívánt mennyiséget.
         $uniquePairs = $termekIds->crossJoin($kepIds)->random($numberOfConnections);
 
-        // 4. Hozzuk létre a kapcsolatokat az egyedi párokkal
         foreach ($uniquePairs as $index => $pair) {
             TermekKepek::create([
                 'termek_id' => $pair[0], // A crossJoin tömböt ad vissza: [termek_id, kep_id]
                 'kep_id' => $pair[1],
-                'rendezes' => $index + 1, // Egy egyszerű rendezés, 1-től kezdve
+                'rendezes' => $index + 1,
             ]);
         }
 

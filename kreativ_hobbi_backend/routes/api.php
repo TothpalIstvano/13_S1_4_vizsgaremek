@@ -115,7 +115,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Fetch the logged-in user's liked product IDs
     Route::get('/user/kedvencek', function (Request $request) {
         return $request->user()
-            ->kedvencek()           // see model note below
+            ->kedvencek()
             ->pluck('termek_id');
     });
 
@@ -182,48 +182,48 @@ Route::middleware('auth:sanctum')->group(function () {
 });
 Route::get('/blog/{id}/comments', [KommentController::class, 'index']);
 
-// POST /api/report  –  bejelentés küldése (auth opcionális, vendég is küldhet)
+// POST /api/report  –  bejelentés küldése
 Route::middleware('auth:sanctum')->post('/report', function (Request $request) {
     $validated = $request->validate([
-        'type'        => ['required', 'in:post,comment'],
-        'target_id'   => ['required', 'integer'],
-        'reason'      => ['required', 'in:serto,spam,18plus,szemelyes,jogsertes,egyeb'],
+        'type' => ['required', 'in:post,comment'],
+        'target_id' => ['required', 'integer'],
+        'reason' => ['required', 'in:serto,spam,18plus,szemelyes,jogsertes,egyeb'],
         'description' => ['nullable', 'string', 'max:1000'],
     ]);
- 
+
     // Ellenőrzés: létezik-e a bejelentett tartalom
     if ($validated['type'] === 'post') {
-        $letezik = \App\Models\Posztok::where('id', $validated['target_id'])->exists();
+        $letezik = Posztok::where('id', $validated['target_id'])->exists();
         if (!$letezik) {
             return response()->json(['message' => 'A poszt nem található.'], 404);
         }
     } else {
-        $letezik = \App\Models\Kommentek::where('id', $validated['target_id'])->exists();
+        $letezik = Kommentek::where('id', $validated['target_id'])->exists();
         if (!$letezik) {
             return response()->json(['message' => 'A komment nem található.'], 404);
         }
     }
- 
+
     // Duplikáció-ellenőrzés (ugyanaz a user, ugyanaz a tartalom)
     $mar_bejelentette = Jelentesek::where('bejelento_id', auth()->id())
         ->where('tipus', $validated['type'])
-        ->when($validated['type'] === 'post',    fn($q) => $q->where('poszt_id',    $validated['target_id']))
-        ->when($validated['type'] === 'comment', fn($q) => $q->where('komment_id',  $validated['target_id']))
+        ->when($validated['type'] === 'post', fn($q) => $q->where('poszt_id', $validated['target_id']))
+        ->when($validated['type'] === 'comment', fn($q) => $q->where('komment_id', $validated['target_id']))
         ->exists();
- 
+
     if ($mar_bejelentette) {
         return response()->json(['message' => 'Ezt a tartalmat már bejelentetted.'], 409);
     }
- 
+
     Jelentesek::create([
         'bejelento_id' => auth()->id(),
-        'tipus'        => $validated['type'],
-        'poszt_id'     => $validated['type'] === 'post'    ? $validated['target_id'] : null,
-        'komment_id'   => $validated['type'] === 'comment' ? $validated['target_id'] : null,
-        'ok'           => $validated['reason'],
-        'leiras'       => $validated['description'] ?? null,
+        'tipus' => $validated['type'],
+        'poszt_id' => $validated['type'] === 'post' ? $validated['target_id'] : null,
+        'komment_id' => $validated['type'] === 'comment' ? $validated['target_id'] : null,
+        'ok' => $validated['reason'],
+        'leiras' => $validated['description'] ?? null,
     ]);
- 
+
     return response()->json(['message' => 'Bejelentés elküldve, köszönjük!'], 201);
 });
 
@@ -646,15 +646,15 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
         $customersLast = Felhasznalok::whereMonth('created_at', $lastMonth)->whereYear('created_at', $lastMonthYear)->count();
 
         return response()->json([
-            'totalSales'     => Rendelesek::sum('osszeg'),
-            'totalOrders'    => Rendelesek::count(),
-            'totalProducts'  => Termekek::count(),
+            'totalSales' => Rendelesek::sum('osszeg'),
+            'totalOrders' => Rendelesek::count(),
+            'totalProducts' => Termekek::count(),
             'totalCustomers' => Felhasznalok::count(),
             'changes' => [
-                'sales'     => ['this' => $salesThis,     'last' => $salesLast],
-                'orders'    => ['this' => $ordersThis,     'last' => $ordersLast],
-                'products'  => ['this' => $productsThis,   'last' => $productsLast],
-                'customers' => ['this' => $customersThis,  'last' => $customersLast],
+                'sales' => ['this' => $salesThis, 'last' => $salesLast],
+                'orders' => ['this' => $ordersThis, 'last' => $ordersLast],
+                'products' => ['this' => $productsThis, 'last' => $productsLast],
+                'customers' => ['this' => $customersThis, 'last' => $customersLast],
             ],
         ]);
     });
@@ -673,7 +673,6 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
                 ->orderBy('honap')
                 ->pluck('db', 'honap');
 
-            // 12 elemű, 0-indexelt tömbök — hiányzó hónapok = 0
             $monthlySales = collect(range(1, 12))->map(fn($m) => (int) ($rawSales[$m] ?? 0))->values();
             $monthlyOrders = collect(range(1, 12))->map(fn($m) => (int) ($rawOrders[$m] ?? 0))->values();
 
@@ -709,7 +708,7 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
 
     // Rendelések lista
     Route::get('/rendelesek', function () {
-        $rendelesek = Rendelesek::with('felhasznalo:id,felhasz_nev','rendeltTermekek.termekek:id,nev,ar','rendeltTermekek.szin:id,nev,hex_kod',)
+        $rendelesek = Rendelesek::with('felhasznalo:id,felhasz_nev', 'rendeltTermekek.termekek:id,nev,ar', 'rendeltTermekek.szin:id,nev,hex_kod', )
             ->withCount('rendeltTermekek')
             ->orderBy('rendeles_datuma', 'desc')
             ->get()
@@ -718,15 +717,15 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
                 'felhasznalo' => [
                     'id' => $r->felhasznalo_id,
                     'nev' => $r->felhasznalo?->felhasz_nev ?? 'Vendég'
-                    ],
+                ],
                 'termekek_szama' => $r->rendelt_termekek_count,
                 'termekek' => $r->rendeltTermekek->map(fn($t) => [
-                    'id'       => $t->termekek?->id ?? null,  
-                    'nev'      => $t->termekek?->nev ?? '-',
-                    'mennyiseg'=> $t->mennyiseg,
+                    'id' => $t->termekek?->id ?? null,
+                    'nev' => $t->termekek?->nev ?? '-',
+                    'mennyiseg' => $t->mennyiseg,
                     'egysegar' => $t->egysegar,
-                    'szin'     => $t->szin?->nev ?? null,
-                    'hex'      => $t->szin?->hex_kod ?? null,
+                    'szin' => $t->szin?->nev ?? null,
+                    'hex' => $t->szin?->hex_kod ?? null,
                 ]),
                 'osszeg' => $r->osszeg,
                 'statusz' => $r->statusz,
@@ -817,7 +816,7 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
             }
         }
 
-        // ── ÚJ: Képek csatolása a termekKepek pivot táblába ──────
+        // Képek csatolása a termekKepek pivot tábláb
         if (!empty($validated['kepek'])) {
             foreach ($validated['kepek'] as $rendezes => $kepId) {
                 \DB::table('termekKepek')->insertOrIgnore([
@@ -859,7 +858,7 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
             ['szinek', 'extra_kategoriak', 'kepek']
         ));
 
-        // Színek szinkronizálása (teljes csere)
+        // Színek szinkronizálása
         if (array_key_exists('szinek', $validated)) {
             \DB::table('termekszinek')->where('termek_id', $id)->delete();
             foreach ($validated['szinek'] ?? [] as $szinId) {
@@ -872,7 +871,7 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
             }
         }
 
-        // Extra kategóriák szinkronizálása (teljes csere)
+        // Extra kategóriák szinkronizálása
         if (array_key_exists('extra_kategoriak', $validated)) {
             \DB::table('termekKategoriak')->where('termek_id', $id)->delete();
             foreach ($validated['extra_kategoriak'] ?? [] as $katId) {
@@ -885,7 +884,7 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
             }
         }
 
-        // ── ÚJ: Képek szinkronizálása (teljes csere) ─────────────
+        // Képek szinkronizálása
         // Ha küldtek kepek tömböt, teljesen cseréljük
         if (array_key_exists('kepek', $validated)) {
             \DB::table('termekKepek')->where('termek_id', $id)->delete();
@@ -999,39 +998,39 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
     // GET /api/admin/jelentesek  –  összes bejelentés listája
     Route::get('/jelentesek', function (Request $request) {
         $statusz = $request->query('statusz'); // pl. ?statusz=fuggoben
-    
+
         $query = Jelentesek::with([
             'bejelento:id,felhasz_nev',
             'poszt:id,cim',
             'komment:id,komment,poszt_id',
             'kezeloAdmin:id,felhasz_nev',
         ])
-        ->orderBy('created_at', 'desc');
-    
+            ->orderBy('created_at', 'desc');
+
         if ($statusz) {
             $query->where('statusz', $statusz);
         }
-    
+
         return response()->json($query->paginate(25));
     });
-    
+
     // PATCH /api/admin/jelentesek/{id}/statusz  –  státusz frissítés
     Route::patch('/jelentesek/{id}/statusz', function (Request $request, $id) {
         $validated = $request->validate([
-            'statusz'          => ['required', 'in:fuggoben,atnezte,megoldva,elvetve'],
+            'statusz' => ['required', 'in:fuggoben,atnezte,megoldva,elvetve'],
             'admin_megjegyzes' => ['nullable', 'string', 'max:1000'],
         ]);
-    
+
         $jelentes = Jelentesek::findOrFail($id);
-        $jelentes->statusz          = $validated['statusz'];
+        $jelentes->statusz = $validated['statusz'];
         $jelentes->admin_megjegyzes = $validated['admin_megjegyzes'] ?? $jelentes->admin_megjegyzes;
-        $jelentes->kezelo_admin_id  = auth()->id();
-        $jelentes->kezeles_datuma   = now();
+        $jelentes->kezelo_admin_id = auth()->id();
+        $jelentes->kezeles_datuma = now();
         $jelentes->save();
-    
+
         return response()->json(['message' => 'Státusz frissítve.', 'jelentes' => $jelentes]);
     });
-    
+
     // DELETE /api/admin/jelentesek/{id}  –  bejelentés törlése
     Route::delete('/jelentesek/{id}', function ($id) {
         Jelentesek::findOrFail($id)->delete();

@@ -13,11 +13,9 @@ class TermekekSeeder extends Seeder
      */
     public function run(): void
     {
-        // Get the fonal subcategories
         $fonalakCategory = Kategoriak::where('nev', 'Fonalak')->first();
         $fonalSubcategories = Kategoriak::where('fo_kategoria_id', $fonalakCategory->id)->get();
 
-        // Ensure at least 5 products are in fonal categories (one in each subcategory)
         foreach ($fonalSubcategories as $index => $subcategory) {
             Termekek::factory()->create([
                 'nev' => match ($index) {
@@ -36,7 +34,6 @@ class TermekekSeeder extends Seeder
             ]);
         }
 
-        // Create remaining random products
         $remainingCount = 31 - $fonalSubcategories->count();
         Termekek::factory()->count($remainingCount)->create();
 

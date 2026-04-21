@@ -35,9 +35,8 @@ class KommentController extends Controller
 
             $transform = function ($comment) use (&$transform) {
                 $user = $comment->kommentIro;
-                
+
                 if ($comment->komment === '') {
-                    // Placeholder komment — a felhasználó neve megjelenik ha még létezik
                     $felhasznalo = $user ? [
                         'id' => $user->id,
                         'felhasz_nev' => $user->felhasz_nev,
@@ -48,7 +47,6 @@ class KommentController extends Controller
                         'profil_kep_url' => null,
                     ];
                 } else {
-                    // Normál komment
                     $felhasznalo = $user ? [
                         'id' => $user->id,
                         'felhasz_nev' => $user->felhasz_nev,
@@ -59,7 +57,7 @@ class KommentController extends Controller
                         'profil_kep_url' => null,
                     ];
                 }
-                
+
                 return [
                     'id' => $comment->id,
                     'komment' => $comment->komment,
@@ -137,15 +135,15 @@ class KommentController extends Controller
         $user = $request->user();
         $adatok = FelhasznaloAdatok::find($user->id);
         $szerepkor = $adatok?->szerepkor;
-        
-        if ((int)$komment->kommentelo !== (int)$user->id && !in_array($szerepkor, ['admin', 'moderator'])) {
+
+        if ((int) $komment->kommentelo !== (int) $user->id && !in_array($szerepkor, ['admin', 'moderator'])) {
             return response()->json(['message' => 'Nincs jogosultságod.'], 403);
         }
 
         $vanGyerek = Kommentek::where('elozetes_komment_id', $id)->exists();
 
         if ($vanGyerek) {
-            $komment->komment = '';  // üres string = placeholder
+            $komment->komment = '';
             $komment->save();
             return response()->json(['message' => 'Komment törölve (placeholder).', 'deleted' => false]);
         }
@@ -163,12 +161,15 @@ class KommentController extends Controller
     private function cleanupPlaceholder($id)
     {
         $komment = Kommentek::find($id);
-        if (!$komment) return;
+        if (!$komment)
+            return;
 
-        if ($komment->komment !== '') return;  // csak üres string = placeholder
+        if ($komment->komment !== '')
+            return;
 
         $vanGyerek = Kommentek::where('elozetes_komment_id', $id)->exists();
-        if ($vanGyerek) return;
+        if ($vanGyerek)
+            return;
 
         $szuloId = $komment->elozetes_komment_id;
         $komment->delete();

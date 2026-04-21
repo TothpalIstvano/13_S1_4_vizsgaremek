@@ -210,7 +210,7 @@ watch(isAuthenticated, (newVal) => {
       <div class="mottoInner">
         <h1>Üdvözölünk a Hobbitár weboldalán!</h1>
         <p>
-          Egy hely, ahol mindent megtalálsz, amire csak szükséged lehet sokfajta szabadidős tevékenységhez, legyen szó kertészetről, barkácsolásról, horgolásról, kötésről, hímzésről vagy éppen ékszerkészítésről. Áruházunk célja hogy minden eszközt az otthonod kényelméből tudj megrendelni, és ezeket akár a küszöbödig szállítani.
+          Egy hely, ahol mindent megtalálsz, amire csak szükséged lehet sokfajta szabadidős tevékenységhez, legyen szó kertészetről, barkácsolásról, horgolásról, kötésről, hímzésről vagy éppen ékszerkészítésről. Áruházunk célja, hogy minden eszközt az otthonod kényelméből tudj megrendelni, és ezeket akár a küszöbödig szállítani.
         </p>
       </div>
     </div>
@@ -622,7 +622,6 @@ watch(isAuthenticated, (newVal) => {
   padding: 20px;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
-  cursor: pointer;
 }
 
 .floating-card:hover {
@@ -1202,7 +1201,7 @@ watch(isAuthenticated, (newVal) => {
 }
 
 .meta-info {
-  margin-bottom: 16px;
+  margin-top: 16px;
 }
 
 .blog-time {

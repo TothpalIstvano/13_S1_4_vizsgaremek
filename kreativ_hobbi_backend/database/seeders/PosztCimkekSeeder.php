@@ -23,15 +23,13 @@ class PosztCimkekSeeder extends Seeder
             return;
         }
 
-        // 3. Hozzunk létre véletlenszerű kapcsolatokat
-        // Például: minden poszthoz rendeljünk 1-5 címkét
         foreach ($posztokIds as $posztId) {
             $randomCimkekIds = $cimkekIds->random(rand(1, 5));
-            
+
             // A syncWithoutDetaching megakadályozza a duplikációkat
             // egyetlen futáson belül is, ha a random() véletlenül ugyanazt adná
             PosztCimkek::insert(
-                $randomCimkekIds->map(function($cimkeId) use ($posztId) {
+                $randomCimkekIds->map(function ($cimkeId) use ($posztId) {
                     return [
                         'poszt_id' => $posztId,
                         'cimke_id' => $cimkeId,

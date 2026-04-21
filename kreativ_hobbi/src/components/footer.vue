@@ -49,7 +49,7 @@ const adatfelhasznalasFile = async () => {
       <div class="footer-section">
         <h3>Térkép</h3>
         <iframe
-          src="https://www.openstreetmap.org/export/embed.html?bbox=19.040236%2C47.497913%2C19.040236%2C47.497913&amp;layer=mapnik"
+          src="https://www.openstreetmap.org/export/embed.html?bbox=19.641816%2C46.902647%2C19.661816%2C46.916647&layer=mapnik&marker=46.909647%2C19.651816"
           style="border:1px solid #ccc; width:100%; height:120px;"
           allowfullscreen
           loading="lazy"
