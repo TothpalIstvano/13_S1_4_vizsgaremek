@@ -1,5 +1,8 @@
 - \[ ] Az oldal kódjának tisztázás
-- \[ ] Az oldal tesztelése
+- \[ ] Az oldal tesztelése:
+  - Profil✅
+  - Bejelentekzés + Regisztáció✅
+  - Index✅
 - \[ ] Az oldal dokumenálása
 - \[ ] Optimalizálás
 

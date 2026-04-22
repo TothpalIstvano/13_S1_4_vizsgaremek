@@ -73,11 +73,11 @@ ${HAZSZAM_INPUT}            id:hazszam
 ${EMELETAJTO_INPUT}         id:emeletAjto
 
 # Camera
-${KAMERA_BTN}               xpath://button[contains(.,"Kamera használata")]
-${FOTOZAS_BTN}              xpath://button[contains(.,"Fotózás")]
-${MEGSE_KAMERA_BTN}         xpath://div[contains(@class,"camera-controls")]//button[contains(.,"Mégse")]
+${KAMERA_BTN}               //*[@id="app"]/main/main/div/div/div/form/div[3]/div[2]/button
+${FOTOZAS_BTN}              //*[@id="app"]/main/main/div/div/div/form/div[3]/div[2]/div/button[1]
+${MEGSE_KAMERA_BTN}         //*[@id="app"]/main/main/div/div/div/form/div[3]/div[2]/div/button[2]
 ${PROFIL_BEALLITAS_BTN}     xpath://button[contains(.,"Profilkép beállítása")]
-${VIDEO_ELEM}               xpath://div[contains(@class,"camera-preview")]//video
+${VIDEO_ELEM}               //*[@id="app"]/main/main/div/div/div/form/div[3]/div[2]/video
 
 # Admin
 ${ADMIN_EMAIL}      test@example.com
@@ -398,6 +398,9 @@ Fill Required Name Fields
     Input Text    ${KERESZTNEV_INPUT}    ${ker}
 
 Save And Wait For Modal To Close
+    Set Focus To Element   ${MENTES_BTN}
+    Scroll Element Into View    ${MENTES_BTN}
+    Wait Until Element Is Visible    ${MENTES_BTN}    timeout=5s
     Click Element    ${MENTES_BTN}
     Wait Until Element Is Not Visible    ${SZERK_MODAL}    timeout=15s
 
