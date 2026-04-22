@@ -1,5 +1,4 @@
 - teszteket majd beletenni a fő mappába + adatbázis export + dbdiagram kép export
-- admin kategória szimbólumok keresés
 
 kivenni a szerverhez: 
 - vue: .env: localhost:8000 helyett ''
