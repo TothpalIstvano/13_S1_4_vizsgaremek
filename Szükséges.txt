@@ -1,10 +1,6 @@
-- teszteket majd beletenni a fő mappába + adatbázis export + dbdiagram kép export
-- admin kategória szimbólumok keresés
-
 kivenni a szerverhez: 
 - vue: .env: localhost:8000 helyett ''
 - vite.config.js: host: '0.0.0.0', allowedHosts: true
-- auth.js: szintén localhostot kivenni
 - api.js: baseURL: ''
 - laravel .env file: session domain, app_url
 

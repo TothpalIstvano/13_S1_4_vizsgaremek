@@ -285,7 +285,7 @@
                 </select>
                 <select v-model="productStockFilter" style="padding:8px 12px; font-size:14px; border:1px solid #e2e8f0; border-radius:8px; height:38px; background:white; cursor:pointer;">
                   <option value="">Összes készlet</option>
-                  <option value="raktaron">✅ Raktáron</option>
+                  <option value="raktaron">✔️ Raktáron</option>
                   <option value="keves">⚠️ Kevés</option>
                   <option value="nincs">🚫 Nincs készleten</option>
                 </select>
@@ -444,10 +444,10 @@
                   style="padding:8px 12px; font-size:14px; border:1px solid #e2e8f0; border-radius:8px; height:38px; background:white; cursor:pointer;"
                 >
                   <option value="">Összes típus</option>
-                  <option value="termek" v-if="isAdmin">🛍️ Termék kategória</option>
-                  <option value="blog">📝 Blog kategória (Cimke)</option>
-                  <option value="fokategoria" v-if="isAdmin">📁 Csak főkategóriák</option>
-                  <option value="alkategoria" v-if="isAdmin">↳ Csak alkategóriák</option>
+                  <option value="termek" v-if="isAdmin">📦 Termék kategória</option>
+                  <option value="blog">📑 Blog kategória (Cimke)</option>
+                  <option value="fokategoria" v-if="isAdmin">🗂️ Csak főkategóriák</option>
+                  <option value="alkategoria" v-if="isAdmin">📂 Csak alkategóriák</option>
                 </select>
               </div>
             </div>
@@ -939,7 +939,7 @@
                   <option value="">Összes rendelés</option>
                   <option value="van">📦 Van rendelése</option>
                   <option value="aktiv">⚠️ Aktív rendelése van</option>
-                  <option value="nincs">— Nincs rendelése</option>
+                  <option value="nincs">🚫 Nincs rendelése</option>
                 </select>
               </div>
             </div>

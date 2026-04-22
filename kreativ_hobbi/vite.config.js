@@ -12,6 +12,8 @@ export default defineConfig({
   ],
   server: {
     port: 5173,
+    allowedHosts: true,
+    host: '0.0.0.0',
     proxy: {
       // Proxy all /api requests to Laravel
       '/api': {

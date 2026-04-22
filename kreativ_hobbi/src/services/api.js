@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: 'http://localhost:8000',
+    baseURL: import.meta.env.VITE_API_URL,
     withCredentials: true,
     headers: {
         'Accept': 'application/json',
@@ -22,12 +22,12 @@ api.interceptors.request.use(async (config) => {
         try {
             // Only fetch if we don't already have the cookie
             if (!getCookie('XSRF-TOKEN')) {
-                await axios.get('http://localhost:8000/sanctum/csrf-cookie', {
+                await axios.get(`${import.meta.env.VITE_API_URL}/sanctum/csrf-cookie`, {
                     withCredentials: true
                 });
             }
 
-            // Explicitly set the token as a header — Axios doesn't always do this automatically
+            // set the token as a header
             const token = getCookie('XSRF-TOKEN');
             if (token) {
                 config.headers['X-XSRF-TOKEN'] = token;
