@@ -77,14 +77,14 @@ Forgot Password Modal Opens
 Forgot Password Modal Closes On X Button
     Switch To Login
     Open Forgot Password Modal
-    Click Button    xpath://button[contains(.,"✕")]
+    Click Element    xpath://button[contains(.,"✕")]
     Wait Until Element Is Not Visible    xpath://h3[contains(.,"Jelszó visszaállítása")]    timeout=5s
 
 Forgot Password Fails With Invalid Email
     Switch To Login
     Open Forgot Password Modal
     Input Text    xpath://input[@placeholder="Email cím"]    notanemail
-    Click Button    xpath://button[contains(.,"Link küldése")]
+    Click Element    xpath://button[contains(.,"Link küldése")]
     Wait Until Element Is Visible    css:.error-message    timeout=5s
     Element Should Contain    css:.error-message    érvényes email
 
@@ -92,15 +92,15 @@ L03 - Forgot Password Succeeds With Valid Email
     Switch To Login
     Open Forgot Password Modal
     Input Text    xpath://input[@placeholder="Email cím"]    teszt1231@example.com
-    Click Button    xpath://button[contains(.,"Link küldése")]
+    Click Element    xpath://button[contains(.,"Link küldése")]
     Wait Until Element Is Visible    xpath://*[contains(.,"Elküldtük a visszaállító linket")]    timeout=10s
 
 Switch From Login To Registration
     Switch To Login
-    Click Button    xpath://button[contains(.,"Regisztráció")]
+    Click Element    xpath://button[contains(.,"Regisztráció")]
     Wait Until Element Is Visible    xpath://h2[contains(.,"Fiók készítése")]    timeout=5s
 
 Switch From Registration Back To Login
     Switch To Registration
-    Click Button    xpath://button[contains(.,"Bejelentkezés")]
+    Click Element    xpath://button[contains(.,"Bejelentkezés")]
     Wait Until Element Is Visible    xpath://h2[contains(.,"Lépj be a fiókodba")]    timeout=5s

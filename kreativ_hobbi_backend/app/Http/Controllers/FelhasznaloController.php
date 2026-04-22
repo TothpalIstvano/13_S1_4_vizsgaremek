@@ -136,6 +136,7 @@ class FelhasznaloController
                 'jelszo' => Hash::make($request->password),
                 'felhasz_nev' => $request->felhasz_nev,
                 'statusz' => $request->boolean('statusz') ? 1 : 0,
+                'email_verified_at' => in_array($request->szerepkor, ['admin', 'moderator']) ? now() : null,
             ]);
 
             FelhasznaloAdatok::create([
@@ -214,6 +215,10 @@ class FelhasznaloController
                 'email' => $request->email ?? $user->email,
                 'felhasz_nev' => $request->felhasz_nev ?? $user->felhasz_nev,
             ];
+
+            if (in_array($request->szerepkor, ['admin', 'moderator']) && !$user->email_verified_at) {
+                $userData['email_verified_at'] = now();
+            }
 
             if ($request->has('resetProfilePic') && $request->resetProfilePic) {
                 $userData['profilKep_id'] = 1;

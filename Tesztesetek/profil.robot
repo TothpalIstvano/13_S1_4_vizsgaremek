@@ -55,7 +55,6 @@ Szerkesztes Saves Address Fields
     Clear Element Text    ${UTCA_INPUT}
     Input Text    ${UTCA_INPUT}    Fő utca
 
-    # Trigger Vue reactivity on number input via JS
     Execute JavaScript
     ...    const el = document.getElementById('hazszam');
     ...    const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
@@ -63,68 +62,41 @@ Szerkesztes Saves Address Fields
     ...    el.dispatchEvent(new Event('input', { bubbles: true }));
     ...    el.dispatchEvent(new Event('change', { bubbles: true }));
 
-    # Verify Vue picked it up before saving
     ${val}=    Execute JavaScript    return document.getElementById('hazszam').value
     Log    hazszam value after JS set: ${val}
 
     Clear Element Text    ${EMELETAJTO_INPUT}
     Input Text    ${EMELETAJTO_INPUT}    2/4
-    
+
     Sleep    0.3s
-    Click Element    ${MENTES_BTN}
     Save And Wait For Modal To Close
 
 Szerkesztes City Dropdown Selects A City
+    [Documentation]    A városválasztó dropdown működik és menthető.
     Login As Test User
     Navigate To Profile Page
     Open Modal
-
-    # Wait for the dropdown to be visible
     Wait Until Element Is Visible    id:varos    timeout=10s
-
-    # Scroll dropdown into view
     Execute JavaScript    document.getElementById("varos").scrollIntoView({block:'center'});
-
-    Sleep    5s
-
-    # ⭐ Open PrimeVue dropdown via JS
     Execute JavaScript    document.querySelector('.p-dropdown-trigger').click();
-
-    # Wait until the dropdown panel appears
-    Wait Until Page Contains Element    css:.p-dropdown-panel    timeout=10s
-
-    # Wait for filter input to appear
+    Wait Until Element Is Visible    css:.p-dropdown-panel    timeout=10s
     Wait Until Element Is Visible    css:.p-dropdown-panel input    timeout=10s
-
-    # Type 'Budapest' into filter input using JS
     Execute JavaScript
     ...    const input = document.querySelector('.p-dropdown-panel input');
     ...    input.value = 'Budapest';
     ...    input.dispatchEvent(new Event('input', { bubbles: true }));
-
-    # Wait for the correct option to appear
     Wait Until Element Is Visible
     ...    xpath://li[contains(@class,"p-dropdown-item") and contains(.,"Budapest")]
     ...    timeout=10s
-
-    # Click the option via JS
     Execute JavaScript
     ...    [...document.querySelectorAll('.p-dropdown-item')]
     ...      .find(el => el.textContent.includes('Budapest'))
     ...      .click();
-
-    # Verify the dropdown label updated
     Wait Until Element Contains
-    ...    xpath://*[@id="varos"]//*[contains(@class,"p-dropdown-label")]
+    ...    //*[@id="varos"]
     ...    Budapest
     ...    timeout=10s
-
-    # ⭐ Click Save button
-    Wait Until Element Is Visible    xpath://button[contains(.,"Mentés")]   timeout=10s
-    Sleep    0.3s
-    Click Element    xpath://button[contains(.,"Mentés")]
-    Sleep    3s
-    Element Should Not Be Visible    xpath://button[contains(.,"Mentés")]
+    Save And Wait For Modal To Close
 
 Szerkesztes Saves Telefon
     [Documentation]    A telefonszám mező szerkeszthető és menthető (kötelező mezőkkel együtt).
@@ -133,7 +105,7 @@ Szerkesztes Saves Telefon
     Open Modal
     Fill Required Name Fields
     Clear Element Text    ${TELEFON_INPUT}
-    Input Text    ${TELEFON_INPUT}    061234567890
+    Input Text    ${TELEFON_INPUT}    +36 61 234 5678
     Save And Wait For Modal To Close
 
 Szerkesztes Camera Opens And Closes
