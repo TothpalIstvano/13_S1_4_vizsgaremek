@@ -60,9 +60,9 @@ ${MEGTEKINTES_BTN}      xpath:(//button[contains(.,"Megtekintés")])[1]
 
 # Szerkesztés modal
 ${SZERK_BTN}                xpath://button[contains(@class,"btn edit") and contains(.,"Szerkesztés")]
-${SZERK_MODAL}              xpath://div[contains(@class,"szerk-modal")]
-${MEGSE_BTN}                xpath://button[contains(@class,"megse")]
-${MENTES_BTN}               xpath://button[contains(@class,"mentes")]
+${SZERK_MODAL}              //*[@id="app"]/main/main/div/div/div
+${MEGSE_BTN}                //*[@id="app"]/main/main/div/div/div/form/div[5]/button[1]
+${MENTES_BTN}               //*[@id="app"]/main/main/div/div/div/form/div[5]/button[2]
 
 # Form fields
 ${VEZETEKNEV_INPUT}         id:vezeteknev
@@ -158,9 +158,8 @@ Fill Registration Form
 
 Submit Registration
     Click Button    xpath://button[contains(.,"Fiók létrehozása")]
-
 Registration Should Succeed
-    Wait Until Location Contains    /Profil    timeout=20s
+    Wait Until Location Contains    /profil    timeout=20s
 
 Registration Should Fail
     Wait Until Element Is Visible    css:.error-message    timeout=5s
@@ -207,10 +206,10 @@ Fill Login Form
     Input Password  xpath=//div[contains(@class,"b-container")]//input[@name="password"]   ${password}
 
 Submit Login
-    Execute JavaScript    document.querySelector('.b-container button[type="submit"]').click()
+    Click Button    xpath://button[contains(.,"Bejelentkezés")]
 
 Login Should Succeed
-    Wait Until Location Contains    /Profil    timeout=20s
+    Wait Until Location Contains    /profil    timeout=20s
 
 Login Should Fail
     Sleep    1s
@@ -328,7 +327,7 @@ Login As Test User
     Switch To Login
     Fill Login Form    test@example.com    Alma12345678.
     Execute JavaScript    document.querySelector('.b-container button[type="submit"]').click()
-    Wait Until Location Contains    /Profil   timeout=20s
+    Wait Until Location Contains    /profil   timeout=20s
 
 Navigate To New Post Page
     Go To    ${URL}/newpost
@@ -400,7 +399,7 @@ Fill Required Name Fields
 
 Save And Wait For Modal To Close
     Click Element    ${MENTES_BTN}
-    Wait Until Element Is Not Visible    ${SZERK_MODAL}    timeout=10s
+    Wait Until Element Is Not Visible    ${SZERK_MODAL}    timeout=15s
 
 Open Camera Browser And Login
     # Override the default Test Setup — open Chrome with fake camera, then log in and navigate

@@ -32,6 +32,7 @@ class Felhasznalok extends Authenticatable implements MustVerifyEmail
         'statusz',
         'letrehozas_Datuma',
         'utolso_Belepes',
+        'email_verified_at',
     ];
 
     protected $casts = [

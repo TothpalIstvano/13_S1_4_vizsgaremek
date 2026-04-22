@@ -2,9 +2,13 @@
 - \[ ] Az oldal tesztelése
 - \[ ] Az oldal dokumenálása
 - \[ ] Optimalizálás
-- \[ ] Mod oladlon is legyen ilyen százalékos rész a dashboardon tovább a másikat ellenőriznoi és pontosítani a százalékot + email verfied check szükséges, hogy tovább menjen a dashboardra
 
-- \[X] Moderátor felület: - A main dashboard a statisztikákkal marad viszont a felső kardok adatai változnak olyanra hogy ez a 4 card helyett Összes értékesítés, Rendelések, Termékek,Felhasználók olyanokat látna a mod hogy összes bejelentés, blogbejegyzések, kommentek és a felhasználok maradhat. Továbbá a Havi értékesítés helyett havi bejelentést látna és Kategóriák szerinti termék megosztás e helyett pedig blog cimkék szerinti megoszlás lenne. - A moderátor csak is csak a következő táblákhoz férhessen hozzá Kategóriák, Blogbejegyzések, Kommentek és Bejelntések. - A Kategóriákban tudjon újat létrehozzni s törlöni is tehát a táblán nem kell modósítani, - A Blogbejegyzésekben mindent tehát a táblán nem kell modósítani, - A Kommentek és Bejelntések is tudjon mindent a táblán nem kell modósítani.✅
+- \[X] Moderátor felület:
+  - A main dashboard a statisztikákkal marad viszont a felső kardok adatai változnak olyanra hogy ez a 4 card helyett Összes értékesítés, Rendelések, Termékek,Felhasználók olyanokat látna a mod hogy összes bejelentés, blogbejegyzések, kommentek és a felhasználok maradhat. Továbbá a Havi értékesítés helyett havi bejelentést látna és Kategóriák szerinti termék megosztás e helyett pedig blog cimkék szerinti megoszlás lenne.
+  - A moderátor csak is csak a következő táblákhoz férhessen hozzá Kategóriák, Blogbejegyzések, Kommentek és Bejelntések.
+  - A Kategóriákban tudjon újat létrehozzni s törlöni is tehát a táblán nem kell modósítani,
+  - A Blogbejegyzésekben mindent tehát a táblán nem kell modósítani,
+  - A Kommentek és Bejelntések is tudjon mindent a táblán nem kell modósítani.✅
 - \[X] Kategoriak tábla-> termék kat. ->csak admin hozzá férés, blog kat. -> admin és mod hozzá férés -> az egész egy táblába jelenjen meg és legyen egy szűrő, hogy blog, termék, mind -> mod ->locked to blog, legyen egy kategoria létrhozás gomb. A táblázat írja ki hogy hány elem tartozik ahhoz a kategoriához. Többi táblába kategoria alap szűrés vhogy jó lenne továbbá hogy a kategoriák is katinthatóak legyenek úgy mint minden más. Továbbá ha a kiírásra katint hogy hány elem tartozik ahhoz a kategoriához akkor letudja nyitni tudjon keresniben és ja akár primeVue dropdown is megteszi✅
 - \[X] ha felvan függesztve a user akkor ne tudjon feltölteni semmit se blogolni és a képe legyen def vagy i guess a basic-ekből tudjon választani✅
 - \[X] Termék szövege forduljonbe normálba változtatás után hogy ne legyenek ott a html taggek + kattintható legyen a termék neve hogy oda dobjon a termékre->Dashboardon✅
@@ -110,16 +114,3 @@
 * \[X] kosár eltárolása✅
 * \[X] áruház alsó oldalak számok átírni (12, 24, 48)✅
 * \[X] rendelés pending✅
-
-```php
-Route::get('/user/isVerified', function () {
-  if (Auth::check()) {
-  $adatok = FelhasznaloAdatok::find(auth()->user()->id);
-          if (!$adatok) {
-  return response()->json(['isVerified' => false], 200);
-  }
-  return response()->json(['isVerified' => $adatok->email_verified_at !== null], 200);
-  }
-  return response()->json(['isVerified' => false], 200);
-});
-```
