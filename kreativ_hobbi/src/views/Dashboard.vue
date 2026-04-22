@@ -12,24 +12,28 @@
             <span class="nav-icon"><FontAwesomeIcon icon="fa-poll" /></span>Dashboard
           </a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link" :class="{active: currentView === 'products'}" @click="currentView = 'products'">
-            <span class="nav-icon"><FontAwesomeIcon icon="fa-bag-shopping" /></span>
-            Termékek
-          </a>
-        </li>
+        <template v-if="isAdmin">
+          <li class="nav-item">
+            <a class="nav-link" :class="{active: currentView === 'products'}" @click="currentView = 'products'">
+              <span class="nav-icon"><FontAwesomeIcon icon="fa-bag-shopping" /></span>
+              Termékek
+            </a>
+          </li>
+        </template>
         <li class="nav-item">
           <a class="nav-link" :class="{active: currentView === 'kategoriak'}" @click="currentView = 'kategoriak'">
             <span class="nav-icon"><FontAwesomeIcon icon="fa-tags" /></span>
             Kategóriák
           </a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link" :class="{active: currentView === 'orders'}" @click="currentView = 'orders'">
-            <span class="nav-icon"><FontAwesomeIcon icon="fa-truck" /></span>
-            Rendelések
-          </a>
-        </li>
+        <template v-if="isAdmin">
+          <li class="nav-item">
+            <a class="nav-link" :class="{active: currentView === 'orders'}" @click="currentView = 'orders'">
+              <span class="nav-icon"><FontAwesomeIcon icon="fa-truck" /></span>
+              Rendelések
+            </a>
+          </li>
+        </template>
         <li class="nav-item">
           <a class="nav-link" :class="{active: currentView === 'blog'}" @click="currentView = 'blog'">
             <span class="nav-icon"><FontAwesomeIcon icon="fa-file-lines" /></span>
@@ -48,18 +52,20 @@
             Bejelentések
           </a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link" :class="{active: currentView === 'users'}" @click="currentView = 'users'">
-            <span class="nav-icon"><FontAwesomeIcon icon="fa-user" /></span>
-            Felhasználók
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" :class="{active: currentView === 'analytics'}" @click="currentView = 'analytics'">
-            <span class="nav-icon"><FontAwesomeIcon icon="fa-chart-line" /></span>
-            Analitika
-          </a>
-        </li>
+        <template v-if="isAdmin">
+          <li class="nav-item">
+            <a class="nav-link" :class="{active: currentView === 'users'}" @click="currentView = 'users'">
+              <span class="nav-icon"><FontAwesomeIcon icon="fa-user" /></span>
+              Felhasználók
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" :class="{active: currentView === 'analytics'}" @click="currentView = 'analytics'">
+              <span class="nav-icon"><FontAwesomeIcon icon="fa-chart-line" /></span>
+              Analitika
+            </a>
+          </li>
+        </template>
       </ul>
     </div>
     <div v-if="sidebarOpen" class="sidebar-overlay" @click="sidebarOpen = false"></div>
@@ -103,62 +109,21 @@
               </div>
             </template>
             <template v-else>
-              <div class="stat-card">
-                <div class="stat-header">
-                  <div><div class="stat-title">Összes értékesítés</div></div>
-                  <div class="stat-icon" style="background: #fff7ed; color: #c2410c;">
-                    <FontAwesomeIcon icon="fa-coins" />
+              <template v-if="isAdmin">
+                <div class="stat-card">
+                  <div class="stat-header">
+                    <div><div class="stat-title">Összes értékesítés</div></div>
+                    <div class="stat-icon" style="background: #fff7ed; color: #c2410c;">
+                      <FontAwesomeIcon icon="fa-coins" />
+                    </div>
                   </div>
-                </div>
-                <div class="stat-value">{{ formatCurrency(stats.totalSales) }}</div>
-                <div class="stat-change" :class="calcChange(stats.changes?.sales?.this, stats.changes?.sales?.last).dir === 'up' ? 'positive' : calcChange(stats.changes?.sales?.this, stats.changes?.sales?.last).dir === 'down' ? 'negative' : 'neutral'">
-                  <template v-if="calcChange(stats.changes?.sales?.this, stats.changes?.sales?.last).dir === 'up'">
-                    ↑ {{ calcChange(stats.changes?.sales?.this, stats.changes?.sales?.last).pct }}% az elmúlt hónaphoz képest
-                  </template>
-                  <template v-else-if="calcChange(stats.changes?.sales?.this, stats.changes?.sales?.last).dir === 'down'">
-                    ↓ {{ calcChange(stats.changes?.sales?.this, stats.changes?.sales?.last).pct }}% az elmúlt hónaphoz képest
-                  </template>
-                  <template v-else>
-                    → Stagnál az elmúlt hónaphoz képest
-                  </template>
-                </div>
-              </div>
-
-              <div class="stat-card">
-                <div class="stat-header">
-                  <div><div class="stat-title">Rendelések</div></div>
-                  <div class="stat-icon" style="background: #dcfce7; color: #166534;">
-                    <FontAwesomeIcon icon="fa-truck" />
-                  </div>
-                </div>
-                <div class="stat-value">{{ stats.totalOrders }}</div>
-                <div class="stat-change" :class="calcChange(stats.changes?.orders?.this, stats.changes?.orders?.last).dir === 'up' ? 'positive' : calcChange(stats.changes?.orders?.this, stats.changes?.orders?.last).dir === 'down' ? 'negative' : 'neutral'">
-                  <template v-if="calcChange(stats.changes?.orders?.this, stats.changes?.orders?.last).dir === 'up'">
-                    ↑ {{ calcChange(stats.changes?.orders?.this, stats.changes?.orders?.last).pct }}% az elmúlt hónaphoz képest
-                  </template>
-                  <template v-else-if="calcChange(stats.changes?.orders?.this, stats.changes?.orders?.last).dir === 'down'">
-                    ↓ {{ calcChange(stats.changes?.orders?.this, stats.changes?.orders?.last).pct }}% az elmúlt hónaphoz képest
-                  </template>
-                  <template v-else>
-                    → Stagnál az elmúlt hónaphoz képest
-                  </template>
-                </div>
-              </div>
-
-              <div class="stat-card">
-                <div class="stat-header">
-                  <div><div class="stat-title">Termékek</div></div>
-                  <div class="stat-icon" style="background: #fef3c7; color: #92400e;">
-                    <FontAwesomeIcon icon="fa-bag-shopping" />
-                  </div>
-                </div>
-                <div class="stat-value">{{ stats.totalProducts }}</div>
-                  <div class="stat-change" :class="calcChange(stats.changes?.products?.this, stats.changes?.products?.last).dir === 'up' ? 'positive' : calcChange(stats.changes?.products?.this, stats.changes?.products?.last).dir === 'down' ? 'negative' : 'neutral'">
-                    <template v-if="calcChange(stats.changes?.products?.this, stats.changes?.products?.last).dir === 'up'">
-                      ↑ {{ calcChange(stats.changes?.products?.this, stats.changes?.products?.last).pct }}% az elmúlt hónaphoz képest
+                  <div class="stat-value">{{ formatCurrency(stats.totalSales) }}</div>
+                  <div class="stat-change" :class="calcChange(stats.changes?.sales?.this, stats.changes?.sales?.last).dir === 'up' ? 'positive' : calcChange(stats.changes?.sales?.this, stats.changes?.sales?.last).dir === 'down' ? 'negative' : 'neutral'">
+                    <template v-if="calcChange(stats.changes?.sales?.this, stats.changes?.sales?.last).dir === 'up'">
+                      ↑ {{ calcChange(stats.changes?.sales?.this, stats.changes?.sales?.last).pct }}% az elmúlt hónaphoz képest
                     </template>
-                    <template v-else-if="calcChange(stats.changes?.products?.this, stats.changes?.products?.last).dir === 'down'">
-                      ↓ {{ calcChange(stats.changes?.products?.this, stats.changes?.products?.last).pct }}% az elmúlt hónaphoz képest
+                    <template v-else-if="calcChange(stats.changes?.sales?.this, stats.changes?.sales?.last).dir === 'down'">
+                      ↓ {{ calcChange(stats.changes?.sales?.this, stats.changes?.sales?.last).pct }}% az elmúlt hónaphoz képest
                     </template>
                     <template v-else>
                       → Stagnál az elmúlt hónaphoz képest
@@ -166,39 +131,127 @@
                   </div>
                 </div>
 
-              <div class="stat-card">
-                <div class="stat-header">
-                  <div><div class="stat-title">Felhasználók</div></div>
-                  <div class="stat-icon" style="background: #e9d5ff; color: #6b21a8;">
-                    <FontAwesomeIcon icon="fa-users" />
+                <div class="stat-card">
+                  <div class="stat-header">
+                    <div><div class="stat-title">Rendelések</div></div>
+                    <div class="stat-icon" style="background: #dcfce7; color: #166534;">
+                      <FontAwesomeIcon icon="fa-truck" />
+                    </div>
+                  </div>
+                  <div class="stat-value">{{ stats.totalOrders }}</div>
+                  <div class="stat-change" :class="calcChange(stats.changes?.orders?.this, stats.changes?.orders?.last).dir === 'up' ? 'positive' : calcChange(stats.changes?.orders?.this, stats.changes?.orders?.last).dir === 'down' ? 'negative' : 'neutral'">
+                    <template v-if="calcChange(stats.changes?.orders?.this, stats.changes?.orders?.last).dir === 'up'">
+                      ↑ {{ calcChange(stats.changes?.orders?.this, stats.changes?.orders?.last).pct }}% az elmúlt hónaphoz képest
+                    </template>
+                    <template v-else-if="calcChange(stats.changes?.orders?.this, stats.changes?.orders?.last).dir === 'down'">
+                      ↓ {{ calcChange(stats.changes?.orders?.this, stats.changes?.orders?.last).pct }}% az elmúlt hónaphoz képest
+                    </template>
+                    <template v-else>
+                      → Stagnál az elmúlt hónaphoz képest
+                    </template>
                   </div>
                 </div>
-                <div class="stat-value">{{ stats.totalCustomers }}</div>
-                <div class="stat-change" :class="calcChange(stats.changes?.customers?.this, stats.changes?.customers?.last).dir === 'up' ? 'positive' : calcChange(stats.changes?.customers?.this, stats.changes?.customers?.last).dir === 'down' ? 'negative' : 'neutral'">
-                  <template v-if="calcChange(stats.changes?.customers?.this, stats.changes?.customers?.last).dir === 'up'">
-                    ↑ {{ calcChange(stats.changes?.customers?.this, stats.changes?.customers?.last).pct }}% az elmúlt hónaphoz képest
-                  </template>
-                  <template v-else-if="calcChange(stats.changes?.customers?.this, stats.changes?.customers?.last).dir === 'down'">
-                    ↓ {{ calcChange(stats.changes?.customers?.this, stats.changes?.customers?.last).pct }}% az elmúlt hónaphoz képest
-                  </template>
-                  <template v-else>
-                    → Stagnál az elmúlt hónaphoz képest
-                  </template>
+
+                <div class="stat-card">
+                  <div class="stat-header">
+                    <div><div class="stat-title">Termékek</div></div>
+                    <div class="stat-icon" style="background: #fef3c7; color: #92400e;">
+                      <FontAwesomeIcon icon="fa-bag-shopping" />
+                    </div>
+                  </div>
+                  <div class="stat-value">{{ stats.totalProducts }}</div>
+                    <div class="stat-change" :class="calcChange(stats.changes?.products?.this, stats.changes?.products?.last).dir === 'up' ? 'positive' : calcChange(stats.changes?.products?.this, stats.changes?.products?.last).dir === 'down' ? 'negative' : 'neutral'">
+                      <template v-if="calcChange(stats.changes?.products?.this, stats.changes?.products?.last).dir === 'up'">
+                        ↑ {{ calcChange(stats.changes?.products?.this, stats.changes?.products?.last).pct }}% az elmúlt hónaphoz képest
+                      </template>
+                      <template v-else-if="calcChange(stats.changes?.products?.this, stats.changes?.products?.last).dir === 'down'">
+                        ↓ {{ calcChange(stats.changes?.products?.this, stats.changes?.products?.last).pct }}% az elmúlt hónaphoz képest
+                      </template>
+                      <template v-else>
+                        → Stagnál az elmúlt hónaphoz képest
+                      </template>
+                    </div>
+                  </div>
+
+                <div class="stat-card">
+                  <div class="stat-header">
+                    <div><div class="stat-title">Felhasználók</div></div>
+                    <div class="stat-icon" style="background: #e9d5ff; color: #6b21a8;">
+                      <FontAwesomeIcon icon="fa-users" />
+                    </div>
+                  </div>
+                  <div class="stat-value">{{ stats.totalCustomers }}</div>
+                  <div class="stat-change" :class="calcChange(stats.changes?.customers?.this, stats.changes?.customers?.last).dir === 'up' ? 'positive' : calcChange(stats.changes?.customers?.this, stats.changes?.customers?.last).dir === 'down' ? 'negative' : 'neutral'">
+                    <template v-if="calcChange(stats.changes?.customers?.this, stats.changes?.customers?.last).dir === 'up'">
+                      ↑ {{ calcChange(stats.changes?.customers?.this, stats.changes?.customers?.last).pct }}% az elmúlt hónaphoz képest
+                    </template>
+                    <template v-else-if="calcChange(stats.changes?.customers?.this, stats.changes?.customers?.last).dir === 'down'">
+                      ↓ {{ calcChange(stats.changes?.customers?.this, stats.changes?.customers?.last).pct }}% az elmúlt hónaphoz képest
+                    </template>
+                    <template v-else>
+                      → Stagnál az elmúlt hónaphoz képest
+                    </template>
+                  </div>
                 </div>
-              </div>
+              </template>
+              <template v-else>
+                <div class="stat-card">
+                  <div class="stat-header">
+                    <div><div class="stat-title">Összes bejelentés</div></div>
+                    <div class="stat-icon" style="background:#fee2e2; color:#991b1b;">
+                      <FontAwesomeIcon icon="fa-flag" />
+                    </div>
+                  </div>
+                  <div class="stat-value">{{ reports.length }}</div>
+                  <div class="stat-change neutral">→ Összesen</div>
+                </div>
+
+                <div class="stat-card">
+                  <div class="stat-header">
+                    <div><div class="stat-title">Blogbejegyzések</div></div>
+                    <div class="stat-icon" style="background:#dcfce7; color:#166534;">
+                      <FontAwesomeIcon icon="fa-file-lines" />
+                    </div>
+                  </div>
+                  <div class="stat-value">{{ blogPosts.length }}</div>
+                  <div class="stat-change neutral">→ Összesen</div>
+                </div>
+
+                <div class="stat-card">
+                  <div class="stat-header">
+                    <div><div class="stat-title">Kommentek</div></div>
+                    <div class="stat-icon" style="background:#fef3c7; color:#92400e;">
+                      <FontAwesomeIcon icon="fa-comment" />
+                    </div>
+                  </div>
+                  <div class="stat-value">{{ comments.length }}</div>
+                  <div class="stat-change neutral">→ Összesen</div>
+                </div>
+
+                <div class="stat-card">
+                  <div class="stat-header">
+                    <div><div class="stat-title">Felhasználók</div></div>
+                    <div class="stat-icon" style="background:#e9d5ff; color:#6b21a8;">
+                      <FontAwesomeIcon icon="fa-users" />
+                    </div>
+                  </div>
+                  <div class="stat-value">{{ stats.totalCustomers }}</div>
+                  <div class="stat-change neutral">→ Összesen</div>
+                </div>
+              </template>
             </template>
           </div>
 
           <!-- Charts -->
           <div class="charts-grid">
             <div class="chart-card">
-              <div class="chart-header"><h3 class="chart-title">Havi értékesítés</h3></div>
+              <div class="chart-header"><h3 class="chart-title">{{ isAdmin ? 'Havi értékesítés' : 'Havi bejelentések' }}</h3></div>
               <div v-if="chartsLoading" class="skeleton skeleton-chart"></div>
               <canvas v-else ref="salesChart"></canvas>
             </div>            
 
             <div class="chart-card">
-              <div class="chart-header"><h3 class="chart-title">Kategóriák szerinti termék megosztás</h3></div>
+              <div class="chart-header"><h3 class="chart-title">{{ isAdmin ? 'Kategóriák szerinti termék megosztás' : 'Blog cimkék szerinti megoszlás' }}</h3></div>
               <div v-if="chartsLoading" class="skeleton skeleton-chart"></div>
               <canvas v-else ref="categoryChart"></canvas>
             </div>
@@ -393,6 +446,8 @@
                   <option value="">Összes típus</option>
                   <option value="termek" v-if="isAdmin">🛍️ Termék kategória</option>
                   <option value="blog">📝 Blog kategória (Cimke)</option>
+                  <option value="fokategoria" v-if="isAdmin">📁 Csak főkategóriák</option>
+                  <option value="alkategoria" v-if="isAdmin">↳ Csak alkategóriák</option>
                 </select>
               </div>
             </div>
@@ -400,8 +455,20 @@
             <table>
               <thead>
                 <tr>
-                  <th style="width:60px;">ID</th>
-                  <th>Név</th>
+                  <th @click="toggleKategoriaSort('id')" style="width:60px; cursor:pointer; user-select:none; white-space:nowrap;">
+                    ID
+                    <span style="font-size:11px; color:#94a3b8; margin-left:4px;">
+                      <span :style="katSortKey==='id'&&katSortDir==='asc'?'color:#f97316':''">▲</span>
+                      <span :style="katSortKey==='id'&&katSortDir==='desc'?'color:#f97316':''">▼</span>
+                    </span>
+                  </th>
+                  <th @click="toggleKategoriaSort('nev')" style="cursor:pointer; user-select:none; white-space:nowrap;">
+                    Név
+                    <span style="font-size:11px; color:#94a3b8; margin-left:4px;">
+                      <span :style="katSortKey==='nev'&&katSortDir==='asc'?'color:#f97316':''">▲</span>
+                      <span :style="katSortKey==='nev'&&katSortDir==='desc'?'color:#f97316':''">▼</span>
+                    </span>
+                  </th>
                   <th>Típus</th>
                   <th>Szülő kategória</th>
                   <th style="cursor:pointer;" @click="toggleKategoriaSort('elemek_szama')">
@@ -436,21 +503,58 @@
                       </span>
                     </td>
                     <td>
-                      <span v-if="kat.fo_kategoria_id" style="color:#64748b; font-size:13px;">
+                      <span
+                        v-if="kat.fo_kategoria_id"
+                        style="color:#f97316; font-weight:600; cursor:pointer; text-decoration:underline dotted; font-size:13px;"
+                        @click="kategoriaSearch = kategoriak.find(k => k.id === kat.fo_kategoria_id && k.tipus === 'termek')?.nev ?? ''"
+                        :title="`Szűrés: ${kategoriak.find(k => k.id === kat.fo_kategoria_id && k.tipus === 'termek')?.nev}`"
+                      >
                         {{ kategoriak.find(k => k.id === kat.fo_kategoria_id && k.tipus === 'termek')?.nev ?? '-' }}
                       </span>
                       <span v-else style="color:#94a3b8;">—</span>
                     </td>
                     <td>
-                      <span
-                        class="badge badge-success"
-                        style="cursor:pointer;"
-                        @click="toggleKategoriaElemek(kat.id + '-' + kat.tipus)"
-                        title="Elemek megtekintése"
-                      >
-                        {{ kat.elemek_szama }} db
-                        {{ nyitottKategoriak.has(kat.id + '-' + kat.tipus) ? '▲' : '▼' }}
-                      </span>
+                      <div style="display:flex; flex-direction:column; gap:5px; align-items:flex-start;">
+
+                        <!-- Elemszám gomb -->
+                        <span
+                          class="badge"
+                          :class="kat.elemek_szama > 0 ? 'badge-success' : 'badge-neutral'"
+                          :style="[
+                            'transition:all 0.15s;',
+                            kat.elemek_szama > 0
+                              ? 'cursor:pointer;'
+                              : 'cursor:not-allowed; opacity:0.45;'
+                          ]"
+                          @click="kat.elemek_szama > 0 && toggleKategoriaElemek(kat.id + '-' + kat.tipus)"
+                          :title="kat.elemek_szama > 0 ? 'Elemek megtekintése' : 'Nincs elem ebben a kategóriában'"
+                        >
+                          {{ kat.elemek_szama }} elem
+                          <span v-if="kat.elemek_szama > 0" style="margin-left:2px;">
+                            {{ nyitottKategoriak.has(kat.id + '-' + kat.tipus) ? '▲' : '▼' }}
+                          </span>
+                        </span>
+
+                        <!-- Alkategória badge — csak termék kategóriánál -->
+                        <span
+                          v-if="kat.tipus === 'termek'"
+                          style="
+                            display:inline-flex;
+                            align-items:center;
+                            gap:4px;
+                            font-size:11px;
+                            font-weight:600;
+                            padding:2px 8px;
+                            border-radius:10px;
+                            background:#f1f5f9;
+                            color:#64748b;
+                            border:1px solid #e2e8f0;
+                          "
+                        >
+                          {{ kat.alkategoriak_szama ?? 0 }} alkategória
+                        </span>
+
+                      </div>
                     </td>
                     <td>
                       <div class="action-buttons">
@@ -476,36 +580,93 @@
 
                   <!-- Expandált elem lista -->
                   <tr v-if="nyitottKategoriak.has(kat.id + '-' + kat.tipus)">
-                    <td colspan="6" style="background:#f8fafc; padding:12px 24px;">
-                      <div style="margin-bottom:8px; display:flex; gap:8px; align-items:center;">
-                        <strong style="font-size:13px;">{{ kat.nev }} elemei:</strong>
-                        <input
-                          type="text"
-                          v-model="kategoriaElemSearch[kat.id + '-' + kat.tipus]"
-                          placeholder="Keresés..."
-                          style="padding:4px 10px; border:1px solid #e2e8f0; border-radius:6px; font-size:13px; width:200px;"
-                        />
-                      </div>
-                      <div v-if="kategoriaElemek[kat.id + '-' + kat.tipus]?.length">
-                        <div
-                          v-for="elem in filteredKategoriaElemek(kat)"
-                          :key="elem.id"
-                          style="display:inline-flex; align-items:center; gap:6px; margin:4px; padding:4px 12px;
-                                background:white; border:1px solid #e2e8f0; border-radius:20px; font-size:13px;
-                                cursor:pointer; transition:all 0.15s;"
-                          @click="kat.tipus==='termek' ? goToProductFromKat(elem.id) : goToBlogPost(elem.id)"
-                          @mouseover="$event.currentTarget.style.background='#fff7ed'"
-                          @mouseleave="$event.currentTarget.style.background='white'"
-                        >
-                          <span style="color:#f97316; font-weight:600;">{{ elem.nev ?? elem.cim }}</span>
-                          <span style="color:#94a3b8; font-size:11px;">→</span>
+                    <td colspan="6" style="padding:0; border-bottom:2px solid #f97316;">
+                      <div style="
+                        background: linear-gradient(135deg, #fff7ed 0%, #fef3e8 100%);
+                        border-left: 4px solid #f97316;
+                        padding: 16px 24px;
+                      ">
+                        <!-- Fejléc -->
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                          <div style="display:flex; align-items:center; gap:10px;">
+                            <span style="font-size:16px;">
+                              {{ kat.tipus === 'termek' ? '🛍️' : '📝' }}
+                            </span>
+                            <strong style="font-size:14px; color:#1e293b;">{{ kat.nev }}</strong>
+                            <span class="badge badge-warning" style="font-size:11px;">
+                              {{ kat.elemek_szama }} elem
+                            </span>
+                          </div>
+                          <input
+                            type="text"
+                            v-model="kategoriaElemSearch[kat.id + '-' + kat.tipus]"
+                            placeholder="🔍 Keresés..."
+                            style="
+                              padding:6px 12px;
+                              border:1.5px solid #fed7aa;
+                              border-radius:20px;
+                              font-size:13px;
+                              width:200px;
+                              background:white;
+                              outline:none;
+                              transition:border-color 0.2s;
+                            "
+                            @focus="$event.target.style.borderColor='#f97316'"
+                            @blur="$event.target.style.borderColor='#fed7aa'"
+                          />
                         </div>
-                      </div>
-                      <div v-else-if="kategoriaElemek[kat.id + '-' + kat.tipus] === undefined">
-                        <span style="color:#94a3b8; font-size:13px;">Betöltés...</span>
-                      </div>
-                      <div v-else>
-                        <span style="color:#94a3b8; font-size:13px;">Nincs elem ebben a kategóriában.</span>
+
+                        <!-- Elemek -->
+                        <div v-if="kategoriaElemek[kat.id + '-' + kat.tipus] === undefined"
+                          style="display:flex; align-items:center; gap:8px; color:#94a3b8; font-size:13px; padding:8px 0;"
+                        >
+                          <span style="animation:spin 1s linear infinite; display:inline-block;">⟳</span>
+                          Betöltés...
+                        </div>
+
+                        <div v-else-if="filteredKategoriaElemek(kat).length === 0"
+                          style="color:#94a3b8; font-size:13px; padding:8px 0; font-style:italic;"
+                        >
+                          Nincs találat a keresésre.
+                        </div>
+
+                        <div v-else style="display:flex; flex-wrap:wrap; gap:8px; padding:4px 0;">
+                          <div
+                            v-for="elem in filteredKategoriaElemek(kat)"
+                            :key="elem.id"
+                            @click="kat.tipus==='termek' ? goToProductFromKat(elem.id) : goToBlogPost(elem.id)"
+                            style="
+                              display:inline-flex;
+                              align-items:center;
+                              gap:6px;
+                              padding:6px 14px;
+                              background:white;
+                              border:1.5px solid #fed7aa;
+                              border-radius:20px;
+                              font-size:13px;
+                              cursor:pointer;
+                              transition:all 0.18s;
+                              box-shadow:0 1px 3px rgba(249,115,22,0.08);
+                            "
+                            @mouseover="e => {
+                              e.currentTarget.style.background='#f97316';
+                              e.currentTarget.style.color='white';
+                              e.currentTarget.style.borderColor='#f97316';
+                              e.currentTarget.style.transform='translateY(-1px)';
+                              e.currentTarget.style.boxShadow='0 4px 12px rgba(249,115,22,0.25)';
+                            }"
+                            @mouseleave="e => {
+                              e.currentTarget.style.background='white';
+                              e.currentTarget.style.color='inherit';
+                              e.currentTarget.style.borderColor='#fed7aa';
+                              e.currentTarget.style.transform='none';
+                              e.currentTarget.style.boxShadow='0 1px 3px rgba(249,115,22,0.08)';
+                            }"
+                          >
+                            <span style="font-weight:600;">{{ elem.nev ?? elem.cim }}</span>
+                            <span style="font-size:11px; opacity:0.6;">→</span>
+                          </div>
+                        </div>
                       </div>
                     </td>
                   </tr>
@@ -2036,6 +2197,7 @@ import FileUpload from 'primevue/fileupload';
 import InputText from 'primevue/inputtext';
 import Checkbox from 'primevue/checkbox';
 import Dropdown from 'primevue/dropdown';
+import { useAuthStore } from '@/stores/auth.js'
 import { useRouter } from 'vue-router';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { library } from '@fortawesome/fontawesome-svg-core'
@@ -2067,6 +2229,7 @@ const blogSearch = ref('');
 const showProductModal = ref(false);
 const showUserModal = ref(false);
 const showBlogModal = ref(false);
+const showKategoriaModal = ref(false);
 
 // Scroll lock — prevents background scroll whenever any modal is open
 const isAnyModalOpen = computed(
@@ -2107,6 +2270,10 @@ const comments = ref([]);
 const commentSearch = ref('');
 const commentPostFilter = ref('');
 const currentCommentPage = ref(1);
+const authStore = useAuthStore()
+
+const isAdmin = computed(() => authStore.szerepkor === 'admin')
+const isModerator = computed(() => authStore.szerepkor === 'moderator')
 
 const { showToast, showErrorModal } = inject('toast');
 const statsLoading = ref(true);
@@ -2825,14 +2992,7 @@ const currentKategoriaPage = ref(1)
 const nyitottKategoriak = ref(new Set())
 const kategoriaElemek = ref({})        // { 'id-tipus': [...] }
 const kategoriaElemSearch = ref({})    // { 'id-tipus': '' }
-const showKategoriaModal = ref(false)
 const ujKategoria = ref({ nev: '', tipus: 'blog', fo_kategoria_id: null })
-
-// Aktuális user szerepköre
-const isAdmin = computed(() => {
-  const me = users.value.find(u => u.id === currentUserId.value)
-  return me?.role === 'admin'
-})
 
 const toggleKategoriaSort = (key) => {
   if (katSortKey.value === key) katSortDir.value = katSortDir.value === 'asc' ? 'desc' : 'asc'
@@ -2841,20 +3001,55 @@ const toggleKategoriaSort = (key) => {
 }
 
 const filteredKategoriak = computed(() => {
+  const s = kategoriaSearch.value.toLowerCase()
+
   let result = kategoriak.value.filter(k => {
-    const s = kategoriaSearch.value.toLowerCase()
-    const matchSearch = !s || k.nev.toLowerCase().includes(s) || String(k.id).includes(s)
-    const matchTipus = !katTipusFilter.value || k.tipus === katTipusFilter.value
-    return matchSearch && matchTipus
+    // Típus szűrő — kibővítve főkat/alkat opcióval
+    if (katTipusFilter.value === 'termek' && k.tipus !== 'termek') return false
+    if (katTipusFilter.value === 'blog' && k.tipus !== 'blog') return false
+    if (katTipusFilter.value === 'fokategoria' && k.fo_kategoria_id !== null) return false
+    if (katTipusFilter.value === 'alkategoria' && k.fo_kategoria_id === null) return false
+
+    if (!s) return true
+
+    // Saját név vagy ID egyezés
+    const sajatEgyezes = k.nev.toLowerCase().includes(s) || String(k.id).includes(s)
+
+    // Szülő nevének egyezése (alkategóriáknál)
+    const szuloNev = k.fo_kategoria_id
+      ? kategoriak.value.find(p => p.id === k.fo_kategoria_id && p.tipus === 'termek')?.nev ?? ''
+      : ''
+    const szuloEgyezes = szuloNev.toLowerCase().includes(s)
+
+    return sajatEgyezes || szuloEgyezes
   })
-  if (katSortKey.value) {
+
+  // Rendezés keresés közben: szülők előre
+  if (s && !katSortKey.value) {
     result = [...result].sort((a, b) => {
-      let aV = a[katSortKey.value], bV = b[katSortKey.value]
-      if (typeof aV === 'number') return katSortDir.value === 'asc' ? aV - bV : bV - aV
-      aV = String(aV ?? '').toLowerCase(); bV = String(bV ?? '').toLowerCase()
-      return katSortDir.value === 'asc' ? aV.localeCompare(bV) : bV.localeCompare(aV)
+      const aFo = !a.fo_kategoria_id ? 0 : 1
+      const bFo = !b.fo_kategoria_id ? 0 : 1
+      if (aFo !== bFo) return aFo - bFo
+      return a.nev.localeCompare(b.nev, 'hu')
     })
   }
+
+  // Manuális rendezés (ID, név, elemszám)
+  if (katSortKey.value) {
+    result = [...result].sort((a, b) => {
+      let aV = a[katSortKey.value]
+      let bV = b[katSortKey.value]
+      if (katSortKey.value === 'id' || katSortKey.value === 'elemek_szama') {
+        aV = Number(aV ?? 0)
+        bV = Number(bV ?? 0)
+        return katSortDir.value === 'asc' ? aV - bV : bV - aV
+      }
+      aV = String(aV ?? '').toLowerCase()
+      bV = String(bV ?? '').toLowerCase()
+      return katSortDir.value === 'asc' ? aV.localeCompare(bV, 'hu') : bV.localeCompare(aV, 'hu')
+    })
+  }
+
   return result
 })
 
@@ -2879,7 +3074,6 @@ const toggleKategoriaElemek = async (key) => {
     newSet.delete(key)
   } else {
     newSet.add(key)
-    // Betöltés ha még nincs
     if (kategoriaElemek.value[key] === undefined) {
       const [id, tipus] = key.split('-')
       try {
@@ -2889,10 +3083,10 @@ const toggleKategoriaElemek = async (key) => {
             .filter(t => t.kategoria_id === Number(id))
             .map(t => ({ id: t.id, nev: t.nev }))
         } else {
-          const { data } = await axios.get(`/api/blog`)
-          kategoriaElemek.value[key] = data
-            .filter(p => p.cimkek?.some(c => String(c.id ?? c) === id))
-            .map(p => ({ id: p.id, cim: p.cim }))
+          // Blog: már betöltött blogPosts-ból szűr, nem csinál új API hívást
+          kategoriaElemek.value[key] = blogPosts.value
+            .filter(p => p.tags?.some(t => String(t.id) === id))
+            .map(p => ({ id: p.id, cim: p.title }))
         }
       } catch (e) {
         kategoriaElemek.value[key] = []
@@ -3508,6 +3702,27 @@ const filteredBlogPosts = computed(() => {
   return result;
 });
 
+// Moderátor dashboard chart: havi bejelentések
+const modMonthlyReports = computed(() => {
+  const counts = Array(12).fill(0)
+  reports.value.forEach(r => {
+    const m = new Date(r.created_at).getMonth()
+    if (!isNaN(m)) counts[m]++
+  })
+  return counts.slice(0, new Date().getMonth() + 1)
+})
+
+// Moderátor dashboard chart: cimkék megoszlása
+const modTagDistribution = computed(() => {
+  const map = {}
+  blogPosts.value.forEach(p => {
+    p.tags.forEach(t => {
+      map[t.nev] = (map[t.nev] ?? 0) + 1
+    })
+  })
+  return map
+})
+
 const totalOrderPages = computed(() => Math.ceil(filteredOrders.value.length / ITEMS_PER_PAGE));
 
 const paginatedOrders = computed(() => {
@@ -3602,132 +3817,174 @@ const currentMonth = new Date().getMonth() + 1;
 const initCharts = () => {
   nextTick(() => {
     if (salesChart.value && !salesChartInstance) {
+      const isAdminUser = isAdmin.value
+
       salesChartInstance = new Chart(salesChart.value, {
         type: 'line',
         data: {
-          labels: MONTHS.slice(0, currentMonth),
+          labels: MONTHS.slice(0, isAdminUser ? currentMonth : modMonthlyReports.value.length),
           datasets: [{
-            label: 'Értékesítés (Ft)',
-            data: analyticsData.value.monthlySales.slice(0, currentMonth),
-            borderColor: '#f97316',
-            backgroundColor: 'rgba(99, 102, 241, 0.1)',
+            label: isAdminUser ? 'Értékesítés (Ft)' : 'Bejelentések',
+            data: isAdminUser ? analyticsData.value.monthlySales.slice(0, currentMonth) : modMonthlyReports.value,
+            borderColor: isAdminUser ? '#f97316' : '#ef4444',
+            backgroundColor: isAdminUser ? 'rgba(249,115,22,0.1)' : 'rgba(239,68,68,0.1)',
             tension: 0.4, fill: true
           }]
         },
         options: {
           responsive: true,
           plugins: { legend: { display: false } },
-          scales: { y: { beginAtZero: true, ticks: { callback: v => v.toLocaleString('hu-HU') + ' Ft' } } }
+          scales: { y: { beginAtZero: true, ticks: { callback: isAdminUser ? v => v.toLocaleString('hu-HU') + ' Ft' : v => v + ' db' } } }
         }
       });
     }
 
     if (categoryChart.value && !categoryChartInstance) {
-    const foKats = analyticsData.value.categories;
-    const FO_HUES = foKats.map((_, i) => 
-      Math.round((i / foKats.length) * 360)
-    );
+      if (isAdmin.value) {
+        const foKats = analyticsData.value.categories;
+        const FO_HUES = foKats.map((_, i) =>
+          Math.round((i / foKats.length) * 360)
+        );
 
 
-    // Főkategória színek: telített, közepes világosság
-    const foBg = foKats.map((_, i) => {
-      const hue = FO_HUES[i % FO_HUES.length];
-      return `hsl(${hue}, 62%, 52%)`;
-    });
+        // Főkategória színek: telített, közepes világosság
+        const foBg = foKats.map((_, i) => {
+          const hue = FO_HUES[i % FO_HUES.length];
+          return `hsl(${hue}, 62%, 52%)`;
+        });
 
-    // Alkategória színek: ugyanaz a hue, halvány + kissé eltolva
-    const alBg = foKats.flatMap((k, i) => {
-      const hue = FO_HUES[i % FO_HUES.length];
-      return (k.alkategoriak ?? []).map((_, j) => {
-        const lightness = 72 + (j * 4);
-        return `hsl(${hue}, 48%, ${Math.min(lightness, 87)}%)`;
-      });
-    });
+        // Alkategória színek: ugyanaz a hue, halvány + kissé eltolva
+        const alBg = foKats.flatMap((k, i) => {
+          const hue = FO_HUES[i % FO_HUES.length];
+          return (k.alkategoriak ?? []).map((_, j) => {
+            const lightness = 72 + (j * 4);
+            return `hsl(${hue}, 48%, ${Math.min(lightness, 87)}%)`;
+          });
+        });
 
-    const foLabels = foKats.map(k => k.nev);
-    const foData   = foKats.map(k => k.db);
+        const foLabels = foKats.map(k => k.nev);
+        const foData = foKats.map(k => k.db);
 
-    const alLabels = foKats.flatMap(k =>
-      (k.alkategoriak ?? []).map(a => a.nev)
-    );
-    const alData = foKats.flatMap(k =>
-      (k.alkategoriak ?? []).map(a => a.db)
-    );
+        const alLabels = foKats.flatMap(k =>
+          (k.alkategoriak ?? []).map(a => a.nev)
+        );
+        const alData = foKats.flatMap(k =>
+          (k.alkategoriak ?? []).map(a => a.db)
+        );
 
-    // Szülő neve minden alkategóriához → tooltip-hez
-    const alParent = foKats.flatMap(k =>
-      (k.alkategoriak ?? []).map(() => k.nev)
-    );
+        // Szülő neve minden alkategóriához → tooltip-hez
+        const alParent = foKats.flatMap(k =>
+          (k.alkategoriak ?? []).map(() => k.nev)
+        );
 
-    const grandTotal = [...foData, ...alData].reduce((s, v) => s + v, 0);
+        const grandTotal = [...foData, ...alData].reduce((s, v) => s + v, 0);
 
-    categoryChartInstance = new Chart(categoryChart.value, {
-      type: 'doughnut',
-      data: {
-        labels: [...foLabels, ...alLabels],
-        datasets: [
-          {
-            label: 'Főkategóriák',
-            data: foData,
-            backgroundColor: foBg,
-            borderWidth: 3,
-            borderColor: '#ffffff',
-            hoverOffset: 8,
-          },
-          {
-            label: 'Alkategóriák',
-            data: alData,
-            backgroundColor: alBg,
-            borderWidth: 2,
-            borderColor: '#ffffff',
-            hoverOffset: 5,
-          },
-        ]
-      },
-      options: {
-        responsive: true,
-          maintainAspectRatio: true,
-          aspectRatio: 1.8, 
-        cutout: '40%',   // kétszintes gyűrű jól látható marad
-        plugins: {
-          legend: {
-            position: 'bottom',
-            labels: {
-              boxWidth: 12,
-              boxHeight: 12,
-              borderRadius: 3,
-              useBorderRadius: true,
-              padding: 12,
-              font: { size: 12 },
-              // Csak a 6 főkategória jelenik meg a legendában
-              filter: (item) => item.datasetIndex === 0,
-            }
-          },
-          tooltip: {
-            callbacks: {
-              title: (items) => {
-                const item = items[0];
-                if (item.datasetIndex === 1) {
-                  // "Kiegészítők › Ollók"
-                  return `${alParent[item.dataIndex]} › ${item.label}`;
-                }
-                return item.label;
+        categoryChartInstance = new Chart(categoryChart.value, {
+          type: 'doughnut',
+          data: {
+            labels: [...foLabels, ...alLabels],
+            datasets: [
+              {
+                label: 'Főkategóriák',
+                data: foData,
+                backgroundColor: foBg,
+                borderWidth: 3,
+                borderColor: '#ffffff',
+                hoverOffset: 8,
               },
-              label: (ctx) => {
-                const db  = ctx.parsed;
-                const pct = grandTotal > 0
-                  ? ((db / grandTotal) * 100).toFixed(1)
-                  : '0.0';
-                const type = ctx.datasetIndex === 0 ? 'Főkategória' : 'Alkategória';
-                return ` ${type}: ${db} db  (${pct}%)`;
+              {
+                label: 'Alkategóriák',
+                data: alData,
+                backgroundColor: alBg,
+                borderWidth: 2,
+                borderColor: '#ffffff',
+                hoverOffset: 5,
+              },
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            aspectRatio: 1.8,
+            cutout: '40%',   // kétszintes gyűrű jól látható marad
+            plugins: {
+              legend: {
+                position: 'bottom',
+                labels: {
+                  boxWidth: 12,
+                  boxHeight: 12,
+                  borderRadius: 3,
+                  useBorderRadius: true,
+                  padding: 12,
+                  font: { size: 12 },
+                  // Csak a 6 főkategória jelenik meg a legendában
+                  filter: (item) => item.datasetIndex === 0,
+                }
+              },
+              tooltip: {
+                callbacks: {
+                  title: (items) => {
+                    const item = items[0];
+                    if (item.datasetIndex === 1) {
+                      // "Kiegészítők › Ollók"
+                      return `${alParent[item.dataIndex]} › ${item.label}`;
+                    }
+                    return item.label;
+                  },
+                  label: (ctx) => {
+                    const db = ctx.parsed;
+                    const pct = grandTotal > 0
+                      ? ((db / grandTotal) * 100).toFixed(1)
+                      : '0.0';
+                    const type = ctx.datasetIndex === 0 ? 'Főkategória' : 'Alkategória';
+                    return ` ${type}: ${db} db  (${pct}%)`;
+                  }
+                }
               }
             }
           }
-        }
-      }
-    });
-    }
+        });
+      } else {
+        // Moderátor: cimke megoszlás egyszerű doughnut
+        const tagData = modTagDistribution.value
+        const labels = Object.keys(tagData)
+        const values = Object.values(tagData)
+        const colors = labels.map((_, i) =>
+          `hsl(${Math.round((i / labels.length) * 360)}, 60%, 55%)`
+        )
 
+        categoryChartInstance = new Chart(categoryChart.value, {
+          type: 'doughnut',
+          data: {
+            labels,
+            datasets: [{
+              data: values,
+              backgroundColor: colors,
+              borderWidth: 2,
+              borderColor: '#fff',
+              hoverOffset: 6
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            aspectRatio: 1.8,
+            cutout: '50%',
+            plugins: {
+              legend: {
+                position: 'bottom',
+                labels: { boxWidth: 12, padding: 12, font: { size: 12 } }
+              },
+              tooltip: {
+                callbacks: {
+                  label: ctx => ` ${ctx.label}: ${ctx.parsed} bejegyzés`
+                }
+              }
+            }
+          }
+        })
+      }
+    }
     if (productSalesChart.value && !productSalesChartInstance) {
       productSalesChartInstance = new Chart(productSalesChart.value, {
         type: 'bar',
@@ -3837,19 +4094,25 @@ onMounted(async () => {
   const { data } = await axios.get('/api/admin/user/id');
   currentUserId.value = data.id;
 
-  // Gyors adatok 
-  await Promise.all([
-    fetchUsers(),
-    fetchOrders(),
-    fetchProducts(),
+  //Moderator jogosultságú adatok
+  const fetchPromises = [
     fetchBlogPosts(),
     fetchTagsFromDatabase(),
-    fetchProductCategories(),
-    fetchColors(),
     fetchComments(),
     fetchReports(),
     fetchKategoriak(),
-  ]);
+    fetchUsers(),  
+  ]
+  //Admin jogosultságú adatok
+  if (isAdmin.value) {
+    fetchPromises.push(
+      fetchOrders(),
+      fetchProducts(),
+      fetchProductCategories(),
+      fetchColors(),
+    )
+  }
+  await Promise.all(fetchPromises);
 
   loading.value = false; // ← táblázatok megjelennek
 
@@ -4403,6 +4666,10 @@ tbody tr:hover {
   color: #9a3412;
 }
 
+.badge-neutral {
+  background: #f1f5f9;
+  color: #64748b;
+}
 /* Product Image */
 .product-img {
   width: 50px;

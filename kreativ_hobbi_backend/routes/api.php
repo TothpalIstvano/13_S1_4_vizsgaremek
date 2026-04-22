@@ -1045,7 +1045,7 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
         // Termék kategóriák (csak admin látja)
         $termekKategoriak = [];
         if ($szerepkor === 'admin') {
-            $termekKategoriak = Kategoriak::withCount('termekek')
+            $termekKategoriak = Kategoriak::withCount('termekek', 'alkategoriak')
                 ->with('alkategoriak')
                 ->get()
                 ->map(fn($k) => [
@@ -1054,6 +1054,7 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
                     'fo_kategoria_id' => $k->fo_kategoria_id,
                     'tipus' => 'termek',
                     'elemek_szama' => $k->termekek_count,
+                    'alkategoriak_szama' => $k->alkategoriak_count,
                 ])
                 ->toArray();
         }
