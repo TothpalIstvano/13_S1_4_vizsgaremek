@@ -202,7 +202,7 @@
     <div v-if="showOverlay" class="overlay">
       <div class="overlay-content">
         <p style="white-space: pre-line">{{ overlayMessage }}</p>
-        <button @click="closeOverlay" class="overlay-button">Close</button>
+        <button @click="closeOverlay" class="overlay-button">Bezárás</button>
       </div>
     </div>
   </div>
