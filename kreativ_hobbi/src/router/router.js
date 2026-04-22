@@ -97,7 +97,7 @@ const router = createRouter({
       path: '/dashboard',
       name: 'Dashboard',
       component: Dashboard,
-      meta: { requiresAuth: true, roles: ['admin'] }
+      meta: { requiresAuth: true, roles: ['admin', 'moderator'] }
     },
     {
       path: '/email-verified',

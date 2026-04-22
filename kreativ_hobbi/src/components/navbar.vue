@@ -51,7 +51,7 @@ function handleClickOutside(event) {
 //response limitálása
 async function checkUser() {
   const check = await axios.get('/api/user/check', { withCredentials: true });
-  if(check.data.szerepkor === 'admin') {
+  if(check.data.szerepkor === 'admin'||check.data.szerepkor === 'moderator') {
     jogosult.value = true;
   }
 
