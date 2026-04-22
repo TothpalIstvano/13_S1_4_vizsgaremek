@@ -126,7 +126,7 @@ const adatfelhasznalasFile = async () => {
   .footer-content {
     flex-direction: column;
     max-width: 95%;
-    gap: 1.5rem;
+    gap: 0rem;
   }
 
   .footer-section {
