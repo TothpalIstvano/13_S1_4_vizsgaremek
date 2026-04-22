@@ -1036,4 +1036,67 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
         Jelentesek::findOrFail($id)->delete();
         return response()->json(['message' => 'Bejelentés törölve.']);
     });
+
+    Route::get('/kategoriak', function (Request $request) {
+        $user = $request->user();
+        $adatok = FelhasznaloAdatok::where('felhasznalo_id', $user->id)->first();
+        $szerepkor = $adatok?->szerepkor;
+
+        // Termék kategóriák (csak admin látja)
+        $termekKategoriak = [];
+        if ($szerepkor === 'admin') {
+            $termekKategoriak = Kategoriak::withCount('termekek')
+                ->with('alkategoriak')
+                ->get()
+                ->map(fn($k) => [
+                    'id' => $k->id,
+                    'nev' => $k->nev,
+                    'fo_kategoria_id' => $k->fo_kategoria_id,
+                    'tipus' => 'termek',
+                    'elemek_szama' => $k->termekek_count,
+                ])
+                ->toArray();
+        }
+
+        // Blog kategóriák = cimkék (admin + mod)
+        $blogKategoriak = Cimkek::withCount([
+            'posztok as elemek_szama'
+        ])->get()->map(fn($c) => [
+                'id' => $c->id,
+                'nev' => $c->nev,
+                'fo_kategoria_id' => null,
+                'tipus' => 'blog',
+                'elemek_szama' => $c->elemek_szama,
+            ])->toArray();
+
+        return response()->json([
+            ...$termekKategoriak,
+            ...$blogKategoriak,
+        ]);
+    });
+
+    // POST /api/admin/kategoriak — új kategória (termék vagy blog)
+    Route::post('/kategoriak/blog', function (Request $request) {
+        $validated = $request->validate([
+            'nev' => 'required|string|max:255|unique:cimkek,nev',
+        ]);
+        $cimke = Cimkek::create($validated);
+        return response()->json($cimke, 201);
+    });
+
+    // Termék kategória törlése (admin only)
+    Route::delete('/kategoriak/{id}', function ($id) {
+        $adatok = FelhasznaloAdatok::where('felhasznalo_id', auth()->id())->first();
+        if ($adatok?->szerepkor !== 'admin') {
+            return response()->json(['message' => 'Nincs jogosultságod.'], 403);
+        }
+        Kategoriak::findOrFail($id)->delete();
+        return response()->json(['message' => 'Kategória törölve.']);
+    });
+
+    // Blog cimke törlése (admin + mod)
+    Route::delete('/kategoriak/blog/{id}', function ($id) {
+        Cimkek::findOrFail($id)->delete();
+        return response()->json(['message' => 'Cimke törölve.']);
+    });
 });
