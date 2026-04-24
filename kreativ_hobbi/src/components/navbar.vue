@@ -160,9 +160,9 @@ onUnmounted(() => {
                 </span>
               </div>
             </RouterLink>
-            <RouterLink :to="userPath" id="mobilProfil">
-              <p v-if="isLoggedIn === 'Bejelentkezés'">{{ isLoggedIn }}</p>
-              <img id="profilkepMobil" v-else :src="isLoggedIn" :alt="altSzoveg" />
+
+            <RouterLink v-if="isLoggedIn !== 'Bejelentkezés'" :to="userPath" id="mobilProfil">
+              <img id="profilkepMobil" :src="isLoggedIn" :alt="altSzoveg" />
             </RouterLink>
           </div>
 
@@ -193,12 +193,18 @@ onUnmounted(() => {
           :class="{ hamburgerElem: !latszik }"
         >Mintakészítő</RouterLink> 
 
-
         <RouterLink 
           class="menu_link" 
           to="/rolunk"
           :class="{ hamburgerElem: !latszik }"
         >Rólunk</RouterLink>
+
+        <RouterLink 
+          v-if="isLoggedIn === 'Bejelentkezés'" 
+          class="menu_link mobile-belepes"
+          :class="{ hamburgerElem: !latszik }"
+          to="/Belepes"
+        >Bejelentkezés</RouterLink>
 
         <RouterLink 
           class="vonal"  
@@ -224,7 +230,7 @@ onUnmounted(() => {
           :class="{ hamburgerElem: !latszik }"
           :to="userPath"
           >
-          <p v-if="isLoggedIn === 'Bejelentkezés'">{{ isLoggedIn }}</p> 
+          <p v-if="isLoggedIn === 'Bejelentkezés'" style="margin: 0; display: inline;">{{ isLoggedIn }}</p> 
           <img id="profilkep" v-else :src="isLoggedIn" :alt="altSzoveg"/>
         </RouterLink>
         
@@ -403,6 +409,10 @@ onUnmounted(() => {
 }
 /*#endregion*/
 
+.mobile-belepes {
+  display: none;
+}
+
 /*#region Reszponzív nav bar + hamburger menü */
 #mobilProfil {
   display: none;
@@ -428,17 +438,21 @@ onUnmounted(() => {
     position: static;
     left: auto;
   }
+
   .logo {
     float: none;
     margin-left: 0;
     display: flex;
   }
+
   .reszelo{
     transition: left 0.7s ease-in-out;
   }
+
   .kalapacs{ 
     transition: left 0.7s ease-in-out;
   }
+
   #nevDiv{
     display: flex;
     justify-content: space-between;
@@ -448,6 +462,7 @@ onUnmounted(() => {
     padding: 0 20px;
     position: relative;
   }
+
   #mobilKosar {
     margin-left: 10px;
     margin-right: 20px;
@@ -459,6 +474,7 @@ onUnmounted(() => {
   .navbar.hamburger-open {
     background-color: #532600da;
   }
+
   .navbar.hero-mode:not(.hamburger-open) {
     background-color: #370f0269;
   }
@@ -479,7 +495,7 @@ onUnmounted(() => {
   #mobilProfil {
     display: inline-flex;
     align-items: center;
-    margin-right: 10px;
+    /*margin-right: 10px;*/
     text-decoration: none;
     color: var(--router-link-muted-color);
     font-size: 0.95rem;
@@ -494,6 +510,13 @@ onUnmounted(() => {
 
   .belepes {
     display: none;
+  }
+
+  .mobile-belepes {
+    display: block;
+    margin: 0 0 10px 0;
+    width: 100%;
+    text-align: center;
   }
 
   .menu_link.hamburgerElem, .vonal {

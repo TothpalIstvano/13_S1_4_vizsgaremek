@@ -8,4 +8,6 @@ a sulis szerveren kivettem a localstorage-eket a képes dolgokból, és a profil
 
 config/cors.php-ban az allowed_origins okozhat gondot max
 
+.htaccess-t is módosítottam a sulis szerveren (a magyar kommentes részt)
+
 (ha úgy gondolná h nem működik - blog képfeltöltés esetleg: https://stackoverflow.com/questions/50730143/laravel-storage-link-wont-work-on-production)
