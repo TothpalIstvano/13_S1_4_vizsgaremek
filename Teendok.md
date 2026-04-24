@@ -1,8 +1,22 @@
 - \[ ] Az oldal kódjának tisztázás
 - \[ ] Az oldal tesztelése:
   - Profil✅
+  - New post
   - Bejelentekzés + Regisztáció✅
   - Index✅
+  - Áruház✅
+  - Kosár✅
+  - Fizetés✅
+  - Single Item✅
+  - Rólunk
+  - Blog
+  - Single Blog
+  - Komment
+  - Dashboard
+  - Mintakésztő
+  - Reset jelszó?
+  - NotFound
+  - Email verify/already verified
 - \[ ] Az oldal dokumenálása
 - \[ ] Optimalizálás
 

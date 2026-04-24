@@ -504,7 +504,10 @@ Fill Delivery Form
     ...    ${utca}=Kossuth utca
     ...    ${hazszam}=12
     ...    ${phone}=+36305795513
-    Wait Until Element Is Not Visible    ${CART_MODAL}    timeout=8s
+    ${modal_open}=    Run Keyword And Return Status
+    ...    Element Should Be Visible    ${CART_MODAL}
+    Run Keyword If    ${modal_open}
+    ...    Wait Until Element Is Not Visible    ${CART_MODAL}    timeout=8s
     Execute JavaScript    window.scrollTo(0, document.body.scrollHeight)
     Sleep    1s
     Wait Until Element Is Visible    id:lastName    timeout=15s
