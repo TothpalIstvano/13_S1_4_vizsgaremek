@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -13,9 +12,9 @@ return new class extends Migration
     {
         Schema::create('kepek', function (Blueprint $table) {
             $table->unsignedInteger('id')->primary()->autoIncrement();
-            $table->string('url_Link',255)->unique()->default('http://localhost:8000/storage/termekKepek/default.jpg');
-            $table->string('alt_Szoveg',255)->nullable();
-            $table->string('leiras',255)->nullable();
+            $table->string('url_Link', 255)->unique()->default('http://localhost:8000/storage/termekKepek/default.jpg');
+            $table->string('alt_Szoveg', 255)->nullable();
+            $table->string('leiras', 255)->nullable();
             $table->timestamps();
         });
     }

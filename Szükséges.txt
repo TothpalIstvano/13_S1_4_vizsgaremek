@@ -3,5 +3,9 @@ kivenni a szerverhez:
 - vite.config.js: host: '0.0.0.0', allowedHosts: true
 - api.js: baseURL: ''
 - laravel .env file: session domain, app_url
+laravel .env-ben én adtam hozzá h SESSION_SECURE_COOKIE
+a sulis szerveren kivettem a localstorage-eket a képes dolgokból, és a profil applyavatar függvényt átírtam
+
+config/cors.php-ban az allowed_origins okozhat gondot max
 
 (ha úgy gondolná h nem működik - blog képfeltöltés esetleg: https://stackoverflow.com/questions/50730143/laravel-storage-link-wont-work-on-production)

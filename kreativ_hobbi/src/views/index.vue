@@ -1381,6 +1381,14 @@ watch(isAuthenticated, (newVal) => {
 /*#endregion*/
 
 /* MEDIA QUERIES */
+@media (max-width: 1600px) {
+  .card-1 {top: 50px; right: -170px;}
+
+  .card-2 {bottom: 40px; right: 90px;}
+
+  .card-3 {top: 160px; left: -60px;}
+}
+
 @media (max-width: 1400px) {
   .card-1 {top: -15px; right: -15px;}
 
@@ -1404,6 +1412,7 @@ watch(isAuthenticated, (newVal) => {
     grid-template-columns: 1fr;
     gap: 40px;
     text-align: center;
+    margin-top: 70px;
   }
   
   .hero-image {
