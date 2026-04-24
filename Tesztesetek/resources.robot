@@ -440,10 +440,9 @@ Dashboard Sidebar Link Should Be Active
     Should Contain    ${active}    active
 
 Open Aruhaz Page
-    Open Browser    ${URL}    ${BROWSER}
+    Open Browser    ${ARUHAZ_URL}    ${BROWSER}
     Maximize Browser Window
-    Wait Until Element Is Visible    //*[@id="app"]/div/header/nav/a[2]
-    Click Element    //*[@id="app"]/div/header/nav/a[2]    
+    Wait Until Element Is Visible    ${PRODUCT_CARD}    timeout=15s
 
 Navigate To Aruhaz
     Go To    ${ARUHAZ_URL}
@@ -502,32 +501,27 @@ Fill Delivery Form
     ...    ${lastname}=Nagy
     ...    ${firstname}=Teszt
     ...    ${email}=teszt@example.com
-    ...    ${utca}=Kossuth Lajos utca
+    ...    ${utca}=Kossuth utca
     ...    ${hazszam}=12
-    ...    ${phone}=+36301234567
+    ...    ${phone}=+36305795513
+    Wait Until Element Is Not Visible    ${CART_MODAL}    timeout=8s
     Execute JavaScript    window.scrollTo(0, document.body.scrollHeight)
     Sleep    1s
-    Wait Until Element Is Visible    ${FIELD_LASTNAME}    timeout=15s
-    Input Text    ${FIELD_LASTNAME}     ${lastname}
-    Input Text    ${FIELD_FIRSTNAME}    ${firstname}
-    Input Text    ${FIELD_EMAIL}        ${email}
-    Input Text    ${FIELD_UTCA}         ${utca}
-    Input Text    ${FIELD_HAZSZAM}      ${hazszam}
+    Wait Until Element Is Visible    id:lastName    timeout=15s
     Execute JavaScript
-    ...    const drop = document.querySelector('#city .p-dropdown-trigger');
-    ...    if(drop) drop.click();
+    ...    const s=(id,v)=>{const el=document.getElementById(id);const setter=Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype,'value').set;setter.call(el,v);el.dispatchEvent(new Event('input',{bubbles:true}));el.dispatchEvent(new Event('blur',{bubbles:true}));};
+    ...    s('lastName','${lastname}');s('firstName','${firstname}');s('email','${email}');s('utca','${utca}');s('hazszam','${hazszam}');s('phone','${phone}');
     Sleep    0.5s
+    Execute JavaScript    document.querySelector('#city .p-dropdown-trigger').click();
+    Sleep    1s
     Execute JavaScript
     ...    const input = document.querySelector('.p-dropdown-panel input');
-    ...    if(input){ const s = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype,'value').set; s.call(input,'Budapest'); input.dispatchEvent(new Event('input',{bubbles:true})); }
-    Sleep    0.5s
+    ...    if(input){ const s=Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype,'value').set; s.call(input,'Budapest'); input.dispatchEvent(new Event('input',{bubbles:true})); }
+    Sleep    1s
     Execute JavaScript
-    ...    const item = [...document.querySelectorAll('.p-dropdown-item')].find(el => el.textContent.includes('Budapest'));
+    ...    const item=[...document.querySelectorAll('.p-dropdown-item')].find(el=>el.textContent.includes('Budapest'));
     ...    if(item) item.click();
-    Sleep    0.3s
-    Input Text    ${FIELD_PHONE}        ${phone}
-    Press Keys    ${FIELD_PHONE}        TAB
-    Sleep    0.3s
+    Sleep    0.5s
 
 Fill Payment Form
     [Arguments]

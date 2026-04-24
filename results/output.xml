@@ -1,0 +1,3014 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot generator="Robot 7.4.1 (Python 3.13.5 on win32)" generated="2026-04-24T08:49:31.050426" rpa="false" schemaversion="5">
+<suite id="s1" name="13 S1 4 vizsgaremek" source="C:\Users\tothpalistvan\Documents\GitHub\13_S1_4_vizsgaremek">
+<suite id="s1-s1" name="Tesztesetek" source="C:\Users\tothpalistvan\Documents\GitHub\13_S1_4_vizsgaremek\Tesztesetek">
+<suite id="s1-s1-s1" name="Aruhaz" source="C:\Users\tothpalistvan\Documents\GitHub\13_S1_4_vizsgaremek\Tesztesetek\aruhaz.robot">
+<test id="s1-s1-s1-t1" name="A01 – Áruház oldal betöltődik és termékek megjelennek" line="11">
+<kw name="Open Aruhaz Page" owner="resources" type="SETUP">
+<kw name="Open Browser" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:49:31.320520" level="INFO">Opening browser 'Chrome' to base url 'http://localhost:5173/aruhaz'.</msg>
+<arg>${ARUHAZ_URL}</arg>
+<arg>${BROWSER}</arg>
+<doc>Opens a new browser instance to the optional ``url``.</doc>
+<status status="PASS" start="2026-04-24T08:49:31.320101" elapsed="1.259235"/>
+</kw>
+<kw name="Maximize Browser Window" owner="SeleniumLibrary">
+<doc>Maximizes current browser window.</doc>
+<status status="PASS" start="2026-04-24T08:49:32.579819" elapsed="0.024945"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${PRODUCT_CARD}</arg>
+<arg>timeout=15s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:49:32.604984" elapsed="2.768432"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:49:31.319276" elapsed="4.054345"/>
+</kw>
+<kw name="Navigate To Aruhaz" owner="resources">
+<kw name="Go To" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:49:35.374659" level="INFO">Opening url 'http://localhost:5173/aruhaz'</msg>
+<arg>${ARUHAZ_URL}</arg>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<status status="PASS" start="2026-04-24T08:49:35.374418" elapsed="0.220919"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${PRODUCT_CARD}</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:49:35.595765" elapsed="2.550157"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:49:35.374048" elapsed="2.772044"/>
+</kw>
+<kw name="Element Should Be Visible" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:49:38.159899" level="INFO">Element 'xpath:(//div[contains(@class,"product-card")])[1]' is displayed.</msg>
+<arg>${PRODUCT_CARD}</arg>
+<doc>Verifies that the element identified by ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:49:38.146371" elapsed="0.013947"/>
+</kw>
+<kw name="Element Should Be Visible" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:49:38.178073" level="INFO">Element 'xpath:(//h3[contains(@class,"product-title")])[1]' is displayed.</msg>
+<arg>${FIRST_PRODUCT_TITLE}</arg>
+<doc>Verifies that the element identified by ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:49:38.160768" elapsed="0.017787"/>
+</kw>
+<kw name="Element Should Be Visible" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:49:38.197628" level="INFO">Element 'xpath:(//p[contains(@class,"product-price")])[1]' is displayed.</msg>
+<arg>${FIRST_PRODUCT_PRICE}</arg>
+<doc>Verifies that the element identified by ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:49:38.179032" elapsed="0.018830"/>
+</kw>
+<kw name="Close Browser Session" owner="resources" type="TEARDOWN">
+<kw name="Close Browser" owner="SeleniumLibrary">
+<doc>Closes the current browser.</doc>
+<status status="PASS" start="2026-04-24T08:49:38.198860" elapsed="2.277252"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:49:38.198389" elapsed="2.277968"/>
+</kw>
+<tag>aruhaz</tag>
+<tag>smoke</tag>
+<status status="PASS" start="2026-04-24T08:49:31.315874" elapsed="9.160785"/>
+</test>
+<test id="s1-s1-s1-t2" name="A02 – Termék keresése szöveggel" line="18">
+<kw name="Open Aruhaz Page" owner="resources" type="SETUP">
+<kw name="Open Browser" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:49:40.485207" level="INFO">Opening browser 'Chrome' to base url 'http://localhost:5173/aruhaz'.</msg>
+<arg>${ARUHAZ_URL}</arg>
+<arg>${BROWSER}</arg>
+<doc>Opens a new browser instance to the optional ``url``.</doc>
+<status status="PASS" start="2026-04-24T08:49:40.484927" elapsed="1.141482"/>
+</kw>
+<kw name="Maximize Browser Window" owner="SeleniumLibrary">
+<doc>Maximizes current browser window.</doc>
+<status status="PASS" start="2026-04-24T08:49:41.627407" elapsed="0.036211"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${PRODUCT_CARD}</arg>
+<arg>timeout=15s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:49:41.663843" elapsed="2.610381"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:49:40.484542" elapsed="3.789884"/>
+</kw>
+<kw name="Navigate To Aruhaz" owner="resources">
+<kw name="Go To" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:49:44.275461" level="INFO">Opening url 'http://localhost:5173/aruhaz'</msg>
+<arg>${ARUHAZ_URL}</arg>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<status status="PASS" start="2026-04-24T08:49:44.275248" elapsed="0.201695"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${PRODUCT_CARD}</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:49:44.477206" elapsed="2.734688"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:49:44.274868" elapsed="2.937188"/>
+</kw>
+<kw name="Get Text" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:49:47.233328" level="INFO">${first_title} = Prémium gyapjú fonal</msg>
+<var>${first_title}</var>
+<arg>${FIRST_PRODUCT_TITLE}</arg>
+<doc>Returns the text value of the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:49:47.212319" elapsed="0.021655"/>
+</kw>
+<kw name="Evaluate" owner="BuiltIn">
+<msg time="2026-04-24T08:49:47.235073" level="INFO">${keyword} = Prém</msg>
+<var>${keyword}</var>
+<arg>'${first_title}'[:4]</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="PASS" start="2026-04-24T08:49:47.234359" elapsed="0.001116"/>
+</kw>
+<kw name="Input Text" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:49:47.236418" level="INFO">Typing text 'Prém' into text field 'xpath://input[contains(@class,"search-input")]'.</msg>
+<arg>${SEARCH_INPUT}</arg>
+<arg>${keyword}</arg>
+<doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:49:47.235946" elapsed="0.124179"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-04-24T08:49:47.861379" level="INFO">Slept 500 milliseconds.</msg>
+<arg>0.5s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-04-24T08:49:47.360468" elapsed="0.501144"/>
+</kw>
+<kw name="Get Element Count" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:49:47.879345" level="INFO">${visible_cards} = 6</msg>
+<var>${visible_cards}</var>
+<arg>xpath://div[contains(@class,"product-card")]</arg>
+<doc>Returns the number of elements matching ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:49:47.862156" elapsed="0.017448"/>
+</kw>
+<kw name="Should Be True" owner="BuiltIn">
+<arg>${visible_cards} &gt;= 1</arg>
+<doc>Fails if the given condition is not true.</doc>
+<status status="PASS" start="2026-04-24T08:49:47.879892" elapsed="0.000756"/>
+</kw>
+<kw name="Close Browser Session" owner="resources" type="TEARDOWN">
+<kw name="Close Browser" owner="SeleniumLibrary">
+<doc>Closes the current browser.</doc>
+<status status="PASS" start="2026-04-24T08:49:47.881567" elapsed="2.199935"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:49:47.881122" elapsed="2.200596"/>
+</kw>
+<tag>aruhaz</tag>
+<tag>search</tag>
+<status status="PASS" start="2026-04-24T08:49:40.481151" elapsed="9.601147"/>
+</test>
+<test id="s1-s1-s1-t3" name="A03 – Üres keresésre nincs találat visszajelzés" line="28">
+<kw name="Open Aruhaz Page" owner="resources" type="SETUP">
+<kw name="Open Browser" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:49:50.094318" level="INFO">Opening browser 'Chrome' to base url 'http://localhost:5173/aruhaz'.</msg>
+<arg>${ARUHAZ_URL}</arg>
+<arg>${BROWSER}</arg>
+<doc>Opens a new browser instance to the optional ``url``.</doc>
+<status status="PASS" start="2026-04-24T08:49:50.093808" elapsed="1.209355"/>
+</kw>
+<kw name="Maximize Browser Window" owner="SeleniumLibrary">
+<doc>Maximizes current browser window.</doc>
+<status status="PASS" start="2026-04-24T08:49:51.303574" elapsed="0.054266"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${PRODUCT_CARD}</arg>
+<arg>timeout=15s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:49:51.358068" elapsed="2.770738"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:49:50.093145" elapsed="4.035832"/>
+</kw>
+<kw name="Navigate To Aruhaz" owner="resources">
+<kw name="Go To" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:49:54.130083" level="INFO">Opening url 'http://localhost:5173/aruhaz'</msg>
+<arg>${ARUHAZ_URL}</arg>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<status status="PASS" start="2026-04-24T08:49:54.129794" elapsed="0.204004"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${PRODUCT_CARD}</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:49:54.334071" elapsed="2.711750"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:49:54.129362" elapsed="2.916639"/>
+</kw>
+<kw name="Input Text" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:49:57.046677" level="INFO">Typing text 'xyzxyzxyznemletezik999' into text field 'xpath://input[contains(@class,"search-input")]'.</msg>
+<arg>${SEARCH_INPUT}</arg>
+<arg>xyzxyzxyznemletezik999</arg>
+<doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:49:57.046293" elapsed="0.190974"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-04-24T08:49:57.738435" level="INFO">Slept 500 milliseconds.</msg>
+<arg>0.5s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-04-24T08:49:57.237617" elapsed="0.501059"/>
+</kw>
+<kw name="Element Should Be Visible" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:49:57.757517" level="INFO">Element 'xpath://*[@id="products"]/div[contains(text(),"Nincs találat")]' is displayed.</msg>
+<arg>xpath://*[@id="products"]/div[contains(text(),"Nincs találat")]</arg>
+<doc>Verifies that the element identified by ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:49:57.739172" elapsed="0.018570"/>
+</kw>
+<kw name="Close Browser Session" owner="resources" type="TEARDOWN">
+<kw name="Close Browser" owner="SeleniumLibrary">
+<doc>Closes the current browser.</doc>
+<status status="PASS" start="2026-04-24T08:49:57.758917" elapsed="2.168609"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:49:57.758291" elapsed="2.169487"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:49:50.088227" elapsed="9.839759"/>
+</test>
+<test id="s1-s1-s1-t4" name="A04 – Kosárba gomb megnyomása megnyitja a modalt" line="35">
+<kw name="Open Aruhaz Page" owner="resources" type="SETUP">
+<kw name="Open Browser" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:49:59.937459" level="INFO">Opening browser 'Chrome' to base url 'http://localhost:5173/aruhaz'.</msg>
+<arg>${ARUHAZ_URL}</arg>
+<arg>${BROWSER}</arg>
+<doc>Opens a new browser instance to the optional ``url``.</doc>
+<status status="PASS" start="2026-04-24T08:49:59.937200" elapsed="1.177444"/>
+</kw>
+<kw name="Maximize Browser Window" owner="SeleniumLibrary">
+<doc>Maximizes current browser window.</doc>
+<status status="PASS" start="2026-04-24T08:50:01.114990" elapsed="0.029543"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${PRODUCT_CARD}</arg>
+<arg>timeout=15s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:50:01.144748" elapsed="2.644781"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:49:59.936841" elapsed="3.852863"/>
+</kw>
+<kw name="Add First Product To Cart" owner="resources">
+<kw name="Navigate To Aruhaz" owner="resources">
+<kw name="Go To" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:50:03.794028" level="INFO">Opening url 'http://localhost:5173/aruhaz'</msg>
+<arg>${ARUHAZ_URL}</arg>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<status status="PASS" start="2026-04-24T08:50:03.793778" elapsed="0.200098"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${PRODUCT_CARD}</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:50:03.994099" elapsed="2.707725"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:50:03.790552" elapsed="2.911429"/>
+</kw>
+<kw name="Get Text" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:50:06.723453" level="INFO">${title} = Prémium gyapjú fonal</msg>
+<var>${title}</var>
+<arg>${FIRST_PRODUCT_TITLE}</arg>
+<doc>Returns the text value of the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:50:06.702122" elapsed="0.021488"/>
+</kw>
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:50:06.724224" level="INFO">Clicking element 'xpath:(//button[contains(@class,"add-btn")])[1]'.</msg>
+<arg>${FIRST_ADD_BTN}</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:50:06.723789" elapsed="0.089799"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${CART_MODAL}</arg>
+<arg>timeout=5s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:50:06.813800" elapsed="0.234537"/>
+</kw>
+<return>
+<value>${title}</value>
+<status status="PASS" start="2026-04-24T08:50:07.048489" elapsed="0.000161"/>
+</return>
+<status status="PASS" start="2026-04-24T08:50:03.790104" elapsed="3.258706"/>
+</kw>
+<kw name="Element Should Be Visible" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:50:07.071353" level="INFO">Element 'xpath://h2[contains(.,"Sikeresen hozzáadva")]' is displayed.</msg>
+<arg>xpath://h2[contains(.,"Sikeresen hozzáadva")]</arg>
+<doc>Verifies that the element identified by ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:50:07.049129" elapsed="0.022568"/>
+</kw>
+<kw name="Close Cart Modal" owner="resources">
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:50:07.072959" level="INFO">Clicking element 'xpath://button[contains(@class,"btn-continue")]'.</msg>
+<arg>${MODAL_CONTINUE_BTN}</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:50:07.072652" elapsed="0.080522"/>
+</kw>
+<kw name="Wait Until Element Is Not Visible" owner="SeleniumLibrary">
+<arg>${CART_MODAL}</arg>
+<arg>timeout=5s</arg>
+<doc>Waits until the element ``locator`` is not visible.</doc>
+<status status="PASS" start="2026-04-24T08:50:07.153654" elapsed="0.435449"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:50:07.072210" elapsed="0.517065"/>
+</kw>
+<kw name="Close Browser Session" owner="resources" type="TEARDOWN">
+<kw name="Close Browser" owner="SeleniumLibrary">
+<doc>Closes the current browser.</doc>
+<status status="PASS" start="2026-04-24T08:50:07.590370" elapsed="2.198579"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:50:07.589773" elapsed="2.199354"/>
+</kw>
+<tag>aruhaz</tag>
+<tag>cart</tag>
+<status status="PASS" start="2026-04-24T08:49:59.933198" elapsed="9.856208"/>
+</test>
+<test id="s1-s1-s1-t5" name="TC05 – Modal tartalmazza a termék nevét" line="41">
+<kw name="Open Aruhaz Page" owner="resources" type="SETUP">
+<kw name="Open Browser" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:50:09.798010" level="INFO">Opening browser 'Chrome' to base url 'http://localhost:5173/aruhaz'.</msg>
+<arg>${ARUHAZ_URL}</arg>
+<arg>${BROWSER}</arg>
+<doc>Opens a new browser instance to the optional ``url``.</doc>
+<status status="PASS" start="2026-04-24T08:50:09.797760" elapsed="1.086317"/>
+</kw>
+<kw name="Maximize Browser Window" owner="SeleniumLibrary">
+<doc>Maximizes current browser window.</doc>
+<status status="PASS" start="2026-04-24T08:50:10.884281" elapsed="0.024280"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${PRODUCT_CARD}</arg>
+<arg>timeout=15s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:50:10.908749" elapsed="2.772878"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:50:09.797328" elapsed="3.884471"/>
+</kw>
+<kw name="Add First Product To Cart" owner="resources">
+<kw name="Navigate To Aruhaz" owner="resources">
+<kw name="Go To" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:50:13.683021" level="INFO">Opening url 'http://localhost:5173/aruhaz'</msg>
+<arg>${ARUHAZ_URL}</arg>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<status status="PASS" start="2026-04-24T08:50:13.682833" elapsed="0.207442"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${PRODUCT_CARD}</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:50:13.891499" elapsed="2.578180"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:50:13.682568" elapsed="2.787271"/>
+</kw>
+<kw name="Get Text" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:50:16.490572" level="INFO">${title} = Prémium gyapjú fonal</msg>
+<var>${title}</var>
+<arg>${FIRST_PRODUCT_TITLE}</arg>
+<doc>Returns the text value of the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:50:16.469972" elapsed="0.020739"/>
+</kw>
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:50:16.491176" level="INFO">Clicking element 'xpath:(//button[contains(@class,"add-btn")])[1]'.</msg>
+<arg>${FIRST_ADD_BTN}</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:50:16.490883" elapsed="0.091965"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${CART_MODAL}</arg>
+<arg>timeout=5s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:50:16.583092" elapsed="0.234643"/>
+</kw>
+<return>
+<value>${title}</value>
+<status status="PASS" start="2026-04-24T08:50:16.817886" elapsed="0.000153"/>
+</return>
+<msg time="2026-04-24T08:50:16.818208" level="INFO">${title} = Prémium gyapjú fonal</msg>
+<var>${title}</var>
+<status status="PASS" start="2026-04-24T08:50:13.682176" elapsed="3.136176"/>
+</kw>
+<kw name="Get Text" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:50:16.838722" level="INFO">${modal_name} = Prémium gyapjú fonal</msg>
+<var>${modal_name}</var>
+<arg>xpath://p[contains(@class,"item-name")]</arg>
+<doc>Returns the text value of the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:50:16.818682" elapsed="0.020187"/>
+</kw>
+<kw name="Should Be Equal" owner="BuiltIn">
+<arg>${modal_name}</arg>
+<arg>${title}</arg>
+<doc>Fails if the given objects are unequal.</doc>
+<status status="PASS" start="2026-04-24T08:50:16.839367" elapsed="0.000579"/>
+</kw>
+<kw name="Close Cart Modal" owner="resources">
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:50:16.840980" level="INFO">Clicking element 'xpath://button[contains(@class,"btn-continue")]'.</msg>
+<arg>${MODAL_CONTINUE_BTN}</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:50:16.840711" elapsed="0.097750"/>
+</kw>
+<kw name="Wait Until Element Is Not Visible" owner="SeleniumLibrary">
+<arg>${CART_MODAL}</arg>
+<arg>timeout=5s</arg>
+<doc>Waits until the element ``locator`` is not visible.</doc>
+<status status="PASS" start="2026-04-24T08:50:16.938718" elapsed="0.446797"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:50:16.840354" elapsed="0.545320"/>
+</kw>
+<kw name="Close Browser Session" owner="resources" type="TEARDOWN">
+<kw name="Close Browser" owner="SeleniumLibrary">
+<doc>Closes the current browser.</doc>
+<status status="PASS" start="2026-04-24T08:50:17.386383" elapsed="2.199931"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:50:17.386057" elapsed="2.200443"/>
+</kw>
+<tag>aruhaz</tag>
+<tag>cart</tag>
+<status status="PASS" start="2026-04-24T08:50:09.794238" elapsed="9.792510"/>
+</test>
+<test id="s1-s1-s1-t6" name="TC06 – Modal „Kosár megtekintése&quot; gomb átvisz a kosárba" line="48">
+<kw name="Open Aruhaz Page" owner="resources" type="SETUP">
+<kw name="Open Browser" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:50:19.594378" level="INFO">Opening browser 'Chrome' to base url 'http://localhost:5173/aruhaz'.</msg>
+<arg>${ARUHAZ_URL}</arg>
+<arg>${BROWSER}</arg>
+<doc>Opens a new browser instance to the optional ``url``.</doc>
+<status status="PASS" start="2026-04-24T08:50:19.594130" elapsed="1.095437"/>
+</kw>
+<kw name="Maximize Browser Window" owner="SeleniumLibrary">
+<doc>Maximizes current browser window.</doc>
+<status status="PASS" start="2026-04-24T08:50:20.689806" elapsed="0.019734"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${PRODUCT_CARD}</arg>
+<arg>timeout=15s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:50:20.709745" elapsed="2.832157"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:50:19.593805" elapsed="3.948260"/>
+</kw>
+<kw name="Add First Product To Cart" owner="resources">
+<kw name="Navigate To Aruhaz" owner="resources">
+<kw name="Go To" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:50:23.543162" level="INFO">Opening url 'http://localhost:5173/aruhaz'</msg>
+<arg>${ARUHAZ_URL}</arg>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<status status="PASS" start="2026-04-24T08:50:23.542971" elapsed="0.198960"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${PRODUCT_CARD}</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:50:23.742275" elapsed="2.708683"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:50:23.542699" elapsed="2.908411"/>
+</kw>
+<kw name="Get Text" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:50:26.474067" level="INFO">${title} = Prémium gyapjú fonal</msg>
+<var>${title}</var>
+<arg>${FIRST_PRODUCT_TITLE}</arg>
+<doc>Returns the text value of the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:50:26.451243" elapsed="0.022983"/>
+</kw>
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:50:26.474706" level="INFO">Clicking element 'xpath:(//button[contains(@class,"add-btn")])[1]'.</msg>
+<arg>${FIRST_ADD_BTN}</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:50:26.474407" elapsed="0.089068"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${CART_MODAL}</arg>
+<arg>timeout=5s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:50:26.563669" elapsed="0.229218"/>
+</kw>
+<return>
+<value>${title}</value>
+<status status="PASS" start="2026-04-24T08:50:26.793033" elapsed="0.000139"/>
+</return>
+<status status="PASS" start="2026-04-24T08:50:23.542346" elapsed="3.250969"/>
+</kw>
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:50:26.793870" level="INFO">Clicking element 'xpath://a[contains(@class,"btn-checkout")]'.</msg>
+<arg>${MODAL_CART_BTN}</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:50:26.793548" elapsed="0.115341"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${CART_HEADER}</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:50:26.909516" elapsed="0.021092"/>
+</kw>
+<kw name="Close Browser Session" owner="resources" type="TEARDOWN">
+<kw name="Close Browser" owner="SeleniumLibrary">
+<doc>Closes the current browser.</doc>
+<status status="PASS" start="2026-04-24T08:50:26.931352" elapsed="2.183049"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:50:26.930993" elapsed="2.183582"/>
+</kw>
+<tag>aruhaz</tag>
+<tag>cart</tag>
+<tag>navigation</tag>
+<status status="PASS" start="2026-04-24T08:50:19.590890" elapsed="9.523924"/>
+</test>
+<test id="s1-s1-s1-t7" name="TC07 – Termék részletes oldala betöltődik" line="54">
+<kw name="Open Aruhaz Page" owner="resources" type="SETUP">
+<kw name="Open Browser" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:50:29.123524" level="INFO">Opening browser 'Chrome' to base url 'http://localhost:5173/aruhaz'.</msg>
+<arg>${ARUHAZ_URL}</arg>
+<arg>${BROWSER}</arg>
+<doc>Opens a new browser instance to the optional ``url``.</doc>
+<status status="PASS" start="2026-04-24T08:50:29.123250" elapsed="1.111775"/>
+</kw>
+<kw name="Maximize Browser Window" owner="SeleniumLibrary">
+<doc>Maximizes current browser window.</doc>
+<status status="PASS" start="2026-04-24T08:50:30.235242" elapsed="0.025193"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${PRODUCT_CARD}</arg>
+<arg>timeout=15s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:50:30.260994" elapsed="2.726972"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:50:29.122806" elapsed="3.865319"/>
+</kw>
+<kw name="Navigate To Aruhaz" owner="resources">
+<kw name="Go To" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:50:32.989022" level="INFO">Opening url 'http://localhost:5173/aruhaz'</msg>
+<arg>${ARUHAZ_URL}</arg>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<status status="PASS" start="2026-04-24T08:50:32.988798" elapsed="0.201078"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${PRODUCT_CARD}</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:50:33.190092" elapsed="2.565841"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:50:32.988427" elapsed="2.767661"/>
+</kw>
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:50:35.756619" level="INFO">Clicking element 'xpath:(//div[contains(@class,"product-card")])[1]'.</msg>
+<arg>${PRODUCT_CARD}</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:50:35.756329" elapsed="0.062631"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>xpath://button[contains(@class,"add-to-cart-btn")]</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:50:35.819430" elapsed="1.051931"/>
+</kw>
+<kw name="Element Should Be Visible" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:50:36.891759" level="INFO">Element 'xpath://h1' is displayed.</msg>
+<arg>xpath://h1</arg>
+<doc>Verifies that the element identified by ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:50:36.871875" elapsed="0.020103"/>
+</kw>
+<kw name="Close Browser Session" owner="resources" type="TEARDOWN">
+<kw name="Close Browser" owner="SeleniumLibrary">
+<doc>Closes the current browser.</doc>
+<status status="PASS" start="2026-04-24T08:50:36.892869" elapsed="2.200079"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:50:36.892394" elapsed="2.200752"/>
+</kw>
+<tag>aruhaz</tag>
+<tag>navigation</tag>
+<status status="PASS" start="2026-04-24T08:50:29.118910" elapsed="9.974471"/>
+</test>
+<test id="s1-s1-s1-t8" name="TC08 – Részletes oldalon „Vissza&quot; gomb visszanavigál" line="61">
+<kw name="Open Aruhaz Page" owner="resources" type="SETUP">
+<kw name="Open Browser" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:50:39.102279" level="INFO">Opening browser 'Chrome' to base url 'http://localhost:5173/aruhaz'.</msg>
+<arg>${ARUHAZ_URL}</arg>
+<arg>${BROWSER}</arg>
+<doc>Opens a new browser instance to the optional ``url``.</doc>
+<status status="PASS" start="2026-04-24T08:50:39.101970" elapsed="1.154693"/>
+</kw>
+<kw name="Maximize Browser Window" owner="SeleniumLibrary">
+<doc>Maximizes current browser window.</doc>
+<status status="PASS" start="2026-04-24T08:50:40.256916" elapsed="0.025390"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${PRODUCT_CARD}</arg>
+<arg>timeout=15s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:50:40.282568" elapsed="2.624368"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:50:39.101500" elapsed="3.805604"/>
+</kw>
+<kw name="Navigate To Aruhaz" owner="resources">
+<kw name="Go To" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:50:42.907964" level="INFO">Opening url 'http://localhost:5173/aruhaz'</msg>
+<arg>${ARUHAZ_URL}</arg>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<status status="PASS" start="2026-04-24T08:50:42.907737" elapsed="0.198279"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${PRODUCT_CARD}</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:50:43.106338" elapsed="2.707330"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:50:42.907401" elapsed="2.906473"/>
+</kw>
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:50:45.814470" level="INFO">Clicking element 'xpath:(//div[contains(@class,"product-card")])[1]'.</msg>
+<arg>${PRODUCT_CARD}</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:50:45.814147" elapsed="0.070683"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>xpath://button[contains(@class,"back-btn")]</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:50:45.885465" elapsed="0.026067"/>
+</kw>
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:50:45.912440" level="INFO">Clicking element 'xpath://button[contains(@class,"back-btn")]'.</msg>
+<arg>xpath://button[contains(@class,"back-btn")]</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:50:45.911916" elapsed="0.069732"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${PRODUCT_CARD}</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:50:45.982047" elapsed="1.918630"/>
+</kw>
+<kw name="Close Browser Session" owner="resources" type="TEARDOWN">
+<kw name="Close Browser" owner="SeleniumLibrary">
+<doc>Closes the current browser.</doc>
+<status status="PASS" start="2026-04-24T08:50:47.901433" elapsed="2.186876"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:50:47.901088" elapsed="2.187420"/>
+</kw>
+<tag>aruhaz</tag>
+<tag>navigation</tag>
+<status status="PASS" start="2026-04-24T08:50:39.097614" elapsed="10.991161"/>
+</test>
+<test id="s1-s1-s1-t9" name="A09 – Ár szűrő alkalmazás szűri a termékeket" line="69">
+<kw name="Open Aruhaz Page" owner="resources" type="SETUP">
+<kw name="Open Browser" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:50:50.098263" level="INFO">Opening browser 'Chrome' to base url 'http://localhost:5173/aruhaz'.</msg>
+<arg>${ARUHAZ_URL}</arg>
+<arg>${BROWSER}</arg>
+<doc>Opens a new browser instance to the optional ``url``.</doc>
+<status status="PASS" start="2026-04-24T08:50:50.097873" elapsed="1.131953"/>
+</kw>
+<kw name="Maximize Browser Window" owner="SeleniumLibrary">
+<doc>Maximizes current browser window.</doc>
+<status status="PASS" start="2026-04-24T08:50:51.230095" elapsed="0.027745"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${PRODUCT_CARD}</arg>
+<arg>timeout=15s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:50:51.258548" elapsed="2.736065"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:50:50.097433" elapsed="3.897355"/>
+</kw>
+<kw name="Navigate To Aruhaz" owner="resources">
+<kw name="Go To" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:50:53.996137" level="INFO">Opening url 'http://localhost:5173/aruhaz'</msg>
+<arg>${ARUHAZ_URL}</arg>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<status status="PASS" start="2026-04-24T08:50:53.995827" elapsed="0.198872"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${PRODUCT_CARD}</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:50:54.195182" elapsed="2.528166"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:50:53.995246" elapsed="2.728262"/>
+</kw>
+<kw name="Get Element Count" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:50:56.734864" level="INFO">${count_before} = 12</msg>
+<var>${count_before}</var>
+<arg>xpath://div[contains(@class,"product-card")]</arg>
+<doc>Returns the number of elements matching ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:50:56.723773" elapsed="0.011437"/>
+</kw>
+<kw name="Clear Element Text" owner="SeleniumLibrary">
+<arg>${PRICE_MAX_INPUT}</arg>
+<doc>Clears the value of the text-input-element identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:50:56.735712" elapsed="0.102119"/>
+</kw>
+<kw name="Input Text" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:50:56.838546" level="INFO">Typing text '1' into text field 'id:maxTextIn'.</msg>
+<arg>${PRICE_MAX_INPUT}</arg>
+<arg>1</arg>
+<doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:50:56.838189" elapsed="0.064772"/>
+</kw>
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:50:56.903910" level="INFO">Clicking element 'xpath://button[contains(@class,"apply-btn")]'.</msg>
+<arg>${APPLY_PRICE_BTN}</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:50:56.903371" elapsed="0.049387"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-04-24T08:50:57.454006" level="INFO">Slept 500 milliseconds.</msg>
+<arg>0.5s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-04-24T08:50:56.953272" elapsed="0.500996"/>
+</kw>
+<kw name="Get Element Count" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:50:57.461540" level="INFO">${count_after} = 12</msg>
+<var>${count_after}</var>
+<arg>xpath://div[contains(@class,"product-card")]</arg>
+<doc>Returns the number of elements matching ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:50:57.454710" elapsed="0.006977"/>
+</kw>
+<kw name="Should Be True" owner="BuiltIn">
+<arg>${count_after} &lt;= ${count_before}</arg>
+<doc>Fails if the given condition is not true.</doc>
+<status status="PASS" start="2026-04-24T08:50:57.462047" elapsed="0.000547"/>
+</kw>
+<kw name="Close Browser Session" owner="resources" type="TEARDOWN">
+<kw name="Close Browser" owner="SeleniumLibrary">
+<doc>Closes the current browser.</doc>
+<status status="PASS" start="2026-04-24T08:50:57.463610" elapsed="2.173749"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:50:57.463115" elapsed="2.174429"/>
+</kw>
+<tag>aruhaz</tag>
+<tag>filter</tag>
+<status status="PASS" start="2026-04-24T08:50:50.093556" elapsed="9.544251"/>
+</test>
+<test id="s1-s1-s1-t10" name="TC10 – Kategória szűrő megjelenik és kattintható" line="80">
+<kw name="Open Aruhaz Page" owner="resources" type="SETUP">
+<kw name="Open Browser" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:50:59.646352" level="INFO">Opening browser 'Chrome' to base url 'http://localhost:5173/aruhaz'.</msg>
+<arg>${ARUHAZ_URL}</arg>
+<arg>${BROWSER}</arg>
+<doc>Opens a new browser instance to the optional ``url``.</doc>
+<status status="PASS" start="2026-04-24T08:50:59.646101" elapsed="2.349719"/>
+</kw>
+<kw name="Maximize Browser Window" owner="SeleniumLibrary">
+<doc>Maximizes current browser window.</doc>
+<status status="PASS" start="2026-04-24T08:51:01.996083" elapsed="0.029502"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${PRODUCT_CARD}</arg>
+<arg>timeout=15s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:51:02.025864" elapsed="1.489973"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:50:59.645681" elapsed="3.870313"/>
+</kw>
+<kw name="Navigate To Aruhaz" owner="resources">
+<kw name="Go To" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:51:03.516776" level="INFO">Opening url 'http://localhost:5173/aruhaz'</msg>
+<arg>${ARUHAZ_URL}</arg>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<status status="PASS" start="2026-04-24T08:51:03.516580" elapsed="0.205757"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${PRODUCT_CARD}</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:51:03.722619" elapsed="2.714893"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:51:03.516269" elapsed="2.921400"/>
+</kw>
+<kw name="Get WebElement" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:51:06.447838" level="INFO">${first_cat_header} = &lt;selenium.webdriver.remote.webelement.WebElement (session="32f15aecf6d15d94db7c06339ed96dc6", element="f.DCD002FE49F1DEF979D22E99B02336B1.d.21AE67D736F27A81C36730D11BCFF0E3.e.57")&gt;</msg>
+<var>${first_cat_header}</var>
+<arg>xpath:(//div[contains(@class,"category-header")])[1]</arg>
+<doc>Returns the first WebElement matching the given ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:51:06.437941" elapsed="0.010083"/>
+</kw>
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:51:06.448963" level="INFO">Clicking element '&lt;selenium.webdriver.remote.webelement.WebElement (session="32f15aecf6d15d94db7c06339ed96dc6", element="f.DCD002FE49F1DEF979D22E99B02336B1.d.21AE67D736F27A81C36730D11BCFF0E3.e.57")&gt;'.</msg>
+<arg>${first_cat_header}</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:51:06.448448" elapsed="0.078141"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-04-24T08:51:06.828339" level="INFO">Slept 300 milliseconds.</msg>
+<arg>0.3s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-04-24T08:51:06.527365" elapsed="0.301360"/>
+</kw>
+<kw name="Get Element Count" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:51:06.839993" level="INFO">${expanded} = 1</msg>
+<var>${expanded}</var>
+<arg>xpath://div[contains(@class,"subcategory-list")]</arg>
+<doc>Returns the number of elements matching ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:51:06.829319" elapsed="0.010923"/>
+</kw>
+<kw name="Should Be True" owner="BuiltIn">
+<arg>${expanded} &gt;= 1</arg>
+<doc>Fails if the given condition is not true.</doc>
+<status status="PASS" start="2026-04-24T08:51:06.841125" elapsed="0.001000"/>
+</kw>
+<kw name="Close Browser Session" owner="resources" type="TEARDOWN">
+<kw name="Close Browser" owner="SeleniumLibrary">
+<doc>Closes the current browser.</doc>
+<status status="PASS" start="2026-04-24T08:51:06.843284" elapsed="2.175420"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:51:06.842690" elapsed="2.176192"/>
+</kw>
+<tag>aruhaz</tag>
+<tag>filter</tag>
+<status status="PASS" start="2026-04-24T08:50:59.642347" elapsed="9.376781"/>
+</test>
+<test id="s1-s1-s1-t11" name="K01 – Üres kosár üzenete megjelenik" line="94">
+<kw name="Open Aruhaz Page" owner="resources" type="SETUP">
+<kw name="Open Browser" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:51:09.027647" level="INFO">Opening browser 'Chrome' to base url 'http://localhost:5173/aruhaz'.</msg>
+<arg>${ARUHAZ_URL}</arg>
+<arg>${BROWSER}</arg>
+<doc>Opens a new browser instance to the optional ``url``.</doc>
+<status status="PASS" start="2026-04-24T08:51:09.027324" elapsed="1.105202"/>
+</kw>
+<kw name="Maximize Browser Window" owner="SeleniumLibrary">
+<doc>Maximizes current browser window.</doc>
+<status status="PASS" start="2026-04-24T08:51:10.132824" elapsed="0.031180"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${PRODUCT_CARD}</arg>
+<arg>timeout=15s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:51:10.164224" elapsed="2.769084"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:51:09.026798" elapsed="3.906685"/>
+</kw>
+<kw name="Go To" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:51:12.934001" level="INFO">Opening url 'http://localhost:5173/kosar'</msg>
+<arg>${KOSAR_URL}</arg>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<status status="PASS" start="2026-04-24T08:51:12.933729" elapsed="0.215235"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-04-24T08:51:14.150321" level="INFO">Slept 1 second.</msg>
+<arg>1s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-04-24T08:51:13.149521" elapsed="1.001099"/>
+</kw>
+<kw name="Run Keyword And Return Status" owner="BuiltIn">
+<kw name="Element Should Be Visible" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:51:14.208721" level="INFO">Element '//*[@id="app"]/main/div/div[2]/h2' is displayed.</msg>
+<arg>${EMPTY_CART_MSG}</arg>
+<doc>Verifies that the element identified by ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:51:14.151579" elapsed="0.057366"/>
+</kw>
+<msg time="2026-04-24T08:51:14.209131" level="INFO">${has_empty} = True</msg>
+<var>${has_empty}</var>
+<arg>Element Should Be Visible</arg>
+<arg>${EMPTY_CART_MSG}</arg>
+<doc>Runs the specified keyword and returns the status as a Boolean value.</doc>
+<status status="PASS" start="2026-04-24T08:51:14.151035" elapsed="0.058293"/>
+</kw>
+<kw name="Run Keyword If" owner="BuiltIn">
+<arg>not ${has_empty}</arg>
+<arg>Run Keywords</arg>
+<arg>Execute JavaScript</arg>
+<arg>window.confirm = function(){ return true; }</arg>
+<arg>AND</arg>
+<arg>Execute JavaScript</arg>
+<arg>const btn = document.getElementById('emptyCart') || document.querySelector('[id*="empty"], [class*="empty-btn"], button[class*="clear"]');</arg>
+<arg>if(btn) btn.click();</arg>
+<arg>AND</arg>
+<arg>Sleep</arg>
+<arg>1s</arg>
+<doc>Runs the given keyword with the given arguments, if ``condition`` is true.</doc>
+<status status="PASS" start="2026-04-24T08:51:14.209683" elapsed="0.000644"/>
+</kw>
+<kw name="Element Should Be Visible" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:51:14.223503" level="INFO">Element '//*[@id="app"]/main/div/div[2]/h2' is displayed.</msg>
+<arg>${EMPTY_CART_MSG}</arg>
+<doc>Verifies that the element identified by ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:51:14.210666" elapsed="0.013176"/>
+</kw>
+<kw name="Close Browser Session" owner="resources" type="TEARDOWN">
+<kw name="Close Browser" owner="SeleniumLibrary">
+<doc>Closes the current browser.</doc>
+<status status="PASS" start="2026-04-24T08:51:14.224889" elapsed="2.183115"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:51:14.224242" elapsed="2.183944"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:51:09.023104" elapsed="7.385327"/>
+</test>
+<test id="s1-s1-s1-t12" name="TC12 – Üres kosár „Vissza az Áruházba&quot; linkje működik" line="107">
+<kw name="Open Aruhaz Page" owner="resources" type="SETUP">
+<kw name="Open Browser" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:51:16.416939" level="INFO">Opening browser 'Chrome' to base url 'http://localhost:5173/aruhaz'.</msg>
+<arg>${ARUHAZ_URL}</arg>
+<arg>${BROWSER}</arg>
+<doc>Opens a new browser instance to the optional ``url``.</doc>
+<status status="PASS" start="2026-04-24T08:51:16.416459" elapsed="3.675634"/>
+</kw>
+<kw name="Maximize Browser Window" owner="SeleniumLibrary">
+<doc>Maximizes current browser window.</doc>
+<status status="PASS" start="2026-04-24T08:51:20.092313" elapsed="0.028097"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${PRODUCT_CARD}</arg>
+<arg>timeout=15s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:51:20.120624" elapsed="0.227162"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:51:16.415723" elapsed="3.932223"/>
+</kw>
+<kw name="Go To" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:51:20.348458" level="INFO">Opening url 'http://localhost:5173/kosar'</msg>
+<arg>${KOSAR_URL}</arg>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<status status="PASS" start="2026-04-24T08:51:20.348201" elapsed="0.240694"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-04-24T08:51:21.090356" level="INFO">Slept 500 milliseconds.</msg>
+<arg>0.5s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-04-24T08:51:20.589487" elapsed="0.501135"/>
+</kw>
+<kw name="Run Keyword And Return Status" owner="BuiltIn">
+<kw name="Element Should Be Visible" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:51:21.188124" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="selenium-screenshot-91.png"&gt;&lt;img src="selenium-screenshot-91.png" width="800px"&gt;&lt;/a&gt;</msg>
+<msg time="2026-04-24T08:51:21.188785" level="FAIL">Element with locator '//*[@id="app"]/main/div/div[2]/h2' not found.</msg>
+<arg>${EMPTY_CART_MSG}</arg>
+<doc>Verifies that the element identified by ``locator`` is visible.</doc>
+<status status="FAIL" start="2026-04-24T08:51:21.095419" elapsed="0.101198">Element with locator '//*[@id="app"]/main/div/div[2]/h2' not found.</status>
+</kw>
+<msg time="2026-04-24T08:51:21.196826" level="INFO">${is_empty} = False</msg>
+<var>${is_empty}</var>
+<arg>Element Should Be Visible</arg>
+<arg>${EMPTY_CART_MSG}</arg>
+<doc>Runs the specified keyword and returns the status as a Boolean value.</doc>
+<status status="PASS" start="2026-04-24T08:51:21.090998" elapsed="0.105983"/>
+</kw>
+<kw name="Skip If" owner="BuiltIn">
+<msg time="2026-04-24T08:51:21.197896" level="SKIP">Kosár nem üres – TC11 előtt futtasd</msg>
+<arg>not ${is_empty}</arg>
+<arg>Kosár nem üres – TC11 előtt futtasd</arg>
+<doc>Skips the rest of the current test if the ``condition`` is True.</doc>
+<status status="SKIP" start="2026-04-24T08:51:21.197316" elapsed="0.000864">Kosár nem üres – TC11 előtt futtasd</status>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<arg>document.querySelector('a[href*="/aruhaz"]').click()</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="NOT RUN" start="2026-04-24T08:51:21.198432" elapsed="0.000130"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${PRODUCT_CARD}</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="NOT RUN" start="2026-04-24T08:51:21.198751" elapsed="0.000104"/>
+</kw>
+<kw name="Close Browser Session" owner="resources" type="TEARDOWN">
+<kw name="Close Browser" owner="SeleniumLibrary">
+<doc>Closes the current browser.</doc>
+<status status="PASS" start="2026-04-24T08:51:21.199449" elapsed="2.181065"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:51:21.199154" elapsed="2.181547"/>
+</kw>
+<tag>kosar</tag>
+<tag>navigation</tag>
+<status status="SKIP" start="2026-04-24T08:51:16.412310" elapsed="6.968638">Kosár nem üres – TC11 előtt futtasd</status>
+</test>
+<test id="s1-s1-s1-t13" name="K02 – Termék hozzáadása után megjelenik a kosárban" line="116">
+<kw name="Open Aruhaz Page" owner="resources" type="SETUP">
+<kw name="Open Browser" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:51:23.390304" level="INFO">Opening browser 'Chrome' to base url 'http://localhost:5173/aruhaz'.</msg>
+<arg>${ARUHAZ_URL}</arg>
+<arg>${BROWSER}</arg>
+<doc>Opens a new browser instance to the optional ``url``.</doc>
+<status status="PASS" start="2026-04-24T08:51:23.389735" elapsed="1.107731"/>
+</kw>
+<kw name="Maximize Browser Window" owner="SeleniumLibrary">
+<doc>Maximizes current browser window.</doc>
+<status status="PASS" start="2026-04-24T08:51:24.497711" elapsed="0.020186"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${PRODUCT_CARD}</arg>
+<arg>timeout=15s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:51:24.518105" elapsed="2.610557"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:51:23.388775" elapsed="3.740092"/>
+</kw>
+<kw name="Add First Product To Cart" owner="resources">
+<kw name="Navigate To Aruhaz" owner="resources">
+<kw name="Go To" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:51:27.130149" level="INFO">Opening url 'http://localhost:5173/aruhaz'</msg>
+<arg>${ARUHAZ_URL}</arg>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<status status="PASS" start="2026-04-24T08:51:27.129929" elapsed="0.205466"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${PRODUCT_CARD}</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:51:27.335668" elapsed="2.718630"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:51:27.129635" elapsed="2.924827"/>
+</kw>
+<kw name="Get Text" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:51:30.076416" level="INFO">${title} = Prémium gyapjú fonal</msg>
+<var>${title}</var>
+<arg>${FIRST_PRODUCT_TITLE}</arg>
+<doc>Returns the text value of the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:51:30.054598" elapsed="0.021960"/>
+</kw>
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:51:30.077191" level="INFO">Clicking element 'xpath:(//button[contains(@class,"add-btn")])[1]'.</msg>
+<arg>${FIRST_ADD_BTN}</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:51:30.076736" elapsed="0.097806"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${CART_MODAL}</arg>
+<arg>timeout=5s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:51:30.174747" elapsed="0.256664"/>
+</kw>
+<return>
+<value>${title}</value>
+<status status="PASS" start="2026-04-24T08:51:30.431577" elapsed="0.000128"/>
+</return>
+<status status="PASS" start="2026-04-24T08:51:27.129218" elapsed="3.302632"/>
+</kw>
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:51:30.432587" level="INFO">Clicking element 'xpath://a[contains(@class,"btn-checkout")]'.</msg>
+<arg>${MODAL_CART_BTN}</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:51:30.432156" elapsed="0.118798"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${CART_HEADER}</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:51:30.551470" elapsed="0.019497"/>
+</kw>
+<kw name="Get Text" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:51:30.592777" level="INFO">${count} = 1 termék</msg>
+<var>${count}</var>
+<arg>${PRODUCT_COUNT_LABEL}</arg>
+<doc>Returns the text value of the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:51:30.571349" elapsed="0.021787"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${count}</arg>
+<arg>termék</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-04-24T08:51:30.593500" elapsed="0.000810"/>
+</kw>
+<kw name="Close Browser Session" owner="resources" type="TEARDOWN">
+<kw name="Close Browser" owner="SeleniumLibrary">
+<doc>Closes the current browser.</doc>
+<status status="PASS" start="2026-04-24T08:51:30.596280" elapsed="2.196282"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:51:30.595627" elapsed="2.197115"/>
+</kw>
+<tag>cart</tag>
+<tag>kosar</tag>
+<status status="PASS" start="2026-04-24T08:51:23.385555" elapsed="9.407448"/>
+</test>
+<test id="s1-s1-s1-t14" name="TC14 – Mennyiség növelése a „+&quot; gombbal" line="124">
+<kw name="Open Aruhaz Page" owner="resources" type="SETUP">
+<kw name="Open Browser" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:51:32.801350" level="INFO">Opening browser 'Chrome' to base url 'http://localhost:5173/aruhaz'.</msg>
+<arg>${ARUHAZ_URL}</arg>
+<arg>${BROWSER}</arg>
+<doc>Opens a new browser instance to the optional ``url``.</doc>
+<status status="PASS" start="2026-04-24T08:51:32.801032" elapsed="1.131752"/>
+</kw>
+<kw name="Maximize Browser Window" owner="SeleniumLibrary">
+<doc>Maximizes current browser window.</doc>
+<status status="PASS" start="2026-04-24T08:51:33.933092" elapsed="0.028149"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${PRODUCT_CARD}</arg>
+<arg>timeout=15s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:51:33.961443" elapsed="2.795648"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:51:32.800537" elapsed="3.956736"/>
+</kw>
+<kw name="Add First Product To Cart" owner="resources">
+<kw name="Navigate To Aruhaz" owner="resources">
+<kw name="Go To" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:51:36.758597" level="INFO">Opening url 'http://localhost:5173/aruhaz'</msg>
+<arg>${ARUHAZ_URL}</arg>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<status status="PASS" start="2026-04-24T08:51:36.758388" elapsed="0.191678"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${PRODUCT_CARD}</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:51:36.950269" elapsed="2.710046"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:51:36.758077" elapsed="2.902406"/>
+</kw>
+<kw name="Get Text" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:51:39.680260" level="INFO">${title} = Prémium gyapjú fonal</msg>
+<var>${title}</var>
+<arg>${FIRST_PRODUCT_TITLE}</arg>
+<doc>Returns the text value of the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:51:39.660629" elapsed="0.019778"/>
+</kw>
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:51:39.680870" level="INFO">Clicking element 'xpath:(//button[contains(@class,"add-btn")])[1]'.</msg>
+<arg>${FIRST_ADD_BTN}</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:51:39.680583" elapsed="0.077026"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${CART_MODAL}</arg>
+<arg>timeout=5s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:51:39.757875" elapsed="0.232562"/>
+</kw>
+<return>
+<value>${title}</value>
+<status status="PASS" start="2026-04-24T08:51:39.990602" elapsed="0.000146"/>
+</return>
+<status status="PASS" start="2026-04-24T08:51:36.757631" elapsed="3.233267"/>
+</kw>
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:51:39.991522" level="INFO">Clicking element 'xpath://a[contains(@class,"btn-checkout")]'.</msg>
+<arg>${MODAL_CART_BTN}</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:51:39.991203" elapsed="0.103049"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${QTY_PLUS}</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:51:40.094636" elapsed="0.019725"/>
+</kw>
+<kw name="Get Value" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:51:40.134136" level="INFO">${before} = 1</msg>
+<var>${before}</var>
+<arg>${QTY_INPUT}</arg>
+<doc>Returns the value attribute of the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:51:40.114642" elapsed="0.019642"/>
+</kw>
+<kw name="Run Keyword And Return Status" owner="BuiltIn">
+<kw name="Element Should Be Enabled" owner="SeleniumLibrary">
+<arg>${QTY_PLUS}</arg>
+<doc>Verifies that element identified by ``locator`` is enabled.</doc>
+<status status="PASS" start="2026-04-24T08:51:40.135117" elapsed="0.031819"/>
+</kw>
+<msg time="2026-04-24T08:51:40.167238" level="INFO">${plus_enabled} = True</msg>
+<var>${plus_enabled}</var>
+<arg>Element Should Be Enabled</arg>
+<arg>${QTY_PLUS}</arg>
+<doc>Runs the specified keyword and returns the status as a Boolean value.</doc>
+<status status="PASS" start="2026-04-24T08:51:40.134636" elapsed="0.032847"/>
+</kw>
+<kw name="Run Keyword If" owner="BuiltIn">
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:51:40.169354" level="INFO">Clicking element 'xpath:(//button[contains(@class,"qty-btn plus")])[1]'.</msg>
+<arg>${QTY_PLUS}</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:51:40.168918" elapsed="0.075900"/>
+</kw>
+<arg>${plus_enabled}</arg>
+<arg>Click Element</arg>
+<arg>${QTY_PLUS}</arg>
+<doc>Runs the given keyword with the given arguments, if ``condition`` is true.</doc>
+<status status="PASS" start="2026-04-24T08:51:40.168090" elapsed="0.076892"/>
+</kw>
+<kw name="Run Keyword If" owner="BuiltIn">
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-04-24T08:51:40.546574" level="INFO">Slept 300 milliseconds.</msg>
+<arg>0.3s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-04-24T08:51:40.245734" elapsed="0.301139"/>
+</kw>
+<arg>${plus_enabled}</arg>
+<arg>Sleep</arg>
+<arg>0.3s</arg>
+<doc>Runs the given keyword with the given arguments, if ``condition`` is true.</doc>
+<status status="PASS" start="2026-04-24T08:51:40.245237" elapsed="0.301774"/>
+</kw>
+<kw name="Get Value" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:51:40.560771" level="INFO">${after} = 2</msg>
+<var>${after}</var>
+<arg>${QTY_INPUT}</arg>
+<doc>Returns the value attribute of the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:51:40.547437" elapsed="0.013508"/>
+</kw>
+<kw name="Run Keyword If" owner="BuiltIn">
+<kw name="Should Be True" owner="BuiltIn">
+<arg>${after} &gt; ${before}</arg>
+<doc>Fails if the given condition is not true.</doc>
+<status status="PASS" start="2026-04-24T08:51:40.562822" elapsed="0.000608"/>
+</kw>
+<arg>${plus_enabled}</arg>
+<arg>Should Be True</arg>
+<arg>${after} &gt; ${before}</arg>
+<doc>Runs the given keyword with the given arguments, if ``condition`` is true.</doc>
+<status status="PASS" start="2026-04-24T08:51:40.561639" elapsed="0.001964"/>
+</kw>
+<kw name="Close Browser Session" owner="resources" type="TEARDOWN">
+<kw name="Close Browser" owner="SeleniumLibrary">
+<doc>Closes the current browser.</doc>
+<status status="PASS" start="2026-04-24T08:51:40.564449" elapsed="2.185974"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:51:40.564062" elapsed="2.186553"/>
+</kw>
+<tag>cart</tag>
+<tag>kosar</tag>
+<status status="PASS" start="2026-04-24T08:51:32.796518" elapsed="9.954314"/>
+</test>
+<test id="s1-s1-s1-t15" name="TC15 – Mennyiség csökkentése a „−&quot; gombbal" line="136">
+<kw name="Open Aruhaz Page" owner="resources" type="SETUP">
+<kw name="Open Browser" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:51:42.759334" level="INFO">Opening browser 'Chrome' to base url 'http://localhost:5173/aruhaz'.</msg>
+<arg>${ARUHAZ_URL}</arg>
+<arg>${BROWSER}</arg>
+<doc>Opens a new browser instance to the optional ``url``.</doc>
+<status status="PASS" start="2026-04-24T08:51:42.759005" elapsed="1.159871"/>
+</kw>
+<kw name="Maximize Browser Window" owner="SeleniumLibrary">
+<doc>Maximizes current browser window.</doc>
+<status status="PASS" start="2026-04-24T08:51:43.919161" elapsed="0.029057"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${PRODUCT_CARD}</arg>
+<arg>timeout=15s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:51:43.948427" elapsed="2.610126"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:51:42.758622" elapsed="3.800089"/>
+</kw>
+<kw name="Navigate To Aruhaz" owner="resources">
+<kw name="Go To" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:51:46.559967" level="INFO">Opening url 'http://localhost:5173/aruhaz'</msg>
+<arg>${ARUHAZ_URL}</arg>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<status status="PASS" start="2026-04-24T08:51:46.559288" elapsed="0.216483"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${PRODUCT_CARD}</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:51:46.775976" elapsed="2.710831"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:51:46.558957" elapsed="2.928034"/>
+</kw>
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:51:49.487797" level="INFO">Clicking element 'xpath:(//button[contains(@class,"add-btn")])[1]'.</msg>
+<arg>${FIRST_ADD_BTN}</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:51:49.487330" elapsed="0.091190"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${CART_MODAL}</arg>
+<arg>timeout=5s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:51:49.582175" elapsed="0.238949"/>
+</kw>
+<kw name="Close Cart Modal" owner="resources">
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:51:49.824828" level="INFO">Clicking element 'xpath://button[contains(@class,"btn-continue")]'.</msg>
+<arg>${MODAL_CONTINUE_BTN}</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:51:49.821959" elapsed="0.175084"/>
+</kw>
+<kw name="Wait Until Element Is Not Visible" owner="SeleniumLibrary">
+<arg>${CART_MODAL}</arg>
+<arg>timeout=5s</arg>
+<doc>Waits until the element ``locator`` is not visible.</doc>
+<status status="PASS" start="2026-04-24T08:51:49.997860" elapsed="0.440225"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:51:49.821547" elapsed="0.616712"/>
+</kw>
+<kw name="Navigate To Aruhaz" owner="resources">
+<kw name="Go To" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:51:50.439135" level="INFO">Opening url 'http://localhost:5173/aruhaz'</msg>
+<arg>${ARUHAZ_URL}</arg>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<status status="PASS" start="2026-04-24T08:51:50.438922" elapsed="0.139836"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${PRODUCT_CARD}</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:51:50.579022" elapsed="2.923854"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:51:50.438570" elapsed="3.064471"/>
+</kw>
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:51:53.503810" level="INFO">Clicking element 'xpath:(//button[contains(@class,"add-btn")])[1]'.</msg>
+<arg>${FIRST_ADD_BTN}</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:51:53.503382" elapsed="0.052725"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${CART_MODAL}</arg>
+<arg>timeout=5s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:51:53.556528" elapsed="0.229592"/>
+</kw>
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:51:53.786781" level="INFO">Clicking element 'xpath://a[contains(@class,"btn-checkout")]'.</msg>
+<arg>${MODAL_CART_BTN}</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:51:53.786439" elapsed="0.110914"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${QTY_MINUS}</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:51:53.898122" elapsed="0.023122"/>
+</kw>
+<kw name="Get Value" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:51:53.939452" level="INFO">${before} = 2</msg>
+<var>${before}</var>
+<arg>${QTY_INPUT}</arg>
+<doc>Returns the value attribute of the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:51:53.921576" elapsed="0.018173"/>
+</kw>
+<kw name="Run Keyword And Return Status" owner="BuiltIn">
+<kw name="Element Should Be Enabled" owner="SeleniumLibrary">
+<arg>${QTY_MINUS}</arg>
+<doc>Verifies that element identified by ``locator`` is enabled.</doc>
+<status status="PASS" start="2026-04-24T08:51:53.941111" elapsed="0.019256"/>
+</kw>
+<msg time="2026-04-24T08:51:53.960751" level="INFO">${minus_enabled} = True</msg>
+<var>${minus_enabled}</var>
+<arg>Element Should Be Enabled</arg>
+<arg>${QTY_MINUS}</arg>
+<doc>Runs the specified keyword and returns the status as a Boolean value.</doc>
+<status status="PASS" start="2026-04-24T08:51:53.940287" elapsed="0.020994"/>
+</kw>
+<kw name="Run Keyword If" owner="BuiltIn">
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:51:53.963523" level="INFO">Clicking element 'xpath:(//button[contains(@class,"qty-btn minus")])[1]'.</msg>
+<arg>${QTY_MINUS}</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:51:53.962676" elapsed="0.067552"/>
+</kw>
+<arg>${minus_enabled}</arg>
+<arg>Click Element</arg>
+<arg>${QTY_MINUS}</arg>
+<doc>Runs the given keyword with the given arguments, if ``condition`` is true.</doc>
+<status status="PASS" start="2026-04-24T08:51:53.961698" elapsed="0.068690"/>
+</kw>
+<kw name="Run Keyword If" owner="BuiltIn">
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-04-24T08:51:54.331986" level="INFO">Slept 300 milliseconds.</msg>
+<arg>0.3s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-04-24T08:51:54.031222" elapsed="0.300999"/>
+</kw>
+<arg>${minus_enabled}</arg>
+<arg>Sleep</arg>
+<arg>0.3s</arg>
+<doc>Runs the given keyword with the given arguments, if ``condition`` is true.</doc>
+<status status="PASS" start="2026-04-24T08:51:54.030684" elapsed="0.301669"/>
+</kw>
+<kw name="Get Value" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:51:54.346660" level="INFO">${after} = 1</msg>
+<var>${after}</var>
+<arg>${QTY_INPUT}</arg>
+<doc>Returns the value attribute of the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:51:54.332583" elapsed="0.014303"/>
+</kw>
+<kw name="Run Keyword If" owner="BuiltIn">
+<kw name="Should Be True" owner="BuiltIn">
+<arg>${after} &lt; ${before}</arg>
+<doc>Fails if the given condition is not true.</doc>
+<status status="PASS" start="2026-04-24T08:51:54.347630" elapsed="0.000415"/>
+</kw>
+<arg>${minus_enabled}</arg>
+<arg>Should Be True</arg>
+<arg>${after} &lt; ${before}</arg>
+<doc>Runs the given keyword with the given arguments, if ``condition`` is true.</doc>
+<status status="PASS" start="2026-04-24T08:51:54.347157" elapsed="0.001038"/>
+</kw>
+<kw name="Close Browser Session" owner="resources" type="TEARDOWN">
+<kw name="Close Browser" owner="SeleniumLibrary">
+<doc>Closes the current browser.</doc>
+<status status="PASS" start="2026-04-24T08:51:54.349120" elapsed="2.215884"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:51:54.348653" elapsed="2.216531"/>
+</kw>
+<tag>cart</tag>
+<tag>kosar</tag>
+<status status="PASS" start="2026-04-24T08:51:42.754917" elapsed="13.810734"/>
+</test>
+<test id="s1-s1-s1-t16" name="K04 – Termék eltávolítása a kosárból" line="154">
+<kw name="Open Aruhaz Page" owner="resources" type="SETUP">
+<kw name="Open Browser" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:51:56.574826" level="INFO">Opening browser 'Chrome' to base url 'http://localhost:5173/aruhaz'.</msg>
+<arg>${ARUHAZ_URL}</arg>
+<arg>${BROWSER}</arg>
+<doc>Opens a new browser instance to the optional ``url``.</doc>
+<status status="PASS" start="2026-04-24T08:51:56.574534" elapsed="1.152238"/>
+</kw>
+<kw name="Maximize Browser Window" owner="SeleniumLibrary">
+<doc>Maximizes current browser window.</doc>
+<status status="PASS" start="2026-04-24T08:51:57.727172" elapsed="0.023548"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${PRODUCT_CARD}</arg>
+<arg>timeout=15s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:51:57.750910" elapsed="2.569982"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:51:56.574128" elapsed="3.746938"/>
+</kw>
+<kw name="Add First Product To Cart" owner="resources">
+<kw name="Navigate To Aruhaz" owner="resources">
+<kw name="Go To" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:52:00.322969" level="INFO">Opening url 'http://localhost:5173/aruhaz'</msg>
+<arg>${ARUHAZ_URL}</arg>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<status status="PASS" start="2026-04-24T08:52:00.321951" elapsed="0.194781"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${PRODUCT_CARD}</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:52:00.516965" elapsed="2.700479"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:52:00.321692" elapsed="2.895919"/>
+</kw>
+<kw name="Get Text" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:52:03.234752" level="INFO">${title} = Prémium gyapjú fonal</msg>
+<var>${title}</var>
+<arg>${FIRST_PRODUCT_TITLE}</arg>
+<doc>Returns the text value of the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:52:03.217751" elapsed="0.017177"/>
+</kw>
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:52:03.235437" level="INFO">Clicking element 'xpath:(//button[contains(@class,"add-btn")])[1]'.</msg>
+<arg>${FIRST_ADD_BTN}</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:52:03.235128" elapsed="0.065842"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${CART_MODAL}</arg>
+<arg>timeout=5s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:52:03.301217" elapsed="0.229121"/>
+</kw>
+<return>
+<value>${title}</value>
+<status status="PASS" start="2026-04-24T08:52:03.530501" elapsed="0.000135"/>
+</return>
+<status status="PASS" start="2026-04-24T08:52:00.321354" elapsed="3.209440"/>
+</kw>
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:52:03.531452" level="INFO">Clicking element 'xpath://a[contains(@class,"btn-checkout")]'.</msg>
+<arg>${MODAL_CART_BTN}</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:52:03.531074" elapsed="0.116115"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${REMOVE_BTN}</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:52:03.647640" elapsed="0.023865"/>
+</kw>
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:52:03.672194" level="INFO">Clicking element 'xpath:(//button[contains(@class,"remove-btn")])[1]'.</msg>
+<arg>${REMOVE_BTN}</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:52:03.671856" elapsed="0.057900"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-04-24T08:52:04.230599" level="INFO">Slept 500 milliseconds.</msg>
+<arg>0.5s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-04-24T08:52:03.730033" elapsed="0.500902"/>
+</kw>
+<kw name="Element Should Be Visible" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:52:04.245394" level="INFO">Element '//*[@id="app"]/main/div/div[2]/h2' is displayed.</msg>
+<arg>${EMPTY_CART_MSG}</arg>
+<doc>Verifies that the element identified by ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:52:04.231245" elapsed="0.014345"/>
+</kw>
+<kw name="Close Browser Session" owner="resources" type="TEARDOWN">
+<kw name="Close Browser" owner="SeleniumLibrary">
+<doc>Closes the current browser.</doc>
+<status status="PASS" start="2026-04-24T08:52:04.246426" elapsed="2.210475"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:52:04.245946" elapsed="2.211594"/>
+</kw>
+<tag>cart</tag>
+<tag>kosar</tag>
+<status status="PASS" start="2026-04-24T08:51:56.570304" elapsed="9.888014"/>
+</test>
+<test id="s1-s1-s1-t17" name="TC17 – Kosár ürítése gombbal (megerősítéssel)" line="163">
+<kw name="Open Aruhaz Page" owner="resources" type="SETUP">
+<kw name="Open Browser" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:52:06.498124" level="INFO">Opening browser 'Chrome' to base url 'http://localhost:5173/aruhaz'.</msg>
+<arg>${ARUHAZ_URL}</arg>
+<arg>${BROWSER}</arg>
+<doc>Opens a new browser instance to the optional ``url``.</doc>
+<status status="PASS" start="2026-04-24T08:52:06.497402" elapsed="1.172887"/>
+</kw>
+<kw name="Maximize Browser Window" owner="SeleniumLibrary">
+<doc>Maximizes current browser window.</doc>
+<status status="PASS" start="2026-04-24T08:52:07.670514" elapsed="0.031782"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${PRODUCT_CARD}</arg>
+<arg>timeout=15s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:52:07.702499" elapsed="2.394389"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:52:06.496305" elapsed="3.600739"/>
+</kw>
+<kw name="Add First Product To Cart" owner="resources">
+<kw name="Navigate To Aruhaz" owner="resources">
+<kw name="Go To" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:52:10.098277" level="INFO">Opening url 'http://localhost:5173/aruhaz'</msg>
+<arg>${ARUHAZ_URL}</arg>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<status status="PASS" start="2026-04-24T08:52:10.098072" elapsed="0.154315"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${PRODUCT_CARD}</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:52:10.252597" elapsed="2.296549"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:52:10.097722" elapsed="2.451578"/>
+</kw>
+<kw name="Get Text" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:52:12.581071" level="INFO">${title} = Prémium gyapjú fonal</msg>
+<var>${title}</var>
+<arg>${FIRST_PRODUCT_TITLE}</arg>
+<doc>Returns the text value of the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:52:12.549496" elapsed="0.031717"/>
+</kw>
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:52:12.581652" level="INFO">Clicking element 'xpath:(//button[contains(@class,"add-btn")])[1]'.</msg>
+<arg>${FIRST_ADD_BTN}</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:52:12.581391" elapsed="0.063368"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${CART_MODAL}</arg>
+<arg>timeout=5s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:52:12.644968" elapsed="0.228569"/>
+</kw>
+<return>
+<value>${title}</value>
+<status status="PASS" start="2026-04-24T08:52:12.873691" elapsed="0.000126"/>
+</return>
+<status status="PASS" start="2026-04-24T08:52:10.097384" elapsed="2.776578"/>
+</kw>
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:52:12.874549" level="INFO">Clicking element 'xpath://a[contains(@class,"btn-checkout")]'.</msg>
+<arg>${MODAL_CART_BTN}</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:52:12.874192" elapsed="0.206138"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${EMPTY_CART_BTN}</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:52:13.080748" elapsed="0.018321"/>
+</kw>
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:52:13.099716" level="INFO">Clicking element 'id:emptyCart'.</msg>
+<arg>${EMPTY_CART_BTN}</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:52:13.099404" elapsed="0.060523"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${CONFIRM_YES_BTN}</arg>
+<arg>timeout=5s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:52:13.160200" elapsed="0.014340"/>
+</kw>
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:52:13.175089" level="INFO">Clicking element 'xpath://button[contains(@class,"confirm-btn danger")]'.</msg>
+<arg>${CONFIRM_YES_BTN}</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:52:13.174799" elapsed="0.051848"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-04-24T08:52:14.227475" level="INFO">Slept 1 second.</msg>
+<arg>1s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-04-24T08:52:13.226948" elapsed="1.000867"/>
+</kw>
+<kw name="Element Should Be Visible" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:52:14.239907" level="INFO">Element '//*[@id="app"]/main/div/div[2]/h2' is displayed.</msg>
+<arg>${EMPTY_CART_MSG}</arg>
+<doc>Verifies that the element identified by ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:52:14.228096" elapsed="0.012093"/>
+</kw>
+<kw name="Close Browser Session" owner="resources" type="TEARDOWN">
+<kw name="Close Browser" owner="SeleniumLibrary">
+<doc>Closes the current browser.</doc>
+<status status="PASS" start="2026-04-24T08:52:14.241054" elapsed="2.159089"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:52:14.240631" elapsed="2.160147"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:52:06.471449" elapsed="9.930109"/>
+</test>
+<test id="s1-s1-s1-t18" name="TC18 – Kosár ürítése gombbal (elutasítással) megtartja a terméket" line="173">
+<kw name="Open Aruhaz Page" owner="resources" type="SETUP">
+<kw name="Open Browser" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:52:16.442198" level="INFO">Opening browser 'Chrome' to base url 'http://localhost:5173/aruhaz'.</msg>
+<arg>${ARUHAZ_URL}</arg>
+<arg>${BROWSER}</arg>
+<doc>Opens a new browser instance to the optional ``url``.</doc>
+<status status="PASS" start="2026-04-24T08:52:16.441524" elapsed="1.139584"/>
+</kw>
+<kw name="Maximize Browser Window" owner="SeleniumLibrary">
+<doc>Maximizes current browser window.</doc>
+<status status="PASS" start="2026-04-24T08:52:17.581365" elapsed="0.031760"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${PRODUCT_CARD}</arg>
+<arg>timeout=15s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:52:17.613343" elapsed="2.519105"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:52:16.440573" elapsed="3.692032"/>
+</kw>
+<kw name="Add First Product To Cart" owner="resources">
+<kw name="Navigate To Aruhaz" owner="resources">
+<kw name="Go To" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:52:20.133627" level="INFO">Opening url 'http://localhost:5173/aruhaz'</msg>
+<arg>${ARUHAZ_URL}</arg>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<status status="PASS" start="2026-04-24T08:52:20.133446" elapsed="0.160986"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${PRODUCT_CARD}</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:52:20.294631" elapsed="2.490945"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:52:20.133197" elapsed="2.652633"/>
+</kw>
+<kw name="Get Text" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:52:22.812176" level="INFO">${title} = Prémium gyapjú fonal</msg>
+<var>${title}</var>
+<arg>${FIRST_PRODUCT_TITLE}</arg>
+<doc>Returns the text value of the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:52:22.785972" elapsed="0.026465"/>
+</kw>
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:52:22.813137" level="INFO">Clicking element 'xpath:(//button[contains(@class,"add-btn")])[1]'.</msg>
+<arg>${FIRST_ADD_BTN}</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:52:22.812691" elapsed="0.080061"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${CART_MODAL}</arg>
+<arg>timeout=5s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:52:22.892958" elapsed="0.233635"/>
+</kw>
+<return>
+<value>${title}</value>
+<status status="PASS" start="2026-04-24T08:52:23.127075" elapsed="0.000317"/>
+</return>
+<status status="PASS" start="2026-04-24T08:52:20.132875" elapsed="2.994850"/>
+</kw>
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:52:23.128598" level="INFO">Clicking element 'xpath://a[contains(@class,"btn-checkout")]'.</msg>
+<arg>${MODAL_CART_BTN}</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:52:23.128146" elapsed="0.105819"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${EMPTY_CART_BTN}</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:52:23.234457" elapsed="0.019940"/>
+</kw>
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:52:23.254965" level="INFO">Clicking element 'id:emptyCart'.</msg>
+<arg>${EMPTY_CART_BTN}</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:52:23.254663" elapsed="0.048964"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${CONFIRM_NO_BTN}</arg>
+<arg>timeout=5s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:52:23.303947" elapsed="0.016292"/>
+</kw>
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:52:23.320836" level="INFO">Clicking element 'xpath://button[contains(@class,"confirm-btn cancel")]'.</msg>
+<arg>${CONFIRM_NO_BTN}</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:52:23.320539" elapsed="0.038529"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-04-24T08:52:23.860163" level="INFO">Slept 500 milliseconds.</msg>
+<arg>0.5s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-04-24T08:52:23.359330" elapsed="0.501103"/>
+</kw>
+<kw name="Element Should Not Be Visible" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:52:23.871242" level="INFO">Element '//*[@id="app"]/main/div/div[2]/h2' did not exist.</msg>
+<arg>${EMPTY_CART_MSG}</arg>
+<doc>Verifies that the element identified by ``locator`` is NOT visible.</doc>
+<status status="PASS" start="2026-04-24T08:52:23.860997" elapsed="0.010432"/>
+</kw>
+<kw name="Close Browser Session" owner="resources" type="TEARDOWN">
+<kw name="Close Browser" owner="SeleniumLibrary">
+<doc>Closes the current browser.</doc>
+<status status="PASS" start="2026-04-24T08:52:23.872771" elapsed="2.150911"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:52:23.872192" elapsed="2.152119"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:52:16.416098" elapsed="9.608999"/>
+</test>
+<test id="s1-s1-s1-t19" name="TC19 – Végösszeg helyesen számítódik" line="183">
+<kw name="Open Aruhaz Page" owner="resources" type="SETUP">
+<kw name="Open Browser" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:52:26.042381" level="INFO">Opening browser 'Chrome' to base url 'http://localhost:5173/aruhaz'.</msg>
+<arg>${ARUHAZ_URL}</arg>
+<arg>${BROWSER}</arg>
+<doc>Opens a new browser instance to the optional ``url``.</doc>
+<status status="PASS" start="2026-04-24T08:52:26.041997" elapsed="0.946844"/>
+</kw>
+<kw name="Maximize Browser Window" owner="SeleniumLibrary">
+<doc>Maximizes current browser window.</doc>
+<status status="PASS" start="2026-04-24T08:52:26.989086" elapsed="0.019635"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${PRODUCT_CARD}</arg>
+<arg>timeout=15s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:52:27.008940" elapsed="2.373240"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:52:26.041470" elapsed="3.340884"/>
+</kw>
+<kw name="Add First Product To Cart" owner="resources">
+<kw name="Navigate To Aruhaz" owner="resources">
+<kw name="Go To" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:52:29.383691" level="INFO">Opening url 'http://localhost:5173/aruhaz'</msg>
+<arg>${ARUHAZ_URL}</arg>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<status status="PASS" start="2026-04-24T08:52:29.383467" elapsed="0.162587"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${PRODUCT_CARD}</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:52:29.546287" elapsed="2.309308"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:52:29.383110" elapsed="2.472640"/>
+</kw>
+<kw name="Get Text" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:52:31.873090" level="INFO">${title} = Prémium gyapjú fonal</msg>
+<var>${title}</var>
+<arg>${FIRST_PRODUCT_TITLE}</arg>
+<doc>Returns the text value of the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:52:31.855885" elapsed="0.017488"/>
+</kw>
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:52:31.873916" level="INFO">Clicking element 'xpath:(//button[contains(@class,"add-btn")])[1]'.</msg>
+<arg>${FIRST_ADD_BTN}</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:52:31.873556" elapsed="0.064143"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${CART_MODAL}</arg>
+<arg>timeout=5s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:52:31.937942" elapsed="0.229490"/>
+</kw>
+<return>
+<value>${title}</value>
+<status status="PASS" start="2026-04-24T08:52:32.167573" elapsed="0.000118"/>
+</return>
+<status status="PASS" start="2026-04-24T08:52:29.382673" elapsed="2.785151"/>
+</kw>
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:52:32.168446" level="INFO">Clicking element 'xpath://a[contains(@class,"btn-checkout")]'.</msg>
+<arg>${MODAL_CART_BTN}</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:52:32.168064" elapsed="0.156828"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${CART_TOTAL}</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:52:32.325340" elapsed="0.019008"/>
+</kw>
+<kw name="Get Text" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:52:32.357036" level="INFO">${total_text} = 2500 Ft</msg>
+<var>${total_text}</var>
+<arg>${CART_TOTAL}</arg>
+<doc>Returns the text value of the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:52:32.344880" elapsed="0.012398"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${total_text}</arg>
+<arg>Ft</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-04-24T08:52:32.357549" elapsed="0.000445"/>
+</kw>
+<kw name="Close Browser Session" owner="resources" type="TEARDOWN">
+<kw name="Close Browser" owner="SeleniumLibrary">
+<doc>Closes the current browser.</doc>
+<status status="PASS" start="2026-04-24T08:52:32.358745" elapsed="2.189006"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:52:32.358322" elapsed="2.189698"/>
+</kw>
+<tag>cart</tag>
+<tag>kosar</tag>
+<status status="PASS" start="2026-04-24T08:52:26.035230" elapsed="8.513137"/>
+</test>
+<test id="s1-s1-s1-t20" name="K05 – Checkout gomb validálja az üres szállítási adatokat" line="191">
+<kw name="Open Aruhaz Page" owner="resources" type="SETUP">
+<kw name="Open Browser" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:52:34.564248" level="INFO">Opening browser 'Chrome' to base url 'http://localhost:5173/aruhaz'.</msg>
+<arg>${ARUHAZ_URL}</arg>
+<arg>${BROWSER}</arg>
+<doc>Opens a new browser instance to the optional ``url``.</doc>
+<status status="PASS" start="2026-04-24T08:52:34.563816" elapsed="0.926935"/>
+</kw>
+<kw name="Maximize Browser Window" owner="SeleniumLibrary">
+<doc>Maximizes current browser window.</doc>
+<status status="PASS" start="2026-04-24T08:52:35.490964" elapsed="0.032410"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${PRODUCT_CARD}</arg>
+<arg>timeout=15s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:52:35.523925" elapsed="2.360522"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:52:34.563152" elapsed="3.321450"/>
+</kw>
+<kw name="Add First Product To Cart" owner="resources">
+<kw name="Navigate To Aruhaz" owner="resources">
+<kw name="Go To" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:52:37.885682" level="INFO">Opening url 'http://localhost:5173/aruhaz'</msg>
+<arg>${ARUHAZ_URL}</arg>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<status status="PASS" start="2026-04-24T08:52:37.885499" elapsed="0.165067"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${PRODUCT_CARD}</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:52:38.050796" elapsed="2.311356"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:52:37.885246" elapsed="2.477061"/>
+</kw>
+<kw name="Get Text" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:52:40.379639" level="INFO">${title} = Prémium gyapjú fonal</msg>
+<var>${title}</var>
+<arg>${FIRST_PRODUCT_TITLE}</arg>
+<doc>Returns the text value of the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:52:40.362443" elapsed="0.017340"/>
+</kw>
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:52:40.380215" level="INFO">Clicking element 'xpath:(//button[contains(@class,"add-btn")])[1]'.</msg>
+<arg>${FIRST_ADD_BTN}</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:52:40.379955" elapsed="0.064174"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${CART_MODAL}</arg>
+<arg>timeout=5s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:52:40.444366" elapsed="0.228270"/>
+</kw>
+<return>
+<value>${title}</value>
+<status status="PASS" start="2026-04-24T08:52:40.672778" elapsed="0.000116"/>
+</return>
+<status status="PASS" start="2026-04-24T08:52:37.884926" elapsed="2.788100"/>
+</kw>
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:52:40.673617" level="INFO">Clicking element 'xpath://a[contains(@class,"btn-checkout")]'.</msg>
+<arg>${MODAL_CART_BTN}</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:52:40.673314" elapsed="0.093726"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>xpath://button[@id="checkout"]</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:52:40.768215" elapsed="0.022127"/>
+</kw>
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:52:40.790923" level="INFO">Clicking element 'xpath://button[@id="checkout"]'.</msg>
+<arg>xpath://button[@id="checkout"]</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:52:40.790640" elapsed="0.040516"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-04-24T08:52:41.832217" level="INFO">Slept 1 second.</msg>
+<arg>1s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-04-24T08:52:40.831423" elapsed="1.001027"/>
+</kw>
+<kw name="Run Keyword And Return Status" owner="BuiltIn">
+<kw name="Element Should Be Visible" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:52:41.924824" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="selenium-screenshot-92.png"&gt;&lt;img src="selenium-screenshot-92.png" width="800px"&gt;&lt;/a&gt;</msg>
+<msg time="2026-04-24T08:52:41.925236" level="FAIL">Element with locator 'xpath://div[contains(@class,"modal")]//h3[contains(.,"Hibás adatok")]' not found.</msg>
+<arg>xpath://div[contains(@class,"modal")]//h3[contains(.,"Hibás adatok")]</arg>
+<doc>Verifies that the element identified by ``locator`` is visible.</doc>
+<status status="FAIL" start="2026-04-24T08:52:41.833465" elapsed="0.098097">Element with locator 'xpath://div[contains(@class,"modal")]//h3[contains(.,"Hibás adatok")]' not found.</status>
+</kw>
+<msg time="2026-04-24T08:52:41.931764" level="INFO">${on_modal} = False</msg>
+<var>${on_modal}</var>
+<arg>Element Should Be Visible</arg>
+<arg>xpath://div[contains(@class,"modal")]//h3[contains(.,"Hibás adatok")]</arg>
+<doc>Runs the specified keyword and returns the status as a Boolean value.</doc>
+<status status="PASS" start="2026-04-24T08:52:41.832897" elapsed="0.099005"/>
+</kw>
+<kw name="Run Keyword And Return Status" owner="BuiltIn">
+<kw name="Location Should Contain" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:52:42.014593" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="selenium-screenshot-93.png"&gt;&lt;img src="selenium-screenshot-93.png" width="800px"&gt;&lt;/a&gt;</msg>
+<msg time="2026-04-24T08:52:42.014856" level="FAIL">Location should have contained '/fizetes' but it was 'http://localhost:5173/kosar'.</msg>
+<arg>/fizetes</arg>
+<doc>Verifies that the current URL contains ``expected``.</doc>
+<status status="FAIL" start="2026-04-24T08:52:41.932656" elapsed="0.086623">Location should have contained '/fizetes' but it was 'http://localhost:5173/kosar'.</status>
+</kw>
+<msg time="2026-04-24T08:52:42.019473" level="INFO">${on_fizetes} = False</msg>
+<var>${on_fizetes}</var>
+<arg>Location Should Contain</arg>
+<arg>/fizetes</arg>
+<doc>Runs the specified keyword and returns the status as a Boolean value.</doc>
+<status status="PASS" start="2026-04-24T08:52:41.932262" elapsed="0.087339"/>
+</kw>
+<kw name="Should Not Be True" owner="BuiltIn">
+<arg>${on_fizetes}</arg>
+<doc>Fails if the given condition is true.</doc>
+<status status="PASS" start="2026-04-24T08:52:42.019876" elapsed="0.000436"/>
+</kw>
+<kw name="Run Keyword If" owner="BuiltIn">
+<arg>${on_modal}</arg>
+<arg>Click Element</arg>
+<arg>xpath://button[contains(@class,"btn confirm")]</arg>
+<doc>Runs the given keyword with the given arguments, if ``condition`` is true.</doc>
+<status status="PASS" start="2026-04-24T08:52:42.020660" elapsed="0.000322"/>
+</kw>
+<kw name="Close Browser Session" owner="resources" type="TEARDOWN">
+<kw name="Close Browser" owner="SeleniumLibrary">
+<doc>Closes the current browser.</doc>
+<status status="PASS" start="2026-04-24T08:52:42.021531" elapsed="2.184456"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:52:42.021248" elapsed="2.185377"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:52:34.554271" elapsed="9.653142"/>
+</test>
+<test id="s1-s1-s1-t21" name="K06 – Érvénytelen irányítószám hibaüzenetet mutat" line="205">
+<kw name="Open Aruhaz Page" owner="resources" type="SETUP">
+<kw name="Open Browser" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:52:44.225744" level="INFO">Opening browser 'Chrome' to base url 'http://localhost:5173/aruhaz'.</msg>
+<arg>${ARUHAZ_URL}</arg>
+<arg>${BROWSER}</arg>
+<doc>Opens a new browser instance to the optional ``url``.</doc>
+<status status="PASS" start="2026-04-24T08:52:44.225248" elapsed="1.052007"/>
+</kw>
+<kw name="Maximize Browser Window" owner="SeleniumLibrary">
+<doc>Maximizes current browser window.</doc>
+<status status="PASS" start="2026-04-24T08:52:45.277465" elapsed="0.024493"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${PRODUCT_CARD}</arg>
+<arg>timeout=15s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:52:45.302147" elapsed="2.300034"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:52:44.224740" elapsed="3.377601"/>
+</kw>
+<kw name="Add First Product To Cart" owner="resources">
+<kw name="Navigate To Aruhaz" owner="resources">
+<kw name="Go To" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:52:47.603431" level="INFO">Opening url 'http://localhost:5173/aruhaz'</msg>
+<arg>${ARUHAZ_URL}</arg>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<status status="PASS" start="2026-04-24T08:52:47.603247" elapsed="0.016731"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${PRODUCT_CARD}</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:52:47.620210" elapsed="2.453463"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:52:47.602994" elapsed="2.470835"/>
+</kw>
+<kw name="Get Text" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:52:50.091300" level="INFO">${title} = Prémium gyapjú fonal</msg>
+<var>${title}</var>
+<arg>${FIRST_PRODUCT_TITLE}</arg>
+<doc>Returns the text value of the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:52:50.073959" elapsed="0.017604"/>
+</kw>
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:52:50.092047" level="INFO">Clicking element 'xpath:(//button[contains(@class,"add-btn")])[1]'.</msg>
+<arg>${FIRST_ADD_BTN}</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:52:50.091751" elapsed="0.064580"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${CART_MODAL}</arg>
+<arg>timeout=5s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:52:50.156546" elapsed="0.226707"/>
+</kw>
+<return>
+<value>${title}</value>
+<status status="PASS" start="2026-04-24T08:52:50.383393" elapsed="0.000114"/>
+</return>
+<status status="PASS" start="2026-04-24T08:52:47.602645" elapsed="2.780995"/>
+</kw>
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:52:50.384213" level="INFO">Clicking element 'xpath://a[contains(@class,"btn-checkout")]'.</msg>
+<arg>${MODAL_CART_BTN}</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:52:50.383869" elapsed="0.111687"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:52:50.497169" level="INFO">Executing JavaScript:
+window.scrollTo(0, document.body.scrollHeight)
+Without any arguments.</msg>
+<arg>window.scrollTo(0, document.body.scrollHeight)</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2026-04-24T08:52:50.496442" elapsed="0.012015"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-04-24T08:52:51.510079" level="INFO">Slept 1 second.</msg>
+<arg>1s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-04-24T08:52:50.508928" elapsed="1.001382"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${FIELD_HAZSZAM}</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:52:51.510688" elapsed="0.016938"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:52:51.528381" level="INFO">Executing JavaScript:
+const el = document.getElementById('hazszam');const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype,'value').set;setter.call(el,'0abc!');el.dispatchEvent(new Event('input',{bubbles:true}));el.dispatchEvent(new Event('blur',{bubbles:true}));
+Without any arguments.</msg>
+<arg>const el = document.getElementById('hazszam');</arg>
+<arg>const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype,'value').set;</arg>
+<arg>setter.call(el,'0abc!');</arg>
+<arg>el.dispatchEvent(new Event('input',{bubbles:true}));</arg>
+<arg>el.dispatchEvent(new Event('blur',{bubbles:true}));</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2026-04-24T08:52:51.527939" elapsed="0.011326"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-04-24T08:52:51.840675" level="INFO">Slept 300 milliseconds.</msg>
+<arg>0.3s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-04-24T08:52:51.539611" elapsed="0.301449"/>
+</kw>
+<kw name="Element Should Be Visible" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:52:51.856827" level="INFO">Element 'xpath://span[contains(@class,"error-message")]' is displayed.</msg>
+<arg>xpath://span[contains(@class,"error-message")]</arg>
+<doc>Verifies that the element identified by ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:52:51.841488" elapsed="0.015602"/>
+</kw>
+<kw name="Close Browser Session" owner="resources" type="TEARDOWN">
+<kw name="Close Browser" owner="SeleniumLibrary">
+<doc>Closes the current browser.</doc>
+<status status="PASS" start="2026-04-24T08:52:51.858200" elapsed="2.197917"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:52:51.857799" elapsed="2.198557"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:52:44.218862" elapsed="9.837830"/>
+</test>
+<test id="s1-s1-s1-t22" name="TC22 – Helyes irányítószám zöld pipát mutat" line="221">
+<kw name="Open Aruhaz Page" owner="resources" type="SETUP">
+<kw name="Open Browser" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:52:54.074579" level="INFO">Opening browser 'Chrome' to base url 'http://localhost:5173/aruhaz'.</msg>
+<arg>${ARUHAZ_URL}</arg>
+<arg>${BROWSER}</arg>
+<doc>Opens a new browser instance to the optional ``url``.</doc>
+<status status="PASS" start="2026-04-24T08:52:54.074046" elapsed="0.993627"/>
+</kw>
+<kw name="Maximize Browser Window" owner="SeleniumLibrary">
+<doc>Maximizes current browser window.</doc>
+<status status="PASS" start="2026-04-24T08:52:55.067923" elapsed="0.025753"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${PRODUCT_CARD}</arg>
+<arg>timeout=15s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:52:55.093862" elapsed="2.355557"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:52:54.073380" elapsed="3.376197"/>
+</kw>
+<kw name="Add First Product To Cart" owner="resources">
+<kw name="Navigate To Aruhaz" owner="resources">
+<kw name="Go To" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:52:57.450622" level="INFO">Opening url 'http://localhost:5173/aruhaz'</msg>
+<arg>${ARUHAZ_URL}</arg>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<status status="PASS" start="2026-04-24T08:52:57.450436" elapsed="0.168253"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${PRODUCT_CARD}</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:52:57.618982" elapsed="2.503507"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:52:57.450185" elapsed="2.672459"/>
+</kw>
+<kw name="Get Text" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:53:00.142502" level="INFO">${title} = Prémium gyapjú fonal</msg>
+<var>${title}</var>
+<arg>${FIRST_PRODUCT_TITLE}</arg>
+<doc>Returns the text value of the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:53:00.122775" elapsed="0.019868"/>
+</kw>
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:53:00.143184" level="INFO">Clicking element 'xpath:(//button[contains(@class,"add-btn")])[1]'.</msg>
+<arg>${FIRST_ADD_BTN}</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:53:00.142874" elapsed="0.063668"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${CART_MODAL}</arg>
+<arg>timeout=5s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:53:00.206734" elapsed="0.226422"/>
+</kw>
+<return>
+<value>${title}</value>
+<status status="PASS" start="2026-04-24T08:53:00.433304" elapsed="0.000123"/>
+</return>
+<status status="PASS" start="2026-04-24T08:52:57.449859" elapsed="2.983711"/>
+</kw>
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:53:00.434105" level="INFO">Clicking element 'xpath://a[contains(@class,"btn-checkout")]'.</msg>
+<arg>${MODAL_CART_BTN}</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:53:00.433821" elapsed="0.096199"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:53:00.531427" level="INFO">Executing JavaScript:
+window.scrollTo(0, document.body.scrollHeight)
+Without any arguments.</msg>
+<arg>window.scrollTo(0, document.body.scrollHeight)</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2026-04-24T08:53:00.530649" elapsed="0.007797"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-04-24T08:53:01.539470" level="INFO">Slept 1 second.</msg>
+<arg>1s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-04-24T08:53:00.538731" elapsed="1.000960"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${FIELD_HAZSZAM}</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:53:01.540215" elapsed="0.016336"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:53:01.558811" level="INFO">Executing JavaScript:
+const el = document.getElementById('hazszam');const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype,'value').set;setter.call(el,'12');el.dispatchEvent(new Event('input',{bubbles:true}));el.dispatchEvent(new Event('blur',{bubbles:true}));
+Without any arguments.</msg>
+<arg>const el = document.getElementById('hazszam');</arg>
+<arg>const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype,'value').set;</arg>
+<arg>setter.call(el,'12');</arg>
+<arg>el.dispatchEvent(new Event('input',{bubbles:true}));</arg>
+<arg>el.dispatchEvent(new Event('blur',{bubbles:true}));</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2026-04-24T08:53:01.558311" elapsed="0.007645"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-04-24T08:53:01.867529" level="INFO">Slept 300 milliseconds.</msg>
+<arg>0.3s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-04-24T08:53:01.566803" elapsed="0.300947"/>
+</kw>
+<kw name="Element Should Be Visible" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:53:01.882191" level="INFO">Element 'xpath://span[contains(@class,"success-indicator")]' is displayed.</msg>
+<arg>xpath://span[contains(@class,"success-indicator")]</arg>
+<doc>Verifies that the element identified by ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:53:01.868183" elapsed="0.014233"/>
+</kw>
+<kw name="Close Browser Session" owner="resources" type="TEARDOWN">
+<kw name="Close Browser" owner="SeleniumLibrary">
+<doc>Closes the current browser.</doc>
+<status status="PASS" start="2026-04-24T08:53:01.884050" elapsed="2.188310"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:53:01.883490" elapsed="2.189132"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:52:54.061893" elapsed="10.011074"/>
+</test>
+<test id="s1-s1-s1-t23" name="TC23 – Teljes szállítási adatok kitöltésével a checkout továbblép a fizetésre" line="236">
+<kw name="Open Aruhaz Page" owner="resources" type="SETUP">
+<kw name="Open Browser" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:53:04.089603" level="INFO">Opening browser 'Chrome' to base url 'http://localhost:5173/aruhaz'.</msg>
+<arg>${ARUHAZ_URL}</arg>
+<arg>${BROWSER}</arg>
+<doc>Opens a new browser instance to the optional ``url``.</doc>
+<status status="PASS" start="2026-04-24T08:53:04.089213" elapsed="1.781654"/>
+</kw>
+<kw name="Maximize Browser Window" owner="SeleniumLibrary">
+<doc>Maximizes current browser window.</doc>
+<status status="PASS" start="2026-04-24T08:53:05.871087" elapsed="0.094254"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${PRODUCT_CARD}</arg>
+<arg>timeout=15s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:53:05.965559" elapsed="1.505798"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:53:04.088740" elapsed="3.382776"/>
+</kw>
+<kw name="Navigate To Cart With Item And Login" owner="resources">
+<kw name="Open Browser" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:53:07.472460" level="INFO">Opening browser 'Chrome' to base url 'http://localhost:5173'.</msg>
+<arg>${URL}</arg>
+<arg>${BROWSER}</arg>
+<doc>Opens a new browser instance to the optional ``url``.</doc>
+<status status="PASS" start="2026-04-24T08:53:07.472193" elapsed="0.944888"/>
+</kw>
+<kw name="Maximize Browser Window" owner="SeleniumLibrary">
+<doc>Maximizes current browser window.</doc>
+<status status="PASS" start="2026-04-24T08:53:08.417310" elapsed="0.022877"/>
+</kw>
+<kw name="Go To" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:53:08.440635" level="INFO">Opening url 'http://localhost:5173'</msg>
+<arg>${URL}</arg>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<status status="PASS" start="2026-04-24T08:53:08.440386" elapsed="0.160132"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>//header//nav//a[7]</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:53:08.600747" elapsed="1.145459"/>
+</kw>
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:53:09.746717" level="INFO">Clicking element '//header//nav//a[7]'.</msg>
+<arg>//header//nav//a[7]</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:53:09.746423" elapsed="0.073367"/>
+</kw>
+<kw name="Login As Test User" owner="resources">
+<kw name="Switch To Login" owner="resources">
+<kw name="Run Keyword And Return Status" owner="BuiltIn">
+<kw name="Element Should Be Visible" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:53:09.837408" level="INFO">Element 'xpath://h2[contains(.,"Fiók készítése")]' is displayed.</msg>
+<arg>xpath://h2[contains(.,"Fiók készítése")]</arg>
+<doc>Verifies that the element identified by ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:53:09.821167" elapsed="0.016473"/>
+</kw>
+<msg time="2026-04-24T08:53:09.837844" level="INFO">${reg_visible} = True</msg>
+<var>${reg_visible}</var>
+<arg>Element Should Be Visible</arg>
+<arg>xpath://h2[contains(.,"Fiók készítése")]</arg>
+<doc>Runs the specified keyword and returns the status as a Boolean value.</doc>
+<status status="PASS" start="2026-04-24T08:53:09.820724" elapsed="0.017352"/>
+</kw>
+<kw name="Run Keyword If" owner="BuiltIn">
+<kw name="Click Button" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:53:09.839635" level="INFO">Clicking button 'xpath://button[contains(.,"Bejelentkezés")]'.</msg>
+<arg>xpath://button[contains(.,"Bejelentkezés")]</arg>
+<doc>Clicks the button identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:53:09.839137" elapsed="0.127250"/>
+</kw>
+<arg>${reg_visible}</arg>
+<arg>Click Button</arg>
+<arg>xpath://button[contains(.,"Bejelentkezés")]</arg>
+<doc>Runs the given keyword with the given arguments, if ``condition`` is true.</doc>
+<status status="PASS" start="2026-04-24T08:53:09.838351" elapsed="0.128251"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>xpath://h2[contains(.,"Lépj be a fiókodba")]</arg>
+<arg>timeout=5s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:53:09.966764" elapsed="0.015632"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>name:email</arg>
+<arg>timeout=5s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:53:09.982615" elapsed="0.014655"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:53:09.820435" elapsed="0.177047"/>
+</kw>
+<kw name="Fill Login Form" owner="resources">
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>xpath=//div[contains(@class,"b-container")]//input[@name="email"]</arg>
+<arg>timeout=5s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:53:09.998114" elapsed="0.016371"/>
+</kw>
+<kw name="Input Text" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:53:10.015016" level="INFO">Typing text 'test@example.com' into text field 'xpath=//div[contains(@class,"b-container")]//input[@name="email"]'.</msg>
+<arg>xpath=//div[contains(@class,"b-container")]//input[@name="email"]</arg>
+<arg>${email}</arg>
+<doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:53:10.014707" elapsed="0.137549"/>
+</kw>
+<kw name="Input Password" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:53:10.152769" level="INFO">Typing password into text field 'xpath=//div[contains(@class,"b-container")]//input[@name="password"]'.</msg>
+<msg time="2026-04-24T08:53:10.179641" level="INFO">Temporally setting log level to: NONE</msg>
+<arg>xpath=//div[contains(@class,"b-container")]//input[@name="password"]</arg>
+<arg>${password}</arg>
+<doc>Types the given password into the text field identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:53:10.152457" elapsed="0.064048"/>
+</kw>
+<arg>test@example.com</arg>
+<arg>Alma12345678.</arg>
+<status status="PASS" start="2026-04-24T08:53:09.997720" elapsed="0.218935"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:53:10.217209" level="INFO">Executing JavaScript:
+document.querySelector('.b-container button[type="submit"]').click()
+Without any arguments.</msg>
+<arg>document.querySelector('.b-container button[type="submit"]').click()</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2026-04-24T08:53:10.216800" elapsed="0.008103"/>
+</kw>
+<kw name="Wait Until Location Contains" owner="SeleniumLibrary">
+<arg>/profil</arg>
+<arg>timeout=20s</arg>
+<doc>Waits until the current URL contains ``expected``.</doc>
+<status status="PASS" start="2026-04-24T08:53:10.225125" elapsed="3.071555"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:53:09.820083" elapsed="3.476747"/>
+</kw>
+<kw name="Navigate To Aruhaz" owner="resources">
+<kw name="Go To" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:53:13.297494" level="INFO">Opening url 'http://localhost:5173/aruhaz'</msg>
+<arg>${ARUHAZ_URL}</arg>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<status status="PASS" start="2026-04-24T08:53:13.297303" elapsed="0.105570"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${PRODUCT_CARD}</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:53:13.403070" elapsed="2.304410"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:53:13.296995" elapsed="2.410635"/>
+</kw>
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:53:15.708042" level="INFO">Clicking element 'xpath:(//button[contains(@class,"add-btn")])[1]'.</msg>
+<arg>${FIRST_ADD_BTN}</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:53:15.707765" elapsed="0.055045"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${CART_MODAL}</arg>
+<arg>timeout=5s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:53:15.763013" elapsed="0.040605"/>
+</kw>
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:53:15.804117" level="INFO">Clicking element 'xpath://a[contains(@class,"btn-checkout")]'.</msg>
+<arg>${MODAL_CART_BTN}</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:53:15.803814" elapsed="0.083368"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${CART_HEADER}</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:53:15.887423" elapsed="0.022793"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:53:15.911310" level="INFO">Executing JavaScript:
+window.scrollTo(0, document.body.scrollHeight)
+Without any arguments.</msg>
+<arg>window.scrollTo(0, document.body.scrollHeight)</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2026-04-24T08:53:15.910490" elapsed="0.006359"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-04-24T08:53:16.917879" level="INFO">Slept 1 second.</msg>
+<arg>1s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-04-24T08:53:15.917076" elapsed="1.001175"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${FIELD_LASTNAME}</arg>
+<arg>timeout=15s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:53:16.918457" elapsed="0.019434"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:53:07.471846" elapsed="9.466215"/>
+</kw>
+<kw name="Fill Delivery Form" owner="resources">
+<kw name="Wait Until Element Is Not Visible" owner="SeleniumLibrary">
+<arg>${CART_MODAL}</arg>
+<arg>timeout=8s</arg>
+<doc>Waits until the element ``locator`` is not visible.</doc>
+<status status="PASS" start="2026-04-24T08:53:16.938821" elapsed="0.005796"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:53:16.945305" level="INFO">Executing JavaScript:
+window.scrollTo(0, document.body.scrollHeight)
+Without any arguments.</msg>
+<arg>window.scrollTo(0, document.body.scrollHeight)</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2026-04-24T08:53:16.944853" elapsed="0.007335"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-04-24T08:53:17.953382" level="INFO">Slept 1 second.</msg>
+<arg>1s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-04-24T08:53:16.952403" elapsed="1.001488"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>id:lastName</arg>
+<arg>timeout=15s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:53:17.954110" elapsed="0.009820"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:53:17.964629" level="INFO">Executing JavaScript:
+const s=(id,v)=&gt;{const el=document.getElementById(id);const setter=Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype,'value').set;setter.call(el,v);el.dispatchEvent(new Event('input',{bubbles:true}));el.dispatchEvent(new Event('blur',{bubbles:true}));};s('lastName','Nagy');s('firstName','Teszt');s('email','teszt@example.com');s('utca','Kossuth utca');s('hazszam','12');s('phone','+36305795513');
+Without any arguments.</msg>
+<arg>const s=(id,v)=&gt;{const el=document.getElementById(id);const setter=Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype,'value').set;setter.call(el,v);el.dispatchEvent(new Event('input',{bubbles:true}));el.dispatchEvent(new Event('blur',{bubbles:true}));};</arg>
+<arg>s('lastName','${lastname}');s('firstName','${firstname}');s('email','${email}');s('utca','${utca}');s('hazszam','${hazszam}');s('phone','${phone}');</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2026-04-24T08:53:17.964122" elapsed="0.011461"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-04-24T08:53:18.476581" level="INFO">Slept 500 milliseconds.</msg>
+<arg>0.5s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-04-24T08:53:17.975876" elapsed="0.500950"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:53:18.477503" level="INFO">Executing JavaScript:
+document.querySelector('#city .p-dropdown-trigger').click();
+Without any arguments.</msg>
+<arg>document.querySelector('#city .p-dropdown-trigger').click();</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2026-04-24T08:53:18.477008" elapsed="0.032441"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-04-24T08:53:19.510624" level="INFO">Slept 1 second.</msg>
+<arg>1s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-04-24T08:53:18.509813" elapsed="1.001025"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:53:19.511601" level="INFO">Executing JavaScript:
+const input = document.querySelector('.p-dropdown-panel input');if(input){ const s=Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype,'value').set; s.call(input,'Budapest'); input.dispatchEvent(new Event('input',{bubbles:true})); }
+Without any arguments.</msg>
+<arg>const input = document.querySelector('.p-dropdown-panel input');</arg>
+<arg>if(input){ const s=Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype,'value').set; s.call(input,'Budapest'); input.dispatchEvent(new Event('input',{bubbles:true})); }</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2026-04-24T08:53:19.511030" elapsed="0.030789"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-04-24T08:53:20.542984" level="INFO">Slept 1 second.</msg>
+<arg>1s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-04-24T08:53:19.542100" elapsed="1.001271"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:53:20.544107" level="INFO">Executing JavaScript:
+const item=[...document.querySelectorAll('.p-dropdown-item')].find(el=&gt;el.textContent.includes('Budapest'));if(item) item.click();
+Without any arguments.</msg>
+<arg>const item=[...document.querySelectorAll('.p-dropdown-item')].find(el=&gt;el.textContent.includes('Budapest'));</arg>
+<arg>if(item) item.click();</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2026-04-24T08:53:20.543576" elapsed="0.026562"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-04-24T08:53:21.071496" level="INFO">Slept 500 milliseconds.</msg>
+<arg>0.5s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-04-24T08:53:20.570394" elapsed="0.501326"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:53:16.938384" elapsed="4.133475"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-04-24T08:53:21.572879" level="INFO">Slept 500 milliseconds.</msg>
+<arg>0.5s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-04-24T08:53:21.072157" elapsed="0.501618"/>
+</kw>
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:53:21.577257" level="INFO">Clicking element 'xpath://button[@id="checkout"]'.</msg>
+<arg>${CHECKOUT_BTN}</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:53:21.576870" elapsed="0.065936"/>
+</kw>
+<kw name="Wait Until Location Contains" owner="SeleniumLibrary">
+<arg>/kosar/fizetes</arg>
+<arg>timeout=15s</arg>
+<doc>Waits until the current URL contains ``expected``.</doc>
+<status status="PASS" start="2026-04-24T08:53:21.643125" elapsed="2.481844"/>
+</kw>
+<kw name="Close Browser Session" owner="resources" type="TEARDOWN">
+<kw name="Close Browser" owner="SeleniumLibrary">
+<doc>Closes the current browser.</doc>
+<status status="PASS" start="2026-04-24T08:53:24.125882" elapsed="2.169701"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:53:24.125496" elapsed="2.170729"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:53:04.078764" elapsed="22.218251"/>
+</test>
+<test id="s1-s1-s1-t24" name="F01 – Fizetési oldal betöltődik" line="247">
+<kw name="Open Aruhaz Page" owner="resources" type="SETUP">
+<kw name="Open Browser" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:53:26.333409" level="INFO">Opening browser 'Chrome' to base url 'http://localhost:5173/aruhaz'.</msg>
+<arg>${ARUHAZ_URL}</arg>
+<arg>${BROWSER}</arg>
+<doc>Opens a new browser instance to the optional ``url``.</doc>
+<status status="PASS" start="2026-04-24T08:53:26.332929" elapsed="2.310437"/>
+</kw>
+<kw name="Maximize Browser Window" owner="SeleniumLibrary">
+<doc>Maximizes current browser window.</doc>
+<status status="PASS" start="2026-04-24T08:53:28.643586" elapsed="0.022394"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${PRODUCT_CARD}</arg>
+<arg>timeout=15s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:53:28.666212" elapsed="1.501105"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:53:26.332463" elapsed="3.835023"/>
+</kw>
+<kw name="Navigate To Cart With Item And Login" owner="resources">
+<kw name="Open Browser" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:53:30.168432" level="INFO">Opening browser 'Chrome' to base url 'http://localhost:5173'.</msg>
+<arg>${URL}</arg>
+<arg>${BROWSER}</arg>
+<doc>Opens a new browser instance to the optional ``url``.</doc>
+<status status="PASS" start="2026-04-24T08:53:30.168172" elapsed="0.580281"/>
+</kw>
+<kw name="Maximize Browser Window" owner="SeleniumLibrary">
+<doc>Maximizes current browser window.</doc>
+<status status="PASS" start="2026-04-24T08:53:30.748683" elapsed="0.480797"/>
+</kw>
+<kw name="Go To" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:53:31.230770" level="INFO">Opening url 'http://localhost:5173'</msg>
+<arg>${URL}</arg>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<status status="PASS" start="2026-04-24T08:53:31.229960" elapsed="0.180040"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>//header//nav//a[7]</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:53:31.410288" elapsed="1.356244"/>
+</kw>
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:53:32.767003" level="INFO">Clicking element '//header//nav//a[7]'.</msg>
+<arg>//header//nav//a[7]</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:53:32.766742" elapsed="0.086905"/>
+</kw>
+<kw name="Login As Test User" owner="resources">
+<kw name="Switch To Login" owner="resources">
+<kw name="Run Keyword And Return Status" owner="BuiltIn">
+<kw name="Element Should Be Visible" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:53:32.884645" level="INFO">Element 'xpath://h2[contains(.,"Fiók készítése")]' is displayed.</msg>
+<arg>xpath://h2[contains(.,"Fiók készítése")]</arg>
+<doc>Verifies that the element identified by ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:53:32.854889" elapsed="0.030083"/>
+</kw>
+<msg time="2026-04-24T08:53:32.885160" level="INFO">${reg_visible} = True</msg>
+<var>${reg_visible}</var>
+<arg>Element Should Be Visible</arg>
+<arg>xpath://h2[contains(.,"Fiók készítése")]</arg>
+<doc>Runs the specified keyword and returns the status as a Boolean value.</doc>
+<status status="PASS" start="2026-04-24T08:53:32.854527" elapsed="0.030811"/>
+</kw>
+<kw name="Run Keyword If" owner="BuiltIn">
+<kw name="Click Button" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:53:32.886350" level="INFO">Clicking button 'xpath://button[contains(.,"Bejelentkezés")]'.</msg>
+<arg>xpath://button[contains(.,"Bejelentkezés")]</arg>
+<doc>Clicks the button identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:53:32.886080" elapsed="0.066213"/>
+</kw>
+<arg>${reg_visible}</arg>
+<arg>Click Button</arg>
+<arg>xpath://button[contains(.,"Bejelentkezés")]</arg>
+<doc>Runs the given keyword with the given arguments, if ``condition`` is true.</doc>
+<status status="PASS" start="2026-04-24T08:53:32.885535" elapsed="0.066908"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>xpath://h2[contains(.,"Lépj be a fiókodba")]</arg>
+<arg>timeout=5s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:53:32.952597" elapsed="0.013838"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>name:email</arg>
+<arg>timeout=5s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:53:32.966649" elapsed="0.012841"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:53:32.854252" elapsed="0.125408"/>
+</kw>
+<kw name="Fill Login Form" owner="resources">
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>xpath=//div[contains(@class,"b-container")]//input[@name="email"]</arg>
+<arg>timeout=5s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:53:32.980170" elapsed="0.010740"/>
+</kw>
+<kw name="Input Text" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:53:32.991504" level="INFO">Typing text 'test@example.com' into text field 'xpath=//div[contains(@class,"b-container")]//input[@name="email"]'.</msg>
+<arg>xpath=//div[contains(@class,"b-container")]//input[@name="email"]</arg>
+<arg>${email}</arg>
+<doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:53:32.991102" elapsed="0.102451"/>
+</kw>
+<kw name="Input Password" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:53:33.094150" level="INFO">Typing password into text field 'xpath=//div[contains(@class,"b-container")]//input[@name="password"]'.</msg>
+<msg time="2026-04-24T08:53:33.119991" level="INFO">Temporally setting log level to: NONE</msg>
+<arg>xpath=//div[contains(@class,"b-container")]//input[@name="password"]</arg>
+<arg>${password}</arg>
+<doc>Types the given password into the text field identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:53:33.093778" elapsed="0.063042"/>
+</kw>
+<arg>test@example.com</arg>
+<arg>Alma12345678.</arg>
+<status status="PASS" start="2026-04-24T08:53:32.979835" elapsed="0.177143"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:53:33.157634" level="INFO">Executing JavaScript:
+document.querySelector('.b-container button[type="submit"]').click()
+Without any arguments.</msg>
+<arg>document.querySelector('.b-container button[type="submit"]').click()</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2026-04-24T08:53:33.157126" elapsed="0.009406"/>
+</kw>
+<kw name="Wait Until Location Contains" owner="SeleniumLibrary">
+<arg>/profil</arg>
+<arg>timeout=20s</arg>
+<doc>Waits until the current URL contains ``expected``.</doc>
+<status status="PASS" start="2026-04-24T08:53:33.166723" elapsed="3.157788"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:53:32.853897" elapsed="3.470766"/>
+</kw>
+<kw name="Navigate To Aruhaz" owner="resources">
+<kw name="Go To" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:53:36.325313" level="INFO">Opening url 'http://localhost:5173/aruhaz'</msg>
+<arg>${ARUHAZ_URL}</arg>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<status status="PASS" start="2026-04-24T08:53:36.325128" elapsed="0.113981"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${PRODUCT_CARD}</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:53:36.439307" elapsed="2.133225"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:53:36.324824" elapsed="2.247867"/>
+</kw>
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:53:38.573112" level="INFO">Clicking element 'xpath:(//button[contains(@class,"add-btn")])[1]'.</msg>
+<arg>${FIRST_ADD_BTN}</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:53:38.572828" elapsed="0.061000"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:53:44.127672" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="selenium-screenshot-94.png"&gt;&lt;img src="selenium-screenshot-94.png" width="800px"&gt;&lt;/a&gt;</msg>
+<msg time="2026-04-24T08:53:44.127976" level="FAIL">Element 'xpath://div[contains(@class,"modal-content")]' not visible after 5 seconds.</msg>
+<arg>${CART_MODAL}</arg>
+<arg>timeout=5s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="FAIL" start="2026-04-24T08:53:38.634020" elapsed="5.498569">Element 'xpath://div[contains(@class,"modal-content")]' not visible after 5 seconds.</status>
+</kw>
+<kw name="Click Element" owner="SeleniumLibrary">
+<arg>${MODAL_CART_BTN}</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="NOT RUN" start="2026-04-24T08:53:44.132829" elapsed="0.000117"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${CART_HEADER}</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="NOT RUN" start="2026-04-24T08:53:44.133064" elapsed="0.000094"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<arg>window.scrollTo(0, document.body.scrollHeight)</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="NOT RUN" start="2026-04-24T08:53:44.133276" elapsed="0.000156"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<arg>1s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="NOT RUN" start="2026-04-24T08:53:44.133562" elapsed="0.000091"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${FIELD_LASTNAME}</arg>
+<arg>timeout=15s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="NOT RUN" start="2026-04-24T08:53:44.133810" elapsed="0.000107"/>
+</kw>
+<status status="FAIL" start="2026-04-24T08:53:30.167831" elapsed="13.966276">Element 'xpath://div[contains(@class,"modal-content")]' not visible after 5 seconds.</status>
+</kw>
+<kw name="Fill Delivery Form" owner="resources">
+<status status="NOT RUN" start="2026-04-24T08:53:44.134509" elapsed="0.000145"/>
+</kw>
+<kw name="Click Element" owner="SeleniumLibrary">
+<arg>${CHECKOUT_BTN}</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="NOT RUN" start="2026-04-24T08:53:44.135455" elapsed="0.000275"/>
+</kw>
+<kw name="Wait Until Location Contains" owner="SeleniumLibrary">
+<arg>/kosar/fizetes</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until the current URL contains ``expected``.</doc>
+<status status="NOT RUN" start="2026-04-24T08:53:44.136333" elapsed="0.000161"/>
+</kw>
+<kw name="Element Should Be Visible" owner="SeleniumLibrary">
+<arg>${CARD_NUMBER_INPUT}</arg>
+<doc>Verifies that the element identified by ``locator`` is visible.</doc>
+<status status="NOT RUN" start="2026-04-24T08:53:44.136869" elapsed="0.000181"/>
+</kw>
+<kw name="Close Browser Session" owner="resources" type="TEARDOWN">
+<kw name="Close Browser" owner="SeleniumLibrary">
+<doc>Closes the current browser.</doc>
+<status status="PASS" start="2026-04-24T08:53:44.138263" elapsed="2.149687"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:53:44.137538" elapsed="2.150684"/>
+</kw>
+<status status="FAIL" start="2026-04-24T08:53:26.310083" elapsed="19.978476">Element 'xpath://div[contains(@class,"modal-content")]' not visible after 5 seconds.</status>
+</test>
+<test id="s1-s1-s1-t25" name="F02 – Fizetési gomb disabled ha mezők üresek" line="254">
+<kw name="Open Aruhaz Page" owner="resources" type="SETUP">
+<kw name="Open Browser" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:53:46.309722" level="INFO">Opening browser 'Chrome' to base url 'http://localhost:5173/aruhaz'.</msg>
+<arg>${ARUHAZ_URL}</arg>
+<arg>${BROWSER}</arg>
+<doc>Opens a new browser instance to the optional ``url``.</doc>
+<status status="PASS" start="2026-04-24T08:53:46.309356" elapsed="1.021461"/>
+</kw>
+<kw name="Maximize Browser Window" owner="SeleniumLibrary">
+<doc>Maximizes current browser window.</doc>
+<status status="PASS" start="2026-04-24T08:53:47.331147" elapsed="0.018829"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${PRODUCT_CARD}</arg>
+<arg>timeout=15s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:53:47.350190" elapsed="2.416951"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:53:46.303811" elapsed="3.463486"/>
+</kw>
+<kw name="Navigate To Cart With Item And Login" owner="resources">
+<kw name="Open Browser" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:53:49.768379" level="INFO">Opening browser 'Chrome' to base url 'http://localhost:5173'.</msg>
+<arg>${URL}</arg>
+<arg>${BROWSER}</arg>
+<doc>Opens a new browser instance to the optional ``url``.</doc>
+<status status="PASS" start="2026-04-24T08:53:49.768098" elapsed="1.784515"/>
+</kw>
+<kw name="Maximize Browser Window" owner="SeleniumLibrary">
+<doc>Maximizes current browser window.</doc>
+<status status="PASS" start="2026-04-24T08:53:51.552824" elapsed="0.028492"/>
+</kw>
+<kw name="Go To" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:53:51.581794" level="INFO">Opening url 'http://localhost:5173'</msg>
+<arg>${URL}</arg>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<status status="PASS" start="2026-04-24T08:53:51.581531" elapsed="0.197492"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>//header//nav//a[7]</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:53:51.779302" elapsed="0.465331"/>
+</kw>
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:53:52.245285" level="INFO">Clicking element '//header//nav//a[7]'.</msg>
+<arg>//header//nav//a[7]</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:53:52.244918" elapsed="0.089628"/>
+</kw>
+<kw name="Login As Test User" owner="resources">
+<kw name="Switch To Login" owner="resources">
+<kw name="Run Keyword And Return Status" owner="BuiltIn">
+<kw name="Element Should Be Visible" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:53:52.358891" level="INFO">Element 'xpath://h2[contains(.,"Fiók készítése")]' is displayed.</msg>
+<arg>xpath://h2[contains(.,"Fiók készítése")]</arg>
+<doc>Verifies that the element identified by ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:53:52.335964" elapsed="0.023184"/>
+</kw>
+<msg time="2026-04-24T08:53:52.359724" level="INFO">${reg_visible} = True</msg>
+<var>${reg_visible}</var>
+<arg>Element Should Be Visible</arg>
+<arg>xpath://h2[contains(.,"Fiók készítése")]</arg>
+<doc>Runs the specified keyword and returns the status as a Boolean value.</doc>
+<status status="PASS" start="2026-04-24T08:53:52.335575" elapsed="0.025038"/>
+</kw>
+<kw name="Run Keyword If" owner="BuiltIn">
+<kw name="Click Button" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:53:52.363729" level="INFO">Clicking button 'xpath://button[contains(.,"Bejelentkezés")]'.</msg>
+<arg>xpath://button[contains(.,"Bejelentkezés")]</arg>
+<doc>Clicks the button identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:53:52.362955" elapsed="0.124150"/>
+</kw>
+<arg>${reg_visible}</arg>
+<arg>Click Button</arg>
+<arg>xpath://button[contains(.,"Bejelentkezés")]</arg>
+<doc>Runs the given keyword with the given arguments, if ``condition`` is true.</doc>
+<status status="PASS" start="2026-04-24T08:53:52.361482" elapsed="0.125925"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>xpath://h2[contains(.,"Lépj be a fiókodba")]</arg>
+<arg>timeout=5s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:53:52.487634" elapsed="0.016993"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>name:email</arg>
+<arg>timeout=5s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:53:52.504835" elapsed="0.017403"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:53:52.335205" elapsed="0.187191"/>
+</kw>
+<kw name="Fill Login Form" owner="resources">
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>xpath=//div[contains(@class,"b-container")]//input[@name="email"]</arg>
+<arg>timeout=5s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:53:52.522897" elapsed="0.013608"/>
+</kw>
+<kw name="Input Text" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:53:52.537005" level="INFO">Typing text 'test@example.com' into text field 'xpath=//div[contains(@class,"b-container")]//input[@name="email"]'.</msg>
+<arg>xpath=//div[contains(@class,"b-container")]//input[@name="email"]</arg>
+<arg>${email}</arg>
+<doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:53:52.536703" elapsed="0.118586"/>
+</kw>
+<kw name="Input Password" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:53:52.655839" level="INFO">Typing password into text field 'xpath=//div[contains(@class,"b-container")]//input[@name="password"]'.</msg>
+<msg time="2026-04-24T08:53:52.696235" level="INFO">Temporally setting log level to: NONE</msg>
+<arg>xpath=//div[contains(@class,"b-container")]//input[@name="password"]</arg>
+<arg>${password}</arg>
+<doc>Types the given password into the text field identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:53:52.655501" elapsed="0.077798"/>
+</kw>
+<arg>test@example.com</arg>
+<arg>Alma12345678.</arg>
+<status status="PASS" start="2026-04-24T08:53:52.522566" elapsed="0.210887"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:53:52.733998" level="INFO">Executing JavaScript:
+document.querySelector('.b-container button[type="submit"]').click()
+Without any arguments.</msg>
+<arg>document.querySelector('.b-container button[type="submit"]').click()</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2026-04-24T08:53:52.733598" elapsed="0.006634"/>
+</kw>
+<kw name="Wait Until Location Contains" owner="SeleniumLibrary">
+<arg>/profil</arg>
+<arg>timeout=20s</arg>
+<doc>Waits until the current URL contains ``expected``.</doc>
+<status status="PASS" start="2026-04-24T08:53:52.740430" elapsed="3.126749"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:53:52.334808" elapsed="3.532522"/>
+</kw>
+<kw name="Navigate To Aruhaz" owner="resources">
+<kw name="Go To" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:53:55.867990" level="INFO">Opening url 'http://localhost:5173/aruhaz'</msg>
+<arg>${ARUHAZ_URL}</arg>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<status status="PASS" start="2026-04-24T08:53:55.867798" elapsed="0.120269"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${PRODUCT_CARD}</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:53:55.988263" elapsed="2.325391"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:53:55.867491" elapsed="2.446361"/>
+</kw>
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:53:58.314340" level="INFO">Clicking element 'xpath:(//button[contains(@class,"add-btn")])[1]'.</msg>
+<arg>${FIRST_ADD_BTN}</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:53:58.313990" elapsed="0.063993"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${CART_MODAL}</arg>
+<arg>timeout=5s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:53:58.378182" elapsed="0.229183"/>
+</kw>
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:53:58.608243" level="INFO">Clicking element 'xpath://a[contains(@class,"btn-checkout")]'.</msg>
+<arg>${MODAL_CART_BTN}</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2026-04-24T08:53:58.607737" elapsed="0.114059"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${CART_HEADER}</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:53:58.722056" elapsed="0.041860"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:53:58.764642" level="INFO">Executing JavaScript:
+window.scrollTo(0, document.body.scrollHeight)
+Without any arguments.</msg>
+<arg>window.scrollTo(0, document.body.scrollHeight)</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2026-04-24T08:53:58.764153" elapsed="0.007939"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-04-24T08:53:59.772909" level="INFO">Slept 1 second.</msg>
+<arg>1s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-04-24T08:53:58.772302" elapsed="1.001127"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${FIELD_LASTNAME}</arg>
+<arg>timeout=15s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:53:59.773624" elapsed="0.016431"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:53:49.767726" elapsed="10.022501"/>
+</kw>
+<kw name="Fill Delivery Form" owner="resources">
+<kw name="Wait Until Element Is Not Visible" owner="SeleniumLibrary">
+<arg>${CART_MODAL}</arg>
+<arg>timeout=8s</arg>
+<doc>Waits until the element ``locator`` is not visible.</doc>
+<status status="PASS" start="2026-04-24T08:53:59.790966" elapsed="0.005703"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:53:59.797278" level="INFO">Executing JavaScript:
+window.scrollTo(0, document.body.scrollHeight)
+Without any arguments.</msg>
+<arg>window.scrollTo(0, document.body.scrollHeight)</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2026-04-24T08:53:59.796870" elapsed="0.005051"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-04-24T08:54:00.802782" level="INFO">Slept 1 second.</msg>
+<arg>1s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-04-24T08:53:59.802118" elapsed="1.001090"/>
+</kw>
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>id:lastName</arg>
+<arg>timeout=15s</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2026-04-24T08:54:00.803559" elapsed="0.013144"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:54:00.817521" level="INFO">Executing JavaScript:
+const s=(id,v)=&gt;{const el=document.getElementById(id);const setter=Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype,'value').set;setter.call(el,v);el.dispatchEvent(new Event('input',{bubbles:true}));el.dispatchEvent(new Event('blur',{bubbles:true}));};s('lastName','Nagy');s('firstName','Teszt');s('email','teszt@example.com');s('utca','Kossuth utca');s('hazszam','12');s('phone','+36305795513');
+Without any arguments.</msg>
+<arg>const s=(id,v)=&gt;{const el=document.getElementById(id);const setter=Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype,'value').set;setter.call(el,v);el.dispatchEvent(new Event('input',{bubbles:true}));el.dispatchEvent(new Event('blur',{bubbles:true}));};</arg>
+<arg>s('lastName','${lastname}');s('firstName','${firstname}');s('email','${email}');s('utca','${utca}');s('hazszam','${hazszam}');s('phone','${phone}');</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2026-04-24T08:54:00.816892" elapsed="0.012031"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-04-24T08:54:01.330208" level="INFO">Slept 500 milliseconds.</msg>
+<arg>0.5s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-04-24T08:54:00.829280" elapsed="0.501161"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:54:01.331009" level="INFO">Executing JavaScript:
+document.querySelector('#city .p-dropdown-trigger').click();
+Without any arguments.</msg>
+<arg>document.querySelector('#city .p-dropdown-trigger').click();</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2026-04-24T08:54:01.330621" elapsed="0.031547"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-04-24T08:54:02.363045" level="INFO">Slept 1 second.</msg>
+<arg>1s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-04-24T08:54:01.362403" elapsed="1.000923"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:54:02.364154" level="INFO">Executing JavaScript:
+const input = document.querySelector('.p-dropdown-panel input');if(input){ const s=Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype,'value').set; s.call(input,'Budapest'); input.dispatchEvent(new Event('input',{bubbles:true})); }
+Without any arguments.</msg>
+<arg>const input = document.querySelector('.p-dropdown-panel input');</arg>
+<arg>if(input){ const s=Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype,'value').set; s.call(input,'Budapest'); input.dispatchEvent(new Event('input',{bubbles:true})); }</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2026-04-24T08:54:02.363574" elapsed="0.026756"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-04-24T08:54:03.391617" level="INFO">Slept 1 second.</msg>
+<arg>1s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-04-24T08:54:02.390572" elapsed="1.001274"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:54:03.392430" level="INFO">Executing JavaScript:
+const item=[...document.querySelectorAll('.p-dropdown-item')].find(el=&gt;el.textContent.includes('Budapest'));if(item) item.click();
+Without any arguments.</msg>
+<arg>const item=[...document.querySelectorAll('.p-dropdown-item')].find(el=&gt;el.textContent.includes('Budapest'));</arg>
+<arg>if(item) item.click();</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2026-04-24T08:54:03.392026" elapsed="0.022423"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-04-24T08:54:03.915713" level="INFO">Slept 500 milliseconds.</msg>
+<arg>0.5s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-04-24T08:54:03.414650" elapsed="0.501446"/>
+</kw>
+<status status="PASS" start="2026-04-24T08:53:59.790548" elapsed="4.125809"/>
+</kw>
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2026-04-24T08:54:03.917654" level="INFO">Clicking element 'xpath://button[@id="checkout"]'.
