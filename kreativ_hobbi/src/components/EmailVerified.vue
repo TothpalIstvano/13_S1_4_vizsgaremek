@@ -63,7 +63,7 @@ onMounted(() => {
         willClose.value = true
         window.opener.postMessage(
             { type: 'EMAIL_VERIFIED' },
-            import.meta.env.VITE_APP_URL || 'http://localhost:5173'
+            import.meta.env.VITE_APP_URL
         )
         setTimeout(() => window.close(), 2000)
     } else {

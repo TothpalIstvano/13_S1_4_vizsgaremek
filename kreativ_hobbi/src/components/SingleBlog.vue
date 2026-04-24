@@ -387,7 +387,7 @@ const addComment = async () => {
     loadingComments.value = true
     
     try {
-      await axios.get('http://localhost:8000/sanctum/csrf-cookie', {
+      await axios.get(`${import.meta.env.VITE_API_URL}/sanctum/csrf-cookie`, {
         withCredentials: true
       });
     } catch (csrfErr) {
@@ -404,7 +404,7 @@ const addComment = async () => {
     const csrfToken = getCookie('XSRF-TOKEN');
     
     const response = await axios.post(
-      `http://localhost:8000/api/blog/${postId.value}/comments`,
+      `${import.meta.env.VITE_API_URL}/api/blog/${postId.value}/comments`,
       {
         komment: newComment.value,
         elozo_komment_id: replyTo.value
