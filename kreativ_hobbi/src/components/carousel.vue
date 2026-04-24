@@ -16,7 +16,7 @@
                 <div class="frame-deco top-left"></div>
                 <div class="frame-deco bottom-right"></div>
                 <img
-                  :src="kepek[currentIndex].termek_fo_kep?.url_Link || fallbackImg"
+                  :src="kepek[currentIndex].termek_fo_kep?.url_Link"
                   :alt="kepek[currentIndex].nev"
                   class="slide-img"
                 />
@@ -130,7 +130,7 @@ library.add(faArrowLeft, faArrowRight)
 
 const router = useRouter();
 
-const fallbackImg = 'http://localhost:8000/storage/termekkepek/default.jpg';
+//const fallbackImg = 'http://localhost:8000/storage/termekkepek/default.jpg';
 
 const bgColors = ['#946609', '#944309', '#c7590a', '#c45529', '#912b03'];
 

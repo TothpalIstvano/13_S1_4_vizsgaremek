@@ -58,7 +58,7 @@ async function fonalTermekBetoltese() {
     try {
         const fonalTipusEncoded = encodeURIComponent(masodikLepes.value.fonalTipus)
         
-        const response = await axios.get(`http://localhost:8000/api/termekek/fonal-csoport/${fonalTipusEncoded}`, {
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/termekek/fonal-csoport/${fonalTipusEncoded}`, {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
