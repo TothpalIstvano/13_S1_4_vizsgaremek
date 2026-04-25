@@ -294,7 +294,6 @@ main {
 }
 
 .kontener.felso-resz {
-  margin-top: 80px;
   margin-right: auto;
   margin-bottom: 50px;
   margin-left: auto;

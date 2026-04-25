@@ -811,8 +811,7 @@ const handleSignUp = async () => {
     top: 0;
     left: 0;
     width: 100% !important;
-    min-height: 280px;
-    height: auto;
+    height: 320px;;
     padding: 32px 24px;
     background-color: #ecf0f3;
     box-shadow: 4px 4px 10px #d1d9e6, -4px -4px 10px #f9f9f9;
@@ -827,7 +826,7 @@ const handleSignUp = async () => {
   }
 
   .main.is-signin .switch {
-    transform: translateY(calc(100% + 40px));
+    transform: translateY(calc(100% + 55px));
     border-radius: 0 0 12px 12px;
   }
 
@@ -872,10 +871,8 @@ const handleSignUp = async () => {
   .main.is-signin .container {
     margin-top: 0;
   }
-
-  .main.is-signin .switch {
-    transform: translateY(380px);
-    border-radius: 0 0 12px 12px;
+  .main.is-signin .b-container {
+    margin-bottom: 320px;
   }
 
   .main {
@@ -897,6 +894,12 @@ const handleSignUp = async () => {
   .is-txr, .is-txl, .is-z200 {
     left: 0 !important;
     transition: none !important;
+  }
+}
+
+@media (max-width: 400px) {
+  .title {
+    font-size: 26px;
   }
 }
 
