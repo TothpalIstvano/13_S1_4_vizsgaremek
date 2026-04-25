@@ -139,8 +139,8 @@ ${OVERLAY_CLOSE}        xpath://button[contains(@class,"overlay-button")]
 Open Registration Page
     Open Browser    ${URL}    ${BROWSER}
     Maximize Browser Window
-    Wait Until Element Is Visible    //header//nav//a[7]
-    Click Element    //header//nav//a[7]    
+    Wait Until Element Is Visible    //*[@id="app"]/div/header/nav/a[8]/p
+    Click Element    //*[@id="app"]/div/header/nav/a[8]/p    
 
 #registration
 
@@ -371,9 +371,19 @@ Navigate To Profile Page
     Wait Until Element Is Visible    xpath://h2[contains(.,"profilhoz tartozó cikkek")]    timeout=15s
 
 Get First Post Edit Href
+    Wait Until Element Is Visible    xpath://article[contains(@class,"post-card")]    timeout=15s
     ${href}=    Execute JavaScript
     ...    return document.querySelector('a[href*="/editpost/"]')?.getAttribute('href') || ''
     RETURN    ${href}
+
+Title Field Should Not Be Empty
+    ${val}=    Execute JavaScript    return document.getElementById('postTitle').value
+    Should Not Be Empty    ${val}
+
+Warning Notification Should Exist
+    ${exists}=    Execute JavaScript
+    ...    return !!document.querySelector('.notification.warn')
+    Should Be True    ${exists}
 
 Check Count Changed
     [Arguments]    ${locator}    ${original_value}
@@ -561,3 +571,8 @@ Assert Overlay Message Contains
     ${msg}=    Get Text    ${OVERLAY_MSG}
     Should Contain    ${msg}    ${expected}
     Click Element    ${OVERLAY_CLOSE}
+
+Click Gyik Item
+    [Arguments]    ${index}
+    Execute JavaScript    document.querySelectorAll('summary.gyik-kerdes')[${index}].click()
+    Sleep    0.3s

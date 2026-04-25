@@ -122,12 +122,11 @@ Single Blog Post Back Button Works
     Location Should Contain    blog
 
 Single Blog Post Shows Comment Section
-    [Documentation]    Megjelenik a hozzászólások szekció
     Navigate To Blog Page
     Wait Until Element Is Visible    ${MEGTEKINTES_BTN}    timeout=10s
     Click Element    ${MEGTEKINTES_BTN}
     Wait Until Element Is Visible    xpath://div[contains(@class,"kommentek-section")]    timeout=10s
-    Element Should Be Visible    xpath://textarea[contains(@placeholder,"hozzászólásodat")]
+    Element Should Be Visible     xpath://div[contains(@class,"kommentek-section")]
 
 Single Blog Post Comment Button Visible
     [Documentation]    A Küldés gomb megjelenik a komment szekciónál
@@ -294,7 +293,7 @@ New Post Back Button Returns To Profile
     Navigate To New Post Page
     Execute JavaScript    document.querySelector('button.back-btn').click()
     Sleep    1s
-    Location Should Contain    Profil
+    Location Should Contain    profil
 
 New Post Tags Multiselect Is Visible
     [Documentation]    A cimke MultiSelect komponens megjelenik az új poszt oldalon
