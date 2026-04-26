@@ -14,7 +14,6 @@
   - Komment✅
   - Dashboard✅
   - Mintakésztő✅
-  - Reset jelszó?
   - NotFound✅
   - Email verify/already verified✅
   
