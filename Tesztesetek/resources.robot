@@ -104,23 +104,25 @@ ${MODAL_CART_BTN}       xpath://a[contains(@class,"btn-checkout")]
 ${PRODUCT_COUNT_LABEL}  xpath://div[contains(@class,"items-header")]/span
 
 # Selectors – Kosár (cart)
-${CART_HEADER}          xpath://h1[contains(.,"kosarad")]
-${EMPTY_CART_MSG}       xpath://h2[contains(.,"A kosárod üres")]
+${CART_HEADER}          //*[@id="app"]/div/header/nav/a[6]/div/img
+${EMPTY_CART_MSG}       //*[@id="app"]/main/div/div[2]/h2
 ${REMOVE_BTN}           xpath:(//button[contains(@class,"remove-btn")])[1]
 ${QTY_MINUS}            xpath:(//button[contains(@class,"qty-btn minus")])[1]
 ${QTY_PLUS}             xpath:(//button[contains(@class,"qty-btn plus")])[1]
 ${QTY_INPUT}            xpath:(//input[contains(@class,"qty-input")])[1]
 ${CART_TOTAL}           xpath://span[contains(@class,"summary-value-total")]
 ${EMPTY_CART_BTN}       id:emptyCart
-${CHECKOUT_BTN}         id:checkout
 
 # Selectors – Szállítási adatok
-${FIELD_NAME}       id:fullName
+${FIELD_LASTNAME}   id:lastName
+${FIELD_FIRSTNAME}  id:firstName
 ${FIELD_EMAIL}      id:email
-${FIELD_ADDRESS}    id:address
-${FIELD_CITY}       id:city
-${FIELD_ZIP}        id:zipCode
+${FIELD_UTCA}       id:utca
+${FIELD_HAZSZAM}    id:hazszam
 ${FIELD_PHONE}      id:phone
+${CHECKOUT_BTN}     xpath://button[@id="checkout"]
+${CONFIRM_YES_BTN}  xpath://button[contains(@class,"confirm-btn danger")]
+${CONFIRM_NO_BTN}   xpath://button[contains(@class,"confirm-btn cancel")]
 
 # Selectors – Fizetés (payment)
 ${CARD_NUMBER_INPUT}    xpath://input[contains(@placeholder,"0000 0000 0000 0000")]
@@ -137,8 +139,8 @@ ${OVERLAY_CLOSE}        xpath://button[contains(@class,"overlay-button")]
 Open Registration Page
     Open Browser    ${URL}    ${BROWSER}
     Maximize Browser Window
-    Wait Until Element Is Visible    //header//nav//a[7]
-    Click Element    //header//nav//a[7]    
+    Wait Until Element Is Visible    //*[@id="app"]/div/header/nav/a[8]/p
+    Click Element    //*[@id="app"]/div/header/nav/a[8]/p    
 
 #registration
 
@@ -369,9 +371,19 @@ Navigate To Profile Page
     Wait Until Element Is Visible    xpath://h2[contains(.,"profilhoz tartozó cikkek")]    timeout=15s
 
 Get First Post Edit Href
+    Wait Until Element Is Visible    xpath://article[contains(@class,"post-card")]    timeout=15s
     ${href}=    Execute JavaScript
     ...    return document.querySelector('a[href*="/editpost/"]')?.getAttribute('href') || ''
     RETURN    ${href}
+
+Title Field Should Not Be Empty
+    ${val}=    Execute JavaScript    return document.getElementById('postTitle').value
+    Should Not Be Empty    ${val}
+
+Warning Notification Should Exist
+    ${exists}=    Execute JavaScript
+    ...    return !!document.querySelector('.notification.warn')
+    Should Be True    ${exists}
 
 Check Count Changed
     [Arguments]    ${locator}    ${original_value}
@@ -404,6 +416,11 @@ Save And Wait For Modal To Close
     Click Element    ${MENTES_BTN}
     Wait Until Element Is Not Visible    ${SZERK_MODAL}    timeout=15s
 
+Wait For Error Modal And Close
+    Wait Until Element Is Visible    xpath://div[contains(@class,"modal")]//h3[contains(.,"Hibás adatok")]    timeout=5s
+    Click Element    xpath://button[contains(@class,"btn confirm")]
+    Wait Until Element Is Not Visible    xpath://div[contains(@class,"modal")]    timeout=3s
+
 Open Camera Browser And Login
     # Override the default Test Setup — open Chrome with fake camera, then log in and navigate
     ${options}=    Evaluate    sys.modules['selenium.webdriver'].ChromeOptions()    sys
@@ -433,10 +450,9 @@ Dashboard Sidebar Link Should Be Active
     Should Contain    ${active}    active
 
 Open Aruhaz Page
-    Open Browser    ${URL}    ${BROWSER}
+    Open Browser    ${ARUHAZ_URL}    ${BROWSER}
     Maximize Browser Window
-    Wait Until Element Is Visible    //header//nav//a[2]
-    Click Element    //header//nav//a[2]    
+    Wait Until Element Is Visible    ${PRODUCT_CARD}    timeout=15s
 
 Navigate To Aruhaz
     Go To    ${ARUHAZ_URL}
@@ -445,6 +461,39 @@ Navigate To Aruhaz
 Navigate To Kosar
     Go To    ${KOSAR_URL}
     Wait Until Element Is Visible    xpath://h1[contains(.,"kosarad") or .//h2[contains(.,"üres")]]    timeout=10s
+
+Ensure Like Is Not Active
+    Execute JavaScript
+    ...    const dislike = document.querySelectorAll('button.dislike-gomb')[0];
+    ...    if (dislike.classList.contains('active')) { dislike.click(); }
+    Sleep    1.5s
+    Execute JavaScript
+    ...    const like = document.querySelectorAll('button.like-gomb')[0];
+    ...    if (like.classList.contains('active')) { like.click(); }
+    Sleep    1.5s
+
+Navigate To Cart With Item
+    Add First Product To Cart
+    Click Element    ${MODAL_CART_BTN}
+    Wait Until Element Is Visible    ${CART_HEADER}    timeout=10s
+    Execute JavaScript    window.scrollTo(0, document.body.scrollHeight)
+    Sleep    0.5s
+
+Navigate To Cart With Item And Login
+    Open Browser    ${URL}    ${BROWSER}
+    Maximize Browser Window
+    Go To    ${URL}
+    Wait Until Element Is Visible    //header//nav//a[7]    timeout=10s
+    Click Element    //header//nav//a[7]
+    Login As Test User
+    Navigate To Aruhaz
+    Click Element    ${FIRST_ADD_BTN}
+    Wait Until Element Is Visible    ${CART_MODAL}    timeout=5s
+    Click Element    ${MODAL_CART_BTN}
+    Wait Until Element Is Visible    ${CART_HEADER}    timeout=10s
+    Execute JavaScript    window.scrollTo(0, document.body.scrollHeight)
+    Sleep    1s
+    Wait Until Element Is Visible    ${FIELD_LASTNAME}    timeout=15s
 
 Add First Product To Cart
     Navigate To Aruhaz
@@ -459,20 +508,33 @@ Close Cart Modal
 
 Fill Delivery Form
     [Arguments]
-    ...    ${name}=Teszt Elek
+    ...    ${lastname}=Nagy
+    ...    ${firstname}=Teszt
     ...    ${email}=teszt@example.com
-    ...    ${address}=Fő utca 1.
-    ...    ${city}=Budapest
-    ...    ${zip}=1051
-    ...    ${phone}=+36301234567
-    Input Text    ${FIELD_NAME}      ${name}
-    Input Text    ${FIELD_EMAIL}     ${email}
-    Input Text    ${FIELD_ADDRESS}   ${address}
-    Input Text    ${FIELD_CITY}      ${city}
-    Input Text    ${FIELD_ZIP}       ${zip}
-    Press Keys    ${FIELD_ZIP}       TAB
-    Sleep    0.3s
-    Input Text    ${FIELD_PHONE}     ${phone}
+    ...    ${utca}=Kossuth utca
+    ...    ${hazszam}=12
+    ...    ${phone}=+36305795513
+    ${modal_open}=    Run Keyword And Return Status
+    ...    Element Should Be Visible    ${CART_MODAL}
+    Run Keyword If    ${modal_open}
+    ...    Wait Until Element Is Not Visible    ${CART_MODAL}    timeout=8s
+    Execute JavaScript    window.scrollTo(0, document.body.scrollHeight)
+    Sleep    1s
+    Wait Until Element Is Visible    id:lastName    timeout=15s
+    Execute JavaScript
+    ...    const s=(id,v)=>{const el=document.getElementById(id);const setter=Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype,'value').set;setter.call(el,v);el.dispatchEvent(new Event('input',{bubbles:true}));el.dispatchEvent(new Event('blur',{bubbles:true}));};
+    ...    s('lastName','${lastname}');s('firstName','${firstname}');s('email','${email}');s('utca','${utca}');s('hazszam','${hazszam}');s('phone','${phone}');
+    Sleep    0.5s
+    Execute JavaScript    document.querySelector('#city .p-dropdown-trigger').click();
+    Sleep    1s
+    Execute JavaScript
+    ...    const input = document.querySelector('.p-dropdown-panel input');
+    ...    if(input){ const s=Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype,'value').set; s.call(input,'Budapest'); input.dispatchEvent(new Event('input',{bubbles:true})); }
+    Sleep    1s
+    Execute JavaScript
+    ...    const item=[...document.querySelectorAll('.p-dropdown-item')].find(el=>el.textContent.includes('Budapest'));
+    ...    if(item) item.click();
+    Sleep    0.5s
 
 Fill Payment Form
     [Arguments]
@@ -509,3 +571,8 @@ Assert Overlay Message Contains
     ${msg}=    Get Text    ${OVERLAY_MSG}
     Should Contain    ${msg}    ${expected}
     Click Element    ${OVERLAY_CLOSE}
+
+Click Gyik Item
+    [Arguments]    ${index}
+    Execute JavaScript    document.querySelectorAll('summary.gyik-kerdes')[${index}].click()
+    Sleep    0.3s
