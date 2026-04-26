@@ -57,7 +57,20 @@ class FelhasznaloAdatokSeeder extends Seeder
                 'kartyaszam' => encrypt('1111222253334444'),
             ]
         );
-
+        FelhasznaloAdatok::factory()->create(
+            [
+                'felhasznalo_id' => 4,
+                'szerepkor' => 'sima',
+                'vezeteknev' => 'test',
+                'keresztnev' => 'user',
+                'varos' => 2,
+                'utca' => 'Idk Street',
+                'hazszam' => 5,
+                'emeletAjto' => '1/A',
+                'telefonszam' => '+36709512357',
+                'kartyaszam' => encrypt('1111222253334444'),
+            ]
+        );
         FelhasznaloAdatok::factory()->count(30)->create();
         $this->command->info('FelhasznaloAdatok table seeded successfully!');
     }
