@@ -9,14 +9,15 @@
   - Fizetés✅
   - Single Item✅
   - Rólunk✅
-  - Blog✅ -> még lehetne bőviteni -> másik fiók chat
+  - Blog✅
   - Single Blog✅
   - Komment✅
   - Dashboard✅
-  - Mintakésztő
+  - Mintakésztő✅
   - Reset jelszó?
   - NotFound✅
-  - Email verify/already verified
+  - Email verify/already verified✅
+  
 - \[ ] Az oldal dokumenálása
 - \[ ] Optimalizálás
 

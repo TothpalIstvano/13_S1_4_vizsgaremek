@@ -135,6 +135,23 @@ ${OVERLAY}              xpath://div[contains(@class,"overlay")]
 ${OVERLAY_MSG}          xpath://div[contains(@class,"overlay-content")]/p
 ${OVERLAY_CLOSE}        xpath://button[contains(@class,"overlay-button")]
 
+#Blog
+${REPORT_MODAL}         xpath://div[contains(@class,"report-modal")]
+${REPORT_SUBTITLE}      xpath://p[contains(@class,"report-modal-subtitle")]
+${REPORT_SUBMIT}        xpath://button[contains(@class,"report-btn-submit")]
+${REPORT_CANCEL}        xpath://button[contains(@class,"report-btn-cancel")]
+${REPORT_CLOSE_X}       xpath://button[contains(@class,"report-close-btn")]
+${REPORT_BACKDROP}      xpath://div[contains(@class,"report-backdrop")]
+${REPORT_SUCCESS}       xpath://div[contains(@class,"report-success")]
+${REPORT_TEXTAREA}      xpath://textarea[contains(@class,"report-textarea")]
+${CONFIRM_MODAL}        xpath://div[contains(@class,"confirm-modal")]
+${CONFIRM_CANCEL}       xpath://button[contains(@class,"confirm-btn cancel")]
+${CONFIRM_DANGER}       xpath://button[contains(@class,"confirm-btn danger")]
+${COMMENT_ITEM}         xpath://div[contains(@class,"comment-item")]
+${COMMENT_REPORT_BTN}   xpath://div[contains(@class,"comment-item")]//button[contains(@class,"report-btn")]
+${COMMENT_DELETE_BTN}   xpath://div[contains(@class,"comment-item")]//button[contains(@class,"delete-btn")]
+${COMMENT_CHAIN_BTN}    xpath://div[contains(@class,"comment-item")]//button[contains(@class,"chain-delete-btn")]
+
 *** Keywords ***
 Open Registration Page
     Open Browser    ${URL}    ${BROWSER}
@@ -576,3 +593,25 @@ Click Gyik Item
     [Arguments]    ${index}
     Execute JavaScript    document.querySelectorAll('summary.gyik-kerdes')[${index}].click()
     Sleep    0.3s
+
+Navigate To First Non-Own Post
+    Navigate To Blog Page
+    Wait Until Element Is Visible    ${MEGTEKINTES_BTN}    timeout=10s
+    Click Element    ${MEGTEKINTES_BTN}
+    Wait Until Location Contains    /blog/    timeout=10s
+    Wait Until Element Is Visible    xpath://div[contains(@class,"blog-content")]    timeout=10s
+
+Login As Admin
+    Switch To Login
+    Fill Login Form    ${ADMIN_EMAIL}    ${ADMIN_PASS}
+    Execute JavaScript    document.querySelector('.b-container button[type="submit"]').click()
+    Wait Until Location Contains    /profil    timeout=20s
+
+Submit Comment And Wait
+    [Arguments]    ${text}=Automatikus teszt komment
+    Wait Until Element Is Visible    xpath://textarea[contains(@class,"comment-textarea")]    timeout=10s
+    Input Text    xpath://textarea[contains(@class,"comment-textarea")]    ${text}
+    Wait Until Element Is Enabled    xpath://button[contains(@class,"comment-submit-btn")]    timeout=5s
+    Click Element    xpath://button[contains(@class,"comment-submit-btn")]
+    Sleep    2s
+    Wait Until Element Is Visible    ${COMMENT_ITEM}    timeout=10s
